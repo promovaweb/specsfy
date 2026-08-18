@@ -19,6 +19,8 @@ interface CheckOptions {
   nodeVersion?: string;
   skillsOverride?: string;
   skillsLauncher?: string;
+  platform?: NodeJS.Platform;
+  pathext?: string;
 }
 
 /** Informa se a versão do runtime satisfaz o contrato do pacote. */
@@ -42,16 +44,18 @@ export async function resolveSkillsCommand(
   path = process.env.PATH ?? "",
   override = process.env.SPECSFY_SKILLS_CLI,
   launcher = process.argv[1],
+  platform: NodeJS.Platform = process.platform,
+  pathext = process.env.PATHEXT,
 ): Promise<string[] | undefined> {
   if (override) {
     const executable = resolve(override);
     return (await isExecutable(executable)) ? [executable] : undefined;
   }
-  const skills = await findExecutable("skills", path);
+  const skills = await findExecutable("skills", path, platform, pathext);
   if (skills) return [skills];
   const packaged = await resolvePackagedSkills(launcher);
   if (packaged) return [process.execPath, packaged];
-  const npx = await findExecutable("npx", path);
+  const npx = await findExecutable("npx", path, platform, pathext);
   return npx ? [npx, "--yes", "skills"] : undefined;
 }
 
@@ -62,12 +66,16 @@ export async function checkPrerequisites(
 ): Promise<PrerequisiteCheck[]> {
   const path = options.path ?? process.env.PATH ?? "";
   const nodeVersion = options.nodeVersion ?? process.versions.node;
-  const git = await findExecutable("git", path);
-  const npm = await findExecutable("npm", path);
+  const platform = options.platform ?? process.platform;
+  const pathext = options.pathext ?? process.env.PATHEXT;
+  const git = await findExecutable("git", path, platform, pathext);
+  const npm = await findExecutable("npm", path, platform, pathext);
   const skills = await resolveSkillsCommand(
     path,
     options.skillsOverride ?? process.env.SPECSFY_SKILLS_CLI,
     options.skillsLauncher ?? process.argv[1],
+    platform,
+    pathext,
   );
   const target = resolve(project);
   let projectOk = false;
@@ -129,13 +137,35 @@ export function assertPrerequisites(
   );
 }
 
-async function findExecutable(name: string, path: string): Promise<string | undefined> {
+async function findExecutable(
+  name: string,
+  path: string,
+  platform: NodeJS.Platform = process.platform,
+  pathext = process.env.PATHEXT,
+): Promise<string | undefined> {
   for (const directory of path.split(delimiter)) {
     if (!directory) continue;
-    const executable = join(directory, name);
-    if (await isExecutable(executable)) return executable;
+    for (const extension of executableExtensions(platform, pathext)) {
+      const executable = join(directory, `${name}${extension}`);
+      if (await isExecutable(executable)) return executable;
+    }
   }
   return undefined;
+}
+
+/**
+ * Sufixos que tornam um arquivo executável na plataforma corrente.
+ *
+ * No Windows um comando do PATH é um arquivo com extensão declarada em
+ * `PATHEXT`; procurar apenas pelo nome nunca encontra `git.exe`.
+ */
+function executableExtensions(platform: NodeJS.Platform, pathext: string | undefined): string[] {
+  if (platform !== "win32") return [""];
+  const declared = (pathext ?? ".COM;.EXE;.BAT;.CMD")
+    .split(";")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return ["", ...declared];
 }
 
 /** Localiza a dependência `skills` a partir do launcher instalado do Specsfy. */
