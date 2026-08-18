@@ -98,4 +98,54 @@ describe("pré-requisitos", () => {
       skills,
     ]);
   });
+  test("encontra executáveis com extensão do PATHEXT no Windows", async () => {
+    const root = await temporaryDirectory();
+    const bin = join(root, "bin");
+    const project = join(root, "project");
+    await mkdir(bin);
+    await mkdir(project);
+    for (const name of ["git.EXE", "skills.CMD", "npm"]) {
+      const executable = join(bin, name);
+      await writeFile(executable, "#!/bin/sh\nexit 0\n");
+      await chmod(executable, 0o755);
+    }
+
+    const checks = await checkPrerequisites(project, {
+      path: bin,
+      nodeVersion: "22.20.0",
+      platform: "win32",
+      pathext: ".COM;.EXE;.BAT;.CMD",
+    });
+
+    expect(checks.every(({ ok }) => ok)).toBe(true);
+    expect(checks.find(({ name }) => name === "git")?.command).toEqual([
+      join(bin, "git.EXE"),
+    ]);
+    expect(checks.find(({ name }) => name === "skills")?.command).toEqual([
+      join(bin, "skills.CMD"),
+    ]);
+    expect(checks.find(({ name }) => name === "npm")?.command).toEqual([
+      join(bin, "npm"),
+    ]);
+  });
+
+  test("não aceita sufixo do Windows em plataforma POSIX", async () => {
+    const root = await temporaryDirectory();
+    const bin = join(root, "bin");
+    await mkdir(bin);
+    const executable = join(bin, "git.EXE");
+    await writeFile(executable, "#!/bin/sh\nexit 0\n");
+    await chmod(executable, 0o755);
+
+    const checks = await checkPrerequisites(root, {
+      path: bin,
+      nodeVersion: "22.20.0",
+      platform: "linux",
+      skillsLauncher: "",
+    });
+
+    expect(checks.find(({ name }) => name === "git")).toMatchObject({
+      ok: false,
+    });
+  });
 });
