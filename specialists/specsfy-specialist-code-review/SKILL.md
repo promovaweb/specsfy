@@ -96,6 +96,9 @@ description: Revisar diffs, branches e PRs por contrato, correção, segurança,
 - `$specsfy-specialist-merge-conflict-resolution` quando a revisão precisar
   ser refeita após uma resolução de conflito, já que a resolução pode mudar
   o comportamento resultante.
+- `$specsfy-specialist-hermes` quando o diff for sobre autoria ou configuração
+  de skills, plugins, cron ou config do Hermes Agent — a fronteira dele é o
+  artefato do runtime, não a revisão de código em geral.
 
 Leia [references/standards.md](references/standards.md) para as lentes de
 revisão, a escala de severidade, o formato de achado e as fontes oficiais de

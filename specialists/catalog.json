@@ -30,6 +30,7 @@
     {"name":"specsfy-specialist-prototyping","description":"Protótipos descartáveis para reduzir incerteza técnica ou de interface.","category":"engineering","tags":["prototype","spike","experiment"],"detect":{"files":[],"dependencies":[]}},
     {"name":"specsfy-specialist-technical-research","description":"Pesquisa técnica rastreável em fontes primárias e artefatos observáveis.","category":"engineering","tags":["research","evidence","documentation"],"detect":{"files":[],"dependencies":[]}},
     {"name":"specsfy-specialist-merge-conflict-resolution","description":"Resolução de conflitos Git preservando intenção e verificando integração.","category":"engineering","tags":["git","merge","rebase"],"detect":{"files":[],"dependencies":[]}},
-    {"name":"specsfy-specialist-gitflow","description":"Gitflow: branches main/develop/feature/release/hotfix, nomes, política de merge e ciclo de release.","category":"engineering","tags":["git","gitflow","branching"],"detect":{"files":[],"dependencies":[]}}
+    {"name":"specsfy-specialist-gitflow","description":"Gitflow: branches main/develop/feature/release/hotfix, nomes, política de merge e ciclo de release.","category":"engineering","tags":["git","gitflow","branching"],"detect":{"files":[],"dependencies":[]}},
+    {"name":"specsfy-specialist-hermes","description":"Hermes Agent: autorar skills/plugins e configurar modelos, providers, gateway, cron e CLI.","category":"platform","tags":["hermes","agents","automation","skills"],"detect":{"files":[".hermes.md","HERMES.md"],"dependencies":[]}}
   ]
 }

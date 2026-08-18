@@ -39,6 +39,7 @@ skills nunca instala o catálogo inteiro automaticamente.
 | frontend | React, Astro, Next.js, TypeScript e Tailwind CSS |
 | interface | shadcn/ui, UI, UX e acessibilidade web |
 | plataforma | Docker, Docker Swarm, Ansible e engenharia de entrega |
+| agentes | Hermes Agent (autoria de skills/plugins e operação do runtime) |
 | qualidade | segurança, observabilidade e performance |
 | design técnico | arquitetura e modelagem de domínio |
 | engenharia | code review, debugging, prototipação, pesquisa e conflitos Git |
