@@ -104,6 +104,8 @@ description: Projetar, implementar e revisar soluções Supabase — Postgres, A
   skill governa os contratos gerenciados da plataforma Supabase.
 - `$specsfy-specialist-postgres` para modelagem de schema, índice, plano de
   query e isolation por trás do Supabase.
+- `$specsfy-specialist-rls-review` depois que as policies existirem: ele as
+  ataca como um tenant hostil e prova o isolamento com pgTAP executável.
 - `$specsfy-specialist-application-security` para modelagem de ameaça de
   JWT, claims e superfícies de autorização além de RLS.
 - `$specsfy-specialist-laravel` quando o mesmo projeto tiver um backend

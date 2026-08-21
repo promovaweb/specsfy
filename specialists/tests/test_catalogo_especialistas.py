@@ -30,6 +30,7 @@ EXPECTED_SKILLS = {
     "specsfy-specialist-react",
     "specsfy-specialist-react-ui-components",
     "specsfy-specialist-redis",
+    "specsfy-specialist-rls-review",
     "specsfy-specialist-shadcn-ui",
     "specsfy-specialist-software-architecture",
     "specsfy-specialist-supabase",

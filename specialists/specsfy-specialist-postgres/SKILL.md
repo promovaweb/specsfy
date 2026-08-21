@@ -110,6 +110,9 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 - `$specsfy-specialist-redis` quando parte do estado consultado estiver em
   cache fora do banco — o Postgres continua sendo a fonte de verdade que o
   Redis nunca substitui.
+- `$specsfy-specialist-rls-review` quando a política de linha já existir e a
+  pergunta for se ela realmente isola um tenant do outro; a prova vem em
+  pgTAP, não na leitura do predicado.
 - `$specsfy-specialist-docker` para empacotar e operar o servidor Postgres
   em container (imagem oficial, volume de dados, healthcheck) — decisão de
   schema, índice e plano continuam aqui.
