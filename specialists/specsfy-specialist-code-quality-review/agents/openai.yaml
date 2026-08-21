@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Revisão de qualidade de código"
+  short_description: "Conformidade do código recém-escrito, por severidade"
+  default_prompt: "Use $specsfy-specialist-code-quality-review para orientar esta tarefa com padrões e validação especializados."
