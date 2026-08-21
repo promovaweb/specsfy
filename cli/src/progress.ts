@@ -116,8 +116,18 @@ async function parseSpec(path: string): Promise<SpecProgress> {
   let totalTasks = 0;
   let completedItems = 0;
   let totalItems = 0;
+  let insideFence = false;
   const fields = new Map<string, string>();
   for (const line of content.split(/\r?\n/u)) {
+    const trimmed = line.trimStart();
+    if (
+      trimmed.startsWith("```") ||
+      trimmed.startsWith("~~~")
+    ) {
+      insideFence = !insideFence;
+      continue;
+    }
+    if (insideFence) continue;
     if (line.startsWith("# ") && title === slug) title = line.slice(2).trim();
     const field = FIELD.exec(line) ?? TABLE_FIELD.exec(line);
     if (field?.[1] && field[2]) {

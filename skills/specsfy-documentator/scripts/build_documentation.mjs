@@ -6,7 +6,7 @@ import { dirname, extname, join, relative, resolve } from "node:path";
 
 const START = "<!-- specsfy:documentator:start -->";
 const END = "<!-- specsfy:documentator:end -->";
-const ignored = new Set([".git", ".venv", "build", "coverage", "dist", "docs", "node_modules", "storage", "vendor"]);
+const ignored = new Set([".git", ".venv", ".next", ".turbo", ".temp", "build", "coverage", "dist", "docs", "node_modules", "playwright-report", "storage", "test-results", "vendor"]);
 const args = process.argv.slice(2);
 const project = resolve(args.includes("--project") ? args[args.indexOf("--project") + 1] : process.cwd());
 const check = args.includes("--check");
