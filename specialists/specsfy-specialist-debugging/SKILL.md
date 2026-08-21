@@ -93,6 +93,8 @@ description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de
 - `$specsfy-specialist-performance-engineering` quando o sintoma for
   degradação sem erro funcional — o diagnóstico de causa raiz aqui pode
   entregar a esta skill a decisão de qual otimização vale o custo.
+- `$specsfy-specialist-code-quality-review` encaminha para cá o achado que
+  não se explica sem reprodução, e recebe de volta a causa raiz.
 - `$specsfy-specialist-code-review` para revisar a correção e o teste de
   regressão antes do merge.
 

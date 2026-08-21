@@ -90,6 +90,9 @@ description: Revisar diffs, branches e PRs por contrato, correção, segurança,
 - `$specsfy-specialist-application-security` quando o diff tocar identidade,
   autorização, dado sensível ou entrada externa — a revisão de segurança
   aprofunda o que esta skill só sinaliza.
+- `$specsfy-specialist-code-quality-review` roda antes, sobre o código que
+  acabou de ser escrito, cobrando os padrões que o próprio projeto
+  registrou; esta skill julga o diff fechado por risco e contrato.
 - `$specsfy-specialist-software-architecture` quando o achado for sobre
   acoplamento, boundary ou decisão estrutural que o diff expõe, não apenas
   sobre o diff em si.

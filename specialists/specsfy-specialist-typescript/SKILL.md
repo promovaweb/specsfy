@@ -108,6 +108,9 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
   tipados.
 - `$specsfy-specialist-web-api-design` quando o tipo espelha um contrato de
   API consumido por outro serviço — a fonte de verdade do contrato vive lá.
+- `$specsfy-specialist-code-quality-review` quando o tipo dinâmico ou a
+  asserção aparecerem numa revisão de conformidade do código recém-escrito;
+  a decisão de modelagem continua aqui.
 - `$specsfy-specialist-code-review` para revisão ampla além de tipos, quando
   a mudança também afeta lógica de negócio ou arquitetura.
 

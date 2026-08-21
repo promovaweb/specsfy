@@ -114,7 +114,7 @@ mapa antes de serem concluídas.
 | plataforma | Docker, Docker Swarm, Ansible e engenharia de entrega |
 | qualidade | segurança, observabilidade e performance |
 | design técnico | arquitetura e modelagem de domínio |
-| engenharia | code review, debugging, prototipação, pesquisa e conflitos Git |
+| engenharia | code review, revisão de qualidade, debugging, prototipação, pesquisa e conflitos Git |
 
 Cada especialista explica o fluxo de trabalho e as validações próprias da sua
 tecnologia. Uma mudança em Eloquent pode combinar Laravel e Postgres, por
@@ -158,6 +158,7 @@ manual quando a entrega pedir aquele domínio.
 | Segurança de Aplicações | Ameaças, controles, segredos e verificações de segurança. |
 | Performance | Orçamentos, medição, profiling, carga e regressões. |
 | Code Review | Revisão técnica guiada pelo contrato e pelos testes. |
+| Revisão de Qualidade | Conformidade do código recém-escrito com os padrões do projeto, por severidade. |
 | Debugging | Diagnóstico de bugs, falhas intermitentes e regressões. |
 | Prototipação | Protótipos descartáveis para dúvidas técnicas ou de interface. |
 | Pesquisa Técnica | Pesquisa rastreável em fontes primárias e artefatos observáveis. |
