@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy · Hermes Agent"
+  short_description: "Autorar skills/plugins e operar o Hermes Agent"
+  default_prompt: "Use $specsfy-specialist-hermes para orientar esta tarefa com padrões e validação especializados do Hermes Agent."

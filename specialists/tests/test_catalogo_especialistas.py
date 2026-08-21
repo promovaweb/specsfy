@@ -20,6 +20,7 @@ EXPECTED_SKILLS = {
     "specsfy-specialist-docker-swarm",
     "specsfy-specialist-domain-modeling",
     "specsfy-specialist-gitflow",
+    "specsfy-specialist-hermes",
     "specsfy-specialist-laravel",
     "specsfy-specialist-merge-conflict-resolution",
     "specsfy-specialist-nextjs",
