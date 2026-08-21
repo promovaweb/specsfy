@@ -10,6 +10,9 @@ import {
 } from "../src/progress.js";
 import { temporaryDirectory } from "./helpers.js";
 
+const NEWLINE = String.fromCharCode(10);
+const FENCE = "```";
+
 describe("progresso das specs", () => {
   test("lê layouts canônico e legado e consolida checklists", async () => {
     const project = await temporaryDirectory();
@@ -51,6 +54,39 @@ describe("progresso das specs", () => {
       effort: 6,
       execution_profile: "standard",
     });
+  });
+
+  test("não conta item de checklist dentro de bloco de código", async () => {
+    const project = await temporaryDirectory();
+    const spec = join(project, "specs/draft/0003-exemplo/spec.md");
+    await mkdir(join(spec, ".."), { recursive: true });
+    await writeFile(
+      spec,
+      "# Exemplo" +
+        NEWLINE.repeat(2) +
+        "| Status | Implementing |" +
+        NEWLINE +
+        "| Definition Gate | Passed |" +
+        NEWLINE.repeat(2) +
+        // O template mostra o formato do checklist dentro de uma cerca. Essas
+        // linhas não são trabalho: ninguém pode marcá-las sem destruir o
+        // exemplo, e contá-las deixa qualquer spec presa abaixo de 100%.
+        FENCE +
+        NEWLINE +
+        "  - [ ] **PREP**: Confirmar escopo." +
+        NEWLINE +
+        "  - [ ] **EXECUTE**: Produzir a entrega." +
+        NEWLINE +
+        FENCE +
+        NEWLINE.repeat(2) +
+        "- [x] T001 Feita" +
+        NEWLINE,
+    );
+
+    const [projected] = await scanSpecs(project);
+
+    expect(projected?.totalItems).toBe(1);
+    expect(projected?.completedItems).toBe(1);
   });
 
   test("usa gates quando a spec não possui checklist", async () => {
