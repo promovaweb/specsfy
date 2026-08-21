@@ -111,6 +111,9 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - `$specsfy-specialist-postgres` e `$specsfy-specialist-supabase` para
   modelagem de autorização por linha/tenant no nível de dado (RLS,
   constraints).
+- `$specsfy-specialist-rls-review` para atacar e provar o isolamento entre
+  tenants dentro do banco, depois que a modelagem de autorização por linha
+  estiver escrita.
 - `$specsfy-specialist-delivery-engineering` para hardening de credenciais
   de pipeline, assinatura de artefato e supply chain.
 - `$specsfy-specialist-web-api-design` quando o risco nasce do desenho do

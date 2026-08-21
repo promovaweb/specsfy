@@ -112,7 +112,7 @@ mapa antes de serem concluídas.
 | frontend | React, Astro, Next.js, TypeScript e Tailwind CSS |
 | interface | experiência de interface, shadcn/ui, UI, UX e acessibilidade web |
 | plataforma | Docker, Docker Swarm, Ansible e engenharia de entrega |
-| qualidade | segurança, observabilidade e performance |
+| qualidade | segurança, revisão de RLS, observabilidade e performance |
 | design técnico | arquitetura e modelagem de domínio |
 | engenharia | code review, debugging, prototipação, pesquisa e conflitos Git |
 
@@ -156,6 +156,7 @@ manual quando a entrega pedir aquele domínio.
 | Observabilidade | Logs, métricas, traces, SLOs e alertas acionáveis. |
 | Engenharia de Entrega | CI/CD, artefatos, promoções, migrations, rollout e rollback. |
 | Segurança de Aplicações | Ameaças, controles, segredos e verificações de segurança. |
+| Revisão de RLS | Ataque entre tenants, catálogo de brechas e prova de isolamento em pgTAP. |
 | Performance | Orçamentos, medição, profiling, carga e regressões. |
 | Code Review | Revisão técnica guiada pelo contrato e pelos testes. |
 | Debugging | Diagnóstico de bugs, falhas intermitentes e regressões. |

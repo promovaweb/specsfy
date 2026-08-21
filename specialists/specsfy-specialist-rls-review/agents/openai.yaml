@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Revisão de RLS"
+  short_description: "Ataque e prova de isolamento entre tenants"
+  default_prompt: "Use $specsfy-specialist-rls-review para orientar esta tarefa com padrões e validação especializados."
