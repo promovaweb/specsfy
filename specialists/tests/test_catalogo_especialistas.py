@@ -13,6 +13,7 @@ EXPECTED_SKILLS = {
     "specsfy-specialist-ansible",
     "specsfy-specialist-application-security",
     "specsfy-specialist-astro",
+    "specsfy-specialist-code-quality-review",
     "specsfy-specialist-code-review",
     "specsfy-specialist-data-modeling",
     "specsfy-specialist-debugging",
