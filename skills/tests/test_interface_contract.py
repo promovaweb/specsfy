@@ -277,6 +277,37 @@ class InterfaceContractTests(unittest.TestCase):
             self.assertIn("src/app/clientes/page.tsx", report["current_routes"])
             self.assertIn("src/components/ClientForm.tsx", report["current_components"])
 
+    def test_inspects_each_interface_candidate_without_global_budget_starvation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            project = Path(temporary)
+            routes = project / "app"
+            components = project / "src/components"
+            routes.mkdir(parents=True)
+            components.mkdir(parents=True)
+            for index in range(80):
+                (routes / f"route-{index:03}.tsx").write_text(
+                    "export default function Page() {}",
+                    encoding="utf-8",
+                )
+                (components / f"Component{index:03}.tsx").write_text(
+                    "export function Component() {}",
+                    encoding="utf-8",
+                )
+
+            completed = subprocess.run(
+                ["node", str(INSPECT_INTERFACE), "--project", str(project)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, completed.returncode, completed.stderr)
+            report = json.loads(completed.stdout)
+            self.assertIn(
+                "src/components/Component079.tsx",
+                report["current_components"],
+            )
+
     def test_setup_maps_all_relevant_sources_before_discovery(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             project = Path(temporary)
