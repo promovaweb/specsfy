@@ -23,7 +23,17 @@ async function files(path, listed = []) {
     if (ignored.has(entry.name) || listed.length >= 80) continue;
     const target = join(path, entry.name);
     if (entry.isDirectory()) await files(target, listed);
-    else listed.push(relative(project, target));
+    else listed.push(relative(project, target).replaceAll("\\", "/"));
+  }
+  return listed;
+}
+
+async function filesFrom(roots) {
+  const listed = [];
+  for (const candidateRoot of roots) {
+    for (const file of await files(join(project, candidateRoot))) {
+      if (!listed.includes(file)) listed.push(file);
+    }
   }
   return listed;
 }
@@ -33,12 +43,11 @@ const composer = await json(join(project, "composer.json"));
 const packages = { ...(packageJson.dependencies ?? {}), ...(packageJson.devDependencies ?? {}) };
 const composerPackages = { ...(composer.require ?? {}), ...(composer["require-dev"] ?? {}) };
 const selected = (names) => names.filter((name) => name in packages || name in composerPackages);
-const sourceFiles = await files(project);
 const has = (path) => existsSync(join(project, path));
 const routeRoots = ["src/app", "src/pages", "app", "pages", "resources/js/Pages", "routes"];
 const componentRoots = ["src/components", "components", "resources/js/Components", "app/components"];
-const routes = sourceFiles.filter((path) => routeRoots.some((root) => path.startsWith(`${root}/`))).slice(0, 40);
-const components = sourceFiles.filter((path) => componentRoots.some((root) => path.startsWith(`${root}/`))).slice(0, 40);
+const routes = await filesFrom(routeRoots);
+const components = await filesFrom(componentRoots);
 
 const report = {
   project,

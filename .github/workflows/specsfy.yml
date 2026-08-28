@@ -41,6 +41,31 @@ jobs:
       - run: python3 -B -m unittest discover -s tests -p 'test_*.py'
       - run: uv run --quiet --with behave==1.3.3 behave tests/features --no-capture
 
+  windows-portability-focal:
+    name: Windows portability - focal scripts only
+    # Focal portability guard; this job does not certify the full Windows suite.
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: '3.12.11'
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '22.12'
+      - name: Run only the nine focal portability tests, not the full Windows suite
+        run: >-
+          python -X utf8 -B -m unittest
+          skills.tests.test_interface_contract.InterfaceContractTests.test_setup_maps_all_relevant_sources_before_discovery
+          skills.tests.test_interface_contract.InterfaceContractTests.test_inspects_the_existing_interface_stack_before_discovery
+          skills.tests.test_interface_contract.InterfaceContractTests.test_inspects_each_interface_candidate_without_global_budget_starvation
+          skills.tests.test_update_spec.UpdateSpecTests.test_analyzer_reopens_only_the_acts_invalidated_by_the_change
+          skills.tests.test_progress.ProgressTests.test_filters_a_spec_by_slug_with_platform_native_paths
+          skills.tests.test_minimum_spec_coverage.MinimumTddCoverageTests.test_requires_three_distinct_tdd_case_markers_per_traceable_item
+          skills.tests.test_minimum_spec_coverage.MinimumTddCoverageTests.test_accepts_three_distinct_tdd_case_markers_per_traceable_item
+          skills.tests.test_minimum_spec_coverage.MinimumTddCoverageTests.test_one_shared_marker_counts_as_one_tdd_case
+          skills.tests.test_bdd_runners.BddRunnerTests.test_tdd_marker_covers_acceptance_informed_by_bdd
+
   cli:
     runs-on: ubuntu-24.04
     permissions:
