@@ -5,7 +5,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { extname, join, relative, resolve } from "node:path";
 
 const skipped = new Set([".agents", ".git", ".hg", ".svn", ".venv", "build", "coverage", "dist", "examples", "fixture", "fixtures", "node_modules", "research", "samples", "target", "vendor"]);
-const extensions = new Set([".cs", ".go", ".java", ".js", ".jsx", ".kt", ".php", ".py", ".rb", ".rs", ".ts", ".tsx"]);
+const extensions = new Set([".cjs", ".cs", ".go", ".java", ".js", ".jsx", ".kt", ".mjs", ".php", ".py", ".rb", ".rs", ".ts", ".tsx"]);
 async function walk(directory) { const files = []; for (const item of await readdir(directory, { withFileTypes: true })) { if (skipped.has(item.name)) continue; const path = join(directory, item.name); if (item.isDirectory()) files.push(...await walk(path)); else files.push(path); } return files; }
 const args = process.argv.slice(2); const positional = args.filter((arg) => !arg.startsWith("--") && !/^\d+$/.test(arg)); const [spec, root] = positional;
 const option = (name, fallback) => args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
