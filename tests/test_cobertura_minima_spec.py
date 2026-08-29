@@ -91,6 +91,56 @@ class MinimumCoverageIntegrationTests(unittest.TestCase):
 
             self.assertEqual(0, green.returncode, green.stdout + green.stderr)
 
+
+    def test_traceability_scans_mjs_and_cjs_test_files(self) -> None:
+        """Um pacote Node sem `"type": "module"` precisa usar `.mjs` para ESM."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            spec = root / "specs/specs/0001-example/spec.md"
+            test = root / "tests/example.test.mjs"
+            spec.parent.mkdir(parents=True)
+            test.parent.mkdir(parents=True)
+            spec.write_text(
+                "#### US-001 — Example\n"
+                "#### AC-001 — Example\n"
+                "#### AC-002 — Example\n"
+                "#### AC-003 — Example\n"
+                "- **FR-001**: Example.\n"
+                "- **NFR-001**: Example. **Verificação**: teste.\n",
+                encoding="utf-8",
+            )
+            marker = "US-001 FR-001 NFR-001"
+            test.write_text(
+                f"// SPECSFY: {marker} AC-001\n"
+                "test('first', () => {});\n"
+                f"// SPECSFY: {marker} AC-002\n"
+                "test('second', () => {});\n"
+                f"// SPECSFY: {marker} AC-003\n"
+                "test('third', () => {});\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                ["node", str(TRACE), str(spec), str(root), "--json"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+            self.assertIn('"files_scanned": 1', result.stdout)
+
+    def test_pending_markers_ignore_the_portuguese_word_todo(self) -> None:
+        """`todo` é palavra comum em pt-BR e não pode ser lida como marcador."""
+        portuguese = (
+            "#### US-001 — História\n"
+            "- **PR-001**: todo texto visível é escrito em Português do Brasil.\n"
+        )
+        marker = portuguese + "- **FR-002**: TODO definir o comportamento.\n"
+
+        self.assertNotIn("Marcadores não resolvidos.", self.validate(portuguese))
+        self.assertIn("Marcadores não resolvidos.", self.validate(marker))
+
     def test_template_framework_and_docs_publish_same_minimum(self) -> None:
         template = (SKILLS / "templates/Spec.md").read_text(encoding="utf-8")
         framework = (SKILLS / "Spec.md").read_text(encoding="utf-8")
