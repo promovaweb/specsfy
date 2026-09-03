@@ -4,6 +4,32 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-09-03
+
+### Adicionado
+
+- Define `VERSION` na raiz como fonte única para todo o ecossistema Specsfy.
+- Inclui uma verificação automática entre CLI, ebook, manifests e artefatos.
+- Publica a documentação completa do deploy com Docker Swarm, Ansible,
+  Laravel Octane e Open Swoole.
+
+### Alterado
+
+- Alinha framework, CLI, skills, especialistas e ebook na versão `0.20.0`.
+- Mantém Hub e website em ciclos de versão independentes.
+
+### Segurança
+
+- Documenta Ansible Vault e Docker Secrets como meios obrigatórios para
+  valores sensíveis usados no deploy.
+
+### Validação
+
+- `python3 -B -m unittest discover -s tests -p 'test_*.py'`
+- `cd cli && npm run check`
+- `make verify-ebook`
+- `make verify-version`
+
 ## [0.13.0] - 2026-09-03
 
 ### Adicionado

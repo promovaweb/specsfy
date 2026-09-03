@@ -7,7 +7,7 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 DOCS_ROOT="$ROOT/docs/user"
 EBOOK_ROOT="$ROOT/ebook"
 BUILD_ROOT="$SCRIPT_DIR/build"
-VERSION_FILE="$EBOOK_ROOT/VERSION"
+VERSION_FILE="$ROOT/VERSION"
 ORDER_FILE="$DOCS_ROOT/reading-order.txt"
 MANIFEST="$EBOOK_ROOT/build.json"
 PDF_STYLE="$SCRIPT_DIR/pdf.css"
@@ -31,10 +31,10 @@ relative_path() {
   realpath --relative-to="$ROOT" "$1"
 }
 
-[ -f "$VERSION_FILE" ] || fail "ebook/VERSION ausente."
+[ -f "$VERSION_FILE" ] || fail "VERSION ausente na raiz."
 VERSION="$(tr -d '[:space:]' < "$VERSION_FILE")"
 [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] \
-  || fail "ebook/VERSION deve conter SemVer estável, por exemplo 1.0.0."
+  || fail "VERSION deve conter SemVer estável, por exemplo 1.0.0."
 
 STEM="Specsfy-Guia-do-Usuario-v$VERSION"
 PDF_OUT="$EBOOK_ROOT/$STEM.pdf"

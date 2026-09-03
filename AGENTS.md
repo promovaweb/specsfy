@@ -51,6 +51,9 @@ independentes.
 - Especialistas vivem em `specialists/`; não os instale na raiz do monorepo.
 - O CLI vive em `cli/` e recusa esta raiz como projeto consumidor.
 - Detalhes operacionais da aplicação interna permanecem em `example/README.md`.
+- `VERSION` na raiz é a única fonte da versão pública do Specsfy. CLI, skills,
+  especialistas, ebook, manifests, tag e GitHub Release usam esse mesmo SemVer.
+  O Hub e o website ficam fora desse ciclo e mantêm versões próprias.
 
 Não crie `plan.md`, `tasks.md`, `research.md`, `data-model.md` ou outra fonte
 normativa paralela.
@@ -105,6 +108,7 @@ Na raiz:
 ```bash
 python3 -B -m unittest discover -s tests -p 'test_*.py'
 uv run --quiet --with behave behave tests/features --no-capture
+make verify-version
 ```
 
 Execute também os validadores declarados no `AGENTS.md` de cada módulo alterado.

@@ -48,15 +48,25 @@ def prepare(cli: Path, version: str, release_date: str, notes_file: Path) -> Non
         raise ValueError(f"data ISO inválida: {release_date}") from error
 
     package_json = cli / "package.json"
+    framework_version = cli.parent / "VERSION"
     version_source = cli / "src" / "version.ts"
     changelog = cli / "CHANGELOG.md"
-    for source in (package_json, version_source, changelog, notes_file):
+    for source in (
+        framework_version,
+        package_json,
+        version_source,
+        changelog,
+        notes_file,
+    ):
         if not source.is_file():
             raise ValueError(f"arquivo obrigatório ausente: {source}")
 
     package_payload = json.loads(package_json.read_text(encoding="utf-8"))
     version_text = version_source.read_text(encoding="utf-8")
     package_version = package_payload.get("version")
+    framework_version_value = framework_version.read_text(
+        encoding="utf-8"
+    ).strip()
     source_match = re.search(
         r'(?m)^export const VERSION = "(\d+\.\d+\.\d+)";$', version_text
     )
@@ -64,6 +74,8 @@ def prepare(cli: Path, version: str, release_date: str, notes_file: Path) -> Non
         raise ValueError("fontes de versão do pacote não são reconhecíveis")
     if package_version != source_match.group(1):
         raise ValueError("fontes de versão atuais divergem")
+    if framework_version_value != package_version:
+        raise ValueError("VERSION da raiz diverge das fontes do CLI")
     current_version = stable_version(package_version)
     if next_version <= current_version:
         raise ValueError(
@@ -85,6 +97,7 @@ def prepare(cli: Path, version: str, release_date: str, notes_file: Path) -> Non
     updated_changelog = changelog_text.replace(UNRELEASED, release_section, 1)
 
     package_payload["version"] = version
+    framework_version.write_text(f"{version}\n", encoding="utf-8")
     package_json.write_text(
         json.dumps(package_payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",

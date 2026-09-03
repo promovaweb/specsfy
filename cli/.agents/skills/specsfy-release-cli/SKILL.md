@@ -1,12 +1,16 @@
 ---
 name: specsfy-release-cli
-description: Publicar uma versão estável do Specsfy CLI a partir do monorepo promovaweb/specsfy, mantendo pacote, executável, CHANGELOG.md, commit, tag e GitHub Release coerentes. Use quando a pessoa pedir para lançar ou retomar uma versão do CLI. Não use para pré-releases nem apenas para atualizar o CLI de um consumidor.
+description: Publicar uma versão estável do Specsfy a partir do monorepo promovaweb/specsfy, mantendo VERSION, CLI, skills, especialistas, ebook, changelog, tag e GitHub Release com o mesmo SemVer. Use quando a pessoa pedir para lançar ou retomar uma versão do Specsfy. Não use para pré-releases nem para atualizar somente um projeto consumidor.
 ---
 
-# Publicar o Specsfy CLI
+# Publicar o Specsfy
 
 Executar na raiz do checkout oficial. Exigir versão `X.Y.Z`, notas
 confirmadas e autorização explícita antes de push.
+
+`VERSION` na raiz é a fonte única. Skills e especialistas recebem a versão da
+tag do monorepo, sem arquivos de versão próprios. Hub e website não participam
+desse número.
 
 ## 1. Classificar o estado
 
@@ -49,31 +53,39 @@ node dist/main.js --help
 ./bin/specsfy --version
 npm publish --dry-run
 cd ..
+make ebook
+make verify-ebook
+make verify-version
 python3 -B \
   cli/.agents/skills/specsfy-release-cli/scripts/release_changelog.py extract \
   --changelog cli/CHANGELOG.md --version X.Y.Z \
   --output /caminho/release-notes.md
 ```
 
-Exigir `X.Y.Z` em `package.json`, `src/version.ts`, `package-lock.json`, CLI
-instalado, binário e `bin/specsfy.build.json`. O changelog promove as notas sob
+Exigir `X.Y.Z` em `VERSION`, `package.json`, `src/version.ts`,
+`package-lock.json`, CLI instalado, binário, `bin/specsfy.build.json`, ebook e
+`ebook/build.json`. O changelog promove as notas sob
 `## [X.Y.Z] - YYYY-MM-DD`.
 
 ## 3. Revisar e versionar
 
-Permitir somente:
+Incluir na entrega:
 
+- `VERSION`;
 - `cli/CHANGELOG.md`;
 - `cli/package.json`;
 - `cli/package-lock.json`;
 - `cli/src/version.ts`;
 - `cli/bin/specsfy`;
 - `cli/bin/specsfy.build.json`.
+- `ebook/build.json` e os artefatos da edição atual;
+- documentação, skills e especialistas alterados pela entrega.
 
 Apresentar notas e diff. Após confirmação:
 
 ```bash
-git add cli/CHANGELOG.md cli/package.json cli/package-lock.json \
+make verify-version
+git add VERSION cli/CHANGELOG.md cli/package.json cli/package-lock.json \
   cli/src/version.ts \
   cli/bin/specsfy cli/bin/specsfy.build.json
 git commit -m "chore(release): vX.Y.Z"

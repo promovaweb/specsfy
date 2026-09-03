@@ -78,7 +78,7 @@ implementarem ou modificarem o framework:
   pessoa precisa conseguir entender para que serve, quando usar, quando não
   usar, quais dados muda e como confirmar o resultado sem consultar o código.
 - Qualquer alteração em `docs/user/`, inclusive imagens: atualize a edição em
-  `ebook/VERSION` conforme SemVer e reconstrua PDF, EPUB e `ebook/build.json`
+  `VERSION` na raiz conforme SemVer e reconstrua PDF, EPUB e `ebook/build.json`
   com `make ebook`.
 - O build conserva somente as cinco edições SemVer mais recentes em `ebook/`.
   A retenção remove apenas PDF e EPUB com o nome canônico e ocorre depois da

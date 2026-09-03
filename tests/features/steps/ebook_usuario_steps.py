@@ -22,7 +22,7 @@ def given_user_documentation(context) -> None:
 
 @given("o arquivo de versão do ebook")
 def given_ebook_version(context) -> None:
-    context.version_path = EBOOK_ROOT / "VERSION"
+    context.version_path = ROOT / "VERSION"
 
 
 @given("seis edições portáteis em um diretório temporário")
@@ -77,7 +77,7 @@ def given_classified_user_pages(context) -> None:
 
 @given("os artefatos portáteis do guia")
 def given_portable_guide_artifacts(context) -> None:
-    context.version = (EBOOK_ROOT / "VERSION").read_text(
+    context.version = (ROOT / "VERSION").read_text(
         encoding="utf-8"
     ).strip()
     context.stem = (
@@ -92,7 +92,7 @@ def given_public_method_chapter(context) -> None:
 
 @when("o contrato editorial do ebook é inspecionado")
 def when_editorial_contract_is_inspected(context) -> None:
-    context.version = (EBOOK_ROOT / "VERSION").read_text(
+    context.version = (ROOT / "VERSION").read_text(
         encoding="utf-8"
     ).strip()
     context.manifest = json.loads(
@@ -156,7 +156,7 @@ def when_pedagogical_path_is_inspected(context) -> None:
 
 @when("os formatos de leitura são inspecionados")
 def when_reading_formats_are_inspected(context) -> None:
-    context.version = (EBOOK_ROOT / "VERSION").read_text(
+    context.version = (ROOT / "VERSION").read_text(
         encoding="utf-8"
     ).strip()
     stem = EBOOK_ROOT / f"Specsfy-Guia-do-Usuario-v{context.version}"

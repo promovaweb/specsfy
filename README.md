@@ -1,5 +1,9 @@
 # Specsfy
 
+O arquivo [`VERSION`](VERSION) define a versão pública única do Specsfy. A
+mesma versão identifica o framework, o CLI, as skills, os especialistas, o
+ebook, a tag Git e a GitHub Release. O website e o Hub têm ciclos próprios.
+
 <!-- markdownlint-disable MD033 -->
 <p align="center">
   <picture>

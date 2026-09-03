@@ -16,6 +16,7 @@ CLAUDE_SKILL = ROOT / "cli" / ".claude" / "skills" / "specsfy-release-cli"
 class CliReleaseSkillTests(unittest.TestCase):
     def make_cli_fixture(self, root: Path) -> Path:
         cli = root / "cli"
+        (root / "VERSION").write_text("0.6.0\n", encoding="utf-8")
         (cli / "src").mkdir(parents=True)
         (cli / "package.json").write_text(
             json.dumps(
@@ -93,6 +94,10 @@ class CliReleaseSkillTests(unittest.TestCase):
                 json.loads(
                     (cli / "package.json").read_text(encoding="utf-8")
                 )["version"],
+            )
+            self.assertEqual(
+                "0.7.0",
+                (root / "VERSION").read_text(encoding="utf-8").strip(),
             )
             self.assertIn(
                 'VERSION = "0.7.0"',

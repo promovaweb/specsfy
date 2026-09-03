@@ -71,16 +71,17 @@ def main() -> int:
         artifacts_by_version[version].append(artifact)
 
     versions = sorted(artifacts_by_version, reverse=True)
-    removed_versions = versions[args.keep :]
+    retained_versions = versions[: args.keep]
     if args.protect_version:
         protected = tuple(
             int(part) for part in args.protect_version.split(".")
         )
-        if protected in removed_versions:
-            raise SystemExit(
-                "Erro: a edição vigente não está entre as versões "
-                "mais recentes."
-            )
+        if protected in versions and protected not in retained_versions:
+            retained_versions = retained_versions[: args.keep - 1] + [protected]
+
+    removed_versions = [
+        version for version in versions if version not in retained_versions
+    ]
 
     removed_files = 0
     for version in removed_versions:
@@ -90,7 +91,7 @@ def main() -> int:
 
     print(
         "Retenção do ebook: "
-        f"{min(len(versions), args.keep)} edição(ões) mantida(s), "
+        f"{len(retained_versions)} edição(ões) mantida(s), "
         f"{len(removed_versions)} removida(s) "
         f"({removed_files} arquivo(s))."
     )

@@ -1,4 +1,4 @@
-.PHONY: brand-guide ebook verify-ebook
+.PHONY: brand-guide ebook verify-ebook verify-version
 
 BRAND_GUIDE_PDF := brand/Specsfy-Manual-de-Marca.pdf
 BRAND_GUIDE_SOURCES := \
@@ -20,7 +20,7 @@ $(BRAND_GUIDE_PDF): $(BRAND_GUIDE_SOURCES)
 
 EBOOK_DOC_SOURCES := $(shell find docs/user -type f -print)
 EBOOK_BUILD_SOURCES := \
-	ebook/VERSION \
+	VERSION \
 	docs/user/reading-order.txt \
 	.ebook/build-ebook.sh \
 	.ebook/extract-document-metadata.py \
@@ -40,3 +40,6 @@ ebook: $(EBOOK_DOC_SOURCES) $(EBOOK_BUILD_SOURCES)
 
 verify-ebook:
 	./.ebook/build-ebook.sh --check
+
+verify-version:
+	python3 -B scripts/check_version_alignment.py

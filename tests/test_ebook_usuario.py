@@ -133,7 +133,7 @@ class UserEbookTests(unittest.TestCase):
         self.assertIn(retention_call, build)
 
     def test_semver_controls_versioned_pdf_and_epub(self) -> None:
-        version = (EBOOK_ROOT / "VERSION").read_text(
+        version = (ROOT / "VERSION").read_text(
             encoding="utf-8"
         ).strip()
         self.assertRegex(
@@ -249,7 +249,7 @@ class UserEbookTests(unittest.TestCase):
         ]
         self.assertTrue(classified_pages)
 
-        version = (EBOOK_ROOT / "VERSION").read_text(
+        version = (ROOT / "VERSION").read_text(
             encoding="utf-8"
         ).strip()
         stem = EBOOK_ROOT / f"Specsfy-Guia-do-Usuario-v{version}"
@@ -270,7 +270,7 @@ class UserEbookTests(unittest.TestCase):
         self.assertNotIn("Classificação", epub_text)
 
     def test_portable_guide_omits_online_download_directions(self) -> None:
-        version = (EBOOK_ROOT / "VERSION").read_text(
+        version = (ROOT / "VERSION").read_text(
             encoding="utf-8"
         ).strip()
         stem = EBOOK_ROOT / f"Specsfy-Guia-do-Usuario-v{version}"
@@ -292,7 +292,7 @@ class UserEbookTests(unittest.TestCase):
             self.assertNotIn("pasta do ebook", text)
 
     def test_epub_is_well_formed_and_contains_navigation(self) -> None:
-        version = (EBOOK_ROOT / "VERSION").read_text(
+        version = (ROOT / "VERSION").read_text(
             encoding="utf-8"
         ).strip()
         epub = EBOOK_ROOT / f"Specsfy-Guia-do-Usuario-v{version}.epub"
@@ -338,7 +338,7 @@ class UserEbookTests(unittest.TestCase):
             )
 
     def test_pdf_and_epub_links_stay_inside_the_ebook(self) -> None:
-        version = (EBOOK_ROOT / "VERSION").read_text(
+        version = (ROOT / "VERSION").read_text(
             encoding="utf-8"
         ).strip()
         stem = EBOOK_ROOT / f"Specsfy-Guia-do-Usuario-v{version}"

@@ -27,7 +27,8 @@ idioma do texto antes de `make ebook`.
 
 ## Edição vigente
 
-A versão está em [`VERSION`](VERSION) e segue SemVer:
+A versão está em [`../VERSION`](../VERSION) e segue SemVer. Essa é a mesma
+versão do framework, CLI, skills, especialistas, tag e GitHub Release:
 
 - `PATCH`: correção de texto, link, exemplo ou apresentação.
 - `MINOR`: nova página, novo percurso ou ampliação material.
@@ -89,7 +90,7 @@ demais arquivos desse percurso entram automaticamente no digest.
 
 Toda alteração em `docs/user/`, inclusive imagens, exige:
 
-1. ajustar `VERSION` conforme o impacto editorial.
+1. ajustar `../VERSION` conforme o impacto da release completa.
 2. atualizar
    [`docs/user/reading-order.txt`](../docs/user/reading-order.txt) se uma
    página foi criada, movida ou removida.
@@ -100,5 +101,5 @@ A regressão da raiz também executa a verificação. Ela falha se o digest das
 fontes ou os hashes do PDF e EPUB não coincidirem com `build.json`.
 
 O script de retenção é executado somente depois que a edição vigente passa
-pela verificação de integridade. Se `VERSION` não estiver entre as cinco
+pela verificação de integridade. Se `../VERSION` não estiver entre as cinco
 versões SemVer mais recentes encontradas, o build interrompe a limpeza.

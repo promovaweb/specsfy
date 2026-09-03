@@ -46,7 +46,7 @@ uma página por skill base, CLI, contexto persistente e especialistas.
 ## Ebook do percurso do usuário
 
 `ebook/` publica todo o percurso `docs/user/` em PDF e EPUB, sem criar uma
-segunda fonte editorial. `ebook/VERSION` controla a edição com SemVer e
+segunda fonte editorial. `VERSION` na raiz controla a edição com SemVer e
 `docs/user/reading-order.txt` declara a ordem pedagógica única, compartilhada
 pelo portal e pelo ebook.
 
@@ -144,3 +144,7 @@ cria uma tag no commit do monorepo e publica a seção correspondente do
 Fontes executáveis de cada módulo prevalecem.
 `docs/develop/context/` governa decisões transversais e `docs/user/` explica
 interfaces públicas.
+`VERSION` na raiz é a fonte única para todo o Specsfy. CLI, skills,
+especialistas, ebook, tag e GitHub Release usam o mesmo SemVer. `make
+verify-version` encerra com erro quando uma projeção publicada diverge. Hub e
+website mantêm versões independentes.
