@@ -1,6 +1,6 @@
 {
   "name": "@promovaweb/specsfy",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "description": "CLI e TUI do Specsfy para instalar skills e acompanhar especificações.",
   "license": "MIT",
   "homepage": "https://promovaweb.com/docs/specsfy/cli/",

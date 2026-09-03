@@ -4,6 +4,41 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-03
+
+### Adicionado
+
+- Cria o especialista orquestrador de deploy para coordenar versionamento,
+  Laravel, Docker, Docker Swarm, Debian Server e Ansible pela mesma conversa.
+- Gera `Dockerfile`, Compose local, stack de produção, playbooks multi-host e
+  utilitários curtos para conexões, chaves públicas, Vault e deploy.
+- Publica o capítulo operacional de servidores e deploy no guia do usuário e
+  no ebook `v1.9.0`.
+
+### Alterado
+
+- Torna Laravel Octane com Open Swoole o runtime obrigatório das aplicações
+  Laravel atendidas pelo Specsfy.
+- Adota `deploy` como usuário operacional do servidor e mantém `app` como
+  usuário interno do container.
+- Faz o arquivo `SEMVER` governar a tag da imagem e a versão usada no deploy.
+
+### Segurança
+
+- Mantém valores sensíveis no Ansible Vault e os converte em Docker Secrets
+  externos sem gravar senhas na stack.
+- Sincroniza somente chaves públicas locais e preserva acessos SSH existentes.
+
+### Validação
+
+- `python3 -B -m unittest discover -s specialists/tests -p 'test_*.py'`
+- `uv run --with behave behave specialists/tests/features`
+- `python3 -B -m unittest discover -s skills/tests -p 'test_*.py'`
+- `PYTHONPATH=skills uv run --with behave behave skills/tests/features`
+- `python3 -B -m unittest discover -s tests -p 'test_*.py'`
+- `make verify-ebook`
+- `ansible-playbook ansible/deploy.yml --syntax-check`
+
 ## [0.12.0] - 2026-09-03
 
 ### Adicionado
