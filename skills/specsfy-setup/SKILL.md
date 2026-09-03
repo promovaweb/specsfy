@@ -184,6 +184,13 @@ para forçar sua execução.
    ainda não existir. O mesmo comando deve ler a constituição e todos os arquivos
    regulares em `specs/` quando detectar GitHub Spec Kit, depois atualizar o
    bloco gerenciado de `.specsfy/SPECKIT.md`.
+   O setup inicial não cria `SEMVER`, `Dockerfile`, `compose.yaml`,
+   `stack.yaml`, `deploy` nem `ansible/`. O versionamento e o deploy começam
+   somente quando a pessoa pedir esse processo de forma explícita; nesse caso,
+   anuncie o handoff para `$specsfy-specialist-deploy`.
+   Toda execução deve ser idempotente: repetir o setup com as mesmas entradas
+   não altera arquivos já reconciliados, não duplica blocos e não inicia outra
+   etapa.
 7. No início e no fim de cada mudança, executar:
 
    ```bash

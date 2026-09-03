@@ -139,7 +139,7 @@ Os próximos guias são opcionais. Consulte-os quando a entrega exigir uma
 integração ou tecnologia específica:
 
 - [Especialistas](specialists.md), para conhecimento técnico adicional.
-- [Da versão ao servidor](deploy.md), para ligar `SEMVER`, imagem, Ansible e
+- [Como funciona o Deploy da aplicação](deploy.md), para ligar `SEMVER`, imagem, Ansible e
   Docker Swarm em um deploy verificável.
 - [Servidores e comandos de deploy](deploy-operations.md), para cadastrar
   servidores, conferir conexões, sincronizar chaves públicas e usar os comandos

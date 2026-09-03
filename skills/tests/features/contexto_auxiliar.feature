@@ -12,6 +12,7 @@ Feature: Contexto auxiliar persistente do projeto
     And STACK.md, RULES.md, DATABASE.md e USER-PROFILE.md existem sob .specsfy
     And os modelos refletem o stack observado
     And AGENTS.md e CLAUDE.md reservam um bloco para as diretrizes do framework
+    But o setup não inicia versionamento nem deploy sem pedido explícito
 
   @FR-004 @FR-005 @AC-002
   Scenario: Reconciliar arquivos que já possuem conteúdo do usuário

@@ -1,4 +1,4 @@
-# Da versão ao servidor
+# Como funciona o Deploy da aplicação
 
 Deploy não começa no servidor. Ele começa quando a entrega recebe um número
 que acompanha o código, a imagem e o manifesto até o ambiente de destino.

@@ -4,6 +4,24 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.20.1] - 2026-09-03
+
+### Corrigido
+
+- Renomeia o capítulo de deploy para “Como funciona o Deploy da aplicação”.
+- Mantém o título alinhado no guia do usuário, ebook e website.
+- Garante que o setup inicial não crie `SEMVER` nem arquivos de deploy sem um
+  pedido explícito do usuário.
+- Confirma por teste que repetir o setup com as mesmas entradas não altera o
+  projeto consumidor.
+
+### Validação
+
+- `python3 -B -m unittest discover -s tests -p 'test_*.py'`
+- `cd cli && npm run check`
+- `make verify-ebook`
+- `make verify-version`
+
 ## [0.20.0] - 2026-09-03
 
 ### Adicionado

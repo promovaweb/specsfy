@@ -172,5 +172,5 @@ e não aceita valores pela linha de comando. `sync-keys` recusa continuar quando
 não encontra uma chave pública local. `run` testa as conexões antes do playbook
 e solicita a senha do Vault no próprio terminal quando ela for necessária.
 
-Volte ao capítulo [Da versão ao servidor](deploy.md) para acompanhar build,
+Volte ao capítulo [Como funciona o Deploy da aplicação](deploy.md) para acompanhar build,
 publicação, rollout, migrations, rollback e conferência da versão ativa.

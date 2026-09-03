@@ -129,8 +129,33 @@ class AuxiliaryContextTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
             self.assertTrue((project / "PROJECT.md").is_file())
             self.assertTrue((project / ".specsfy" / "STACK.md").is_file())
+            for deploy_path in (
+                "SEMVER",
+                "Dockerfile",
+                "compose.yaml",
+                "stack.yaml",
+                "deploy",
+                "ansible",
+            ):
+                self.assertFalse((project / deploy_path).exists(), deploy_path)
             self.assertFalse((hub / "PROJECT.md").exists())
             self.assertFalse((hub / "specs").exists())
+            snapshot = {
+                path.relative_to(project): path.read_bytes()
+                for path in project.rglob("*")
+                if path.is_file()
+            }
+            repeated = run_script(SETUP, "--project", str(project))
+            self.assertEqual(0, repeated.returncode, repeated.stderr)
+            self.assertEqual("", repeated.stdout)
+            self.assertEqual(
+                snapshot,
+                {
+                    path.relative_to(project): path.read_bytes()
+                    for path in project.rglob("*")
+                    if path.is_file()
+                },
+            )
             agents = (project / "AGENTS.md").read_text(encoding="utf-8")
             normalized = " ".join(agents.casefold().split())
             self.assertIn("diretório do projeto", normalized)

@@ -71,6 +71,19 @@ def then_agent_files_have_reserved_blocks(context) -> None:
         assert "<!-- specsfy:framework:end -->" in text
 
 
+@then("o setup não inicia versionamento nem deploy sem pedido explícito")
+def then_setup_does_not_start_deploy(context) -> None:
+    for relative in (
+        "SEMVER",
+        "Dockerfile",
+        "compose.yaml",
+        "stack.yaml",
+        "deploy",
+        "ansible",
+    ):
+        assert not (context.project / relative).exists(), relative
+
+
 @given("arquivos auxiliares com dados adicionados pela pessoa")
 def given_human_context(context) -> None:
     context.project = temporary_project(context)
