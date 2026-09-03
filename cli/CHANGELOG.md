@@ -4,6 +4,27 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-09-03
+
+### Adicionado
+
+- Adota Cloudflare Tunnel como ingresso padrão das stacks Docker Swarm.
+- Executa `cloudflared` na rede overlay da aplicação e entrega o token por
+  Docker Secret criado a partir do Ansible Vault.
+- Permite escolher outro proxy com `--proxy external`.
+
+### Alterado
+
+- Documenta o fluxo do túnel no guia do usuário, no capítulo de deploy e na
+  referência técnica das skills.
+
+### Validação
+
+- `python3 -B -m unittest discover -s tests -p 'test_*.py'`
+- `cd cli && npm run check`
+- `make verify-ebook`
+- `make verify-version`
+
 ## [0.20.1] - 2026-09-03
 
 ### Corrigido

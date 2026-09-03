@@ -74,6 +74,12 @@ o Docker Engine e o Swarm. Os outros especialistas continuam atendendo tarefas
 focais sem assumir a coordenação da entrega. Toda publicação ou alteração
 remota depende de autorização explícita.
 
+O scaffold usa `cloudflare-tunnel` como valor padrão de `--proxy`. Nesse modo,
+ele acrescenta `cloudflared` à rede overlay da aplicação, cria a referência ao
+Docker Secret `cloudflare_tunnel_token` e inclui
+`vault_cloudflare_tunnel_token` nos campos protegidos pelo Ansible Vault. O
+valor `external` omite esses componentes quando a pessoa escolhe outro proxy.
+
 ### Contrato operacional do deploy
 
 O gerador publica um wrapper `deploy` na raiz do consumidor. Esse arquivo

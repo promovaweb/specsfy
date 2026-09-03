@@ -115,6 +115,57 @@ playbook cria o usuário `deploy`, instala o Docker Engine, ativa o Docker
 Swarm e publica a stack pelo manager. Se algum desses arquivos já existir, o gerador
 encerra sem sobrescrever o conteúdo.
 
+Por padrão, a stack também cria o serviço `cloudflared`. Ele participa da
+mesma rede overlay da aplicação e encaminha o hostname público para
+`http://app:8000`. A conexão parte do container para o Cloudflare, por isso o
+serviço Laravel não publica a porta `8000` no host de produção.
+
+```mermaid
+flowchart LR
+  C[Cloudflare] <-->|conexões de saída| T[cloudflared]
+  T -->|rede overlay: http://app:8000| A[Laravel Octane]
+  S[Docker Secret] -->|arquivo montado| T
+```
+
+O token do túnel entra no Ansible Vault como
+`vault_cloudflare_tunnel_token`. O playbook o converte no Docker Secret
+externo `cloudflare_tunnel_token`, montado em arquivo no container. A stack
+usa `--token-file`; o valor não aparece no YAML, nos argumentos do processo ou
+no repositório.
+
+Se você escolher Nginx, Traefik, HAProxy ou outro ingresso, diga isso ao pedir
+o deploy. A geração usa `--proxy external`, não cria `cloudflared` e deixa a
+configuração pública para a alternativa escolhida. O Cloudflare Tunnel só é
+omitido depois dessa escolha explícita.
+
+### Opções do scaffold
+
+| Opção | Obrigatória | Padrão | Resultado |
+| --- | --- | --- | --- |
+| `--project <caminho>` | sim | nenhum | define a raiz que contém `SEMVER` |
+| `--image <nome>` | sim | nenhum | define a imagem sem tag nem digest |
+| `--proxy <tipo>` | não | `cloudflare-tunnel` | aceita o padrão ou `external` |
+
+O gerador grava os arquivos no projeto indicado e encerra sem alterações se
+algum destino já existir. Ele também recusa `SEMVER` inválido, imagem com tag
+ou digest e valor de proxy desconhecido. Estes exemplos mostram as formas de
+uso da interface:
+
+```bash
+node scripts/scaffold.mjs --project . --image registry.example/app
+
+node scripts/scaffold.mjs --project /srv/minha-app --image ghcr.io/equipe/app
+
+node scripts/scaffold.mjs --project . --image registry.example/app \
+  --proxy cloudflare-tunnel
+
+node scripts/scaffold.mjs --project . --image registry.example/app \
+  --proxy external
+
+node scripts/scaffold.mjs --project ../api --image ghcr.io/equipe/api \
+  --proxy external
+```
+
 Depois da geração, a skill pergunta quais senhas, tokens e chaves a aplicação
 consome e registra os nomes em `ansible/vault-fields.txt`. O utilitário
 solicita a senha do Vault e cada valor com entrada oculta:
@@ -223,6 +274,8 @@ escrita no cluster. A leitura deve confirmar:
 - versão do Docker Engine e papel de cada node.
 - presença das redes externas necessárias.
 - existência dos Docker Secrets esperados.
+- serviço `cloudflared` na rede overlay, salvo quando outro proxy foi pedido.
+- token do túnel entregue por Docker Secret, sem valor literal na stack.
 - versão do manifesto igual ao conteúdo de `SEMVER`.
 - acesso ao digest publicado.
 - sintaxe aceita por `docker stack config`.

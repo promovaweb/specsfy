@@ -48,6 +48,9 @@ description: "Criar e revisar automação Ansible idempotente, segura e testáve
 - Criar um preflight separado para conferir versão do controlador, sistema do
   alvo, acesso ao Docker, papel de manager, login no registry, collections,
   imagem imutável e Docker Secrets antes do play com escrita.
+- Quando a stack usar Cloudflare Tunnel, criar
+  `cloudflare_tunnel_token` a partir de `vault_cloudflare_tunnel_token` com
+  `no_log: true`. A stack recebe somente o nome do Docker Secret.
 - Copiar manifests versionados para um diretório estável no host, validar cada
   um com `docker stack config` e publicar as stacks em ordem de dependência.
 - Após cada publicação, consultar as réplicas até atingir a convergência ou

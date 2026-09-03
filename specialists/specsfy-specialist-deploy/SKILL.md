@@ -31,6 +31,10 @@ description: Orquestrar release e deploy em servidor com SEMVER, Docker Swarm e 
    node scripts/scaffold.mjs --project <raiz> --image <registry>/<aplicacao>
    ```
 
+   O padrão inclui Cloudflare Tunnel na stack. Se a pessoa pedir outro proxy,
+   gerar sem `cloudflared` com `--proxy external` e configurar a alternativa
+   solicitada em etapa própria.
+
 4. Acionar `$specsfy-specialist-debian-server` para levantar as máquinas uma
    por rodada. Registrar hostname, endereço, porta SSH, usuário de conexão e
    papel `manager` ou `worker` em `ansible/inventory.yml`, preservando os hosts
@@ -54,6 +58,9 @@ description: Orquestrar release e deploy em servidor com SEMVER, Docker Swarm e 
    ```
 
    A repetição mantém os campos existentes e pergunta somente os ausentes.
+
+   No padrão Cloudflare Tunnel, incluir `vault_cloudflare_tunnel_token`. O
+   serviço lê o token pelo arquivo `/run/secrets/cloudflare_tunnel_token`.
 
 8. Gerar a referência da imagem com `docker-tag`. Recusar qualquer tag Docker
    diferente do valor presente em `SEMVER`.
@@ -82,6 +89,11 @@ description: Orquestrar release e deploy em servidor com SEMVER, Docker Swarm e 
   produção.
 - Em Laravel, exigir `laravel/octane` e Open Swoole. A imagem instala
   `openswoole`; Compose e stack executam Octane com `--server=swoole`.
+- Sugerir Cloudflare Tunnel como entrada pública padrão. Executar `cloudflared`
+  como serviço da stack, ligado à mesma rede overlay da aplicação e sem porta
+  pública no serviço Laravel. O hostname do túnel aponta para `http://app:8000`.
+- Trocar o padrão somente quando a pessoa pedir outro proxy. Nesse caso, não
+  gerar o serviço `cloudflared` nem o secret do token.
 - Ansible configura o servidor e o estado do Swarm. Não deixe uma sequência
   manual de comandos SSH como procedimento principal.
 - Criar o usuário de serviço `deploy`, adicionar somente esse usuário ao grupo
@@ -112,6 +124,8 @@ description: Orquestrar release e deploy em servidor com SEMVER, Docker Swarm e 
 - Expor token de join em log, variável aberta ou arquivo commitado.
 - Guardar senha, token ou chave no `stack.yaml`, em variável aberta ou na
   imagem.
+- Passar o token do Cloudflare Tunnel por argumento, variável aberta ou arquivo
+  versionado.
 - Conceder `sudo` irrestrito ao usuário `deploy` sem necessidade
   confirmada.
 - Fazer build no servidor ou recompilar uma imagem para cada ambiente.

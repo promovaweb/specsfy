@@ -38,6 +38,12 @@ meu-projeto/
         └── stack.yaml.j2
 ```
 
+No modo padrão, `vault-fields.txt` inclui
+`vault_cloudflare_tunnel_token`. Você informa esse valor pelo prompt oculto de
+`./deploy secrets`, junto dos demais secrets ainda ausentes. O template da
+stack monta o Docker Secret no serviço `cloudflared`, que compartilha a rede
+overlay com `app`.
+
 O arquivo `deploy` oferece nomes curtos para ações que você pode copiar em
 outro painel do Herdr. Você não precisa iniciar o fluxo por esses comandos. Um
 pedido como “faça o deploy desta aplicação” continua sendo a entrada normal, e
@@ -62,6 +68,11 @@ trechos e apresenta a comparação dos arquivos alterados antes de substituir
 uma estrutura sem marcações gerenciadas. Repetir o pedido não significa gerar
 tudo novamente. Significa reconciliar o estado existente com a aplicação que
 será publicada.
+
+Essa reconciliação também confere o ingresso. Sem uma escolha diferente, a IA
+mantém Cloudflare Tunnel como serviço da stack. Quando você pedir outro proxy,
+ela remove ou deixa de gerar os componentes do túnel e prepara a alternativa
+solicitada sem misturar tokens entre os dois caminhos.
 
 ## Como os servidores entram no inventário
 
@@ -172,5 +183,6 @@ e não aceita valores pela linha de comando. `sync-keys` recusa continuar quando
 não encontra uma chave pública local. `run` testa as conexões antes do playbook
 e solicita a senha do Vault no próprio terminal quando ela for necessária.
 
-Volte ao capítulo [Como funciona o Deploy da aplicação](deploy.md) para acompanhar build,
-publicação, rollout, migrations, rollback e conferência da versão ativa.
+Volte ao capítulo [Como funciona o Deploy da aplicação](deploy.md) para
+acompanhar build, publicação, rollout, migrations, rollback e conferência da
+versão ativa.

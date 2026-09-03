@@ -10,6 +10,13 @@ Aplicações Laravel usam Laravel Octane com Open Swoole. A imagem instala a
 extensão `openswoole`, enquanto o Compose e a stack executam
 `octane:start --server=swoole`.
 
+O ingresso público padrão usa Cloudflare Tunnel. A stack executa `cloudflared`
+como serviço na mesma rede overlay do Laravel, e o hostname configurado no
+Cloudflare aponta para `http://app:8000`. O serviço abre conexões de saída e a
+stack não publica a porta do Laravel no host. Quando a pessoa escolher outro
+proxy, gere a base com `--proxy external` e configure essa alternativa fora do
+template do Cloudflare.
+
 Antes de cada release, releia o `Dockerfile` contra os manifests e o código da
 aplicação. Confira PHP, extensões, bibliotecas do sistema, dependências
 Composer, assets, entrypoint, usuário interno, porta e healthcheck. Preserve
@@ -62,6 +69,11 @@ com entrada oculta, depois adiciona as variáveis criptografadas ao `vault.yml`.
 Não aceite esses valores na conversa ou como argumento de linha de comando.
 Uma nova execução ignora campos já presentes e solicita somente os ausentes.
 
+No padrão Cloudflare Tunnel, trate o token como `vault_cloudflare_tunnel_token`.
+O Ansible cria o Docker Secret externo `cloudflare_tunnel_token`, e o serviço
+usa `--token-file /run/secrets/cloudflare_tunnel_token`. Não use `--token`,
+variável aberta ou valor literal no YAML.
+
 O playbook lê as variáveis `vault_<nome>`, usa
 `community.docker.docker_secret` com `no_log: true` e publica somente Docker
 Secrets externos. O container recebe arquivos em `/run/secrets`; o entrypoint
@@ -83,3 +95,6 @@ converte cada arquivo na variável esperada sem imprimir o conteúdo.
 - [Docker Engine no Debian](https://docs.docker.com/engine/install/debian/)
 - [Docker Swarm](https://docs.docker.com/engine/swarm/)
 - [Módulos community.docker](https://docs.ansible.com/ansible/latest/collections/community/docker/)
+- [Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/)
+- [Parâmetros do cloudflared](https://developers.cloudflare.com/tunnel/advanced/run-parameters/)
+- [Tokens do túnel](https://developers.cloudflare.com/tunnel/advanced/tunnel-tokens/)

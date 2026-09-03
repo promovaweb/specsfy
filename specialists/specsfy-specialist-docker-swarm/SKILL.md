@@ -45,6 +45,13 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 
 ## Padrões
 
+- Em deploy coordenado por `$specsfy-specialist-deploy`, usar Cloudflare Tunnel
+  como entrada pública padrão. Manter `cloudflared` e a aplicação na mesma rede
+  overlay, sem publicar a porta do Laravel no host. Aceitar outro proxy quando
+  a pessoa pedir essa troca de forma explícita.
+- Entregar o token do túnel por Docker Secret montado como arquivo e iniciar
+  `cloudflared` com `--token-file`. Nunca guardar o valor na stack.
+
 - Separar dependências, aplicação e ingress em stacks diferentes. Publicar em
   ordem de dependência, aguardar a convergência declarada de cada serviço e só
   então abrir o caminho público.

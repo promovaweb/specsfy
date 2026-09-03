@@ -90,6 +90,12 @@ class DeploySpecialistTests(unittest.TestCase):
             variables = (project / "ansible/group_vars/all.yml").read_text(
                 encoding="utf-8"
             )
+            stack_template = (
+                project / "ansible/templates/stack.yaml.j2"
+            ).read_text(encoding="utf-8")
+            vault_fields = (project / "ansible/vault-fields.txt").read_text(
+                encoding="utf-8"
+            )
 
             self.assertIn("octane:start", compose)
             self.assertIn("--server=swoole", compose)
@@ -110,6 +116,13 @@ class DeploySpecialistTests(unittest.TestCase):
             self.assertIn("deploy_user: deploy", variables)
             self.assertIn("app_version: \"2.3.4\"", variables)
             self.assertIn("external: true", stack)
+            self.assertIn("cloudflare/cloudflared:2026.8.3", stack)
+            self.assertIn('"--token-file"', stack)
+            self.assertIn("/run/secrets/cloudflare_tunnel_token", stack)
+            self.assertIn("cloudflare_tunnel_token", variables)
+            self.assertIn("vault_cloudflare_tunnel_token", vault_fields)
+            self.assertIn("cloudflare/cloudflared:2026.8.3", stack_template)
+            self.assertNotIn('"--token",', stack)
             self.assertNotIn("DB_PASSWORD=", stack)
             self.assertNotIn("password: \"", stack.casefold())
             deploy_utility = (project / "deploy").read_text(encoding="utf-8")
@@ -247,6 +260,8 @@ class DeploySpecialistTests(unittest.TestCase):
             original = (
                 "vault_app_key: !vault |\n  $ANSIBLE_VAULT;1.1;AES256\n"
                 "vault_db_password: !vault |\n  $ANSIBLE_VAULT;1.1;AES256\n"
+                "vault_cloudflare_tunnel_token: !vault |\n"
+                "  $ANSIBLE_VAULT;1.1;AES256\n"
             )
             vault.write_text(original, encoding="utf-8")
 
@@ -260,6 +275,40 @@ class DeploySpecialistTests(unittest.TestCase):
             self.assertEqual(0, repeated.returncode, repeated.stderr)
             self.assertIn("já contém todos os campos", repeated.stdout)
             self.assertEqual(original, vault.read_text(encoding="utf-8"))
+
+    def test_allows_an_explicit_external_proxy_without_cloudflared(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory)
+            (project / "SEMVER").write_text("2.3.4\n", encoding="utf-8")
+
+            result = subprocess.run(
+                [
+                    "node",
+                    str(SCRIPT),
+                    "--project",
+                    str(project),
+                    "--image",
+                    "registry.example/equipe/app",
+                    "--proxy",
+                    "external",
+                ],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            stack = (project / "stack.yaml").read_text(encoding="utf-8")
+            variables = (project / "ansible/group_vars/all.yml").read_text(
+                encoding="utf-8"
+            )
+            vault_fields = (project / "ansible/vault-fields.txt").read_text(
+                encoding="utf-8"
+            )
+            self.assertNotIn("cloudflared", stack)
+            self.assertNotIn("cloudflare_tunnel_token", variables)
+            self.assertNotIn("vault_cloudflare_tunnel_token", vault_fields)
+            self.assertIn("registry.example/equipe/app:2.3.4", stack)
 
 
 if __name__ == "__main__":
