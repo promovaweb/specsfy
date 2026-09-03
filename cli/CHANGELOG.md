@@ -4,6 +4,32 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-09-03
+
+### Adicionado
+
+- Adiciona o especialista de versionamento para criar, consultar, incrementar
+  e conferir o arquivo `SEMVER` na raiz do projeto consumidor.
+- Adiciona o especialista de Debian Server e amplia o fluxo de deploy com
+  Docker, Docker Swarm, Ansible e engenharia de entrega.
+- Publica o capítulo "Da versão ao servidor" no guia do usuário e inclui a
+  edição `v1.8.0` do ebook em PDF e EPUB.
+
+### Alterado
+
+- Faz Ansible, Docker Swarm e engenharia de entrega carregarem o especialista
+  de versionamento durante a preparação do deploy.
+- Faz Docker consultar `SEMVER` quando a imagem representar uma release.
+
+### Validação
+
+- `python3 -B -m unittest discover -s specialists/tests -p 'test_*.py'`
+- `uv run --quiet --with behave==1.3.3 behave specialists/tests/features --no-capture`
+- `python3 -B -m unittest discover -s skills/tests -p 'test_*.py'`
+- `cd skills && uv run --quiet --with behave==1.3.3 behave tests/features --no-capture`
+- `python3 -B -m unittest discover -s tests -p 'test_*.py'`
+- `make verify-ebook`
+
 ## [0.11.2] - 2026-08-31
 
 ### Corrigido
