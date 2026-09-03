@@ -21,8 +21,10 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 
 ## Fluxo
 
-1. Acionar `$specsfy-specialist-versioning`, ler `SEMVER` e conferir se a
-   imagem imutável e o manifesto representam a mesma versão.
+1. Em release ou deploy completo, trabalhar sob
+   `$specsfy-specialist-deploy`. Conferir o `SEMVER` preparado por
+   `$specsfy-specialist-versioning`, executar `verify-docker-tag` antes de
+   `docker stack deploy` e interromper quando a tag for diferente.
 1. Mapear managers, workers, zonas, labels, quorum e dependências externas
    (registry, storage, DNS) antes de qualquer mudança de topologia.
 1. Validar que a imagem publicada é a mesma testada e que o arquivo de stack
@@ -105,6 +107,8 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-deploy` coordena servidor, imagem, Ansible e publicação
+  da stack; esta skill governa somente o Swarm.
 - `$specsfy-specialist-versioning` prepara `SEMVER` e confere a versão usada
   pela imagem e pelo manifesto da stack.
 - `$specsfy-specialist-ansible` prepara e mantém os nodes; esta skill governa

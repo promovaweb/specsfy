@@ -242,6 +242,9 @@ tests/
 
 - [Hierarquia, navegação, `Breadcrumb` no shell, regiões da tela, densidade,
   responsividade e componentes existentes.]
+- [Em aplicação Laravel, Laravel Octane com Open Swoole e `laravel/octane` são
+  obrigatórios. Registre `--server=swoole`, o healthcheck e o reload dos
+  workers persistentes.]
 
 #### Blocos React e componentes selecionados
 

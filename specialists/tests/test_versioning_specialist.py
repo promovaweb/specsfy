@@ -65,6 +65,39 @@ class VersioningSpecialistTests(unittest.TestCase):
             self.assertEqual(0, accepted.returncode, accepted.stderr)
             self.assertNotEqual(0, refused.returncode)
 
+    def test_builds_a_docker_tag_from_the_root_semver_file(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory)
+            (project / "SEMVER").write_text("3.4.5\n", encoding="utf-8")
+
+            result = self.run_script(
+                project, "docker-tag", "registry.example:5000/equipe/app"
+            )
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            self.assertEqual(
+                "registry.example:5000/equipe/app:3.4.5", result.stdout.strip()
+            )
+
+    def test_rejects_a_docker_tag_that_differs_from_semver(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory)
+            (project / "SEMVER").write_text("3.4.5\n", encoding="utf-8")
+
+            accepted = self.run_script(
+                project,
+                "verify-docker-tag",
+                "registry.example:5000/equipe/app:3.4.5",
+            )
+            refused = self.run_script(
+                project,
+                "verify-docker-tag",
+                "registry.example:5000/equipe/app:latest",
+            )
+
+            self.assertEqual(0, accepted.returncode, accepted.stderr)
+            self.assertNotEqual(0, refused.returncode)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -281,6 +281,7 @@ pendente.
 | Tailwind CSS | `specsfy-specialist-tailwind-css` |
 | shadcn/ui | `specsfy-specialist-shadcn-ui` |
 | Docker ou Compose | `specsfy-specialist-docker` |
+| Release ou deploy completo | `specsfy-specialist-deploy` |
 | Docker Swarm | `specsfy-specialist-docker-swarm` |
 | Ansible | `specsfy-specialist-ansible` |
 | OpenAPI | `specsfy-specialist-web-api-design` |
@@ -298,6 +299,12 @@ pendente.
 Para todo projeto Laravel com React, o setup instala shadcn/ui e ReUI juntos.
 Não trate essa dupla como opcional: shadcn/ui prepara a base e ReUI cria CRUDs
 e interfaces sobre ela.
+
+Para toda aplicação Laravel, Laravel Octane com Open Swoole é obrigatório.
+Confira `laravel/octane` em `composer.json` e `composer.lock`, a extensão
+`openswoole` na imagem e `--server=swoole` no runtime. Registre essa combinação
+em `.specsfy/STACK.md` e encaminhe a instalação ou correção ausente para uma
+spec antes de aprovar o setup.
 
 Depois de instalar a dupla, o setup registra em `INTERFACE.md` que telas React
 são compostas por componentes. Cada nova tela deve consultar o mapa, reutilizar

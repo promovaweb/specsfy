@@ -8,6 +8,8 @@
  * - current --project <diretório>
  * - bump patch|minor|major --project <diretório>
  * - verify X.Y.Z --project <diretório>
+ * - docker-tag <imagem> --project <diretório>
+ * - verify-docker-tag <imagem:versão> --project <diretório>
  */
 
 import { rename, readFile, writeFile } from "node:fs/promises";
@@ -72,6 +74,26 @@ function bumpVersion(current, level) {
   throw new Error("O incremento deve ser patch, minor ou major.");
 }
 
+/** Confere uma imagem sem tag e acrescenta a versão do sistema do usuário. */
+function buildDockerTag(image, version) {
+  if (!image || image.includes("@") || image.split("/").at(-1).includes(":")) {
+    throw new Error("Informe a imagem sem tag ou digest.");
+  }
+  return `${image}:${version}`;
+}
+
+/** Confere se a referência Docker termina com a versão do arquivo SEMVER. */
+function verifyDockerTag(image, version) {
+  if (!image || image.includes("@") || !image.endsWith(`:${version}`)) {
+    throw new Error(`A tag Docker deve terminar com :${version}.`);
+  }
+  const repository = image.slice(0, -version.length - 1);
+  if (!repository || repository.split("/").at(-1).includes(":")) {
+    throw new Error(`Referência Docker inválida: ${image}`);
+  }
+  return image;
+}
+
 /** Executa o comando solicitado contra o arquivo SEMVER do projeto. */
 async function main() {
   const { command, initial, positionals, project } = parseArguments(process.argv.slice(2));
@@ -96,6 +118,10 @@ async function main() {
     parseVersion(expected);
     if (current !== expected) throw new Error(`SEMVER contém ${current}, não ${expected}.`);
     process.stdout.write(`${current}\n`);
+  } else if (command === "docker-tag") {
+    process.stdout.write(`${buildDockerTag(positionals[0], current)}\n`);
+  } else if (command === "verify-docker-tag") {
+    process.stdout.write(`${verifyDockerTag(positionals[0], current)}\n`);
   } else throw new Error(`Comando desconhecido: ${command}`);
 }
 

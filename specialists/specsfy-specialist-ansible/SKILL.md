@@ -19,10 +19,15 @@ description: "Criar e revisar automação Ansible idempotente, segura e testáve
 
 ## Fluxo
 
-1. Acionar `$specsfy-specialist-versioning` e conferir `SEMVER`, imagem e
-   manifestos antes do preflight de deploy.
+1. Em release ou deploy completo, trabalhar sob
+   `$specsfy-specialist-deploy` e usar o `SEMVER`, a imagem e os manifestos já
+   preparados pela orquestradora.
 1. Confirmar inventário, grupos, ambiente-alvo, método de conexão e escopo
    exato de hosts antes de qualquer execução com efeito.
+1. Usar `./deploy check-hosts` para apresentar todos os hosts em tabela e
+   confirmar o módulo `ping` antes da primeira task remota. Usar
+   `./deploy sync-keys` para adicionar somente chaves públicas ao usuário
+   `deploy`, sem excluir entradas existentes do `authorized_keys`.
 1. Inspecionar a precedência de variáveis aplicável (ver tabela em
    `references/standards.md`) e as versões fixadas de collections e
    `ansible-core`.
@@ -111,6 +116,8 @@ description: "Criar e revisar automação Ansible idempotente, segura e testáve
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-deploy` coordena a automação completa do servidor; esta
+  skill cuida das roles e do playbook Ansible.
 - `$specsfy-specialist-versioning` mantém `SEMVER` alinhado à imagem e aos
   manifestos transportados pela automação.
 - `$specsfy-specialist-docker-swarm` quando o host provisionado por Ansible

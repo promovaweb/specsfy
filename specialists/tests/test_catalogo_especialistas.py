@@ -19,6 +19,7 @@ EXPECTED_SKILLS = {
     "specsfy-specialist-debugging",
     "specsfy-specialist-delivery-engineering",
     "specsfy-specialist-docker",
+    "specsfy-specialist-deploy",
     "specsfy-specialist-docker-swarm",
     "specsfy-specialist-domain-modeling",
     "specsfy-specialist-design-system",
@@ -189,19 +190,40 @@ class SpecialistCatalogTests(unittest.TestCase):
                 for term in terms:
                     self.assertIn(term, content)
 
-    def test_deploy_specialists_require_versioning(self) -> None:
+    def test_deploy_specialists_delegate_the_complete_flow(self) -> None:
         catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
         entries = {entry["name"]: entry for entry in catalog["skills"]}
-        versioning = "specsfy-specialist-versioning"
         for name in (
             "specsfy-specialist-ansible",
             "specsfy-specialist-delivery-engineering",
+            "specsfy-specialist-docker",
             "specsfy-specialist-docker-swarm",
         ):
             with self.subTest(skill=name):
-                self.assertIn(versioning, entries[name]["requires"])
+                self.assertEqual([], entries[name].get("requires", []))
                 content = (ROOT / name / "SKILL.md").read_text(encoding="utf-8")
-                self.assertIn(f"${versioning}", content)
+                self.assertIn("$specsfy-specialist-deploy", content)
+
+    def test_deploy_orchestrator_installs_the_complete_server_chain(self) -> None:
+        catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
+        entry = next(
+            item for item in catalog["skills"]
+            if item["name"] == "specsfy-specialist-deploy"
+        )
+
+        self.assertEqual(
+            {
+                "specsfy-specialist-ansible",
+                "specsfy-specialist-debian-server",
+                "specsfy-specialist-docker",
+                "specsfy-specialist-docker-swarm",
+                "specsfy-specialist-versioning",
+            },
+            set(entry["requires"]),
+        )
+        content = (ROOT / entry["name"] / "SKILL.md").read_text(encoding="utf-8")
+        for term in ("SEMVER", "Docker Engine", "docker swarm init", "Ansible"):
+            self.assertIn(term, content)
 
     def test_react_ui_components_are_paired_with_ui_design(self) -> None:
         component_skill = ROOT / "specsfy-specialist-react-ui-components"

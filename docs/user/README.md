@@ -141,6 +141,9 @@ integração ou tecnologia específica:
 - [Especialistas](specialists.md), para conhecimento técnico adicional.
 - [Da versão ao servidor](deploy.md), para ligar `SEMVER`, imagem, Ansible e
   Docker Swarm em um deploy verificável.
+- [Servidores e comandos de deploy](deploy-operations.md), para cadastrar
+  servidores, conferir conexões, sincronizar chaves públicas e usar os comandos
+  curtos no Herdr.
 - [Uso avançado](advanced-usage.md), para automação e integrações.
 - aplicação em projetos [Laravel](laravel.md), [Astro](astro.md) ou
   [Next.js](nextjs.md).

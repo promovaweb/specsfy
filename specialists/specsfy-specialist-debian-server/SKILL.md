@@ -18,19 +18,24 @@ description: Administrar servidores Debian para aplicações e clusters com APT,
 
 ## Fluxo
 
-1. Registrar versão, arquitetura, kernel, uptime, carga, memória, discos,
+1. Sob `$specsfy-specialist-deploy`, perguntar quais máquinas compõem o
+   ambiente e registrar alias, endereço, porta SSH, usuário inicial e papel no
+   Swarm em `ansible/inventory.yml`. Ao adicionar um servidor, preservar todas
+   as entradas atuais e testar o novo host antes de configurá-lo.
+2. Registrar versão, arquitetura, kernel, uptime, carga, memória, discos,
    mounts, rede, unidades com falha e pacotes pendentes.
-2. Identificar o papel do host, serviços expostos, janela de manutenção,
+3. Identificar o papel do host, serviços expostos, janela de manutenção,
    acesso de recuperação e estado gerenciado por Ansible.
-3. Definir usuários administrativos, chaves SSH, sudo e permissões sem
+4. Criar o usuário operacional `deploy`, adicionar suas chaves públicas SSH e
+   definir sudo e permissões sem
    retirar o acesso atual antes de testar uma segunda sessão.
-4. Configurar APT e atualizações de segurança, planejando reinícios de serviço
+5. Configurar APT e atualizações de segurança, planejando reinícios de serviço
    e reboot quando kernel ou bibliotecas exigirem.
-5. Aplicar firewall compatível com a topologia. Em Swarm, incluir tráfego de
+6. Aplicar firewall compatível com a topologia. Em Swarm, incluir tráfego de
    controle, descoberta e overlay somente entre nodes autorizados.
-6. Persistir ajustes de kernel em `/etc/sysctl.d/`, aplicar de forma
+7. Persistir ajustes de kernel em `/etc/sysctl.d/`, aplicar de forma
    condicional e medir o comportamento do workload depois da mudança.
-7. Validar systemd, journald, espaço, inodes, relógio, DNS, conectividade e
+8. Validar systemd, journald, espaço, inodes, relógio, DNS, conectividade e
    reinicialização controlada em ambiente apropriado.
 
 ## Padrões
@@ -77,6 +82,8 @@ description: Administrar servidores Debian para aplicações e clusters com APT,
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-deploy` coordena a preparação completa do servidor;
+  este especialista define o estado Debian do host.
 - `$specsfy-specialist-ansible` automatiza e repete a configuração do host;
   este especialista define o estado Debian que a automação deve produzir.
 - `$specsfy-specialist-docker` governa imagem e runtime do container; este

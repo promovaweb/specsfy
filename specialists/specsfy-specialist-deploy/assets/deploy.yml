@@ -1,0 +1,117 @@
+---
+- name: Preparar todos os servidores do ambiente
+  hosts: all
+  become: true
+  tasks:
+    - name: Instalar Docker Engine e suporte Python
+      ansible.builtin.apt:
+        name:
+          - docker.io
+          - python3-docker
+        state: present
+        update_cache: true
+
+    - name: Manter Docker Engine ativo
+      ansible.builtin.service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Manter grupo operacional deploy
+      ansible.builtin.group:
+        name: "{{ deploy_user }}"
+        state: present
+
+    - name: Manter usuário operacional deploy
+      ansible.builtin.user:
+        name: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        groups: docker
+        append: true
+        create_home: true
+        shell: /bin/bash
+        password_lock: true
+
+    - name: Sincronizar chaves públicas do controlador
+      ansible.builtin.import_tasks: keys.yml
+
+    - name: Criar diretório da aplicação
+      ansible.builtin.file:
+        path: "{{ app_root }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0750"
+
+- name: Inicializar o primeiro manager do Docker Swarm
+  hosts: "swarm_managers[0]"
+  become: true
+  tasks:
+    - name: Manter o manager principal no Swarm
+      community.docker.docker_swarm:
+        state: present
+        advertise_addr: "{{ swarm_advertise_addr }}"
+      no_log: true
+
+    - name: Ler tokens para ingresso de novos nodes
+      community.docker.docker_swarm_info:
+      register: swarm_information
+      no_log: true
+
+    - name: Compartilhar tokens somente durante a execução
+      ansible.builtin.set_fact:
+        swarm_join_tokens: "{{ swarm_information.swarm_facts.JoinTokens }}"
+      no_log: true
+
+- name: Integrar managers adicionais
+  hosts: "swarm_managers[1:]"
+  become: true
+  tasks:
+    - name: Manter o node no Swarm como manager
+      community.docker.docker_swarm:
+        state: join
+        advertise_addr: "{{ swarm_advertise_addr }}"
+        join_token: >-
+          {{ hostvars[groups['swarm_managers'][0]].swarm_join_tokens.Manager }}
+        remote_addrs:
+          - >-
+            {{ hostvars[groups['swarm_managers'][0]].ansible_host }}:2377
+      no_log: true
+
+- name: Integrar workers
+  hosts: swarm_workers
+  become: true
+  tasks:
+    - name: Manter o node no Swarm como worker
+      community.docker.docker_swarm:
+        state: join
+        advertise_addr: "{{ swarm_advertise_addr }}"
+        join_token: >-
+          {{ hostvars[groups['swarm_managers'][0]].swarm_join_tokens.Worker }}
+        remote_addrs:
+          - >-
+            {{ hostvars[groups['swarm_managers'][0]].ansible_host }}:2377
+      no_log: true
+
+- name: Publicar a stack pelo manager principal
+  hosts: "swarm_managers[0]"
+  become: true
+  tasks:
+    - name: Criar Docker Secrets externos
+      ansible.builtin.import_tasks: secrets.yml
+
+    - name: Renderizar stack versionada
+      ansible.builtin.template:
+        src: stack.yaml.j2
+        dest: "{{ app_root }}/stack.yaml"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: "0640"
+
+    - name: Publicar stack Docker Swarm
+      community.docker.docker_stack:
+        name: "{{ app_stack_name }}"
+        state: present
+        compose:
+          - "{{ app_root }}/stack.yaml"
+        with_registry_auth: true

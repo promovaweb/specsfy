@@ -20,8 +20,9 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Fluxo
 
-1. Acionar `$specsfy-specialist-versioning`, preparar `SEMVER` e conferir o
-   número que identificará artefato, changelog e tag.
+1. Em release ou deploy completo, trabalhar sob
+   `$specsfy-specialist-deploy` e usar o `SEMVER` preparado pela
+   `$specsfy-specialist-versioning` para artefato, changelog e tag.
 1. Mapear commit, artefato, ambientes, aprovações necessárias e owner de cada
    promoção antes de desenhar o pipeline.
 1. Tornar build e testes reproduzíveis a partir de lockfiles versionados —
@@ -95,6 +96,8 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-deploy` coordena o release e o deploy completos; esta
+  skill cuida do pipeline e das promoções.
 - `$specsfy-specialist-versioning` prepara `SEMVER` e mantém o número alinhado
   entre artefato, changelog, tag e promoção.
 - `$specsfy-specialist-ansible` aplica configuração idempotente em hosts;

@@ -24,27 +24,34 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 1. Ler `composer.json`/`composer.lock` para confirmar versão do framework,
    PHP e pacotes relevantes (Sanctum, Horizon, Octane, Scout) antes de supor
    comportamento por memória.
-2. Mapear a requisição do ponto de entrada até domínio, persistência,
+2. Tratar Laravel Octane com Open Swoole e o pacote `laravel/octane` como
+   runtime obrigatório. Quando estiver ausente,
+   incluir instalação e configuração no trabalho antes de considerar a
+   aplicação pronta para execução ou deploy.
+3. Mapear a requisição do ponto de entrada até domínio, persistência,
    efeitos assíncronos e resposta, identificando o boundary onde a regra de
    negócio já vive no projeto (Action, Service, Model rico).
-3. Localizar convenções irmãs — como o projeto organiza Form Requests,
+4. Localizar convenções irmãs — como o projeto organiza Form Requests,
    Policies, Resources e Jobs — e seguir o padrão existente em vez de
    introduzir um novo.
-4. Definir autorização, validação, transação, idempotência e modo de falha
+5. Definir autorização, validação, transação, idempotência e modo de falha
    antes de escrever código, especialmente para jobs e webhooks.
-5. Escrever o teste focal (Pest ou PHPUnit conforme o projeto), implementar a
+6. Escrever o teste focal (Pest ou PHPUnit conforme o projeto), implementar a
    menor fatia que o torna verde e então refatorar.
-6. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou
+7. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou
    `EXPLAIN` via `$specsfy-specialist-postgres`) quando cardinalidade ou
    latência importarem.
-7. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
+8. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
    disponíveis no projeto antes de considerar a tarefa concluída.
-8. Verificar impacto operacional — migration em produção, workers, scheduler,
+9. Verificar impacto operacional — migration em produção, workers, scheduler,
    cache de config — e registrar risco quando a ação exigir autorização
    externa.
 
 ## Padrões
 
+- Executar HTTP com Laravel Octane, Open Swoole e `--server=swoole`. Instalar a
+  extensão `openswoole` na imagem e limpar estado por requisição; singletons e propriedades estáticas
+  não podem transportar dados entre usuários nos workers persistentes.
 - Manter controllers finos: validação em Form Requests, autorização em
   Policies/Gates, regra de negócio no boundary já adotado pelo projeto.
 - Tratar Eloquent como acesso a dados: eager load explícito (`with`,

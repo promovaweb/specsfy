@@ -63,11 +63,45 @@ não instalam globalmente e não realizam ações destrutivas por padrão.
 
 O especialista `specsfy-specialist-versioning` inclui
 `scripts/semver.mjs`. O utilitário cria, consulta, incrementa e confere o
-arquivo `SEMVER` na raiz do projeto consumidor. Ansible, Docker Swarm e
-engenharia de entrega declaram esse especialista em `requires`; Docker o chama
-quando a imagem representa uma release ou um deploy. A preparação pode alterar
-o arquivo local, mas publicação e implantação remotas continuam dependentes de
-autorização explícita.
+arquivo `SEMVER` na raiz do projeto consumidor. Ele também gera a referência
+Docker com essa versão e recusa uma tag diferente.
+
+`specsfy-specialist-deploy` é a entrada para o fluxo completo de release ou
+deploy. Seu catálogo instala Versioning, Docker, Debian Server, Ansible e Docker
+Swarm como dependências. O gerador cria `compose.yaml` para desenvolvimento,
+`stack.yaml` para produção e os arquivos Ansible que preparam o usuário `deploy`,
+o Docker Engine e o Swarm. Os outros especialistas continuam atendendo tarefas
+focais sem assumir a coordenação da entrega. Toda publicação ou alteração
+remota depende de autorização explícita.
+
+### Contrato operacional do deploy
+
+O gerador publica um wrapper `deploy` na raiz do consumidor. Esse arquivo
+mantém a interface humana curta e encaminha cada ação para a implementação em
+`ansible/`:
+
+| Entrada | Implementação | Contrato |
+| --- | --- | --- |
+| `check-hosts` | `check-hosts.py` | mostra hosts e testa conexões |
+| `secrets` | `create-vault.sh` | inclui valores ausentes no Vault |
+| `sync-keys` | `sync-keys.yml` e `keys.yml` | inclui chaves `.pub` |
+| `run` | `check-hosts.py` e `deploy.yml` | confere e publica a stack |
+
+`ANSIBLE_INVENTORY` seleciona um inventário alternativo somente para o
+processo atual. Sem a variável, o wrapper exige
+`ansible/inventory.yml`. O arquivo `inventory.example.yml` não pode ser usado
+silenciosamente como alvo real.
+
+A descoberta de máquinas pertence ao especialista Debian sob coordenação do
+deploy. Ele coleta um host por rodada e registra alias, `ansible_host`,
+`ansible_port`, `ansible_user` e grupo do Swarm. Uma solicitação para adicionar
+servidor mescla a nova entrada, preserva os hosts atuais e executa a sequência
+conexão, chave pública, baseline Debian, Docker Engine e ingresso no Swarm.
+
+O host usa `deploy` como conta operacional com acesso ao Docker e diretórios em
+`/opt/apps`. O container mantém `app` como usuário sem privilégios do processo.
+Essa separação impede que um nome represente ao mesmo tempo a administração do
+servidor e o runtime da aplicação.
 
 Templates de documentos gerenciados vivem em `skills/templates/` e são
 publicados juntos em `.specsfy/templates/`. Nos projetos consumidores, um
@@ -240,3 +274,10 @@ alterar Composer e carrega o especialista quando a tarefa envolve pacote.
 O validador verifica frontmatter, nome, metadata e estrutura. Testes focais
 devem verificar o comportamento específico. Validação estrutural não prova a
 metodologia.
+
+## Justificativa de tamanho
+
+Este contexto reúne a estrutura, a descoberta, a interação, o handoff, a
+instalação e as interfaces operacionais das skills. Esses contratos precisam
+permanecer juntos porque uma mudança de catálogo pode afetar o instalador, a
+transição entre responsabilidades e a documentação publicada no mesmo ciclo.

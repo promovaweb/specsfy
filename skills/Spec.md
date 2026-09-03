@@ -144,6 +144,14 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
     linguagem cotidiana e registra respostas confirmadas em
     `.specsfy/DATABASE.md`.
 
+## Contrato de runtime Laravel
+
+Toda aplicação Laravel usa Laravel Octane como servidor de aplicação. O pacote
+`laravel/octane` é obrigatório com Open Swoole. O Octane usa o identificador
+`swoole` para esse servidor. Código executado por workers persistentes não pode manter
+estado de uma requisição para a seguinte. Build, healthcheck, reload e deploy
+devem exercitar o processo Octane que atende o tráfego real.
+
 ## Contrato de experiência de interface
 
 Quando a entrega criar ou mudar uma interface usada por pessoas, a descoberta

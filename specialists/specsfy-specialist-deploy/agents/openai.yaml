@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Deploy"
+  short_description: "Deploy versionado em Docker Swarm via Ansible"
+  default_prompt: "Use $specsfy-specialist-deploy para preparar ou executar este release ou deploy."

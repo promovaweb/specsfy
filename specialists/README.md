@@ -47,6 +47,13 @@ arquitetura, operação e disciplinas de engenharia. A referência completa de
 instalação e uso pertence à
 [`documentação do Specsfy`](../docs/).
 
+Para release, deploy ou inclusão de servidor, use somente
+`specsfy-specialist-deploy`. A orquestradora prepara o `SEMVER`, inspeciona a
+aplicação, mantém o inventário Ansible, testa conexões, sincroniza chaves
+públicas para a conta `deploy` e chama Docker Swarm, Ansible e os demais
+especialistas necessários. O projeto consumidor recebe o wrapper `./deploy`
+com as ações `check-hosts`, `secrets`, `sync-keys` e `run`.
+
 Nenhuma skill deste módulo é instalada ou executada pela raiz do
 [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy).
 

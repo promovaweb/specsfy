@@ -404,6 +404,22 @@ class InterfaceContractTests(unittest.TestCase):
         self.assertIn("em toda execução completa do setup", normalized.casefold())
         self.assertIn("$specsfy-documentator", normalized)
 
+    def test_laravel_projects_require_octane_as_the_application_server(self) -> None:
+        sources = (
+            ROOT / "Spec.md",
+            ROOT / "templates" / "Spec.md",
+            ROOT / "specsfy-setup" / "SKILL.md",
+            ROOT.parent / "specialists" / "specsfy-specialist-laravel" / "SKILL.md",
+        )
+
+        for source in sources:
+            with self.subTest(source=source):
+                content = source.read_text(encoding="utf-8")
+                self.assertIn("Laravel Octane", content)
+                self.assertIn("obrigatório", content)
+                self.assertIn("laravel/octane", content)
+                self.assertIn("Open Swoole", content)
+
     def test_reui_specialist_documents_free_registry_setup(self) -> None:
         reui = (ROOT.parent / "specialists" / "specsfy-specialist-reui" / "SKILL.md").read_text(encoding="utf-8")
         setup = (ROOT.parent / "specialists" / "specsfy-specialist-reui" / "references" / "setup.md").read_text(encoding="utf-8")

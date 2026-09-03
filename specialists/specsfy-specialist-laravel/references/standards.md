@@ -66,6 +66,13 @@
 
 ## Operação
 
+- Laravel Octane com Open Swoole e `laravel/octane` é o runtime HTTP
+  obrigatório. Instale `openswoole` por PECL na imagem, execute
+  `octane:start --server=swoole`, configure o healthcheck no processo Octane e
+  recarregue os workers durante o deploy.
+- Revise singletons, estado estático e callbacks capturados: workers Octane
+  persistem entre requisições e não podem carregar dados de um usuário para o
+  próximo.
 - `config:cache`, `route:cache`, `event:cache` reduzem I/O de boot; qualquer
   um deles fica obsoleto silenciosamente se o deploy não os regenerar após
   mudar config/rotas/listeners — automatizar no pipeline, não como passo
@@ -118,15 +125,16 @@
 
 ## Fontes oficiais
 
-- Documentação Laravel: https://laravel.com/docs
-- Ciclo de vida da requisição: https://laravel.com/docs/lifecycle
-- Eloquent — relacionamentos e eager loading: https://laravel.com/docs/eloquent-relationships
-- Autorização (Policies/Gates): https://laravel.com/docs/authorization
-- Filas: https://laravel.com/docs/queues
-- Banco e migrations: https://laravel.com/docs/migrations
-- Testes: https://laravel.com/docs/testing
-- Task scheduling: https://laravel.com/docs/scheduling
-- OWASP Laravel Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Laravel_Cheat_Sheet.html
+- [Documentação Laravel](https://laravel.com/docs)
+- [Laravel Octane e Open Swoole](https://laravel.com/docs/octane#swoole)
+- [Ciclo de vida da requisição](https://laravel.com/docs/lifecycle)
+- [Relacionamentos Eloquent e eager loading](https://laravel.com/docs/eloquent-relationships)
+- [Autorização com Policies e Gates](https://laravel.com/docs/authorization)
+- [Filas](https://laravel.com/docs/queues)
+- [Banco e migrations](https://laravel.com/docs/migrations)
+- [Testes](https://laravel.com/docs/testing)
+- [Task scheduling](https://laravel.com/docs/scheduling)
+- [OWASP Laravel Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Laravel_Cheat_Sheet.html)
 
 Confirme a versão instalada em `composer.lock` antes de usar uma API — o
 comportamento de casts, filas e autorização mudou entre versões majors.

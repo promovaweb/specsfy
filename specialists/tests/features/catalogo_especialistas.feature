@@ -39,3 +39,8 @@ Feature: Catálogo de especialistas sob demanda
     Then o gestor de pacotes Laravel está disponível
     And ele define instalação e documentação em docs/packages
     And specify e implement consultam os pacotes já instalados
+
+  Scenario: Orquestrar deploy completo em Docker Swarm
+    Given o catálogo versionado de especialistas
+    Then a skill de deploy coordena SEMVER, Docker, servidor, Ansible e Swarm
+    And o gerador publica Compose local, stack de produção e playbook completo

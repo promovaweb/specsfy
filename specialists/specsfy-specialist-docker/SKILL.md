@@ -27,9 +27,10 @@ description: Criar, revisar e depurar imagens Docker e ambientes Compose com bui
    (variáveis, portas, volumes) antes de propor mudança.
 2. Inspecionar `Dockerfile`, `.dockerignore`, `docker-compose.yml` e a
    política de imagem/tag já em uso pelo projeto.
-3. Quando a imagem for destinada a uma release ou deploy, acionar
-   `$specsfy-specialist-versioning`, ler `SEMVER` e alinhar a versão antes do
-   build.
+3. Quando a imagem fizer parte de uma release ou deploy, executar esta etapa
+   sob `$specsfy-specialist-deploy`. Usar a versão entregue por
+   `$specsfy-specialist-versioning`, gerar a referência com `docker-tag` e
+   recusá-la quando `verify-docker-tag` apontar diferença.
 4. Separar dependências de build e runtime com estágios (`multi-stage
    build`) claros — a imagem final não deve conter compilador, cache de
    pacote ou fonte que não roda em produção.
@@ -116,6 +117,8 @@ description: Criar, revisar e depurar imagens Docker e ambientes Compose com bui
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-deploy` coordena a entrega completa; esta skill cuida
+  somente da imagem e do Compose de desenvolvimento.
 - `$specsfy-specialist-versioning` prepara `SEMVER` e confere a identidade da
   imagem antes da publicação.
 - `$specsfy-specialist-docker-swarm` para orquestração multi-nó, secrets de

@@ -1,19 +1,16 @@
 ---
 name: specsfy-specialist-versioning
-description: Gerenciar o arquivo SEMVER na raiz do projeto, propor incrementos e alinhar versão, imagem, tag e deploy. Use ao preparar releases e artefatos.
+description: Gerenciar a versão do sistema pelo SEMVER da raiz e validar tags Docker. Use como apoio focal da `$specsfy-specialist-deploy`.
 ---
 
 # Versionamento
 
 ## Quando usar
 
-- Acionar ao preparar release, imagem destinada a deploy, tag Git ou promoção
-  entre ambientes.
-- Acionar automaticamente a partir de `$specsfy-specialist-ansible`,
-  `$specsfy-specialist-docker-swarm` e
-  `$specsfy-specialist-delivery-engineering`.
-- Acionar com `$specsfy-specialist-docker` quando a imagem sair do uso local e
-  passar a representar uma versão publicável.
+- Acionar pela `$specsfy-specialist-deploy` ao preparar release, imagem
+  destinada a deploy, tag Git ou promoção entre ambientes.
+- Em pedido completo de release ou deploy, devolver a coordenação para
+  `$specsfy-specialist-deploy` depois de preparar e conferir a versão.
 - Não publicar imagem, tag, GitHub Release nem executar deploy sem autorização
   explícita. A preparação local pode criar ou atualizar `SEMVER`.
 
@@ -52,6 +49,8 @@ description: Gerenciar o arquivo SEMVER na raiz do projeto, propor incrementos e
 node scripts/semver.mjs current --project .
 node scripts/semver.mjs bump patch --project .
 node scripts/semver.mjs verify 1.4.1 --project .
+node scripts/semver.mjs docker-tag registry.example/app --project .
+node scripts/semver.mjs verify-docker-tag registry.example/app:1.4.1 --project .
 ```
 
 Ao instalar a skill, ajuste o primeiro caminho para apontar para
@@ -71,6 +70,8 @@ skills do agente.
 ## Validação
 
 - Executar `current` e `verify` para confirmar o conteúdo de `SEMVER`.
+- Gerar a tag Docker com `docker-tag` e executar `verify-docker-tag` antes do
+  build, push ou deploy; uma tag diferente do `SEMVER` interrompe o fluxo.
 - Comparar a versão com a tag Git anterior e recusar valor igual ou inferior.
 - Comparar `SEMVER`, tag da imagem, anotações OCI, changelog e manifesto de
   deploy.
@@ -79,6 +80,8 @@ skills do agente.
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-deploy` é a única responsável por coordenar o fluxo
+  completo de release ou deploy.
 - `$specsfy-specialist-docker` constrói e publica a imagem identificada pela
   versão preparada aqui.
 - `$specsfy-specialist-docker-swarm` aplica no cluster a imagem e o digest

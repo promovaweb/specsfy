@@ -64,6 +64,9 @@ O CLI instala a metodologia de `skills/` e, sob demanda, especialistas de
 `specialists/`. Veja o [guia de instalação](docs/user/installation.md), o
 [primeiro uso](docs/user/getting-started.md) e o
 [guia do CLI](docs/user/cli.md).
+Release, cadastro de servidores e produção em Docker Swarm usam a entrada única
+[`specsfy-specialist-deploy`](docs/user/deploy.md), com inventário Ansible,
+teste das conexões e sincronização de chaves públicas.
 O portal completo está em [`docs/README.md`](docs/README.md).
 
 Para desenvolver a partir do checkout:

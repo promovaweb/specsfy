@@ -224,3 +224,25 @@ def then_base_skills_consult_existing_packages(context) -> None:
         content = path.read_text(encoding="utf-8")
         assert "specsfy-specialist-laravel-package-manager" in content
         assert ".specsfy/PACKAGES.md" in content
+
+
+@then("a skill de deploy coordena SEMVER, Docker, servidor, Ansible e Swarm")
+def then_deploy_orchestrates_the_server_chain(context) -> None:
+    name = "specsfy-specialist-deploy"
+    entry = next(item for item in context.catalog["skills"] if item["name"] == name)
+    assert {
+        "specsfy-specialist-versioning",
+        "specsfy-specialist-debian-server",
+        "specsfy-specialist-docker",
+        "specsfy-specialist-docker-swarm",
+        "specsfy-specialist-ansible",
+    } == set(entry["requires"])
+
+
+@then("o gerador publica Compose local, stack de produção e playbook completo")
+def then_deploy_generator_is_available(context) -> None:
+    skill = ROOT / "specsfy-specialist-deploy"
+    content = (skill / "SKILL.md").read_text(encoding="utf-8")
+    assert (skill / "scripts" / "scaffold.mjs").is_file()
+    for value in ("compose.yaml", "stack.yaml", "Docker Swarm", "usuário `deploy`"):
+        assert value in content

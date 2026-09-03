@@ -14,17 +14,19 @@ ao Docker Swarm com um caminho conhecido de rollback.
 
 ## O arquivo SEMVER
 
-`SEMVER` contém uma única linha:
+`SEMVER` contém uma única linha com a versão preparada. Você pode abrir o
+arquivo antes do deploy e comparar esse valor com a imagem que será publicada:
 
 ```text
 1.4.0
 ```
 
-O formato segue `MAJOR.MINOR.PATCH`:
+O formato segue `MAJOR.MINOR.PATCH`. Cada parte comunica um tipo diferente de
+mudança e impede que uma correção pareça uma quebra de compatibilidade:
 
-- aumente `PATCH` para uma correção compatível, como `1.4.0` para `1.4.1`;
+- aumente `PATCH` para uma correção compatível, como `1.4.0` para `1.4.1`.
 - aumente `MINOR` para uma capacidade nova e compatível, como `1.4.1` para
-  `1.5.0`;
+  `1.5.0`.
 - aumente `MAJOR` quando a interface pública deixa de ser compatível, como
   `1.5.0` para `2.0.0`.
 
@@ -40,7 +42,8 @@ node .agents/skills/specsfy-specialist-versioning/scripts/semver.mjs \
   init --initial 1.0.0 --project .
 ```
 
-Consulte e incremente a versão com o mesmo utilitário:
+O mesmo utilitário permite consultar a versão antes de qualquer alteração e
+incrementá-la depois que o alcance da entrega estiver confirmado:
 
 ```bash
 node .agents/skills/specsfy-specialist-versioning/scripts/semver.mjs \
@@ -69,24 +72,67 @@ A versão preparada precisa aparecer nos artefatos que representam a entrega:
 
 O commit também pode gerar uma tag de imagem, como `git-a1b2c3d`. Depois da
 publicação, o digest `sha256:...` identifica o conteúdo exato promovido. O
-número explica a evolução para pessoas; o digest garante que todos os nodes
+número explica a evolução para pessoas. O digest garante que todos os nodes
 baixem os mesmos bytes.
 
 ```mermaid
-flowchart LR
-  S[SEMVER] --> T[Testes]
+flowchart TD
+  P[Pedido em linguagem natural] --> D[specsfy-specialist-deploy]
+  D --> I[Inventário dos servidores]
+  I --> C[Teste das conexões]
+  C --> K[Chaves públicas para deploy]
+  D --> S[SEMVER]
+  D --> V[Secrets no Ansible Vault]
+  S --> T[Testes da aplicação]
   T --> B[Build único]
   B --> R[Registry e digest]
   R --> G[Tag Git e GitHub Release]
-  R --> A[Ansible]
-  A --> W[Docker Swarm]
-  W --> O[Convergência observada]
+  K --> A[Ansible]
+  V --> A
+  R --> A
+  A --> W[Managers e workers do Docker Swarm]
+  W --> O[Stack, réplicas e healthchecks]
 ```
 
 ## Como as skills trabalham juntas
 
 Você não precisa chamar cada especialista manualmente durante um fluxo de
 deploy. O catálogo declara as relações necessárias.
+
+Use `$specsfy-specialist-deploy` como entrada única para um release ou deploy
+completo. Ela gera a base operacional com:
+
+```bash
+node .agents/skills/specsfy-specialist-deploy/scripts/scaffold.mjs \
+  --project . \
+  --image registry.example/equipe/aplicacao
+```
+
+O comando lê `SEMVER` na raiz e cria o `Dockerfile` com Open Swoole, o
+`compose.yaml` para desenvolvimento, o `stack.yaml` para produção e a pasta
+`ansible/`. Aplicações Laravel executam Octane com `--server=swoole`. O
+playbook cria o usuário `deploy`, instala o Docker Engine, ativa o Docker
+Swarm e publica a stack pelo manager. Se algum desses arquivos já existir, o gerador
+encerra sem sobrescrever o conteúdo.
+
+Depois da geração, a skill pergunta quais senhas, tokens e chaves a aplicação
+consome e registra os nomes em `ansible/vault-fields.txt`. O utilitário
+solicita a senha do Vault e cada valor com entrada oculta:
+
+```bash
+./deploy secrets
+```
+
+Cada resposta é adicionada automaticamente ao `vault.yml` como variável
+criptografada. O playbook transforma essas variáveis em Docker Secrets. A
+stack mantém somente os nomes externos e nunca recebe os valores protegidos.
+Se você repetir o comando, ele preserva os campos existentes e pergunta apenas
+pelos que ainda faltam.
+
+O próximo capítulo, [Servidores, conexões e comandos de
+deploy](deploy-operations.md), mostra a árvore criada no projeto, o cadastro de
+máquinas, a conta `deploy`, a sincronização das chaves públicas e os comandos
+curtos para outro painel do Herdr.
 
 ### Versionamento prepara a entrega
 
@@ -101,7 +147,7 @@ apenas ao desenvolvimento local. O build recebe a tag SemVer, a tag do commit
 e as anotações OCI. A mesma imagem serve HTTP, filas, scheduler ou outros
 processos, com comandos próprios.
 
-A imagem é compilada uma vez. Staging e produção recebem o mesmo digest; não
+A imagem é compilada uma vez. Staging e produção recebem o mesmo digest. Não
 há um novo build por ambiente.
 
 ### Ansible prepara os hosts
@@ -136,7 +182,8 @@ VERSION=$(tr -d '\n' < SEMVER)
 git tag --list "v${VERSION}"
 ```
 
-Esse comando consulta o Git. Ele não cria a tag.
+Esse comando consulta o Git sem criar a tag. Uma linha vazia confirma que a
+versão ainda não foi usada no repositório local.
 
 ### 2. Teste e compile uma vez
 
@@ -169,14 +216,15 @@ um caminho simples para repetir o deploy sem recompilar.
 
 ### 4. Valide os hosts e a stack
 
-O preflight do Ansible deve confirmar:
+O preflight do Ansible reúne as condições que precisam estar visíveis antes da
+escrita no cluster. A leitura deve confirmar:
 
-- acesso aos hosts e ao registry;
-- versão do Docker Engine e papel de cada node;
-- presença das redes externas necessárias;
-- existência dos Docker Secrets esperados;
-- versão do manifesto igual ao conteúdo de `SEMVER`;
-- acesso ao digest publicado;
+- acesso aos hosts e ao registry.
+- versão do Docker Engine e papel de cada node.
+- presença das redes externas necessárias.
+- existência dos Docker Secrets esperados.
+- versão do manifesto igual ao conteúdo de `SEMVER`.
+- acesso ao digest publicado.
 - sintaxe aceita por `docker stack config`.
 
 Check mode prepara essa leitura sem implantar a stack. Depois da autorização,
@@ -184,7 +232,8 @@ o playbook copia os manifestos e chama o deploy na ordem das dependências.
 
 ### 5. Observe a convergência
 
-Depois de `docker stack deploy`, acompanhe cada serviço:
+Depois de `docker stack deploy`, acompanhe cada serviço até que a quantidade de
+réplicas ativas corresponda à quantidade desejada:
 
 ```bash
 docker stack services minha-stack
@@ -201,16 +250,18 @@ não estabilizar, interrompa a promoção e use a versão anterior já publicada
 Em um rolling update, versões antiga e nova podem executar ao mesmo tempo. A
 alteração do banco precisa aceitar essa convivência.
 
-Use o percurso expand/contract:
+Use o percurso expand/contract para separar a mudança compatível da remoção do
+formato anterior:
 
-1. adicione coluna, tabela ou índice sem remover o contrato antigo;
-2. publique código que entende os dois formatos;
-3. migre ou preencha os dados necessários;
-4. confirme que nenhum processo antigo depende do formato anterior;
+1. adicione coluna, tabela ou índice sem remover o contrato antigo.
+2. publique código que entende os dois formatos.
+3. migre ou preencha os dados necessários.
+4. confirme que nenhum processo antigo depende do formato anterior.
 5. remova o contrato antigo em outra versão.
 
-Execute a migration por uma única tarefa ou réplica. Os serviços HTTP e os
-workers não devem disputar a mesma migration durante o rollout.
+Execute a migration por uma única tarefa ou réplica. Se dois containers
+tentarem alterar o mesmo schema, o rollout pode parar no meio da atualização.
+Os serviços HTTP e os workers não devem disputar a mesma migration.
 
 ## Rollback faz parte da preparação
 
@@ -218,12 +269,13 @@ Antes do deploy, registre a versão anterior e seu digest. O rollback de código
 volta a stack para essa imagem. O rollback de dados é outro procedimento:
 algumas migrations não podem ser desfeitas sem perda.
 
-Um plano mínimo informa:
+Um plano mínimo deixa registrada a imagem que voltará ao ar, a relação com o
+banco e os sinais usados para interromper o rollout. Ele informa:
 
-- versão e digest anteriores;
-- comando para restaurar a referência da stack;
-- compatibilidade do banco com a versão anterior;
-- sinais que interrompem o rollout;
+- versão e digest anteriores.
+- comando para restaurar a referência da stack.
+- compatibilidade do banco com a versão anterior.
+- sinais que interrompem o rollout.
 - pessoa responsável por acompanhar a recuperação.
 
 No Swarm, `rollback_config` define paralelismo, intervalo, ordem e resposta a

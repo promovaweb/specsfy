@@ -196,6 +196,7 @@ manual quando a entrega pedir aquele domínio.
 | Next.js | App Router, fronteiras server/client, cache, dados e deploy. |
 | TypeScript | Tipos, strictness, módulos e contratos de API. |
 | Docker | Imagens, Compose, segurança, builds e ambiente local. |
+| Deploy | Orquestra `SEMVER`, inventário, conexões, chaves públicas, Compose local, stack Swarm e Ansible. |
 | Versionamento | Arquivo `SEMVER`, incrementos e alinhamento entre artefato, tag e deploy. |
 | Debian Server | APT, systemd, SSH, nftables, sysctl, storage e Docker Engine no host. |
 | Docker Swarm | Stacks, serviços, redes, secrets, rollout e recuperação. |
