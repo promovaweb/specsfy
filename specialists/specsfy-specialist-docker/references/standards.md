@@ -1,5 +1,24 @@
 # Padrões e referências Docker
 
+## Imagem única para processos Laravel
+
+Uma aplicação Laravel pode compartilhar o mesmo filesystem entre Octane,
+Horizon, scheduler, queue e WebSocket. Compile dependências e assets uma vez,
+copie somente o resultado para o runtime e use um entrypoint em forma exec para
+selecionar o processo. Essa composição impede que cada serviço receba uma
+imagem recompilada e facilita comparar o digest implantado.
+
+Separe builders de extensões que mudam em ritmos diferentes. Um estágio comum
+instala headers e compiladores; ramos independentes compilam extensões de banco,
+mídia, servidor de aplicação e cache; o runtime recebe apenas `.so` e arquivos
+de configuração. Preserve ownership do código por root e conceda escrita ao
+usuário da aplicação somente em diretórios de cache e arquivos temporários.
+
+O fluxo de publicação deve recusar tags SemVer e SHA já existentes, publicar a
+imagem com metadados OCI e só depois criar ou enviar a tag Git correspondente.
+Valide o entrypoint em cada modo de processo e confirme que caches dependentes
+de env são reconstruídos no startup.
+
 ## Multi-stage build
 
 ```dockerfile

@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "version": "1.7.20",
-  "edition": "v1.7.20",
-  "generated_at": "2026-08-31T11:07:48Z",
-  "source_sha256": "01daa5a1998f535bd17e9980b9d9d48846bb8ac4d973fd7088675efb439b686b",
+  "version": "1.8.0",
+  "edition": "v1.8.0",
+  "generated_at": "2026-09-03T12:25:02Z",
+  "source_sha256": "da88f629f04f991c6d2736af0d792a4e2448de3b56912eceb118e7ac242aad3b",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -28,6 +28,7 @@
     "docs/user/cli-reference.md",
     "docs/user/cli.md",
     "docs/user/credits.md",
+    "docs/user/deploy.md",
     "docs/user/design-system.md",
     "docs/user/getting-started.md",
     "docs/user/inbox.md",
@@ -78,12 +79,12 @@
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v1.7.20.pdf",
-      "sha256": "646d7c6b3207a51f16d6b79843a023c4463ed50d061eeabd14c33a3556ffe3d5"
+      "file": "Specsfy-Guia-do-Usuario-v1.8.0.pdf",
+      "sha256": "13d00a0891fdf7118aec4b75e15fcc42c3cfca4fa19eebccb68cf4803b2561ce"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v1.7.20.epub",
-      "sha256": "71d26f967ebbda516d76a2c54ab876312841c959d753c03f3f29709680fe01af"
+      "file": "Specsfy-Guia-do-Usuario-v1.8.0.epub",
+      "sha256": "df19d5f65ab25e9f51431dd917bac991c14db4f6dbb791a711c1a6434afe2470"
     }
   }
 }

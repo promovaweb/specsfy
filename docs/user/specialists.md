@@ -61,7 +61,7 @@ instalação.
 | React, Astro, Next.js ou TypeScript | especialista correspondente |
 | Tailwind CSS ou shadcn/ui | Tailwind CSS ou shadcn/ui correspondente |
 | ReUI solicitado para React e Tailwind | ReUI, React, Tailwind CSS e shadcn/ui |
-| Docker, Swarm ou Ansible | especialista de plataforma correspondente |
+| Docker, Swarm ou Ansible | especialista de plataforma e versionamento correspondente |
 | OpenAPI, OpenTelemetry, Prometheus ou CI/CD | API, observabilidade ou entrega correspondente |
 
 ## Instalação manual
@@ -155,7 +155,7 @@ equipe ativa, o módulo e o título atual. Em Laravel, o padrão reaproveita o
 | backend e dados | Laravel, Supabase, Postgres, Redis e APIs web |
 | frontend | React, Astro, Next.js, TypeScript e Tailwind CSS |
 | interface | design system, experiência de interface, shadcn/ui, UI, UX e acessibilidade web |
-| plataforma | Docker, Docker Swarm, Ansible e engenharia de entrega |
+| plataforma | versionamento, Docker, Docker Swarm, Ansible e engenharia de entrega |
 | qualidade | segurança, observabilidade e performance |
 | design técnico | arquitetura e modelagem de domínio |
 | engenharia | code review, debugging, prototipação, pesquisa e conflitos Git |
@@ -196,6 +196,8 @@ manual quando a entrega pedir aquele domínio.
 | Next.js | App Router, fronteiras server/client, cache, dados e deploy. |
 | TypeScript | Tipos, strictness, módulos e contratos de API. |
 | Docker | Imagens, Compose, segurança, builds e ambiente local. |
+| Versionamento | Arquivo `SEMVER`, incrementos e alinhamento entre artefato, tag e deploy. |
+| Debian Server | APT, systemd, SSH, nftables, sysctl, storage e Docker Engine no host. |
 | Docker Swarm | Stacks, serviços, redes, secrets, rollout e recuperação. |
 | Ansible | Playbooks, roles, Vault e automação de infraestrutura. |
 | APIs Web | Contratos HTTP, erros, paginação, idempotência e evolução de API. |

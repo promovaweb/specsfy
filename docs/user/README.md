@@ -24,12 +24,12 @@ implementação do framework para seguir esse percurso.
 
 ## Leia online ou como ebook
 
-Este mesmo percurso compõe a edição portátil **v1.7.17**. Use o PDF para leitura
+Este mesmo percurso compõe a edição portátil **v1.8.0**. Use o PDF para leitura
 e impressão ou o EPUB em leitores que permitem ajustar fonte e tamanho:
 
-- [PDF](../../ebook/Specsfy-Guia-do-Usuario-v1.7.17.pdf), para leitura,
+- [PDF](../../ebook/Specsfy-Guia-do-Usuario-v1.8.0.pdf), para leitura,
   compartilhamento e impressão.
-- [EPUB](../../ebook/Specsfy-Guia-do-Usuario-v1.7.17.epub), para leitores
+- [EPUB](../../ebook/Specsfy-Guia-do-Usuario-v1.8.0.epub), para leitores
   digitais com fonte e tamanho ajustáveis.
 
 Os dois formatos são reconstruídos a partir destas páginas. O
@@ -139,6 +139,8 @@ Os próximos guias são opcionais. Consulte-os quando a entrega exigir uma
 integração ou tecnologia específica:
 
 - [Especialistas](specialists.md), para conhecimento técnico adicional.
+- [Da versão ao servidor](deploy.md), para ligar `SEMVER`, imagem, Ansible e
+  Docker Swarm em um deploy verificável.
 - [Uso avançado](advanced-usage.md), para automação e integrações.
 - aplicação em projetos [Laravel](laravel.md), [Astro](astro.md) ou
   [Next.js](nextjs.md).

@@ -1,5 +1,22 @@
 # Padrões e referências Docker Swarm
 
+## Sequência de stacks e convergência
+
+Divida stacks por ciclo de vida: dados, aplicação e ingress. Garanta redes,
+configs e Docker Secrets externos antes do primeiro `docker stack deploy`.
+Depois de cada stack, compare réplicas atuais e desejadas serviço a serviço;
+um comando concluído não comprova que o scheduler estabilizou as tasks.
+
+Em aplicações com migrations, escolha um único serviço para executá-las e
+mantenha os outros modos com essa função desligada. Combine a janela de
+migrations com `update_config`, `rollback_config` e compatibilidade entre a
+versão anterior e a nova. Para storage local, fixe a task por label administrada
+e documente backup, restore e a consequência de perder aquele node.
+
+Um ingress outbound-only pode conectar-se a uma rede edge sem publicar portas.
+Confirme healthcheck do tunnel, ao menos duas réplicas quando houver capacidade
+no cluster e ordem explícita das rotas antes do catch-all.
+
 ## Topologia e quorum
 
 - O Raft consensus exige maioria simples viva para eleger líder e aceitar

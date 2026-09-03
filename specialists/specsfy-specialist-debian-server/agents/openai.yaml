@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Debian Server"
+  short_description: "Hosts Debian para aplicações e clusters"
+  default_prompt: "Use $specsfy-specialist-debian-server para orientar esta tarefa com padrões e validação especializados."

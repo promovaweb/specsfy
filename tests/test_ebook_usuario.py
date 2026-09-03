@@ -159,6 +159,22 @@ class UserEbookTests(unittest.TestCase):
         self.assertEqual(user_pages, set(ordered_sources))
         self.assertEqual(len(user_pages), len(ordered_sources))
 
+    def test_deploy_chapter_connects_semver_to_the_runtime(self) -> None:
+        chapter = (ROOT / "docs" / "user" / "deploy.md").read_text(encoding="utf-8")
+        order = (ROOT / "docs" / "user" / "reading-order.txt").read_text(
+            encoding="utf-8"
+        )
+        for term in (
+            "SEMVER",
+            "specsfy-specialist-versioning",
+            "Docker",
+            "Ansible",
+            "Docker Swarm",
+            "rollback",
+        ):
+            self.assertIn(term, chapter)
+        self.assertIn("docs/user/deploy.md", order)
+
     def test_build_manifest_proves_sources_and_artifacts_are_current(
         self,
     ) -> None:

@@ -61,6 +61,14 @@ Conteúdo extenso, padrões externos e matrizes de decisão ficam em
 Scripts automatizam transformações determinísticas. Eles retornam códigos úteis,
 não instalam globalmente e não realizam ações destrutivas por padrão.
 
+O especialista `specsfy-specialist-versioning` inclui
+`scripts/semver.mjs`. O utilitário cria, consulta, incrementa e confere o
+arquivo `SEMVER` na raiz do projeto consumidor. Ansible, Docker Swarm e
+engenharia de entrega declaram esse especialista em `requires`; Docker o chama
+quando a imagem representa uma release ou um deploy. A preparação pode alterar
+o arquivo local, mas publicação e implantação remotas continuam dependentes de
+autorização explícita.
+
 Templates de documentos gerenciados vivem em `skills/templates/` e são
 publicados juntos em `.specsfy/templates/`. Nos projetos consumidores, um
 arquivo homônimo em `.specsfy/templates/custom/` tem precedência. Esse

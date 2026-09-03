@@ -15,6 +15,7 @@ STACK = {
     "specsfy-specialist-redis",
     "specsfy-specialist-docker-swarm",
     "specsfy-specialist-ansible",
+    "specsfy-specialist-debian-server",
     "specsfy-specialist-react",
     "specsfy-specialist-astro",
     "specsfy-specialist-nextjs",
@@ -41,7 +42,7 @@ def then_all_are_namespaced(context) -> None:
 
 
 @then(
-    "Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, React, Astro e Nextjs estão disponíveis"
+    "Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, Debian Server, React, Astro e Nextjs estão disponíveis"
 )
 def then_stack_is_available(context) -> None:
     assert STACK <= context.names

@@ -27,20 +27,36 @@ description: Criar, revisar e depurar imagens Docker e ambientes Compose com bui
    (variáveis, portas, volumes) antes de propor mudança.
 2. Inspecionar `Dockerfile`, `.dockerignore`, `docker-compose.yml` e a
    política de imagem/tag já em uso pelo projeto.
-3. Separar dependências de build e runtime com estágios (`multi-stage
+3. Quando a imagem for destinada a uma release ou deploy, acionar
+   `$specsfy-specialist-versioning`, ler `SEMVER` e alinhar a versão antes do
+   build.
+4. Separar dependências de build e runtime com estágios (`multi-stage
    build`) claros — a imagem final não deve conter compilador, cache de
    pacote ou fonte que não roda em produção.
-4. Fixar artefatos de forma reproduzível (lockfile, versão de base image
+5. Fixar artefatos de forma reproduzível (lockfile, versão de base image
    pinada ou por digest) e reduzir contexto de build e camadas mutáveis.
-5. Executar o processo como usuário não root, limitar privilégios
+6. Executar o processo como usuário não root, limitar privilégios
    (`cap_drop`, sem `--privileged`) e nunca embutir segredo na imagem.
-6. Definir healthcheck, tratamento de sinal (`SIGTERM`, `SIGINT`), volumes,
+7. Definir healthcheck, tratamento de sinal (`SIGTERM`, `SIGINT`), volumes,
    redes e configuração externa (env, arquivo montado) explicitamente.
-7. Construir a imagem, escanear vulnerabilidades e testá-la exatamente como
+8. Construir a imagem, escanear vulnerabilidades e testá-la exatamente como
    será executada em produção (mesmo usuário, mesmas variáveis).
 
 ## Padrões
 
+- Em aplicações com extensões nativas, dividir compilação em estágios
+  independentes por família. Uma alteração em Redis, mídia ou servidor de
+  aplicação não precisa invalidar toda a toolchain.
+- Quando vários serviços usam o mesmo código, produzir uma imagem única e
+  selecionar modos de processo no entrypoint, como HTTP, scheduler, filas e
+  WebSocket. Cada modo recebe healthcheck, sinal e escrita compatíveis com sua
+  função.
+- Publicar referências imutáveis para SemVer e commit, conferir se ambas ainda
+  não existem e registrar o digest usado pelo deploy. A tag Git só deve ser
+  publicada depois que a imagem estiver disponível no registry.
+- Gerar caches de framework no entrypoint quando eles dependem de configuração
+  fornecida no runtime. Não transportar cache de configuração criado durante o
+  build para ambientes com valores diferentes.
 - Preferir base mínima compatível (slim/alpine quando a stack suporta) e
   fixar por digest (`@sha256:...`) quando reprodutibilidade byte-a-byte
   importar mais que atualização automática de patch.
@@ -100,6 +116,8 @@ description: Criar, revisar e depurar imagens Docker e ambientes Compose com bui
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-versioning` prepara `SEMVER` e confere a identidade da
+  imagem antes da publicação.
 - `$specsfy-specialist-docker-swarm` para orquestração multi-nó, secrets de
   cluster, rede overlay e rollout de serviços — este especialista cobre a
   imagem e o Compose local, não o cluster de produção.
@@ -115,6 +133,8 @@ description: Criar, revisar e depurar imagens Docker e ambientes Compose com bui
   orquestrado pela CLI do Supabase sobre Docker.
 - `$specsfy-specialist-laravel` para os contratos de execução da aplicação
   empacotada (workers de fila, scheduler, variáveis de ambiente esperadas).
+- `$specsfy-specialist-debian-server` para kernel, filesystem, systemd, APT e
+  Docker Engine do host que executa a imagem.
 
 Leia [references/standards.md](references/standards.md) para build,
 Compose, segurança, supply chain e operação.

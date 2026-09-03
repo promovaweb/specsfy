@@ -20,20 +20,22 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Fluxo
 
+1. Acionar `$specsfy-specialist-versioning`, preparar `SEMVER` e conferir o
+   número que identificará artefato, changelog e tag.
 1. Mapear commit, artefato, ambientes, aprovações necessárias e owner de cada
    promoção antes de desenhar o pipeline.
-2. Tornar build e testes reproduzíveis a partir de lockfiles versionados —
+1. Tornar build e testes reproduzíveis a partir de lockfiles versionados —
    nunca resolver dependência "mais recente" no momento do build.
-3. Produzir o artefato imutável uma única vez e promovê-lo, sem
+1. Produzir o artefato imutável uma única vez e promovê-lo, sem
    recompilação, entre ambientes (o binário testado em staging é
    bit-a-bit o mesmo publicado em produção).
-4. Separar credenciais, permissões e trust boundaries por job — o job que
+1. Separar credenciais, permissões e trust boundaries por job — o job que
    builda não tem a credencial que publica em produção.
-5. Coordenar migrations de schema com compatibilidade entre a versão antiga e
+1. Coordenar migrations de schema com compatibilidade entre a versão antiga e
    a nova da aplicação durante toda a janela de rollout (expand/contract).
-6. Definir a estratégia de rollout, os sinais objetivos de sucesso, o
+1. Definir a estratégia de rollout, os sinais objetivos de sucesso, o
    critério de pausa e o mecanismo de rollback antes do primeiro deploy real.
-7. Registrar proveniência (de onde veio o artefato), versão, evidência de
+1. Registrar proveniência (de onde veio o artefato), versão, evidência de
    teste e resultado do rollout de forma auditável.
 
 ## Padrões
@@ -93,6 +95,8 @@ description: "Projetar e revisar CI/CD, artefatos, releases, promoções, migrat
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-versioning` prepara `SEMVER` e mantém o número alinhado
+  entre artefato, changelog, tag e promoção.
 - `$specsfy-specialist-ansible` aplica configuração idempotente em hosts;
   esta skill governa promoção, aprovação e proveniência da entrega.
 - `$specsfy-specialist-software-architecture` define boundaries e restrições

@@ -15,6 +15,7 @@ EXPECTED_SKILLS = {
     "specsfy-specialist-astro",
     "specsfy-specialist-code-review",
     "specsfy-specialist-data-modeling",
+    "specsfy-specialist-debian-server",
     "specsfy-specialist-debugging",
     "specsfy-specialist-delivery-engineering",
     "specsfy-specialist-docker",
@@ -43,6 +44,7 @@ EXPECTED_SKILLS = {
     "specsfy-specialist-typescript",
     "specsfy-specialist-ui-design",
     "specsfy-specialist-ux-design",
+    "specsfy-specialist-versioning",
     "specsfy-specialist-web-accessibility",
     "specsfy-specialist-web-api-design",
 }
@@ -153,6 +155,53 @@ class SpecialistCatalogTests(unittest.TestCase):
                 self.assertIsInstance(entry.get("requires", []), list)
                 for required_name in entry.get("requires", []):
                     self.assertIn(required_name, EXPECTED_SKILLS)
+
+    def test_platform_specialists_cover_a_versioned_deploy_chain(self) -> None:
+        expected_terms = {
+            "specsfy-specialist-docker": (
+                "independentes por família",
+                "modos de processo",
+                "SemVer",
+            ),
+            "specsfy-specialist-docker-swarm": (
+                "ordem de dependência",
+                "migrations",
+                "convergência",
+            ),
+            "specsfy-specialist-ansible": (
+                "preflight",
+                "check mode",
+                "Docker Secrets",
+            ),
+            "specsfy-specialist-debian-server": (
+                "sysctl.d",
+                "systemd",
+                "Docker",
+            ),
+        }
+        for name, terms in expected_terms.items():
+            with self.subTest(skill=name):
+                skill = ROOT / name
+                content = "\n".join(
+                    path.read_text(encoding="utf-8")
+                    for path in (skill / "SKILL.md", skill / "references/standards.md")
+                )
+                for term in terms:
+                    self.assertIn(term, content)
+
+    def test_deploy_specialists_require_versioning(self) -> None:
+        catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
+        entries = {entry["name"]: entry for entry in catalog["skills"]}
+        versioning = "specsfy-specialist-versioning"
+        for name in (
+            "specsfy-specialist-ansible",
+            "specsfy-specialist-delivery-engineering",
+            "specsfy-specialist-docker-swarm",
+        ):
+            with self.subTest(skill=name):
+                self.assertIn(versioning, entries[name]["requires"])
+                content = (ROOT / name / "SKILL.md").read_text(encoding="utf-8")
+                self.assertIn(f"${versioning}", content)
 
     def test_react_ui_components_are_paired_with_ui_design(self) -> None:
         component_skill = ROOT / "specsfy-specialist-react-ui-components"

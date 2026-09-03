@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Versionamento"
+  short_description: "SEMVER alinhado entre release e deploy"
+  default_prompt: "Use $specsfy-specialist-versioning para preparar e conferir a versão desta entrega."

@@ -1,5 +1,22 @@
 # Padrões e referências Ansible
 
+## Deploy de stacks com preflight
+
+Separe a inspeção da publicação. O preflight confere sintaxe, inventory,
+`--limit`, conectividade, sistema operacional, manager Swarm, autenticação do
+registry, collections, imagem e Docker Secrets. Ofereça um caminho de check
+mode que não chame `docker_stack`, pois o módulo não simula mudanças.
+
+Use `community.docker.docker_stack` com collection fixada. Instale no host as
+dependências Python declaradas pelo módulo, valide os manifests antes e envie
+`with_registry_auth` apenas quando o registry privado exigir. Modele a ordem de
+dependência como dados e inclua as tasks de deploy em loop; após cada item,
+consulte as réplicas até a convergência esperada.
+
+Configuração de kernel deve ter leitura sem mudança, arquivo persistente em
+`/etc/sysctl.d/` e aplicação condicional. Esse trio mantém a segunda execução
+sem alterações e conserva o valor depois do reboot.
+
 ## Estrutura recomendada
 
 - Layout de role padrão: `defaults/`, `vars/`, `tasks/`, `handlers/`,

@@ -19,25 +19,38 @@ description: "Criar e revisar automação Ansible idempotente, segura e testáve
 
 ## Fluxo
 
+1. Acionar `$specsfy-specialist-versioning` e conferir `SEMVER`, imagem e
+   manifestos antes do preflight de deploy.
 1. Confirmar inventário, grupos, ambiente-alvo, método de conexão e escopo
    exato de hosts antes de qualquer execução com efeito.
-2. Inspecionar a precedência de variáveis aplicável (ver tabela em
+1. Inspecionar a precedência de variáveis aplicável (ver tabela em
    `references/standards.md`) e as versões fixadas de collections e
    `ansible-core`.
-3. Modelar o estado desejado com módulos idempotentes e roles coesas, uma
+1. Modelar o estado desejado com módulos idempotentes e roles coesas, uma
    responsabilidade por role.
-4. Proteger secrets com Ansible Vault ou um provedor externo (lookup em
+1. Proteger secrets com Ansible Vault ou um provedor externo (lookup em
    cofre gerenciado); nunca em texto plano no repositório.
-5. Validar sintaxe, `ansible-lint`, check mode e diff sem revelar segredos no
+1. Validar sintaxe, `ansible-lint`, check mode e diff sem revelar segredos no
    output.
-6. Testar a role em ambiente descartável e repetir a mesma execução para
+1. Testar a role em ambiente descartável e repetir a mesma execução para
    provar que a segunda rodada não relata `changed`.
-7. Aplicar em produção com serialização (`serial`), limites (`--limit`) e
+1. Aplicar em produção com serialização (`serial`), limites (`--limit`) e
    critério de parada (`max_fail_percentage`/`any_errors_fatal`) compatíveis
    com o risco da mudança.
 
 ## Padrões
 
+- Criar um preflight separado para conferir versão do controlador, sistema do
+  alvo, acesso ao Docker, papel de manager, login no registry, collections,
+  imagem imutável e Docker Secrets antes do play com escrita.
+- Copiar manifests versionados para um diretório estável no host, validar cada
+  um com `docker stack config` e publicar as stacks em ordem de dependência.
+- Após cada publicação, consultar as réplicas até atingir a convergência ou
+  encerrar com erro após tentativas limitadas. Não concluir pelo retorno do
+  módulo de deploy isoladamente.
+- Tratar check mode com honestidade: tasks de inspeção podem usar
+  `check_mode: false`; tasks que alteram estado devem ser puladas ou suportar a
+  simulação. O preflight precisa permanecer útil sem implantar stacks.
 - Usar FQCN (`ansible.builtin.copy`, não `copy`) e módulos declarativos,
   evitando `shell`/`command` sempre que existir módulo idempotente
   equivalente.
@@ -98,6 +111,8 @@ description: "Criar e revisar automação Ansible idempotente, segura e testáve
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-versioning` mantém `SEMVER` alinhado à imagem e aos
+  manifestos transportados pela automação.
 - `$specsfy-specialist-docker-swarm` quando o host provisionado por Ansible
   entra em um cluster Swarm — Ansible prepara o node, Swarm orquestra os
   serviços dentro dele.
@@ -105,6 +120,8 @@ description: "Criar e revisar automação Ansible idempotente, segura e testáve
   uma etapa de pipeline com promoção entre ambientes.
 - `$specsfy-specialist-application-security` para revisão de gestão de
   segredo, rotação de credencial e hardening do host provisionado.
+- `$specsfy-specialist-debian-server` para preparar APT, SSH, sysctl, systemd,
+  firewall e Docker Engine antes da automação da aplicação.
 
 Leia [references/standards.md](references/standards.md) para estrutura de
 roles, precedência de variáveis, idempotência, segurança operacional e

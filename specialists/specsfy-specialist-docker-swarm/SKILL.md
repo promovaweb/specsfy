@@ -21,26 +21,39 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 
 ## Fluxo
 
+1. Acionar `$specsfy-specialist-versioning`, ler `SEMVER` e conferir se a
+   imagem imutável e o manifesto representam a mesma versão.
 1. Mapear managers, workers, zonas, labels, quorum e dependências externas
    (registry, storage, DNS) antes de qualquer mudança de topologia.
-2. Validar que a imagem publicada é a mesma testada e que o arquivo de stack
+1. Validar que a imagem publicada é a mesma testada e que o arquivo de stack
    usa apenas chaves suportadas por `docker stack deploy` (não todo o schema
    do Compose).
-3. Definir services, redes, ports, volumes, configs e secrets, com um owner
+1. Definir services, redes, ports, volumes, configs e secrets, com um owner
    claro para cada recurso compartilhado.
-4. Configurar replicas, placement constraints/preferences,
+1. Configurar replicas, placement constraints/preferences,
    `resources.limits`/`reservations`, healthcheck e `restart_policy`.
-5. Projetar `update_config` e `rollback_config` (paralelismo, delay, ordem
+1. Projetar `update_config` e `rollback_config` (paralelismo, delay, ordem
    `start-first`/`stop-first`, `failure_action`) garantindo que a versão nova
    e a antiga coexistam sem quebrar contrato de API/dados durante o rollout.
-6. Aplicar em um swarm representativo (staging com topologia equivalente, não
+1. Aplicar em um swarm representativo (staging com topologia equivalente, não
    um único nó) e observar convergência com `docker service ps` e `docker
    service logs`.
-7. Documentar procedimento de deploy, rollback, rotação de secret, backup do
+1. Documentar procedimento de deploy, rollback, rotação de secret, backup do
    estado do Raft e plano de recuperação de perda de manager.
 
 ## Padrões
 
+- Separar dependências, aplicação e ingress em stacks diferentes. Publicar em
+  ordem de dependência, aguardar a convergência declarada de cada serviço e só
+  então abrir o caminho público.
+- Concentrar migrations em uma réplica escolhida. Os demais serviços iniciam
+  com migrations desativadas para impedir concorrência durante rollout.
+- Usar a mesma imagem imutável para HTTP, filas, scheduler e WebSocket, com
+  comandos e healthchecks próprios. Manter o worker de contingência em zero
+  réplica quando outro supervisor de filas estiver ativo.
+- Criar redes overlay externas e criptografadas antes das stacks. Serviços de
+  dados ficam apenas na rede interna; um tunnel outbound-only pode eliminar
+  portas públicas no host quando esse desenho atende ao projeto.
 - Manter número ímpar de managers (1, 3 ou 5) e nunca deixar o quorum
   dependente de um único manager em produção.
 - Publicar imagens imutáveis por digest (`image@sha256:...`) acessíveis por
@@ -92,6 +105,8 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-versioning` prepara `SEMVER` e confere a versão usada
+  pela imagem e pelo manifesto da stack.
 - `$specsfy-specialist-ansible` prepara e mantém os nodes; esta skill governa
   quorum, scheduler, services e redes do Swarm.
 - `$specsfy-specialist-laravel` define os contratos da aplicação e
@@ -104,6 +119,8 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 - `$specsfy-specialist-observability` para instrumentar os sinais (health,
   taxa de erro, latência) que decidem continuar, pausar ou reverter um
   rollout.
+- `$specsfy-specialist-debian-server` para portas do cluster, kernel,
+  filesystem e serviço Docker dos nodes.
 
 Leia [references/standards.md](references/standards.md) para topologia do
 Raft, ciclo de vida de secrets/configs, redes overlay, estratégias de rollout

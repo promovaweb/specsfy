@@ -7,7 +7,7 @@ Feature: Catálogo de especialistas sob demanda
   Scenario: Publicar o catálogo completo da stack Promovaweb
     Given o catálogo versionado de especialistas
     Then todas as skills usam o prefixo specsfy-specialist-
-    And Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, React, Astro e Nextjs estão disponíveis
+    And Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, Debian Server, React, Astro e Nextjs estão disponíveis
     And Shadcn, UI, UX e acessibilidade estão disponíveis separadamente
 
   Scenario: Publicar especialistas autocontidos
