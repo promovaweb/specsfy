@@ -37,6 +37,8 @@ precisa guardar quando o sistema atual não responder.
 3. Registrar regras de unicidade, retenção, exclusão e histórico.
 4. Comparar a proposta com os contratos e consultas atuais.
 5. Encaminhar a confirmação para a skill de banco do projeto.
+6. Exigir uma tarefa `[MIGRATION]` com arquivo versionado para qualquer mudança
+   ligada ao banco e conferir sua aplicação em uma base de teste.
 
 ## Padrões
 
@@ -54,6 +56,8 @@ precisa guardar quando o sistema atual não responder.
 
 - Rode os testes e validadores ligados ao modelo persistente.
 - Confira a migration em uma cópia do banco e compare o schema resultante.
+- Confirme o arquivo, o comando de aplicação e a consulta do estado da
+  migration antes de encerrar a tarefa.
 - Não declare o modelo pronto sem uma saída verificável do projeto.
 
 ## Skills relacionadas

@@ -45,6 +45,27 @@ Quando a spec declara uma interface, o plano inclui tarefas para telas,
 menus, navegação, formulário, ações e seus testes de navegação, validação e recuperação de erro.
 Uma tarefa de API ou persistência não substitui essas tarefas.
 
+Quando qualquer tarefa altera banco, schema, tabela, coluna, índice, relação
+ou model persistente, o plano inclui uma tarefa separada com as tags
+`[CODE] [MIGRATION]`. Ela aponta para o arquivo versionado e fica entre os
+testes TDD e o código que passa a usar a nova estrutura.
+
+```text
+T004 [CODE] [MIGRATION] Criar tabela em
+database/migrations/2026_09_04_120000_create_clients_table.php
+```
+
+O `VERIFY` registra um comando que aplica a migration no banco de teste e outro
+que consulta seu estado. Em Laravel, por exemplo:
+
+```bash
+php artisan migrate --env=testing
+php artisan migrate:status --env=testing
+```
+
+Sem a tarefa `[MIGRATION]`, o validador recusa um plano que contenha trabalho
+ligado ao banco.
+
 Essas tarefas ficam em uma `Fase de interface` dedicada. Há uma tarefa por tela
 registrada, usando os componentes e a stack já existentes no projeto.
 Em projetos React, o `PREP` de cada tarefa carrega
@@ -62,6 +83,7 @@ predecessores exigidos possuem RED válido.
 - ordem explícita de dependência.
 - testes com RED como predecessores do código.
 - caminhos e comandos reais do projeto.
+- migration explícita para toda tarefa ligada ao banco.
 - tarefas mantidas dentro da fonte única.
 
 ## Erros comuns

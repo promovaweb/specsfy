@@ -35,6 +35,12 @@ Definition Gate: Passed
 Status: Defined
 ```
 
+Quando o plano inclui uma tarefa `[MIGRATION]`, a validação final também
+confere a entrega registrada pela implementação. A tarefa só pode terminar
+quando a comprovação relaciona o arquivo versionado da migration, o comando
+que a aplicou no banco de teste e o comando que consultou o estado depois da
+aplicação.
+
 Uma falha de parser, fixture ou ambiente não serve como prova de requisito
 ausente.
 
@@ -43,6 +49,7 @@ ausente.
 - problemas apontados com localização e motivo.
 - nenhuma aprovação baseada em suposição.
 - verificação das evidências externas citadas.
+- conferência da aplicação das migrations previstas no plano.
 - retorno automático à etapa que pode resolver a lacuna.
 - gate aprovado somente após nova validação.
 

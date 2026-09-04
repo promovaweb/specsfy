@@ -66,7 +66,9 @@ são reaproveitados; dependências transitivas continuam relacionadas em
 3. Confirme a versão, extensões, convenções locais e o caminho da requisição.
 4. Na definição e no plano, registre autorização e validação. Quando a mudança
    alcançar persistência ou execução assíncrona, inclua transações,
-   idempotência, filas, falhas e migrations.
+   idempotência, filas, falhas e uma tarefa `[CODE] [MIGRATION]` separada.
+   Essa tarefa aponta para o arquivo em `database/migrations/` e inclui os
+   comandos de aplicação e consulta do estado.
 5. Derive testes para caminho feliz, autorização, validação, efeitos e falhas.
 6. Antes de qualquer teste, crie `.env.testing` com `APP_ENV=testing` e um
    `DB_DATABASE` ou `DB_URL` explícito, diferente do destino usado pelo `.env`.
@@ -83,6 +85,18 @@ node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
 Somente a saída `SAFE` permite continuar. `PENDING` encerra a etapa até a
 configuração ser corrigida. `IGNORED` descarta o comando, sem pedir autorização
 para forçá-lo.
+
+Quando houver uma migration planejada, aplique-a no banco de teste protegido e
+confirme o resultado antes de concluir a tarefa:
+
+```bash
+php artisan migrate --env=testing
+php artisan migrate:status --env=testing
+```
+
+O registro da tarefa precisa conter o caminho exato da migration e a saída com
+exit code zero dos dois comandos. Criar um model, alterar uma consulta ou fazer
+os testes passarem não substitui essa conferência.
 
 1. Em Laravel com Pest, o CLI oferece:
 
@@ -114,7 +128,8 @@ instalada.
 
 - não aplique a skill a PHP sem Laravel.
 - não presuma APIs pela versão mais recente da documentação.
-- não execute migration, deploy ou comando operacional sem autorização.
+- não execute migration, deploy ou comando operacional fora da autorização
+  registrada na tarefa e do ambiente de teste protegido.
 - não execute teste sem `.env.testing` separado do banco de desenvolvimento.
 - não use `RefreshDatabase`, `DatabaseMigrations`, `migrate:fresh`,
   `migrate:refresh`, `migrate:reset`, `migrate:rollback` ou `db:wipe`; use

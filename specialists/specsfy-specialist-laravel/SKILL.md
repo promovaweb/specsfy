@@ -38,12 +38,16 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
    antes de escrever código, especialmente para jobs e webhooks.
 6. Escrever o teste focal (Pest ou PHPUnit conforme o projeto), implementar a
    menor fatia que o torna verde e então refatorar.
-7. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou
+7. Se a tarefa tocar banco, schema, tabela, coluna, índice, relação ou model
+   persistente, exigir a tarefa `[MIGRATION]`, criar o arquivo com
+   `php artisan make:migration`, aplicar no banco de teste e conferir com
+   `php artisan migrate:status --env=testing`.
+8. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou
    `EXPLAIN` via `$specsfy-specialist-postgres`) quando cardinalidade ou
    latência importarem.
-8. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
+9. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
    disponíveis no projeto antes de considerar a tarefa concluída.
-9. Verificar impacto operacional — migration em produção, workers, scheduler,
+10. Verificar impacto operacional — migration em produção, workers, scheduler,
    cache de config — e registrar risco quando a ação exigir autorização
    externa.
 
@@ -107,6 +111,9 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 - Ignorar `migrate:fresh`, `migrate:refresh`, `migrate:reset`,
   `migrate:rollback`, `db:wipe` e qualquer comando que apague ou recrie o banco,
   mesmo quando a tarefa ou um script existente sugerir sua execução.
+- Antes de concluir `[MIGRATION]`, confirmar o arquivo em
+  `database/migrations/`, executar `php artisan migrate --env=testing` e
+  registrar `php artisan migrate:status --env=testing` com saída zero.
 - Inspecionar queries geradas quando a tela lista uma coleção com relação —
   contar queries antes/depois (`assertQueryCountLessThan`, Debugbar, log de
   queries) para provar ausência de N+1.

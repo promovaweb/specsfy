@@ -92,6 +92,9 @@ ou pendente.
 - Executar `$specsfy-aux-stack` após mudanças estruturais de tecnologia,
   `$specsfy-aux-rules` para regras confirmadas e `$specsfy-aux-database` sempre
   que banco, schema, tabela, campo, relação ou migration mudar.
+- Toda tarefa ligada ao banco inclui uma tarefa `[MIGRATION]` com arquivo
+  versionado. A implementação aplica a migration no banco de teste e registra
+  uma consulta de estado antes de concluir a tarefa ou o Delivery Gate.
 - Executar
   `.agents/skills/specsfy-setup/scripts/monitor_context.mjs --project . --check`
   no início, após cada tarefa de implementação e antes do Delivery Gate.

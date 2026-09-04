@@ -39,6 +39,9 @@ arquivo contém o fluxo, os caminhos canônicos e os gates do framework.
   a entrega; resolva todo resultado `PENDING`.
 - Use as skills `specsfy-aux-*` para manter stack, regras e banco sem apagar
   conteúdo humano.
+- Toda tarefa ligada ao banco inclui uma tarefa `[MIGRATION]` com arquivo
+  versionado. A implementação aplica a migration no banco de teste e consulta
+  seu estado antes de concluir a tarefa ou o Delivery Gate.
 - Execute `$specsfy-documentator` depois de cada implementação para reconstruir
   a documentação técnica completa em `docs/` e o registro de dependências em
   `.specsfy/PACKAGES.md`.

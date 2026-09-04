@@ -17,6 +17,8 @@
   bordas, espaçamentos, margens, padding e tipografia quando a tarefa altera a
   interface, mesmo sem pedido específico.
 - O pai foi concluído somente depois dos seis itens.
+- Toda tarefa `[MIGRATION]` possui arquivo versionado, comando de aplicação com
+  saída zero e consulta de estado com saída zero.
 - A micro-retrospectiva registrou melhoria aplicada ou ausência justificada.
 
 ## Por história
@@ -37,3 +39,5 @@
 - NFRs têm medição ou evidência documentada.
 - Não há placeholder, teste pulado ou mudança de escopo escondida.
 - O código observado corresponde à versão atual da fonte única `specs/<estado>/<NNNN>-<slug>/spec.md`.
+- Nenhuma tarefa ligada ao banco ficou sem sua tarefa `[MIGRATION]`, e todas as
+  migrations planejadas foram aplicadas e conferidas no banco de teste.

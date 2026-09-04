@@ -45,8 +45,8 @@ exigindo autorização específica.
 node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
-5. Leia `references/quality-gates.md` e faça a revisão semântica.
-6. Confira o campo `Interface para pessoas`. Se for `Sim`, exija na seção 10
+1. Leia `references/quality-gates.md` e faça a revisão semântica.
+2. Confira o campo `Interface para pessoas`. Se for `Sim`, exija na seção 10
    stack e convenções observadas, telas e responsabilidades, fluxo de
    informação e navegação, menus e navegação principal, formulários e ações,
    composição e disposição, estados e acessibilidade. Confira se a tecnologia
@@ -54,17 +54,20 @@ node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs specs/<estado>
    da stack ou se a lacuna foi registrada para a pessoa. Um CRUD sem telas e
    formulário é `BLOCKER`; retorne automaticamente ao
    `$specsfy-02-backlog` para esclarecer a lacuna.
-7. Compare research, requisitos, BDD, plano técnico, modelo de dados, contratos,
+3. Compare research, requisitos, BDD, plano técnico, modelo de dados, contratos,
    TDD, matriz e tarefas. Confirme no mínimo três `AC` distintos para a feature
    inteira e para cada `US`, `FR` e `NFR`; não confunda “arquivo bem formatado”
    com “especificação correta”.
-8. Quando produto, arquitetura ou segurança forem materiais, leia
+4. Quando produto, arquitetura ou segurança forem materiais, leia
    `references/review-lenses.md`, registre findings na seção 13 e execute
    `scripts/review_findings.mjs`. `P1 Open` mantém o gate pendente.
-9. Se a definição alterar stack ou persistência, exija que a Definition of Done
+5. Se a definição alterar stack ou persistência, exija que a Definition of Done
    cite respectivamente `.specsfy/STACK.md` ou `.specsfy/DATABASE.md`. Para
    mudança material de finalidade ou capacidade, exija revisão de `PROJECT.md`;
    para regra nova confirmada, exija `.specsfy/RULES.md`.
+6. No aceite final, procure tarefas `[MIGRATION]` e execute
+   `verify_evidence.mjs` para cada uma. Mantenha o Delivery Gate pendente se o
+   arquivo, o comando de aplicação ou a consulta de estado estiver ausente.
 
 ## Classificar achados
 

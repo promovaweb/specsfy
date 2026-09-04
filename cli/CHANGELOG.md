@@ -4,6 +4,31 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-09-04
+
+### Adicionado
+
+- Exige uma tarefa `[MIGRATION]` quando o plano altera banco de dados,
+  schema, tabela, coluna, índice, relação ou modelo persistente.
+- Confere o arquivo versionado, a aplicação no banco de teste e a consulta do
+  estado antes de aceitar a conclusão da migration.
+- Inclui testes unitários e cenários BDD para impedir planos e entregas sem a
+  migration necessária.
+
+### Alterado
+
+- Alinha planejamento, implementação, validação, Laravel, PostgreSQL e
+  modelagem de dados ao mesmo contrato de migrations.
+- Documenta o fluxo nos guias do usuário, na referência técnica e no ebook.
+
+### Validação
+
+- `python3 -B -m unittest discover -s tests -p 'test_*.py'`
+- `python3 -B -m unittest discover -s skills/tests -p 'test_*.py'`
+- `PYTHONPATH=skills uv run --quiet --with behave behave skills/tests/features --no-capture`
+- `make verify-ebook`
+- `make verify-version`
+
 ## [0.21.0] - 2026-09-03
 
 ### Adicionado

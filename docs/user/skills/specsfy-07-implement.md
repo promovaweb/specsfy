@@ -38,12 +38,14 @@ Implemente T003 da spec 0004 e valide a regressão.
    pelo `check_database_safety.mjs`. Sem `SAFE`, interrompe antes do teste.
 6. Faz a menor mudança de produção, incluindo a tela e a interação previstas.
 7. Executa o teste focal até obter GREEN.
-8. Faz a revisão visual obrigatória quando a tarefa puder alterar a interface,
+8. Em uma tarefa `[MIGRATION]`, aplica o arquivo no banco de teste e consulta o
+   estado das migrations.
+9. Faz a revisão visual obrigatória quando a tarefa puder alterar a interface,
    mesmo sem pedido específico. Confere bordas, espaçamentos, margens, padding,
    tipografia, alinhamento, largura, overflow, foco, zoom e conteúdo curto ou
    longo nos viewports e estados aplicáveis.
-9. Refatora sem alterar o comportamento.
-10. Executa a regressão e atualiza os registros da tarefa:
+10. Refatora sem alterar o comportamento.
+11. Executa a regressão e atualiza os registros da tarefa:
 
 ```text
 T003 [x] Implementar solicitação sem revelar existência do cadastro
@@ -55,6 +57,11 @@ Regressão: passou
 O checklist normativo da tarefa segue `PREP`, `EXECUTE`, `VERIFY`, `VISUAL`,
 `EVIDENCE` e `IMPROVE`. O item `VISUAL` registra a inspeção da interface ou o
 motivo concreto para sua não aplicação.
+
+Para `[MIGRATION]`, o comentário `specsfy:evidence` precisa listar o arquivo
+criado, o comando de aplicação e a consulta de estado, todos com saída zero.
+`verify_evidence.mjs` confere os três elementos. A existência do model ou do
+teste não substitui essa comprovação.
 
 Depois de cada tarefa de código, a skill chama o documentador do projeto
 consumidor. A execução só continua quando `docs/` estiver atualizado.
@@ -74,6 +81,7 @@ consumidor. A execução só continua quando `docs/` estiver atualizado.
 - ampliar o escopo sem atualizar a spec.
 - implementar um CRUD como API sem os menus, as telas e o formulário aprovados.
 - marcar conclusão sem regressão.
+- marcar uma tarefa de banco sem criar, aplicar e conferir a migration.
 - rodar teste no banco do `.env` ou aceitar um comando que recrie o banco.
 - deixar `docs/`, `PROJECT.md` ou os arquivos `.specsfy/` incompatíveis com o
   código alterado.

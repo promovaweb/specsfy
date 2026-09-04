@@ -35,7 +35,9 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
    locks e concorrência esperada sob a carga real.
 6. Planejar a migration com compatibilidade entre a versão antiga e nova da
    aplicação durante o deploy, e um caminho de rollback testável.
-7. Validar backup, restore, monitoramento e capacidade no ambiente alvo antes
+7. Marcar a execução como `[MIGRATION]`, apontar o arquivo versionado, aplicar
+   em uma base de teste e consultar o histórico do migrador antes de concluir.
+8. Validar backup, restore, monitoramento e capacidade no ambiente alvo antes
    de declarar a mudança pronta para produção.
 
 ## Padrões
@@ -88,6 +90,8 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
   realista, não com a tabela vazia do ambiente de desenvolvimento.
 - Estimar o lock e o tempo de rewrite de qualquer DDL contra o tamanho real
   da tabela em produção antes de agendar a janela de deploy.
+- Conferir cada tarefa `[MIGRATION]` pelo arquivo, pelo comando de aplicação e
+  pela consulta do histórico do migrador, todos registrados com saída zero.
 - Provar restore periodicamente a partir do backup real, incluindo o tempo
   que o processo leva (RTO) — backup sem restore testado não é uma garantia
   de recuperação.

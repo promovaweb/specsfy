@@ -144,6 +144,10 @@ Se não houver tarefa pronta, diferencie `concluído` de `bloqueado por dependê
    Em React, siga `$specsfy-specialist-react-ui-components` para localizar,
    reaproveitar, adaptar e registrar os componentes antes de criar uma nova
    composição.
+   Quando a tarefa usa `[MIGRATION]`, crie primeiro o arquivo versionado no
+   caminho planejado. Passe o comando pelo `check_database_safety.mjs`, aplique
+   a migration no banco de teste e consulte o estado logo depois. Registre os
+   dois comandos com saída zero no comentário `specsfy:evidence` da tarefa.
 5. Depois de alterar produção e antes de marcar `EXECUTE`, monitore o contexto:
 
 ```bash
@@ -189,6 +193,11 @@ arquivo. Atestação de `--self-test` não prova entrega.
 13. Na seção 14 de `specs/<estado>/<NNNN>-<slug>/spec.md`, altere o pai de `- [ ]` para `- [x]` somente quando os seis itens estiverem concluídos, incluindo `VISUAL`.
 14. Execute `validate_tasks.mjs`, recalcule a próxima tarefa e confira o próximo item retornado por `next_task.mjs`.
 
+Uma tarefa `[MIGRATION]` não pode ser concluída apenas porque o model, a query
+ou o teste existe. `verify_evidence.mjs` exige o arquivo da migration, o comando
+que a aplicou e a consulta que confirma seu estado. Se faltar qualquer um,
+mantenha `EXECUTE`, `VERIFY` e a tarefa abertos.
+
 Atualize os itens conforme o trabalho acontece; não os marque em lote no encerramento. Tarefas `[P]` podem ser agrupadas apenas quando não tocam os mesmos arquivos ou estado. Se a execução revelar dependência oculta, torne-a explícita na seção 14.
 
 ## Controlar mudança de escopo
@@ -220,7 +229,9 @@ Quando todas as tarefas da seção 14 estiverem marcadas:
 6. carregue `$specsfy-documentator`, reconstrua `docs/` e exija que o
    `build_documentation.mjs --project <raiz> --check` passe;
 7. não declare conclusão se alguma evidência estiver ausente;
-8. altere `Delivery Gate` para `Passed` somente com rastreabilidade completa,
+8. para toda tarefa `[MIGRATION]`, execute `verify_evidence.mjs` e confirme o
+   arquivo, a aplicação e a consulta de estado;
+9. altere `Delivery Gate` para `Passed` somente com rastreabilidade completa,
    defina `Status: Reviewing` e execute `specsfy transition <id> review`.
    `$specsfy-04-validate` conclui o aceite e move a spec para `completed`.
 

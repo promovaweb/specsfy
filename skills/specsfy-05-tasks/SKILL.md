@@ -118,6 +118,13 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
   Node, usa o runner confirmado pelo usuário e o script `test:tdd`.
 - Faça cada tarefa `[CODE]` depender do predecessor TDD da mesma fatia com RED.
+- Sempre que uma tarefa tocar banco, schema, tabela, coluna, índice, relação ou
+  model persistente, crie uma tarefa `[CODE] [MIGRATION]` separada. Ela aponta
+  para o arquivo versionado dentro do diretório de migrations do projeto,
+  depende dos testes TDD e precede o código que usa a nova estrutura.
+- O item `VERIFY` da tarefa `[MIGRATION]` registra dois comandos aprovados pelo
+  `check_database_safety.mjs`: um aplica a migration no banco de teste e outro
+  consulta o estado das migrations. Não aprove o Plan Gate sem essa tarefa.
 - Quando a fatia alterar manifests ou configuração estrutural, crie uma tarefa
   `[DOC]` para `.specsfy/STACK.md`. Quando alterar banco, schema, model
   persistente, tabela, campo, relação ou migration, crie uma tarefa `[DOC]`
@@ -131,6 +138,9 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Quando uma convenção virar regra confirmada, crie tarefa `[DOC]` para
   `.specsfy/RULES.md`.
 - Dê a cada tarefa um resultado único, caminho exato e critério verificável.
+- Use a tag `[MIGRATION]` somente junto de `[CODE]` ou `[OPS]`. O caminho deve
+  ficar em `database/migrations/`, `migrations/`, `prisma/migrations/` ou
+  `supabase/migrations/`, conforme a stack encontrada.
 - Anexe a cada tarefa, exatamente nesta ordem, os itens `PREP`, `EXECUTE`,
   `VERIFY`, `VISUAL`, `EVIDENCE` e `IMPROVE` definidos no template `Tasks.md`
   resolvido.

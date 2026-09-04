@@ -66,6 +66,11 @@ O especialista `specsfy-specialist-versioning` inclui
 arquivo `SEMVER` na raiz do projeto consumidor. Ele também gera a referência
 Docker com essa versão e recusa uma tag diferente.
 
+O planejador usa `[MIGRATION]` para toda tarefa ligada ao banco. O validador
+de tarefas exige um arquivo versionado em um diretório de migrations. No Ato
+III, `verify_evidence.mjs` só aceita a conclusão depois de encontrar o arquivo,
+o comando que aplicou a migration e uma consulta posterior do estado.
+
 `specsfy-specialist-deploy` é a entrada para o fluxo completo de release ou
 deploy. Seu catálogo instala Versioning, Docker, Debian Server, Ansible e Docker
 Swarm como dependências. O gerador cria `compose.yaml` para desenvolvimento,
