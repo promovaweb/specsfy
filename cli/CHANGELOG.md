@@ -4,6 +4,23 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.22.2] - 2026-09-04
+
+### Corrigido
+
+- Publica o reforço que impede o Delivery Gate quando uma migration planejada
+  permanece aberta.
+- Limita a exigência automática de migration às mudanças estruturais do banco.
+- Reconstrói o manifesto do executável depois da atualização completa da
+  versão.
+
+### Validação
+
+- `cd cli && npm run check`
+- `python3 -B -m unittest discover -s skills/tests -p 'test_*.py'`
+- `make verify-ebook`
+- `make verify-version`
+
 ## [0.22.1] - 2026-09-04
 
 ### Corrigido
