@@ -62,6 +62,8 @@ Para `[MIGRATION]`, o comentário `specsfy:evidence` precisa listar o arquivo
 criado, o comando de aplicação e a consulta de estado, todos com saída zero.
 `verify_evidence.mjs` confere os três elementos. A existência do model ou do
 teste não substitui essa comprovação.
+Durante o aceite final, `--delivery` também recusa qualquer tarefa
+`[MIGRATION]` que permaneça aberta.
 
 Depois de cada tarefa de código, a skill chama o documentador do projeto
 consumidor. A execução só continua quando `docs/` estiver atualizado.

@@ -7,7 +7,7 @@ Feature: Conferir migrations planejadas
   Scenario: Recusar plano de banco sem migration
     Given os validadores de tarefas e comprovação do Specsfy
     When o contrato de migrations planejadas é inspecionado
-    Then toda tarefa ligada ao banco exige uma tarefa MIGRATION
+    Then toda alteração estrutural do banco exige uma tarefa MIGRATION
 
   Scenario: Recusar migration sem aplicação comprovada
     Given os validadores de tarefas e comprovação do Specsfy

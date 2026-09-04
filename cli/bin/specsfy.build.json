@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "version": "0.22.0",
+  "version": "0.22.1",
   "runtime": "node",
   "minimum_node": ">=22.20.0",
-  "source_sha256": "b4ee6f46cd53d6c35c9f4321165e6b11714f7b0b75d68b6d5ef64e2f631094c2",
-  "binary_sha256": "fd19d59bc136087759863eb85e4807fedefc4182f08fbbf6db33375db40b9b4c"
+  "source_sha256": "27907d6dfde265db633be4654ec8b357bd8609bc1d96abf47ee458d2f7d91cbe",
+  "binary_sha256": "d1f874232692a13fbfe900ade7302e96befee9322b34835d98e19d0cf8dec0ca"
 }

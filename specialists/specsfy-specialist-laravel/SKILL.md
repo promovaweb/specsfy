@@ -38,8 +38,8 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
    antes de escrever código, especialmente para jobs e webhooks.
 6. Escrever o teste focal (Pest ou PHPUnit conforme o projeto), implementar a
    menor fatia que o torna verde e então refatorar.
-7. Se a tarefa tocar banco, schema, tabela, coluna, índice, relação ou model
-   persistente, exigir a tarefa `[MIGRATION]`, criar o arquivo com
+7. Se a tarefa criar ou alterar schema, tabela, coluna, índice, relação ou
+   model persistente, exigir a tarefa `[MIGRATION]`, criar o arquivo com
    `php artisan make:migration`, aplicar no banco de teste e conferir com
    `php artisan migrate:status --env=testing`.
 8. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou

@@ -4,6 +4,24 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.22.1] - 2026-09-04
+
+### Corrigido
+
+- Limita a exigência automática de migration a mudanças que criam ou alteram
+  a estrutura do banco.
+- Impede o Delivery Gate quando uma tarefa `[MIGRATION]` planejada permanece
+  aberta.
+- Mantém a conferência do arquivo versionado, da aplicação no banco de teste e
+  da consulta posterior do estado.
+
+### Validação
+
+- `python3 -B -m unittest discover -s skills/tests -p 'test_*.py'`
+- `PYTHONPATH=skills uv run --quiet --with behave behave skills/tests/features --no-capture`
+- `make verify-ebook`
+- `make verify-version`
+
 ## [0.22.0] - 2026-09-04
 
 ### Adicionado

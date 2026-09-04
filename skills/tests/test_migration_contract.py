@@ -67,6 +67,23 @@ class MigrationContractTests(unittest.TestCase):
 
             self.assertTrue(any("sem uma tarefa [MIGRATION]" in error for error in errors))
 
+    def test_database_read_does_not_require_migration(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            spec = Path(directory) / "spec.md"
+            spec.write_text(
+                spec_with_tasks(
+                    "- [ ] T004 [CODE] [US-001] Consultar clientes no banco em "
+                    "app/Queries/ListarClientes.php — Refs: US-001, FR-001, "
+                    "NFR-001, AC-001, AC-002, AC-003 — Depends: none\n" + checklist()
+                ),
+                encoding="utf-8",
+            )
+
+            result = run(TASKS, str(spec), "--allow-draft", "--json")
+            errors = json.loads(result.stdout)["errors"]
+
+            self.assertFalse(any("sem uma tarefa [MIGRATION]" in error for error in errors))
+
     def test_migration_task_must_point_to_versioned_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             spec = Path(directory) / "spec.md"
@@ -131,6 +148,33 @@ class MigrationContractTests(unittest.TestCase):
             passed = run(EVIDENCE, str(spec), str(project), "--json")
 
             self.assertEqual(0, passed.returncode, passed.stdout + passed.stderr)
+
+    def test_delivery_rejects_open_planned_migration(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory)
+            spec = project / "spec.md"
+            spec.write_text(
+                "| Evidence Contract | 1 |\n"
+                "#### US-001 — Cadastro\n"
+                "#### AC-001 — Criação\n"
+                "- **FR-001**: Persistir cliente.\n"
+                "### 14. Tarefas\n"
+                "- [ ] T004 [CODE] [MIGRATION] [US-001] Criar tabela em "
+                "database/migrations/2026_create_clients.php — Refs: US-001, "
+                "FR-001, AC-001 — Depends: none\n",
+                encoding="utf-8",
+            )
+
+            planning = run(EVIDENCE, str(spec), str(project), "--json")
+            delivery = run(EVIDENCE, str(spec), str(project), "--json", "--delivery")
+
+            self.assertEqual(0, planning.returncode, planning.stdout + planning.stderr)
+            self.assertTrue(
+                any(
+                    "migration planejada ainda não foi concluída" in error
+                    for error in json.loads(delivery.stdout)["errors"]
+                )
+            )
 
 
 if __name__ == "__main__":

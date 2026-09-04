@@ -39,7 +39,7 @@ Quando o plano inclui uma tarefa `[MIGRATION]`, a validação final também
 confere a entrega registrada pela implementação. A tarefa só pode terminar
 quando a comprovação relaciona o arquivo versionado da migration, o comando
 que a aplicou no banco de teste e o comando que consultou o estado depois da
-aplicação.
+aplicação. Uma tarefa `[MIGRATION]` ainda aberta também impede o Delivery Gate.
 
 Uma falha de parser, fixture ou ambiente não serve como prova de requisito
 ausente.

@@ -39,5 +39,6 @@
 - NFRs têm medição ou evidência documentada.
 - Não há placeholder, teste pulado ou mudança de escopo escondida.
 - O código observado corresponde à versão atual da fonte única `specs/<estado>/<NNNN>-<slug>/spec.md`.
-- Nenhuma tarefa ligada ao banco ficou sem sua tarefa `[MIGRATION]`, e todas as
+- Nenhuma alteração estrutural do banco ficou sem sua tarefa `[MIGRATION]`, e
+  todas as
   migrations planejadas foram aplicadas e conferidas no banco de teste.

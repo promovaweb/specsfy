@@ -45,7 +45,7 @@ Quando a spec declara uma interface, o plano inclui tarefas para telas,
 menus, navegação, formulário, ações e seus testes de navegação, validação e recuperação de erro.
 Uma tarefa de API ou persistência não substitui essas tarefas.
 
-Quando qualquer tarefa altera banco, schema, tabela, coluna, índice, relação
+Quando qualquer tarefa cria ou altera schema, tabela, coluna, índice, relação
 ou model persistente, o plano inclui uma tarefa separada com as tags
 `[CODE] [MIGRATION]`. Ela aponta para o arquivo versionado e fica entre os
 testes TDD e o código que passa a usar a nova estrutura.
@@ -63,8 +63,9 @@ php artisan migrate --env=testing
 php artisan migrate:status --env=testing
 ```
 
-Sem a tarefa `[MIGRATION]`, o validador recusa um plano que contenha trabalho
-ligado ao banco.
+Sem a tarefa `[MIGRATION]`, o validador recusa um plano que crie ou altere a
+estrutura do banco. Consultar ou usar uma tabela existente não exige migration
+por si só.
 
 Essas tarefas ficam em uma `Fase de interface` dedicada. Há uma tarefa por tela
 registrada, usando os componentes e a stack já existentes no projeto.

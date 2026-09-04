@@ -66,8 +66,9 @@ node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs specs/<estado>
    mudança material de finalidade ou capacidade, exija revisão de `PROJECT.md`;
    para regra nova confirmada, exija `.specsfy/RULES.md`.
 6. No aceite final, procure tarefas `[MIGRATION]` e execute
-   `verify_evidence.mjs` para cada uma. Mantenha o Delivery Gate pendente se o
-   arquivo, o comando de aplicação ou a consulta de estado estiver ausente.
+   `verify_evidence.mjs --delivery` para cada uma. Mantenha o Delivery Gate
+   pendente quando a tarefa estiver aberta ou quando o arquivo, o comando de
+   aplicação ou a consulta de estado estiver ausente.
 
 ## Classificar achados
 

@@ -118,10 +118,10 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
   Node, usa o runner confirmado pelo usuário e o script `test:tdd`.
 - Faça cada tarefa `[CODE]` depender do predecessor TDD da mesma fatia com RED.
-- Sempre que uma tarefa tocar banco, schema, tabela, coluna, índice, relação ou
-  model persistente, crie uma tarefa `[CODE] [MIGRATION]` separada. Ela aponta
-  para o arquivo versionado dentro do diretório de migrations do projeto,
-  depende dos testes TDD e precede o código que usa a nova estrutura.
+- Sempre que uma tarefa criar ou alterar schema, tabela, coluna, índice,
+  relação ou model persistente, crie uma tarefa `[CODE] [MIGRATION]` separada.
+  Ela aponta para o arquivo versionado dentro do diretório de migrations do
+  projeto, depende dos testes TDD e precede o código que usa a nova estrutura.
 - O item `VERIFY` da tarefa `[MIGRATION]` registra dois comandos aprovados pelo
   `check_database_safety.mjs`: um aplica a migration no banco de teste e outro
   consulta o estado das migrations. Não aprove o Plan Gate sem essa tarefa.
@@ -141,6 +141,8 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Use a tag `[MIGRATION]` somente junto de `[CODE]` ou `[OPS]`. O caminho deve
   ficar em `database/migrations/`, `migrations/`, `prisma/migrations/` ou
   `supabase/migrations/`, conforme a stack encontrada.
+- Uma leitura, consulta ou uso de tabela existente não exige `[MIGRATION]` por
+  si só. A tag é obrigatória quando o plano cria ou altera a estrutura.
 - Anexe a cada tarefa, exatamente nesta ordem, os itens `PREP`, `EXECUTE`,
   `VERIFY`, `VISUAL`, `EVIDENCE` e `IMPROVE` definidos no template `Tasks.md`
   resolvido.
