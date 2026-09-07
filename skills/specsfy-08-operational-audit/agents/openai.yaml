@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - 08 - Auditoria operacional"
+  short_description: "Audita ações operacionais após a feature"
+  default_prompt: "Use $specsfy-08-operational-audit depois que uma SPEC estiver em completed para delimitar o escopo da entrega e identificar somente ações operacionais causalmente necessárias, sem executá-las."
