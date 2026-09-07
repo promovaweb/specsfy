@@ -134,6 +134,8 @@ Se não houver tarefa pronta, diferencie `concluído` de `bloqueado por dependê
    somente o runner confirmado pelo usuário.
 3. Para `[CODE]`, confirme o predecessor TDD concluído cobrindo os mesmos IDs,
    com RED registrado na seção 11. Sem isso, pare e não altere produção.
+   `Plan Gate: Passed` libera somente a próxima fatia elegível pelo grafo e
+   nunca dispensa o RED específico de uma CODE futura.
    Anuncie a pendência e retorne automaticamente para
    `$specsfy-05-tasks`, que reabre o plano, chama `$specsfy-06-tdd-bdd` e
    retoma esta skill depois do novo `Plan Gate: Passed`.
