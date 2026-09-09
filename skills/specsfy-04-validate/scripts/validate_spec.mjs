@@ -100,7 +100,7 @@ if (!input || !existsSync(input)) {
   for (const kind of ["US", "FR", "NFR", "AC"]) if (!ids[kind].length) errors.push(`Nenhuma definição ${kind}-NNN encontrada.`);
   errors.push(...minimumBddErrors(body));
   if (status === "Complete" && /^\s*-\s+\[ \]\s+T\d{3,}/m.test(body)) errors.push("Status Complete não permite tarefas abertas na seção 14.");
-  if (/\b(?:TODO|TBD|FIXME)\b|\[NEEDS CLARIFICATION/im.test(body) && !(status === "Draft" && draft)) errors.push("Marcadores não resolvidos.");
+  if (/\b(?:TODO|TBD|FIXME)\b|\[NEEDS CLARIFICATION/m.test(body) && !(status === "Draft" && draft)) errors.push("Marcadores não resolvidos.");
   errors.push(...interfaceErrors(body, status));
   const result = { path, format: field(body, "Formato"), slug, status, gates, counts: Object.fromEntries(Object.entries(ids).map(([key, value]) => [key, value.length])), errors, warnings };
   if (asJson) console.log(JSON.stringify(result, null, 2));
