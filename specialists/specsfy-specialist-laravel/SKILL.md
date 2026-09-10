@@ -24,10 +24,11 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 1. Ler `composer.json`/`composer.lock` para confirmar versão do framework,
    PHP e pacotes relevantes (Sanctum, Horizon, Octane, Scout) antes de supor
    comportamento por memória.
-2. Tratar Laravel Octane com Open Swoole e o pacote `laravel/octane` como
-   runtime obrigatório. Quando estiver ausente,
-   incluir instalação e configuração no trabalho antes de considerar a
-   aplicação pronta para execução ou deploy.
+2. Confirmar qual servidor de aplicação atende o tráfego — PHP-FPM,
+   FrankenPHP, Octane com algum driver — pelo comando de inicialização e pelos
+   manifests, não por variável de ambiente herdada de template. Quando o
+   projeto não declarar servidor algum, tratar isso como lacuna a resolver
+   antes de considerar a aplicação pronta para deploy.
 3. Mapear a requisição do ponto de entrada até domínio, persistência,
    efeitos assíncronos e resposta, identificando o boundary onde a regra de
    negócio já vive no projeto (Action, Service, Model rico).
@@ -53,9 +54,11 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 
 ## Padrões
 
-- Executar HTTP com Laravel Octane, Open Swoole e `--server=swoole`. Instalar a
-  extensão `openswoole` na imagem e limpar estado por requisição; singletons e propriedades estáticas
-  não podem transportar dados entre usuários nos workers persistentes.
+- Executar HTTP pelo servidor que o projeto declarou, e exercitar esse mesmo
+  processo em build, healthcheck e deploy. Sob modo worker — Octane com
+  qualquer driver, FrankenPHP em worker mode, RoadRunner — limpar estado por
+  requisição: singleton, propriedade estática e cache em memória de processo
+  não podem transportar dados de um usuário para o próximo.
 - Manter controllers finos: validação em Form Requests, autorização em
   Policies/Gates, regra de negócio no boundary já adotado pelo projeto.
 - Tratar Eloquent como acesso a dados: eager load explícito (`with`,

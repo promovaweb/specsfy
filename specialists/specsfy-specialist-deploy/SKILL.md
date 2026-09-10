@@ -21,7 +21,7 @@ description: Orquestrar release e deploy em servidor com SEMVER, Docker Swarm e 
    `$specsfy-specialist-versioning` para ler ou preparar `SEMVER`.
 2. Inspecionar `Dockerfile`, Compose, stack e `ansible/` existentes. Comparar
    PHP, extensões, dependências, assets, entrypoint, usuário interno, portas,
-   healthcheck e comando do Octane com a aplicação atual. Preservar trechos
+   healthcheck e comando do servidor de aplicação com a aplicação atual. Preservar trechos
    personalizados e apresentar o diff antes de substituir um arquivo sem
    marcações gerenciadas.
 3. Executar o gerador somente na primeira preparação, quando todos os destinos
@@ -87,8 +87,12 @@ description: Orquestrar release e deploy em servidor com SEMVER, Docker Swarm e 
 - Gerar `compose.yaml` para desenvolvimento e `stack.yaml` para produção.
   Toda produção usa a stack pelo Docker Swarm; não use Compose como runtime de
   produção.
-- Em Laravel, exigir `laravel/octane` e Open Swoole. A imagem instala
-  `openswoole`; Compose e stack executam Octane com `--server=swoole`.
+- Em Laravel, gerar por padrão `laravel/octane` com Open Swoole: a imagem
+  instala `openswoole` e Compose e stack executam Octane com
+  `--server=swoole`. Quando o projeto já declarar outro servidor em
+  `.specsfy/STACK.md`, respeitar a declaração e gerar para ele; migrar de
+  servidor é decisão do projeto e pede spec própria, nunca um efeito colateral
+  da preparação do deploy.
 - Sugerir Cloudflare Tunnel como entrada pública padrão. Executar `cloudflared`
   como serviço da stack, ligado à mesma rede overlay da aplicação e sem porta
   pública no serviço Laravel. O hostname do túnel aponta para `http://app:8000`.

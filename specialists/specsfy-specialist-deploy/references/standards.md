@@ -6,9 +6,11 @@ O playbook separa roles para host Debian, Docker Engine, Docker Swarm e
 aplicação. A automação configura repositório de pacotes, daemon, rotação de
 logs, firewall, diretórios, registry e redes antes de publicar a stack.
 
-Aplicações Laravel usam Laravel Octane com Open Swoole. A imagem instala a
-extensão `openswoole`, enquanto o Compose e a stack executam
-`octane:start --server=swoole`.
+O padrão gerado para Laravel é Laravel Octane com Open Swoole: a imagem
+instala a extensão `openswoole` e o Compose e a stack executam
+`octane:start --server=swoole`. Esse é o ponto de partida, não uma exigência —
+um projeto que declare PHP-FPM ou FrankenPHP em `.specsfy/STACK.md` mantém o
+próprio servidor, e a stack passa a exercitar o processo dele.
 
 O ingresso público padrão usa Cloudflare Tunnel. A stack executa `cloudflared`
 como serviço na mesma rede overlay do Laravel, e o hostname configurado no
