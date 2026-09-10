@@ -404,7 +404,7 @@ class InterfaceContractTests(unittest.TestCase):
         self.assertIn("em toda execução completa do setup", normalized.casefold())
         self.assertIn("$specsfy-documentator", normalized)
 
-    def test_laravel_projects_require_octane_as_the_application_server(self) -> None:
+    def test_laravel_projects_declare_their_application_server(self) -> None:
         sources = (
             ROOT / "Spec.md",
             ROOT / "templates" / "Spec.md",
@@ -414,11 +414,22 @@ class InterfaceContractTests(unittest.TestCase):
 
         for source in sources:
             with self.subTest(source=source):
-                content = source.read_text(encoding="utf-8")
-                self.assertIn("Laravel Octane", content)
-                self.assertIn("obrigatório", content)
-                self.assertIn("laravel/octane", content)
-                self.assertIn("Open Swoole", content)
+                normalized = " ".join(source.read_text(encoding="utf-8").split())
+                self.assertIn("servidor de aplicação", normalized)
+
+        contrato = (ROOT / "Spec.md").read_text(encoding="utf-8")
+        secao = contrato.split("## Contrato de runtime Laravel", 1)[1].split("\n## ", 1)[0]
+        normalizada = " ".join(secao.split())
+
+        self.assertIn("declara explicitamente seu servidor de aplicação", normalizada)
+        self.assertIn("exercitar o mesmo processo que atende o tráfego real", normalizada)
+        # Modo worker é o risco real, e vale para qualquer servidor que
+        # reaproveite a aplicação entre requisições.
+        self.assertIn("não pode manter estado de uma requisição para a seguinte", normalizada)
+        # Qual servidor adotar é decisão do projeto: o contrato não pode
+        # tornar nenhum deles obrigatório.
+        self.assertIn("decisão do projeto, não do framework", normalizada)
+        self.assertNotIn("obrigatório", normalizada)
 
     def test_reui_specialist_documents_free_registry_setup(self) -> None:
         reui = (ROOT.parent / "specialists" / "specsfy-specialist-reui" / "SKILL.md").read_text(encoding="utf-8")

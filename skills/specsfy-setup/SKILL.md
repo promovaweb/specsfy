@@ -307,11 +307,19 @@ Para todo projeto Laravel com React, o setup instala shadcn/ui e ReUI juntos.
 Não trate essa dupla como opcional: shadcn/ui prepara a base e ReUI cria CRUDs
 e interfaces sobre ela.
 
-Para toda aplicação Laravel, Laravel Octane com Open Swoole é obrigatório.
-Confira `laravel/octane` em `composer.json` e `composer.lock`, a extensão
-`openswoole` na imagem e `--server=swoole` no runtime. Registre essa combinação
-em `.specsfy/STACK.md` e encaminhe a instalação ou correção ausente para uma
-spec antes de aprovar o setup.
+Para toda aplicação Laravel, confirme qual servidor de aplicação atende o
+tráfego e registre-o em `.specsfy/STACK.md` com a evidência: o comando de
+inicialização no `Dockerfile`, `Procfile` ou equivalente, a imagem e as
+extensões exigidas e, quando houver, o pacote correspondente em `composer.json`
+e `composer.lock`. Variável de ambiente herdada de template não prova nada:
+`OCTANE_SERVER` definido sem `laravel/octane` instalado é linha morta, e
+registrá-la como runtime cria uma stack falsa.
+
+Quando o servidor rodar em modo worker, registre também o reload dos workers e
+encaminhe para uma spec a auditoria de estado entre requisições. Não exija um
+servidor específico nem bloqueie o setup por causa da escolha do projeto:
+bloqueie apenas quando o servidor não estiver declarado ou quando a evidência
+contradisser o que roda.
 
 Depois de instalar a dupla, o setup registra em `INTERFACE.md` que telas React
 são compostas por componentes. Cada nova tela deve consultar o mapa, reutilizar

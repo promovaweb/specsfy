@@ -66,13 +66,16 @@
 
 ## Operação
 
-- Laravel Octane com Open Swoole e `laravel/octane` é o runtime HTTP
-  obrigatório. Instale `openswoole` por PECL na imagem, execute
-  `octane:start --server=swoole`, configure o healthcheck no processo Octane e
-  recarregue os workers durante o deploy.
-- Revise singletons, estado estático e callbacks capturados: workers Octane
-  persistem entre requisições e não podem carregar dados de um usuário para o
-  próximo.
+- O runtime HTTP é declarado pelo projeto em `.specsfy/STACK.md`. Configure o
+  healthcheck no processo que de fato atende o tráfego e, em modo worker,
+  recarregue os workers durante o deploy. Uma composição comum é Octane com
+  `octane:start --server=swoole` e a extensão instalada por PECL na imagem, mas
+  FrankenPHP e PHP-FPM são alternativas legítimas.
+- Revise singletons, estado estático e callbacks capturados sempre que o
+  servidor for de modo worker: o processo persiste entre requisições e não pode
+  carregar dados de um usuário para o próximo. Em modo clássico, uma bootagem
+  por requisição, esse risco não existe — o que se abre mão é de performance,
+  não de correção.
 - `config:cache`, `route:cache`, `event:cache` reduzem I/O de boot; qualquer
   um deles fica obsoleto silenciosamente se o deploy não os regenerar após
   mudar config/rotas/listeners — automatizar no pipeline, não como passo
@@ -126,7 +129,7 @@
 ## Fontes oficiais
 
 - [Documentação Laravel](https://laravel.com/docs)
-- [Laravel Octane e Open Swoole](https://laravel.com/docs/octane#swoole)
+- [Laravel Octane e seus servidores](https://laravel.com/docs/octane)
 - [Ciclo de vida da requisição](https://laravel.com/docs/lifecycle)
 - [Relacionamentos Eloquent e eager loading](https://laravel.com/docs/eloquent-relationships)
 - [Autorização com Policies e Gates](https://laravel.com/docs/authorization)
