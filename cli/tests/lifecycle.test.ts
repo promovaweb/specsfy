@@ -43,6 +43,45 @@ describe("ciclo de vida das specs", () => {
     });
   });
 
+  test("reabre spec concluída desde o Ato I", async () => {
+    const project = await temporaryDirectory();
+    await createSpec(project, "specs/completed/0042-login-social", "Complete");
+
+    const result = await transitionSpec(project, "0042-login-social", "draft");
+
+    expect(result).toMatchObject({
+      from: "completed",
+      to: "draft",
+      status: "Draft",
+    });
+    const target = join(project, "specs/draft/0042-login-social/spec.md");
+    expect(await readFile(target, "utf8")).toContain("| Status | Draft |");
+  });
+
+  test("reabre spec concluída somente desde o Ato II", async () => {
+    const project = await temporaryDirectory();
+    await createSpec(project, "specs/completed/0042-login-social", "Complete");
+
+    const result = await transitionSpec(project, "0042-login-social", "defined");
+
+    expect(result).toMatchObject({
+      from: "completed",
+      to: "defined",
+      status: "Defined",
+    });
+    const target = join(project, "specs/defined/0042-login-social/spec.md");
+    expect(await readFile(target, "utf8")).toContain("| Status | Defined |");
+  });
+
+  test("spec concluída não pula diretamente para planned", async () => {
+    const project = await temporaryDirectory();
+    await createSpec(project, "specs/completed/0042-login-social", "Complete");
+
+    await expect(
+      transitionSpec(project, "0042-login-social", "planned"),
+    ).rejects.toThrow("completed para planned");
+  });
+
   test("recusa transições que pulam estados", async () => {
     const project = await temporaryDirectory();
     await createSpec(project, "specs/draft/0042-login-social", "Draft");
