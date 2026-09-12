@@ -42,7 +42,7 @@ const NEXT_FOLDERS: Record<SpecFolder, readonly SpecFolder[]> = {
   planned: ["defined", "planned", "in-progress"],
   "in-progress": ["planned", "in-progress", "review"],
   review: ["in-progress", "review", "completed"],
-  completed: ["completed"],
+  completed: ["draft", "defined", "completed"],
 };
 
 const TABLE_STATUS = /^(\|\s*Status\s*\|\s*)([^|]*)(\|\s*)$/imu;
