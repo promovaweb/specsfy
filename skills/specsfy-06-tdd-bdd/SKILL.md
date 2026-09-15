@@ -72,7 +72,9 @@ Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não 
 1. Leia `specs/<estado>/<NNNN>-<slug>/spec.md`, testes e configuração do projeto.
 2. Exija `Formato: Specsfy/2.0` e `Definition Gate: Passed`. No modo `prepare`,
    use `Status: Defined` e `Plan Gate: Pending`; nos modos `cycle` e `verify`,
-   use `Status: Planned` ou `Implementing`.
+   use `Status: Planned` ou `Implementing`. Em `cycle`, selecione somente a
+   fatia liberada pelo grafo de `Depends`: Plan Gate Passed nao libera CODE
+   futura cujo RED proprio ainda esteja pendente.
 3. Selecione uma fatia vertical pequena: um `AC` Gherkin e seus `FR/NFR`.
 4. Resolva o runner de testes pela stack antes de escrever testes:
    - projeto PHP (`composer.json` ou `artisan`), inclusive PHP + Node: use Pest;
