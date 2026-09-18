@@ -65,8 +65,45 @@ class VerifyRepositoryTests(unittest.TestCase):
 
     def test_uses_node_for_all_internal_validators(self) -> None:
         source = SCRIPT.read_text(encoding="utf-8")
-        self.assertIn('["node", scripts.validate, spec]', source)
+        self.assertIn('["node", scripts.validate, spec, ...', source)
         self.assertNotIn('python3', source.lower())
+
+    def test_draft_spec_uses_non_strict_validation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in BASE_SKILLS:
+                self.create_skill(root, name)
+            self.create_skill(root, "specsfy-setup")
+            self.create_skill(root, "specsfy-documentator")
+            for name in ("stack", "rules", "database"):
+                self.create_skill(root, f"specsfy-aux-{name}")
+
+            validator = (
+                root
+                / ".agents/skills/specsfy-04-validate/scripts/validate_spec.mjs"
+            )
+            validator.parent.mkdir(parents=True, exist_ok=True)
+            validator.write_text(
+                'process.exit(process.argv.includes("--allow-draft") ? 0 : 7);\n',
+                encoding="utf-8",
+            )
+            spec = root / "specs/draft/0042-example/spec.md"
+            spec.parent.mkdir(parents=True)
+            spec.write_text("| Status | Draft |\n", encoding="utf-8")
+
+            completed = subprocess.run(
+                ["node", str(SCRIPT), str(root), "--json"],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+            payload = json.loads(completed.stdout)
+            validation = next(
+                check for check in payload["checks"] if check["name"].startswith("spec:")
+            )
+
+            self.assertEqual("passed", validation["status"])
+            self.assertIn("--allow-draft", validation["command"])
 
 
 if __name__ == "__main__":
