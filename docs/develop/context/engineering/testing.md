@@ -65,6 +65,11 @@ transversal.
 - Cada caso TDD declara `SPECSFY:` junto à própria definição. Um marcador
   compartilhado por um arquivo é considerado como somente um caso, ainda que
   existam vários testes no arquivo.
+- A tarefa `[TEST] [TDD]` declara o caminho do arquivo executável. A auditoria
+  usa somente os arquivos declarados pela spec, isolando IDs locais que se
+  repetem em outras specs. Na compatibilidade com specs legadas sem tarefas
+  TDD, o resultado identifica `scan_scope: repository-fallback` e emite um
+  aviso de escopo.
 - O Gherkin permanece como referência na `spec.md`. Ele não cria nem executa
   uma segunda suíte `.feature`.
 

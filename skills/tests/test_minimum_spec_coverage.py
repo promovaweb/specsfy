@@ -91,6 +91,76 @@ class MinimumBddCoverageTests(unittest.TestCase):
 
 
 class MinimumTddCoverageTests(unittest.TestCase):
+    def test_limits_markers_to_test_files_declared_by_the_current_spec(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            spec_a = root / "specs/complete/0001-feature-a/spec.md"
+            spec_b = root / "specs/implementing/0002-feature-b/spec.md"
+            test_a = root / "tests/test_feature_a.py"
+            test_b = root / "tests/test_feature_b.py"
+            spec_a.parent.mkdir(parents=True)
+            spec_b.parent.mkdir(parents=True)
+            test_a.parent.mkdir(parents=True)
+            definitions = (
+                "#### US-001 — Example\n"
+                "#### AC-001 — Example\n"
+                "#### AC-002 — Example\n"
+                "#### AC-003 — Example\n"
+                "- **FR-001**: Example.\n"
+                "- **NFR-001**: Example. **Verificação**: teste.\n"
+            )
+            spec_a.write_text(
+                definitions
+                + "- [x] T001 [TEST] [TDD] [US-001] Case in tests/test_feature_a.py — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none\n",
+                encoding="utf-8",
+            )
+            marker = "US-001 FR-001 NFR-001"
+            test_a.write_text(
+                f"# SPECSFY: {marker} AC-001\n"
+                "def test_first(): pass\n",
+                encoding="utf-8",
+            )
+            command = ["node", str(TRACE), str(spec_a), str(root), "--json"]
+            before = subprocess.run(
+                command, text=True, capture_output=True, check=False
+            )
+            spec_b.write_text(
+                definitions
+                + "- [x] T001 [TEST] [TDD] [US-001] Case in tests/test_feature_b.py — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none\n",
+                encoding="utf-8",
+            )
+            test_b.write_text(
+                f"# SPECSFY: {marker} AC-001\n"
+                f"# SPECSFY: {marker} AC-002\n"
+                f"# SPECSFY: {marker} AC-003\n"
+                "# SPECSFY: FR-999\n",
+                encoding="utf-8",
+            )
+
+            after = subprocess.run(
+                command, text=True, capture_output=True, check=False
+            )
+
+            self.assertEqual(1, before.returncode)
+            self.assertEqual(1, after.returncode)
+            original = __import__("json").loads(before.stdout)
+            result = __import__("json").loads(after.stdout)
+            self.assertEqual("declared-tests", result["scan_scope"])
+            self.assertEqual(1, result["files_scanned"])
+            self.assertEqual(1, result["feature_cases"])
+            self.assertEqual([], result["orphan_markers"])
+            self.assertEqual(
+                ["tests/test_feature_a.py:1"], result["locations"]["US-001"]
+            )
+            for key in (
+                "files_scanned",
+                "feature_cases",
+                "case_counts",
+                "orphan_markers",
+                "locations",
+            ):
+                self.assertEqual(original[key], result[key])
+
     def test_requires_three_distinct_tdd_case_markers_per_traceable_item(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

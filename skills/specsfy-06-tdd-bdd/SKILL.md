@@ -147,6 +147,12 @@ Execute:
 node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
+O auditor limita a varredura aos arquivos existentes citados nas tarefas
+`[TEST] [TDD]` da spec. Por isso, cada tarefa TDD deve declarar o caminho do
+arquivo de teste que materializa o caso. Specs legadas sem essas tarefas ainda
+usam a raiz informada, mas o resultado expõe `scan_scope: repository-fallback`
+e um aviso de escopo para tornar essa compatibilidade explícita.
+
 Trate como gap cada feature, `US`, `FR` ou `NFR` com menos de três casos TDD e
 cada `AC` sem ao menos um caso. Para `NFR` verificado manualmente ou por
 observabilidade, cite a evidência sem dispensar os três casos automatizáveis;
