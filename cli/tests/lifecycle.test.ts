@@ -43,6 +43,37 @@ describe("ciclo de vida das specs", () => {
     });
   });
 
+  test("atualiza caminhos de research qualificados pelo estado", async () => {
+    const project = await temporaryDirectory();
+    const identifier = "0042-login-social";
+    const source = await createSpec(
+      project,
+      `specs/planned/${identifier}`,
+      "Planned",
+    );
+    const research = join(source, "..", "research", "R-001-provider.md");
+    await mkdir(join(research, ".."), { recursive: true });
+    await writeFile(research, "# Provider\n");
+    await writeFile(
+      source,
+      `${await readFile(source, "utf8")}\n#### Artefatos de pesquisa armazenados\n\n- \`specs/planned/${identifier}/research/R-001-provider.md\`\n`,
+    );
+
+    await transitionSpec(project, identifier, "in-progress");
+
+    const target = join(project, "specs/in-progress", identifier, "spec.md");
+    const content = await readFile(target, "utf8");
+    expect(content).toContain(
+      `specs/in-progress/${identifier}/research/R-001-provider.md`,
+    );
+    expect(content).not.toContain(
+      `specs/planned/${identifier}/research/R-001-provider.md`,
+    );
+    await expect(
+      readFile(join(project, "specs/in-progress", identifier, "research/R-001-provider.md"), "utf8"),
+    ).resolves.toBe("# Provider\n");
+  });
+
   test("recusa transições que pulam estados", async () => {
     const project = await temporaryDirectory();
     await createSpec(project, "specs/draft/0042-login-social", "Draft");
