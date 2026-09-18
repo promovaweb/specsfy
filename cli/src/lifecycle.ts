@@ -112,7 +112,12 @@ export async function transitionSpec(
   }
   const status = STATUS_BY_FOLDER[to];
   const content = await readFile(spec.path, "utf8");
-  const updated = updateStatus(content, status);
+  const updated = updateResearchPaths(
+    updateStatus(content, status),
+    spec.folder,
+    to,
+    identifier,
+  );
   await writeTextAtomic(spec.path, updated);
 
   const targetDirectory = join(resolvePath(project), "specs", to, identifier);
@@ -266,6 +271,18 @@ function updateStatus(content: string, status: string): string {
   }
   const newline = content.endsWith("\n") ? "" : "\n";
   return `${content}${newline}\n| Status | ${status} |\n`;
+}
+
+function updateResearchPaths(
+  content: string,
+  from: SpecFolder,
+  to: SpecFolder,
+  identifier: string,
+): string {
+  if (from === to) return content;
+  const source = `specs/${from}/${identifier}/research/`;
+  const target = `specs/${to}/${identifier}/research/`;
+  return content.replaceAll(source, target);
 }
 
 function readTableField(content: string, field: string): string | undefined {

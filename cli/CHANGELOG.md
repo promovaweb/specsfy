@@ -4,6 +4,11 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- Atualiza referências qualificadas de `research/` quando uma spec muda de
+  pasta de estado, preservando o carregamento dos artefatos após a transição.
+
 ## [0.23.0] - 2026-09-15
 
 ### Adicionado
