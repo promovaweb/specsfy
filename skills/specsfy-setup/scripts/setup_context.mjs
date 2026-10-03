@@ -3,9 +3,10 @@
 import { existsSync } from "node:fs";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { syncSpecKitContext } from "./sync_speckit_context.mjs";
 
-const START = "<!-- specsfy:framework:start -->"; const END = "<!-- specsfy:framework:end -->"; const skillRoot = resolve(dirname(new URL(import.meta.url).pathname), "..", "..");
+const START = "<!-- specsfy:framework:start -->"; const END = "<!-- specsfy:framework:end -->"; const skillRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const args = process.argv.slice(2); const project = resolve(args.includes("--project") ? args[args.indexOf("--project") + 1] : process.cwd());
 async function json(path) { try { const value = JSON.parse(await readFile(path, "utf8")); return value && typeof value === "object" ? value : {}; } catch { return {}; } }
 async function template(name, tokens) { const candidates = [join(project, ".specsfy", "templates", "custom", name), join(project, ".specsfy", "templates", name), join(skillRoot, "templates", name)]; const path = candidates.find(existsSync); if (!path) throw new Error(`template não encontrado: ${join(project, ".specsfy", "templates", name)}; execute \`specsfy install\``); let content = await readFile(path, "utf8"); for (const [token, value] of Object.entries(tokens)) { if (!content.includes(token)) throw new Error(`token obrigatório ausente em ${path}: ${token}`); content = content.replaceAll(token, value); } const unresolved = [...new Set(content.match(/\{\{[A-Z0-9_]+\}\}/g) ?? [])]; if (unresolved.length) throw new Error(`tokens não preenchidos em ${path}: ${unresolved.join(", ")}`); return content; }
