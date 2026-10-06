@@ -44,7 +44,7 @@ async function walk(directory) {
     if (ignored.has(entry.name)) continue;
     const target = join(directory, entry.name);
     if (entry.isDirectory()) await walk(target);
-    else if (textExtensions.has(extension(entry.name)) || entry.name === "Gemfile") classify(relative(project, target));
+    else if (textExtensions.has(extension(entry.name)) || entry.name === "Gemfile") classify(relative(project, target).replaceAll("\\", "/"));
   }
 }
 
