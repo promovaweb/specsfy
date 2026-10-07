@@ -9,6 +9,8 @@ substitui `specs/<estado>/<NNNN>-<slug>/spec.md`.
 ```text
 specs/
 ├── inbox/
+│   ├── processed/
+│   │   └── <AAAA-MM-DD-HHMMSS>-<slug>.md
 │   └── <AAAA-MM-DD-HHMMSS>-<slug>.md
 ├── backlog/
 │   └── <NNNN>-<slug>.md
@@ -23,7 +25,14 @@ specs/
         └── research/
 ```
 
-- `specs/inbox/` preserva inputs imediatamente, sem perguntas nem promoção.
+- `specs/inbox/` preserva inputs imediatamente, sem perguntas nem promoção. É
+  a fila ativa: só contém capturas que ainda precisam de tratamento.
+- `specs/inbox/processed/` guarda capturas cujo pedido está integralmente
+  coberto por specs com `Definition Gate: Passed`. A captura chega ali pelo
+  comando `specsfy inbox process`, com o texto original intacto, `Status`
+  `Processada`, as specs derivadas registradas e os vínculos atualizados. A
+  consulta da fila ativa ignora essa pasta; a busca por histórico e duplicatas
+  a inclui. Nada é apagado.
 - `specs/backlog/` organiza ideias escolhidas para refinamento.
 - `specs/<estado>/<NNNN>-<slug>/spec.md` é a única fonte normativa de uma
   fatia. Ela existe em uma única pasta de estado.
@@ -126,7 +135,9 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
    registra automaticamente as respostas já declaradas e pergunta somente por
    lacuna, ambiguidade ou contradição aplicável.
 3. Use `specsfy-03-specify` para criar e consolidar a spec normativa inicial.
-4. Use `specsfy-04-validate` para comprovar a definição.
+4. Use `specsfy-04-validate` para comprovar a definição. Com o Definition
+   Gate aprovado, ela também retira da fila ativa as capturas de
+   `specs/inbox/` integralmente cobertas pela spec.
 5. Use `specsfy-05-tasks` e `specsfy-06-tdd-bdd` para planejar, derivar
    testes TDD do BDD de referência e observar RED válido.
 6. Use `specsfy-07-implement` para entregar em RED → GREEN → REFACTOR.

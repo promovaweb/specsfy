@@ -116,8 +116,18 @@ specsfy transition 0001-recuperar-senha in-progress --project .
 specsfy migrate --project .
 ```
 
-Use `migrate` apenas para converter o layout anterior `specs/specs/`. Para
-recalibrar a execução, registre Effort e sua justificativa diretamente na fonte
+Use `migrate` apenas para converter o layout anterior `specs/specs/`.
+
+Quando o Definition Gate aprovado esgota uma captura de `specs/inbox/`, a
+validação a retira da fila ativa sem apagar nada:
+
+```bash
+specsfy inbox process 2026-07-28-143205-recuperar-senha.md \
+  --spec 0001-recuperar-senha --project .
+```
+
+A captura vai para `specs/inbox/processed/` com `Status: Processada`, as specs
+derivadas registradas e os links atualizados. Para recalibrar a execução, registre Effort e sua justificativa diretamente na fonte
 normativa:
 
 ```bash

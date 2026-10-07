@@ -53,12 +53,45 @@ grava a captura e orienta você a remover o conteúdo sensível antes de reenvia
 captura sem perguntas → backlog refinável → spec normativa
 ```
 
-- `specs/inbox/` preserva o input.
+- `specs/inbox/` preserva o input e funciona como fila ativa.
+- `specs/inbox/processed/` guarda as capturas já cobertas por specs aprovadas.
 - `specs/backlog/` organiza algo escolhido para refinamento.
 - `specs/<estado>/<NNNN>-<slug>/spec.md` governa comportamento e entrega.
 
-Uma captura pode permanecer indefinidamente na Inbox. Quando quiser avançar,
-use `$specsfy-02-backlog` com o caminho do arquivo.
+Uma captura pode permanecer na Inbox pelo tempo que for preciso. Quando quiser
+avançar, use `$specsfy-02-backlog` com o caminho do arquivo.
+
+## Quando a captura sai da Inbox
+
+Virar backlog ou spec em Draft não retira a captura da fila ativa: enquanto
+qualquer parte do pedido estiver sem definição aprovada, ela continua em
+`specs/inbox/`, e a leitura da pasta mostra o que ainda precisa de tratamento.
+
+A saída acontece em um único momento: quando `$specsfy-04-validate` aprova o
+Definition Gate de uma spec e confirma que essa spec, sozinha ou com outras já
+aprovadas, cobre o pedido inteiro. A validação então executa:
+
+```bash
+specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de-atraso
+```
+
+O comando move o arquivo para `specs/inbox/processed/`, com o mesmo nome, e:
+
+- troca `Status: Capturada` por `Status: Processada`;
+- registra as specs que absorveram o pedido em `Spec derivada` e a data em
+  `Processada em`;
+- atualiza os links para a captura no backlog e nas specs;
+- preserva o texto original e a análise inicial sem alteração.
+
+```text
+specs/inbox/                       ← capturas pendentes
+specs/inbox/processed/             ← capturas integralmente cobertas por specs aprovadas
+```
+
+Nada é apagado. Capturas processadas continuam valendo como histórico e
+entram na busca por duplicatas do backlog. Se uma parte do pedido ficou de
+fora, a captura permanece na fila ativa e a validação informa o que resta
+encaminhar.
 
 ## Sessões de descoberta do MVP
 

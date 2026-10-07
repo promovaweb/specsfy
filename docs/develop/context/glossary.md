@@ -43,6 +43,7 @@ fonte normativa antes de alterar usos.
 | --- | --- | --- |
 | Fatia vertical | Entrega demonstrável com problema, aceite, testes, tarefas e evidência próprios | camada técnica |
 | Ideia capturada | Input preservado e pré-processado sem perguntas em `specs/inbox/<data-hora>-<slug>.md` | backlog, requisito ou autorização |
+| Captura processada | Captura movida para `specs/inbox/processed/` porque specs com Definition Gate aprovado cobrem o pedido inteiro; texto original e vínculos preservados | entrega concluída, exclusão ou arquivo morto |
 | Backlog | Item priorizável em `specs/backlog/<NNNN>-<slug>.md` que amadurece uma necessidade antes da promoção | captura bruta, spec ou tarefa |
 | Descoberta adaptativa | Conversa que aprofunda ideia, backlog ou spec e prepara o handoff | captura superficial ou especificação |
 | Spec | `specs/<estado>/<NNNN>-<slug>/spec.md`, fonte normativa única de uma fatia. Somente o diretório é numerado | documento de contexto |

@@ -231,6 +231,29 @@ specsfy effort 0001-recuperar-senha 10 \
   --reason "Entrega distribuída." --project ./api --json
 ```
 
+## `specsfy inbox process`
+
+Retira de `specs/inbox/` uma captura cujo pedido já está integralmente coberto
+por specs com `Definition Gate: Passed` e a guarda em
+`specs/inbox/processed/`. O comando marca `Status: Processada`, registra as
+specs derivadas e a data em `Processada em`, atualiza as referências à captura
+em `specs/backlog/` e nas specs e preserva o texto original. A captura pode ser
+indicada pelo nome do arquivo ou pelo caminho. `--spec` é obrigatório e pode
+ser repetido quando mais de uma spec cobre o pedido. O comando recusa specs em
+`draft` ou com o gate pendente e nunca sobrescreve uma captura já processada.
+Decidir se o pedido está inteiro coberto é tarefa da validação; o comando só
+executa a mudança.
+
+Exemplos:
+
+```bash
+specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de-atraso
+specsfy inbox process specs/inbox/2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de-atraso --project .
+specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-por-email --spec 0008-avisos-por-sms
+specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de-atraso --json
+specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de-atraso --project ./api --json
+```
+
 ## `specsfy progress`
 
 Lê specs e calcula estados, gates, Effort, tarefas, checklists e porcentagens.

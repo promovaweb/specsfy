@@ -4,6 +4,20 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Adicionado
+
+- `specsfy inbox process <captura> --spec <id>` retira de `specs/inbox/` a
+  captura cujo pedido está integralmente coberto por specs com
+  `Definition Gate: Passed` e a guarda em `specs/inbox/processed/`, com
+  `Status: Processada`, specs derivadas e data registradas, vínculos
+  atualizados e texto original intacto. Specs em `draft` ou com o gate
+  pendente são recusadas.
+- As skills `specsfy-01-inbox`, `specsfy-02-backlog`, `specsfy-03-specify` e
+  `specsfy-04-validate` e o contrato `Spec.md` passam a declarar a fila ativa
+  e a saída da captura: só a validação move, depois de
+  `specsfy transition <id> defined`; a busca por duplicatas inclui as
+  capturas processadas.
+
 ## [0.24.3] - 2026-10-20
 
 ### Corrigido

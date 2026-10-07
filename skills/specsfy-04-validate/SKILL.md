@@ -111,6 +111,25 @@ Sem alterar requisitos automaticamente:
 5. relate o resultado no chat.
 
 Quando o Definition Gate passar, execute `specsfy transition <id> defined`.
+
+Em seguida, retire da fila ativa as capturas que a spec esgotou:
+
+1. localize em `specs/inbox/` cada captura referenciada pela spec ou pelo
+   backlog que a originou;
+2. releia o texto original da captura e compare com o que a spec e outras
+   specs com `Definition Gate: Passed` definem;
+3. se o pedido estiver integralmente coberto, execute
+   `specsfy inbox process <captura> --spec <id>` (repita `--spec` para cada
+   spec que cobre a captura). O comando move o arquivo para
+   `specs/inbox/processed/`, marca `Status: Processada`, registra as specs
+   derivadas e atualiza os vínculos, sem tocar no texto original;
+4. se qualquer parte do pedido ainda não tiver spec aprovada, a captura
+   permanece em `specs/inbox/`; registre no chat o que resta encaminhar e não
+   force a saída.
+
+O comando recusa specs em Draft ou com o gate pendente. Nunca mova uma captura
+por outro meio nem a apague.
+
 Em `review`, use a mesma análise para o aceite final. Com Delivery Gate passado,
 Status `Complete` e a DoD comprovada, execute `specsfy transition <id> completed`.
 Antes disso, chame `$specsfy-interviewer` quando uma resposta puder mudar a

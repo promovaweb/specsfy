@@ -24,12 +24,18 @@ describe("CLI público", () => {
       "transition",
       "migrate",
       "effort",
+      "inbox",
       "progress",
       "milestones",
       "test",
       "tui",
       "config",
     ]);
+    expect(
+      program.commands
+        .find((command) => command.name() === "inbox")
+        ?.commands.map((command) => command.name()),
+    ).toEqual(["process"]);
     expect(
       program.commands
         .find((command) => command.name() === "skills")
@@ -122,6 +128,63 @@ describe("CLI público", () => {
       status: "Implementing",
     });
     expect(await readFile(join(project, "specs.md"), "utf8")).toContain("M01");
+  });
+
+  test("inbox process retira a captura da fila ativa com rastreabilidade", async () => {
+    const project = await temporaryDirectory();
+    const capture = "2026-07-28-143205-avisar-clientes.md";
+    await mkdir(join(project, "specs/inbox"), { recursive: true });
+    await writeFile(
+      join(project, "specs/inbox", capture),
+      "# Inbox: Avisar clientes\n\n| Metadado | Valor |\n| --- | --- |\n" +
+        "| Status | Capturada |\n| Spec derivada | Nenhuma |\n\n## Texto original\n\nAvisar.\n",
+    );
+    const spec = join(project, "specs/defined/0001-avisos/spec.md");
+    await mkdir(join(spec, ".."), { recursive: true });
+    await writeFile(
+      spec,
+      "# Avisos\n\n| Status | Defined |\n| Definition Gate | Passed |\n\n" +
+        `Origem: specs/inbox/${capture}\n`,
+    );
+    const output = vi.spyOn(console, "log").mockImplementation(() => undefined);
+
+    expect(
+      await runCli([
+        "node", "specsfy", "inbox", "process", capture,
+        "--spec", "0001-avisos", "--project", project, "--json",
+      ]),
+    ).toBe(0);
+    expect(JSON.parse(String(output.mock.calls.at(-1)?.[0]))).toMatchObject({
+      name: capture,
+      to: `specs/inbox/processed/${capture}`,
+      status: "Processada",
+      updated_references: ["specs/defined/0001-avisos/spec.md"],
+    });
+    expect(await readFile(join(project, "specs/inbox/processed", capture), "utf8")).toContain(
+      "| Status | Processada |",
+    );
+    expect(await readFile(spec, "utf8")).toContain(`specs/inbox/processed/${capture}`);
+  });
+
+  test("inbox process recusa spec sem Definition Gate aprovado", async () => {
+    const project = await temporaryDirectory();
+    const capture = "2026-07-28-143205-avisar-clientes.md";
+    await mkdir(join(project, "specs/inbox"), { recursive: true });
+    await writeFile(join(project, "specs/inbox", capture), "# Inbox\n\n| Status | Capturada |\n");
+    const spec = join(project, "specs/draft/0001-avisos/spec.md");
+    await mkdir(join(spec, ".."), { recursive: true });
+    await writeFile(spec, "# Avisos\n\n| Status | Draft |\n| Definition Gate | Pending |\n");
+    vi.spyOn(console, "log").mockImplementation(() => undefined);
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    expect(
+      await runCli([
+        "node", "specsfy", "inbox", "process", capture,
+        "--spec", "0001-avisos", "--project", project,
+      ]),
+    ).toBe(1);
+    expect(String(error.mock.calls.at(-1)?.[0])).toContain("Definition Gate");
+    expect(await readFile(join(project, "specs/inbox", capture), "utf8")).toContain("Capturada");
   });
 
   test("effort registra estimativa e justificativa na spec", async () => {

@@ -11,6 +11,7 @@ import { stdin, stdout } from "node:process";
 import { Catalog } from "./catalog.js";
 import { clickUpfyHandoff } from "./clickupfy.js";
 import { loadConfig, updateConfig } from "./config.js";
+import { processInboxCapture } from "./inbox.js";
 import { SkillInstaller } from "./installer.js";
 import {
   migrateSpecs,
@@ -258,6 +259,29 @@ export function buildProgram(): Command {
       else {
         console.log(`${result.identifier}\tEffort ${result.effort}/10`);
         printClickUpfyHandoff(handoff);
+      }
+    });
+
+  const inbox = program
+    .command("inbox")
+    .description("mantém a fila ativa de capturas em specs/inbox/");
+  inbox
+    .command("process")
+    .description("retira da fila ativa uma captura coberta por specs com Definition Gate aprovado")
+    .argument("<captura>", "arquivo .md em specs/inbox/, por nome ou caminho")
+    .requiredOption("--spec <id>", "spec que cobre a captura; pode ser repetida", collect, [])
+    .addOption(projectOption())
+    .option("--json", "emite resultado JSON")
+    .action(async (
+      capture: string,
+      options: ProjectOptions & { spec: string[]; json?: boolean },
+    ) => {
+      const result = await processInboxCapture(options.project, capture, options.spec);
+      if (options.json) console.log(JSON.stringify(result));
+      else {
+        console.log(`${result.name}\t${result.from} → ${result.to}\t${result.status}`);
+        for (const spec of result.specs) console.log(`Spec\t${spec.identifier}\t${spec.path}`);
+        for (const path of result.updated_references) console.log(`Referência\t${path}`);
       }
     });
 

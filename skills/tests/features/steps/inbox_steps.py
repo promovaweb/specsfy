@@ -275,3 +275,56 @@ def then_imports_hub_mvp_into_consumer(context) -> None:
     assert milestone.is_file()
     assert "MVP.md" in milestone.read_text(encoding="utf-8")
     assert not (context.project / "specs/inbox").exists()
+
+
+@given("o contrato central e as skills de inbox, backlog, especificação e validação")
+def given_contract_and_inbox_lifecycle_skills(context) -> None:
+    context.contract = (ROOT / "Spec.md").read_text(encoding="utf-8")
+    context.lifecycle_skills = {
+        name: (ROOT / name / "SKILL.md").read_text(encoding="utf-8")
+        for name in (
+            "specsfy-01-inbox",
+            "specsfy-02-backlog",
+            "specsfy-03-specify",
+            "specsfy-04-validate",
+        )
+    }
+
+
+@when("a saída da Inbox é inspecionada")
+def when_inbox_exit_is_inspected(context) -> None:
+    context.normalized = {
+        name: " ".join(text.split()).casefold()
+        for name, text in context.lifecycle_skills.items()
+    }
+
+
+@then("a estrutura canônica declara specs/inbox/processed/")
+def then_canonical_structure_declares_processed(context) -> None:
+    assert "│   ├── processed/" in context.contract
+    assert "`specs/inbox/processed/`" in context.contract
+
+
+@then("a captura permanece na Inbox até o Definition Gate das specs que a cobrem")
+def then_capture_stays_until_definition_gate(context) -> None:
+    for name in ("specsfy-01-inbox", "specsfy-03-specify"):
+        assert "`specs/inbox/processed/`" in context.lifecycle_skills[name], name
+        assert "definition gate" in context.normalized[name], name
+    assert "não mover" in context.normalized["specsfy-01-inbox"]
+
+
+@then("só a validação move a captura, pelo CLI, depois de specsfy transition para defined")
+def then_only_validation_moves_the_capture(context) -> None:
+    validate = context.lifecycle_skills["specsfy-04-validate"]
+    transition = validate.index("`specsfy transition <id> defined`")
+    process = validate.index("`specsfy inbox process <captura> --spec <id>`")
+    assert transition < process
+    assert "parte do pedido" in context.normalized["specsfy-04-validate"]
+    assert "`specsfy inbox process`" not in context.lifecycle_skills["specsfy-02-backlog"]
+
+
+@then("a busca por duplicatas do backlog inclui as capturas processadas")
+def then_backlog_search_includes_processed(context) -> None:
+    backlog = context.lifecycle_skills["specsfy-02-backlog"]
+    assert "`specs/inbox/processed/*.md`" in backlog
+    assert "não alterar, mover nem apagar entradas de inbox" in context.normalized["specsfy-02-backlog"]

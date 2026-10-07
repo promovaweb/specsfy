@@ -41,7 +41,10 @@ transversais. A spec da fatia governa cada mudança.
 O Specsfy não possui banco de dados de runtime. O estado normativo é Markdown
 versionado no Git:
 
-- `specs/inbox/` preserva inputs timestampados e sua análise inicial.
+- `specs/inbox/` preserva inputs timestampados e sua análise inicial; é a fila
+  ativa.
+- `specs/inbox/processed/` preserva, sem alteração do texto original, as
+  capturas integralmente cobertas por specs com Definition Gate aprovado.
 - backlog preserva itens escolhidos para refinamento ainda não promovidos.
 - specs mantêm decisões e progresso por fatia.
 - research preserva evidência consultada.

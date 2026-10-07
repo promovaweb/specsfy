@@ -44,7 +44,9 @@ específica.
 1. Extraia termos derivados do pedido do usuário, incluindo nomes do domínio e
    equivalentes evidentes já usados na conversa.
 2. Antes de criar ou atualizar o item, pesquise esses termos em:
-   - `specs/inbox/*.md`;
+   - `specs/inbox/*.md`, a fila ativa;
+   - `specs/inbox/processed/*.md`, capturas já cobertas por specs aprovadas,
+     úteis para histórico e duplicatas;
    - `specs/backlog/*.md`;
    - `specs/<estado>/*/spec.md`;
    - `docs/**/*.md`.
@@ -122,7 +124,8 @@ ou prioridade. Esses dados podem amadurecer no aprofundamento.
 2. Se existir item correspondente, atualize-o sem mudar seu ID e preserve a
    formulação anterior.
 3. Se a origem for `specs/inbox/`, registre esse caminho em
-   `Referências relacionadas`; não altere nem apague a captura.
+   `Referências relacionadas`; não altere, mova nem apague a captura. Ela
+   continua na fila ativa até a validação da spec derivada.
 4. Para criar um item novo, execute:
 
 ```bash
@@ -287,7 +290,8 @@ as lacunas que impedem o Definition Gate.
 
 ## Limites
 
-- Não alterar nem apagar entradas de Inbox.
+- Não alterar, mover nem apagar entradas de Inbox. Virar backlog não retira a
+  captura da fila ativa.
 - Não criar `spec.md`, tarefas, research, testes ou código.
 - Não inventar stakeholders, integrações, restrições ou decisões.
 - Não transformar hipótese técnica em requisito.
