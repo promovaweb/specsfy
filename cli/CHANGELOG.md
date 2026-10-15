@@ -4,6 +4,16 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- A validação de specs reconhece `TODO`, `TBD` e `FIXME` somente em
+  maiúsculas e como palavras inteiras; texto em português como "todo o site"
+  ou "método" deixa de reprovar a spec com "Marcadores não resolvidos".
+- A validação de tarefas passa a exigir `[MIGRATION]` para tarefas como
+  "Criar índice", e o importador de MVP reconhece resultados declarados com
+  "conseguirá"; ambos falhavam na fronteira de palavra antes ou depois de
+  letras acentuadas.
+
 ## [0.23.0] - 2026-09-15
 
 ### Adicionado

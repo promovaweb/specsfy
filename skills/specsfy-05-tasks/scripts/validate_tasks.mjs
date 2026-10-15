@@ -7,7 +7,11 @@ import { spawnSync } from "node:child_process";
 /** Mantém a ordem do checklist e a cobertura mínima de casos TDD. */
 const KEYS = ["PREP", "EXECUTE", "VERIFY", "VISUAL", "EVIDENCE", "IMPROVE"], MIN = 3;
 /** Reconhece alterações estruturais que exigem migration no plano. */
-const SCHEMA_CHANGE_TASK = /\b(?:criar|alterar|adicionar|remover|renomear|modificar|excluir)\b.*\b(?:schema|tabela|coluna|campo\s+persistente|model\s+persistente|índice|indice|chave\s+estrangeira|foreign\s+key|constraint|relação\s+persistente)\b|\b(?:schema|tabela|coluna|campo\s+persistente|model\s+persistente|índice|indice|chave\s+estrangeira|foreign\s+key|constraint|relação\s+persistente)\b.*\b(?:criar|alterar|adicionar|remover|renomear|modificar|excluir)\b/i;
+const SCHEMA_VERBS = "criar|alterar|adicionar|remover|renomear|modificar|excluir";
+const SCHEMA_TARGETS = "schema|tabela|coluna|campo\\s+persistente|model\\s+persistente|índice|indice|chave\\s+estrangeira|foreign\\s+key|constraint|relação\\s+persistente";
+/** Delimita palavras com letras Unicode; `\b` trata letras acentuadas como separadores. */
+const word = (alternatives) => `(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`;
+const SCHEMA_CHANGE_TASK = new RegExp(`${word(SCHEMA_VERBS)}.*${word(SCHEMA_TARGETS)}|${word(SCHEMA_TARGETS)}.*${word(SCHEMA_VERBS)}`, "iu");
 /** Aceita os diretórios versionados usados pelos frameworks cobertos. */
 const MIGRATION_PATH = /(?:^|[\s`])(?:database\/migrations|migrations|prisma\/migrations|supabase\/migrations)\/[\w./-]+/i;
 const args = process.argv.slice(2), specInput = args.find((arg) => !arg.startsWith("--")), draft = args.includes("--allow-draft"), json = args.includes("--json");

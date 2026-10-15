@@ -139,6 +139,28 @@ Menus: menu principal com Clientes para /clientes.
             self.assertIn("Pendente: o MVP não declara os menus ou a navegação principal", spec_content)
             self.assertIn("| Definition Gate | Pending |", spec_content)
 
+    def test_reads_result_declared_with_accented_future_verb(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            project = Path(directory)
+            (project / "MVP.md").write_text(
+                "## Consulta de registros\n\nA aplicação deve consultar registros.\n"
+                "O usuário conseguirá exportar os registros filtrados.\n",
+                encoding="utf-8",
+            )
+
+            result = subprocess.run(
+                ["node", str(SCRIPT), "--root", str(project)],
+                text=True,
+                capture_output=True,
+                check=False,
+            )
+
+            self.assertEqual(0, result.returncode, result.stderr)
+            item = json.loads(result.stdout)["items"][0]
+            spec_content = (project / item["spec"]).read_text(encoding="utf-8")
+            self.assertNotIn("Pendente: o MVP não declara o resultado ou valor esperado", spec_content)
+            self.assertIn("O usuário conseguirá exportar os registros filtrados.", spec_content)
+
     def test_keeps_contextual_themes_out_of_backlog_and_specs(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             project = Path(directory)

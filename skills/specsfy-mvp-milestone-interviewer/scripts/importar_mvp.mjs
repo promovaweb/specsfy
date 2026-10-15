@@ -146,7 +146,7 @@ function extractObviousValue(theme, field) {
   const patterns = {
     problem: [/^(?:o|a)\s+(?:problema|dor|necessidade)\s+(?:e|é)\s+/iu, /\b(?:nao|não)\s+(?:consegue|conseguem|tem|têm|possui|possuem)\b/iu, /\bdificuldade\b/iu],
     person: [/^(?:para quem|destinado a|feito para|usuarios?|usuárias?|pessoas?)\b/iu],
-    result: [/^(?:o sistema|a pessoa|o usuario|a usuaria|o usuário|a usuária)\s+(?:deve|consegue|conseguira|conseguirá)\b/iu, /^(?:permitir|possibilitar|entregar|gerar|obter)\b/iu],
+    result: [/^(?:o sistema|a pessoa|o usuario|a usuaria|o usuário|a usuária)\s+(?:deve|consegue|conseguira|conseguirá)(?![\p{L}\p{N}_])/iu, /^(?:permitir|possibilitar|entregar|gerar|obter)\b/iu],
     context: [/^(?:durante|quando|ao|na|no|em)\b/iu],
     menu: [/\bmenus?\b/iu, /\bnavega(?:ção|cao)\b/iu],
   };

@@ -67,6 +67,23 @@ class MigrationContractTests(unittest.TestCase):
 
             self.assertTrue(any("sem uma tarefa [MIGRATION]" in error for error in errors))
 
+    def test_accented_schema_target_requires_planned_migration(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            spec = Path(directory) / "spec.md"
+            spec.write_text(
+                spec_with_tasks(
+                    "- [ ] T004 [CODE] [US-001] Criar índice único em clientes.email "
+                    "em app/Models/Cliente.php — Refs: US-001, FR-001, NFR-001, "
+                    "AC-001, AC-002, AC-003 — Depends: none\n" + checklist()
+                ),
+                encoding="utf-8",
+            )
+
+            result = run(TASKS, str(spec), "--allow-draft", "--json")
+            errors = json.loads(result.stdout)["errors"]
+
+            self.assertTrue(any("sem uma tarefa [MIGRATION]" in error for error in errors))
+
     def test_database_read_does_not_require_migration(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             spec = Path(directory) / "spec.md"
