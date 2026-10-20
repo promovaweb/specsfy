@@ -150,11 +150,25 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
 
 ## Contrato de runtime Laravel
 
-Toda aplicação Laravel usa Laravel Octane como servidor de aplicação. O pacote
-`laravel/octane` é obrigatório com Open Swoole. O Octane usa o identificador
-`swoole` para esse servidor. Código executado por workers persistentes não pode manter
-estado de uma requisição para a seguinte. Build, healthcheck, reload e deploy
-devem exercitar o processo Octane que atende o tráfego real.
+Toda aplicação Laravel declara explicitamente seu servidor de aplicação em
+`.specsfy/STACK.md`, com a evidência que o comprova: o comando que sobe o
+processo, a imagem e as extensões exigidas. Build, healthcheck, reload e deploy
+devem exercitar o mesmo processo que atende o tráfego real; validar um servidor
+diferente do que roda em produção não é evidência.
+
+Qual servidor adotar é decisão do projeto, não do framework. PHP-FPM,
+FrankenPHP em modo clássico, FrankenPHP em worker mode e Laravel Octane com
+Swoole, Open Swoole, RoadRunner ou FrankenPHP são escolhas legítimas, cada uma
+com um custo. O contrato exige que a escolha seja explícita e comprovada, não
+que seja uma em particular.
+
+Modo worker — Octane com qualquer driver, FrankenPHP em worker mode,
+RoadRunner — boota a aplicação uma única vez e a reaproveita entre requisições.
+Sob ele, o código não pode manter estado de uma requisição para a seguinte:
+property estática, singleton que guarda usuário ou `Request`, e cache em
+memória de processo passam a vazar de um usuário para outro. Adotar modo worker
+exige auditar esses pontos antes de ligar, não apenas trocar o comando de
+inicialização; trate essa auditoria como spec própria.
 
 ## Contrato de experiência de interface
 
