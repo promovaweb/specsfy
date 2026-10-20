@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TRACE = ROOT / "specsfy-06-tdd-bdd/scripts/check_traceability.mjs"
 TASKS = ROOT / "specsfy-05-tasks/scripts/validate_tasks.mjs"
+NEXT_TASK = ROOT / "specsfy-07-implement/scripts/next_task.mjs"
 def run_node(script: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(["node", str(script), *arguments], text=True, capture_output=True, check=False)
 
@@ -17,6 +18,47 @@ def run_node(script: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
 def validate_tasks(spec: Path) -> dict:
     result = run_node(TASKS, str(spec), "--allow-draft", "--json")
     return json.loads(result.stdout)
+
+
+def task_checklist(complete: bool) -> str:
+    marker = "x" if complete else " "
+    return (
+        f"  - [{marker}] **PREP**: Confirmar baseline.\n"
+        f"  - [{marker}] **EXECUTE**: Produzir entrega.\n"
+        f"  - [{marker}] **VERIFY**: Observar RED valido.\n"
+        f"  - [{marker}] **VISUAL**: Nao aplicavel porque a tarefa nao altera interface.\n"
+        f"  - [{marker}] **EVIDENCE**: Registrar RED valido.\n"
+        f"  - [{marker}] **IMPROVE**: Revisar aprendizado.\n"
+    )
+
+
+def incremental_spec(initial_code_complete: bool = False, future_tdd_complete: bool = False) -> str:
+    initial = task_checklist(True)
+    open_checklist = task_checklist(False)
+    initial_code = task_checklist(initial_code_complete)
+    future_tdd = task_checklist(future_tdd_complete)
+    return "".join((
+        "| Campo | Valor |\n| --- | --- |\n"
+        "| Formato | Specsfy/2.0 |\n| Status | Planned |\n"
+        "| Definition Gate | Passed |\n| Plan Gate | Passed |\n"
+        "#### US-001 — Exemplo\n"
+        "#### AC-001 — Caminho feliz\n#### AC-002 — Limite\n#### AC-003 — Falha\n#### AC-004 — Regra dependente\n"
+        "- **FR-001**: Comportamento observavel.\n"
+        "- **NFR-001**: Qualidade. **Verificacao**: teste.\n"
+        "### 14. Tarefas\n"
+        "- [x] T001 [TEST] [TDD] [US-001] RED inicial em tests/Feature/ExampleTest.php — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none\n",
+        initial,
+        "- [x] T002 [TEST] [TDD] [US-001] RED de limite inicial em tests/Feature/ExampleTest.php — Refs: US-001, FR-001, NFR-001, AC-002 — Depends: none\n",
+        initial,
+        "- [x] T003 [TEST] [TDD] [US-001] RED de falha inicial em tests/Feature/ExampleTest.php — Refs: US-001, FR-001, NFR-001, AC-003 — Depends: none\n",
+        initial,
+        f"- [{'x' if initial_code_complete else ' '}] T011 [CODE] [US-001] GREEN da primeira fatia em app/Example.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003\n",
+        initial_code,
+        f"- [{'x' if future_tdd_complete else ' '}] T004 [TEST] [TDD] [US-001] RED dependente em tests/Feature/ExampleTest.php — Refs: US-001, FR-001, NFR-001, AC-004 — Depends: T011\n",
+        future_tdd,
+        "- [ ] T012 [CODE] [US-001] GREEN da segunda fatia em app/Example.php — Refs: US-001, FR-001, NFR-001, AC-004 — Depends: T004\n",
+        open_checklist,
+    ))
 
 
 class BddRunnerTests(unittest.TestCase):
@@ -224,6 +266,84 @@ class BddRunnerTests(unittest.TestCase):
                 "US-001 possui 1 predecessor(es) TDD; mínimo exigido: 3.",
                 result["errors"],
             )
+
+    def test_plan_gate_allows_a_future_tdd_causally_blocked_by_first_code_slice(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            spec = Path(temporary) / "spec.md"
+            spec.write_text(incremental_spec(), encoding="utf-8")
+
+            result = validate_tasks(spec)
+
+            self.assertEqual([], result["errors"])
+
+            next_task = run_node(NEXT_TASK, str(spec), "--json")
+            payload = json.loads(next_task.stdout)
+            self.assertEqual(0, next_task.returncode, next_task.stdout + next_task.stderr)
+            self.assertEqual("T011", payload["ready"][0]["id"])
+            self.assertEqual([{"id": "T004", "waiting_for": ["T011"], "line_number": payload["blocked"][0]["line_number"]}], payload["blocked"][:1])
+
+    def test_future_tdd_becomes_ready_only_after_its_causal_code_completes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            spec = Path(temporary) / "spec.md"
+            spec.write_text(incremental_spec(initial_code_complete=True), encoding="utf-8")
+
+            after_first_green = run_node(NEXT_TASK, str(spec), "--json")
+            after_first_payload = json.loads(after_first_green.stdout)
+            self.assertEqual(0, after_first_green.returncode, after_first_green.stdout + after_first_green.stderr)
+            self.assertEqual("T004", after_first_payload["ready"][0]["id"])
+
+            spec.write_text(incremental_spec(initial_code_complete=True, future_tdd_complete=True), encoding="utf-8")
+            self.assertEqual([], validate_tasks(spec)["errors"])
+            after_dependent_red = run_node(NEXT_TASK, str(spec), "--json")
+            after_red_payload = json.loads(after_dependent_red.stdout)
+            self.assertEqual(0, after_dependent_red.returncode, after_dependent_red.stdout + after_dependent_red.stderr)
+            self.assertEqual("T012", after_red_payload["ready"][0]["id"])
+
+    def test_rejects_pending_tdd_without_a_causal_code_predecessor(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            spec = Path(temporary) / "spec.md"
+            spec.write_text(incremental_spec().replace("Depends: T011\n", "Depends: none\n"), encoding="utf-8")
+
+            result = validate_tasks(spec)
+
+            self.assertTrue(any("T004" in error and "causal" in error for error in result["errors"]), result["errors"])
+
+    def test_rejects_circular_causal_dependencies(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            spec = Path(temporary) / "spec.md"
+            spec.write_text(
+                incremental_spec().replace("Depends: T001, T002, T003\n", "Depends: T001, T002, T003, T004\n"),
+                encoding="utf-8",
+            )
+
+            result = validate_tasks(spec)
+
+            self.assertTrue(any("circular" in error.lower() for error in result["errors"]), result["errors"])
+
+    def test_rejects_code_without_its_own_tdd_predecessor(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            spec = Path(temporary) / "spec.md"
+            spec.write_text(incremental_spec().replace("Depends: T004\n", "Depends: none\n"), encoding="utf-8")
+
+            result = validate_tasks(spec)
+
+            self.assertTrue(any("T012 é CODE sem predecessor TDD" in error for error in result["errors"]), result["errors"])
+
+    def test_rejects_completed_tdd_without_completed_red_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            spec = Path(temporary) / "spec.md"
+            spec.write_text(
+                incremental_spec().replace(
+                    "  - [x] **EVIDENCE**: Registrar RED valido.\n",
+                    "  - [ ] **EVIDENCE**: Registrar RED valido.\n",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+
+            result = validate_tasks(spec)
+
+            self.assertTrue(any("T001 está concluída com itens de checklist abertos: EVIDENCE" in error for error in result["errors"]), result["errors"])
 
     def test_feature_path_is_not_a_tdd_task(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

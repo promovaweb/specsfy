@@ -210,8 +210,12 @@ Depois do Plan Gate, execute `specsfy transition <id> planned`. Quando a
 conversa alterar abrangência, dependência ou capacidade necessária, chame
 `$specsfy-interviewer` antes de replanejar e atualize Effort com justificativa.
 
-O modo estrito rejeita `Plan Gate: Passed` quando algum predecessor TDD
-de uma tarefa `[CODE]` continua aberto. Se a validação falhar, mantenha
+O modo estrito rejeita `Plan Gate: Passed` quando um predecessor TDD necessário
+para uma tarefa `[CODE]` executável continua aberto. Um TDD futuro pode
+permanecer aberto somente quando depende causalmente de uma `[CODE]` anterior
+necessária para tornar seu comportamento observável; a cadeia deve estar em
+`Depends`, a CODE anterior precisa ter seus próprios REDs concluídos e a CODE
+futura continua bloqueada até o seu RED específico concluir. Se a validação falhar, mantenha
 `Status: Defined`, `Plan Gate: Failed`, `Delivery Gate: Pending` e relate os
 bloqueios.
 
