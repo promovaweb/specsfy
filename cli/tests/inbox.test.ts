@@ -146,6 +146,52 @@ describe("saída da Inbox para processed", () => {
     expect(await scanInboxCaptures(project, { includeProcessed: true })).toHaveLength(1);
   });
 
+  test("recusa Draft e gate implícito mesmo quando outro sinal parece aprovado", async () => {
+    const project = await temporaryDirectory();
+    await write(project, `specs/inbox/${CAPTURE}`, CAPTURE_CONTENT);
+    await createSpec(project, "defined", "0006-aprovada", "Passed");
+    await createSpec(project, "draft", "0007-draft-com-gate", "Passed");
+    await write(
+      project,
+      "specs/defined/0008-status-draft/spec.md",
+      "# Especificação\n\n| Campo | Valor |\n| --- | --- |\n" +
+        "| Status | Draft |\n| Definition Gate | Passed |\n",
+    );
+    await write(
+      project,
+      "specs/defined/0009-sem-gate/spec.md",
+      "# Especificação\n\n| Campo | Valor |\n| --- | --- |\n| Status | Defined |\n",
+    );
+    await write(
+      project,
+      "specs/specs/0010-legado-em-draft/spec.md",
+      "# Especificação\n\n| Campo | Valor |\n| --- | --- |\n" +
+        "| Status | Draft |\n| Definition Gate | Passed |\n",
+    );
+
+    for (const identifier of [
+      "0007-draft-com-gate",
+      "0008-status-draft",
+      "0009-sem-gate",
+      "0010-legado-em-draft",
+    ]) {
+      await expect(
+        processInboxCapture(project, CAPTURE, [identifier]),
+      ).rejects.toThrow("Definition Gate");
+    }
+    await expect(
+      processInboxCapture(project, CAPTURE, ["0006-aprovada", "0007-draft-com-gate"]),
+    ).rejects.toThrow("0007-draft-com-gate");
+
+    await expect(
+      readFile(join(project, "specs/inbox", CAPTURE), "utf8"),
+    ).resolves.toBe(CAPTURE_CONTENT);
+    await expect(
+      readFile(join(project, "specs/defined/0006-aprovada/spec.md"), "utf8"),
+    ).resolves.toContain(`Origem: specs/inbox/${CAPTURE}`);
+    expect(await scanInboxCaptures(project, { includeProcessed: true })).toHaveLength(1);
+  });
+
   test("exige ao menos uma spec e uma captura existente na fila ativa", async () => {
     const project = await temporaryDirectory();
     await write(project, `specs/inbox/${CAPTURE}`, CAPTURE_CONTENT);

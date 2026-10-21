@@ -98,6 +98,42 @@ class CliInboxContractTests(unittest.TestCase):
             self.assertTrue((root / "specs" / "inbox" / CAPTURE).is_file())
             self.assertFalse((root / "specs" / "inbox" / "processed").exists())
 
+    def test_refuses_draft_or_implicit_gate_even_when_another_signal_looks_approved(self) -> None:
+        cases = {
+            "pasta draft com gate Passed": ("draft", "| Status | Defined |\n| Definition Gate | Passed |\n"),
+            "Status Draft com gate Passed": ("defined", "| Status | Draft |\n| Definition Gate | Passed |\n"),
+            "sem Definition Gate escrito": ("defined", "| Status | Defined |\n"),
+        }
+        for label, (folder, rows) in cases.items():
+            with self.subTest(label), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "specs" / "inbox").mkdir(parents=True)
+                (root / "specs" / "inbox" / CAPTURE).write_text(CAPTURE_CONTENT, encoding="utf-8")
+                spec = root / "specs" / folder / "0007-avisos-de-atraso" / "spec.md"
+                spec.parent.mkdir(parents=True)
+                spec.write_text(
+                    "# Especificação: Avisos de atraso\n\n| Campo | Valor |\n| --- | --- |\n"
+                    f"{rows}\nOrigem: specs/inbox/{CAPTURE}\n",
+                    encoding="utf-8",
+                )
+
+                result = subprocess.run(
+                    [
+                        str(CLI), "inbox", "process", CAPTURE,
+                        "--spec", "0007-avisos-de-atraso",
+                        "--project", str(root),
+                    ],
+                    text=True,
+                    capture_output=True,
+                    check=False,
+                )
+
+                self.assertEqual(1, result.returncode)
+                self.assertIn("Definition Gate", result.stderr)
+                self.assertEqual(CAPTURE_CONTENT, (root / "specs" / "inbox" / CAPTURE).read_text(encoding="utf-8"))
+                self.assertIn(f"specs/inbox/{CAPTURE}", spec.read_text(encoding="utf-8"))
+                self.assertFalse((root / "specs" / "inbox" / "processed").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

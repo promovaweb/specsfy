@@ -10,8 +10,10 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
   captura cujo pedido está integralmente coberto por specs com
   `Definition Gate: Passed` e a guarda em `specs/inbox/processed/`, com
   `Status: Processada`, specs derivadas e data registradas, vínculos
-  atualizados e texto original intacto. Specs em `draft` ou com o gate
-  pendente são recusadas.
+  atualizados e texto original intacto. Cada spec indicada precisa estar
+  fora de `draft`, ter `Status` diferente de `Draft` e declarar
+  `Definition Gate: Passed`; sem o gate escrito, a spec é recusada e a
+  captura permanece na fila.
 - As skills `specsfy-01-inbox`, `specsfy-02-backlog`, `specsfy-03-specify` e
   `specsfy-04-validate` e o contrato `Spec.md` passam a declarar a fila ativa
   e a saída da captura: só a validação move, depois de

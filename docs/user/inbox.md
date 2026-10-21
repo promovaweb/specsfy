@@ -83,6 +83,12 @@ O comando move o arquivo para `specs/inbox/processed/`, com o mesmo nome, e:
 - atualiza os links para a captura no backlog e nas specs;
 - preserva o texto original e a análise inicial sem alteração.
 
+Antes de mover, o comando confere cada spec indicada. Ela precisa estar fora
+da pasta `draft`, ter `Status` diferente de `Draft` e mostrar
+`Definition Gate: Passed` na tabela do topo. Se o gate não estiver escrito, a
+spec é recusada mesmo que já esteja em outra pasta. Basta uma spec recusada
+para a captura continuar em `specs/inbox/`.
+
 ```text
 specs/inbox/                       ← capturas pendentes
 specs/inbox/processed/             ← capturas integralmente cobertas por specs aprovadas

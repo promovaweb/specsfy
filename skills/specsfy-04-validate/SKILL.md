@@ -127,8 +127,10 @@ Em seguida, retire da fila ativa as capturas que a spec esgotou:
    permanece em `specs/inbox/`; registre no chat o que resta encaminhar e não
    force a saída.
 
-O comando recusa specs em Draft ou com o gate pendente. Nunca mova uma captura
-por outro meio nem a apague.
+O comando recusa a spec que estiver na pasta `draft`, tiver `Status: Draft` ou
+não declarar `Definition Gate: Passed` na tabela de metadados; com uma spec
+recusada, nenhuma captura sai da fila. Nunca mova uma captura por outro meio
+nem a apague.
 
 Em `review`, use a mesma análise para o aceite final. Com Delivery Gate passado,
 Status `Complete` e a DoD comprovada, execute `specsfy transition <id> completed`.

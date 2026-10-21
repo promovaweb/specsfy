@@ -135,15 +135,20 @@ export async function processInboxCapture(
   };
 }
 
+/**
+ * Exige os três sinais da definição aprovada: pasta fora de `draft`, `Status`
+ * diferente de Draft e `Definition Gate: Passed` escrito na spec. Nenhum deles
+ * é inferido a partir dos outros.
+ */
 async function assertDefinitionGatePassed(spec: ResolvedSpec): Promise<void> {
   const content = await readFile(spec.path, "utf8");
   const gate = readTableRow(content, "Definition Gate");
-  const passedByGate = gate === undefined ? undefined : gate.toLowerCase() === "passed";
-  const passedByFolder = spec.folder !== "draft";
-  if (passedByGate === false || (passedByGate === undefined && !passedByFolder)) {
+  const draft = spec.folder === "draft" || spec.status.toLowerCase() === "draft";
+  if (draft || gate?.toLowerCase() !== "passed") {
     throw new Error(
       `a spec ${spec.identifier} ainda não tem Definition Gate aprovado ` +
-        `(pasta ${spec.folder}, gate ${gate ?? "ausente"}); a captura permanece na fila ativa`,
+        `(pasta ${spec.folder}, status ${spec.status}, gate ${gate ?? "ausente"}); ` +
+        "a captura permanece na fila ativa",
     );
   }
 }

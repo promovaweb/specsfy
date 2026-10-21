@@ -239,8 +239,11 @@ por specs com `Definition Gate: Passed` e a guarda em
 specs derivadas e a data em `Processada em`, atualiza as referências à captura
 em `specs/backlog/` e nas specs e preserva o texto original. A captura pode ser
 indicada pelo nome do arquivo ou pelo caminho. `--spec` é obrigatório e pode
-ser repetido quando mais de uma spec cobre o pedido. O comando recusa specs em
-`draft` ou com o gate pendente e nunca sobrescreve uma captura já processada.
+ser repetido quando mais de uma spec cobre o pedido. Cada spec precisa estar
+fora de `draft`, ter `Status` diferente de `Draft` e declarar
+`Definition Gate: Passed` na própria tabela de metadados; a ausência do gate
+conta como recusa. Se qualquer spec indicada falhar, nada é movido. O comando
+nunca sobrescreve uma captura já processada.
 Decidir se o pedido está inteiro coberto é tarefa da validação; o comando só
 executa a mudança.
 
