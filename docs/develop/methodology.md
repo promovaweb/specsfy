@@ -71,8 +71,8 @@ input → specs/inbox/ → specs/backlog/
 ```
 
 `specsfy-01-inbox` preserva e pré-processa sem perguntas. O backlog adiciona
-refinamento dialogado. Ambas mantêm proveniência, mas somente `spec.md` governa
-o comportamento.
+refinamento dialogado. Ambas mantêm proveniência, mas só `spec.md` governa o
+comportamento; a captura sai de `specs/inbox/` para `processed/` na validação.
 
 Na descoberta de MVP, `specsfy-mvp-milestone-interviewer` preserva `MVP.md`
 como fonte de negócio e produto. Ele procura `MVP.md` e `BRAND.md` na raiz do

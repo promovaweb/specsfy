@@ -14,6 +14,10 @@ SKILL = ROOT / "specsfy-01-inbox/SKILL.md"
 TEMPLATE = ROOT / "templates/Inbox.md"
 MVP_INTERVIEWER = ROOT / "specsfy-mvp-milestone-interviewer/SKILL.md"
 MVP_IMPORTER = ROOT / "specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs"
+BACKLOG_SKILL = ROOT / "specsfy-02-backlog/SKILL.md"
+SPECIFY_SKILL = ROOT / "specsfy-03-specify/SKILL.md"
+VALIDATE_SKILL = ROOT / "specsfy-04-validate/SKILL.md"
+CENTRAL_CONTRACT = ROOT / "Spec.md"
 
 
 class InboxCaptureTests(unittest.TestCase):
@@ -302,6 +306,57 @@ class InboxCaptureTests(unittest.TestCase):
             self.assertNotEqual(0, result.returncode)
             self.assertIn("não será sobrescrita", result.stderr)
             self.assertFalse((project / "specs/inbox").exists())
+
+
+class InboxProcessedTests(unittest.TestCase):
+    """A captura sai da fila ativa só quando specs aprovadas cobrem todo o pedido."""
+
+    def test_central_contract_declares_the_processed_folder(self) -> None:
+        contract = CENTRAL_CONTRACT.read_text(encoding="utf-8")
+        normalized = " ".join(contract.split()).casefold()
+
+        self.assertIn("│   ├── processed/", contract)
+        self.assertIn("`specs/inbox/processed/`", contract)
+        self.assertIn("definition gate", normalized)
+        self.assertIn("`specsfy inbox process`", contract)
+
+    def test_inbox_skill_describes_the_exit_without_allowing_it_during_capture(self) -> None:
+        skill = SKILL.read_text(encoding="utf-8")
+        normalized = " ".join(skill.split()).casefold()
+
+        self.assertIn("`specs/inbox/processed/`", skill)
+        self.assertIn("`specsfy inbox process`", skill)
+        self.assertIn("definition gate", normalized)
+        self.assertIn("não alterar nem apagar capturas anteriores", normalized)
+        self.assertIn("não mover", normalized)
+
+    def test_backlog_search_includes_processed_captures_and_never_moves_them(self) -> None:
+        skill = BACKLOG_SKILL.read_text(encoding="utf-8")
+        normalized = " ".join(skill.split()).casefold()
+
+        self.assertIn("`specs/inbox/processed/*.md`", skill)
+        self.assertIn("não alterar, mover nem apagar entradas de inbox", normalized)
+
+    def test_specify_keeps_the_capture_active_until_the_definition_gate(self) -> None:
+        skill = SPECIFY_SKILL.read_text(encoding="utf-8")
+        normalized = " ".join(skill.split()).casefold()
+
+        self.assertIn("`specs/inbox/processed/`", skill)
+        self.assertIn("definition gate", normalized)
+
+    def test_validate_processes_covered_captures_after_the_definition_gate(self) -> None:
+        skill = VALIDATE_SKILL.read_text(encoding="utf-8")
+        normalized = " ".join(skill.split()).casefold()
+
+        self.assertIn("`specsfy inbox process <captura> --spec <id>`", skill)
+        self.assertIn("`specsfy transition <id> defined`", skill)
+        self.assertLess(
+            skill.index("`specsfy transition <id> defined`"),
+            skill.index("`specsfy inbox process <captura> --spec <id>`"),
+        )
+        self.assertIn("integralmente", normalized)
+        self.assertIn("parte do pedido", normalized)
+        self.assertIn("permanece em `specs/inbox/`", skill)
 
 
 if __name__ == "__main__":

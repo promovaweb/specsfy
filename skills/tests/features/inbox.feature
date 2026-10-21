@@ -12,6 +12,14 @@ Feature: Captura imediata na Inbox
     And preserva o texto original e separa análise, inferências e pontos a revisar
     And não cria backlog, spec, tarefas ou código
 
+  Scenario: Retirar da fila ativa uma captura integralmente coberta por specs aprovadas
+    Given o contrato central e as skills de inbox, backlog, especificação e validação
+    When a saída da Inbox é inspecionada
+    Then a estrutura canônica declara specs/inbox/processed/
+    And a captura permanece na Inbox até o Definition Gate das specs que a cobrem
+    And só a validação move a captura, pelo CLI, depois de specsfy transition para defined
+    And a busca por duplicatas do backlog inclui as capturas processadas
+
   Scenario: Instalar todos os templates documentais do framework
     Given uma instalação base do Specsfy
     When o CLI publica os arquivos estruturais no projeto consumidor

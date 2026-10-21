@@ -44,12 +44,20 @@ precisa ser revisto. Nenhum backlog, spec, tarefa ou código é criado.
 Os metadados incluem horário da captura, origem, slug, status, hash do texto
 original e links futuros para backlog ou spec.
 
+A captura nasce com `Status: Capturada` e fica em `specs/inbox/` enquanto o
+pedido tiver alguma parte sem definição aprovada. Quando specs com Definition
+Gate aprovado cobrirem o pedido inteiro, a validação a move para
+`specs/inbox/processed/` com `Status: Processada`. O texto original não muda.
+Leia [Quando a captura sai da Inbox](../inbox.md#quando-a-captura-sai-da-inbox).
+
 ## Erros comuns
 
 - esperar que a captura faça perguntas ou complete definições ausentes.
 - tratar a análise inicial como requisito aprovado.
 - implementar diretamente a partir de `specs/inbox/`.
 - editar o texto original em vez de registrar uma evolução no backlog.
+- mover ou apagar a captura à mão: só `specsfy inbox process`, executado pela
+  validação, a retira da fila ativa.
 - procurar o template dentro da skill: o padrão vive em
   `.specsfy/templates/Inbox.md`, e uma personalização homônima em
   `.specsfy/templates/custom/` tem precedência.

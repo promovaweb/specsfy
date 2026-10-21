@@ -87,6 +87,16 @@ O script usa `.specsfy/templates/custom/Inbox.md` quando presente e recorre a
 existente. Se o template estiver ausente, relate a instalação incompleta; não
 crie um template paralelo dentro da skill.
 
+## Ciclo da captura
+
+A captura nasce com `Status: Capturada` e permanece em `specs/inbox/`, a fila
+ativa, enquanto qualquer parte do pedido estiver sem destino. Ela só sai dali
+quando specs com `Definition Gate: Passed` cobrirem o pedido inteiro: nesse
+momento `$specsfy-04-validate` executa `specsfy inbox process`, que a move para
+`specs/inbox/processed/` com `Status: Processada`, o texto original intacto e
+as specs derivadas registradas. Esta skill nunca executa esse comando: capturar
+e processar são atos de etapas diferentes.
+
 ## Orquestrar a conversa
 
 Esta skill é uma exceção deliberada ao handoff automático do framework:
@@ -107,7 +117,9 @@ resultado esperado: <resultado>` depois de a captura estar segura.
 ## Limites
 
 - Não pesquisar duplicatas antes de salvar.
-- Não alterar nem apagar capturas anteriores.
+- Não alterar nem apagar capturas anteriores. Não mover uma captura para
+  `specs/inbox/processed/`; essa saída pertence à validação, depois do
+  Definition Gate.
 - Não transformar inferência em declaração do usuário.
 - Não criar `specs/backlog/`, qualquer pasta de estado de spec, tarefas, research, testes ou
   código.

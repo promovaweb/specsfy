@@ -108,7 +108,10 @@ node <diretório-da-skill>/scripts/iniciar_spec.mjs \
   preserva proveniência, mas deixa de governar o comportamento.
 - Ao derivar diretamente de `specs/inbox/<data-hora>-<slug>.md`, registre o
   caminho na spec e preserve a captura sem alteração. A análise inicial é
-  contexto, não requisito confirmado.
+  contexto, não requisito confirmado. A captura continua em `specs/inbox/`
+  enquanto a spec estiver em Draft; ela só passa para `specs/inbox/processed/`
+  quando `$specsfy-04-validate` aprovar o Definition Gate e confirmar que as
+  specs cobrem o pedido inteiro.
 - Preserve o cabeçalho como uma tabela Markdown de duas colunas, `Campo` e
   `Valor`; não converta seus metadados em linhas `**Campo**: valor`.
 - Na tabela, declare `ID` como `SPEC-NNNN` e `Slug` como

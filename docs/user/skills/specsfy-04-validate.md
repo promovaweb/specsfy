@@ -35,6 +35,12 @@ Definition Gate: Passed
 Status: Defined
 ```
 
+7. Move a spec para `defined` e confere as capturas de `specs/inbox/` que a
+   originaram. Se a spec, sozinha ou com outras já aprovadas, cobre o pedido
+   inteiro, executa `specsfy inbox process <captura> --spec <id>` e a captura
+   passa para `specs/inbox/processed/`. Se ficou alguma parte sem spec
+   aprovada, a captura permanece na fila ativa e a skill informa o que resta.
+
 Quando o plano inclui uma tarefa `[MIGRATION]`, a validação final também
 confere a entrega registrada pela implementação. A tarefa só pode terminar
 quando a comprovação relaciona o arquivo versionado da migration, o comando
@@ -52,6 +58,8 @@ ausente.
 - conferência da aplicação das migrations previstas no plano.
 - retorno automático à etapa que pode resolver a lacuna.
 - gate aprovado somente após nova validação.
+- captura da Inbox retirada da fila ativa somente quando o pedido inteiro
+  estiver coberto por specs aprovadas.
 
 ## Erros comuns
 

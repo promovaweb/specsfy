@@ -241,7 +241,9 @@ valida o build e a correspondência da tag.
 
 Novas specs usam `specs/draft/<NNNN>-<slug>/spec.md`. Capturas imediatas ficam
 em `specs/inbox/<data-hora>-<slug>.md` e itens refináveis em
-`specs/backlog/<NNNN>-<slug>.md`. O dashboard mantém leitura do layout
+`specs/backlog/<NNNN>-<slug>.md`. `specsfy inbox process <captura> --spec <id>`
+move para `specs/inbox/processed/` a captura integralmente coberta por specs
+com Definition Gate aprovado, preservando o texto e atualizando os vínculos. O dashboard mantém leitura do layout
 legado. A skill de especificação renderiza cada arquivo novo a partir do
 template instalado. O CLI recusa instalação na raiz do monorepo oficial.
 
