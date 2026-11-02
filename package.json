@@ -1,0 +1,19 @@
+{
+  "name": "specsfy-workspace",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.20.0"
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs skills/tests/*.test.mjs specialists/tests/*.test.mjs",
+    "test:integration": "node --test tests/*.test.mjs",
+    "test:skills": "node --test skills/tests/*.test.mjs",
+    "test:specialists": "node --test specialists/tests/*.test.mjs",
+    "test:example": "node --test example/tests/*.test.mjs",
+    "validate:skills": "node scripts/validate-skills.mjs"
+  },
+  "devDependencies": {
+    "yaml": "2.9.0"
+  }
+}

@@ -10,6 +10,7 @@ Todo o projeto compartilha uma única raiz Git. Os diretórios abaixo são módu
 com responsabilidades próprias, não repositórios, submódulos ou worktrees
 independentes.
 
+<!-- markdownlint-disable MD013 -->
 | Caminho | Responsabilidade |
 | --- | --- |
 | `./` | integração, automação e testes transversais |
@@ -21,6 +22,7 @@ independentes.
 | `specsfy/` | visão geral pública detalhada |
 | `specialists/` | skills técnicas opcionais |
 | `cli/` | instalação, TUI e progresso visual |
+<!-- markdownlint-enable MD013 -->
 
 - Execute Git somente na raiz do monorepo.
 - Mantenha regras de exclusão somente no `.gitignore` da raiz; módulos não
@@ -60,7 +62,8 @@ normativa paralela.
 
 ## Disciplina documental
 
-- Toda criação ou alteração atualiza, na mesma entrega, a documentação aplicável.
+- Toda criação ou alteração atualiza, na mesma entrega, a documentação
+  aplicável.
 - Documentação deriva das fontes executáveis e não duplica inventários de
   manifests, rotas, schemas ou testes.
 - Na primeira camada, `docs/` contém somente `docs/README.md`, `docs/user/` e
@@ -106,8 +109,9 @@ II–III.
 Na raiz:
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm ci --ignore-scripts
+npm test
+npm run validate:skills
 make verify-version
 ```
 
@@ -116,9 +120,7 @@ Para uma skill:
 
 ```bash
 cd skills
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  <nome>
+node ../scripts/validate-skills.mjs <nome>
 ```
 
 ## Critério de entrega

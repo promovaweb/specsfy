@@ -1,4 +1,4 @@
 interface:
-  display_name: "02 · Backlog"
+  display_name: "Specsfy - 02 - Backlog"
   short_description: "Refina o backlog e produz um brief testável"
   default_prompt: "Use $specsfy-02-backlog para pesquisar referências, registrar ou atualizar o item, resolver lacunas por perguntas adaptativas e executar transições automáticas até $specsfy-03-specify."

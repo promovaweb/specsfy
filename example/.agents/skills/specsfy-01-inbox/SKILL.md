@@ -5,6 +5,19 @@ description: "Use quando o usuário enviar uma ideia, pensamento, necessidade, o
 
 # Registrar uma entrada na Inbox
 
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `sem perguntas`.
+Não formule perguntas nesta skill. Registre pontos ausentes para uma etapa
+posterior sem interromper a captura.
+
 Registre imediatamente o texto recebido em `specs/inbox/`. Trate a Inbox como
 uma entrada durável anterior ao backlog: ela preserva intenção e
 organiza sinais úteis, mas não decide requisitos nem autoriza implementação.
@@ -43,6 +56,8 @@ organiza sinais úteis, mas não decide requisitos nem autoriza implementação.
    - sinais de escopo, regra, restrição, canal ou solução mencionada;
    - riscos, dependências e relações evidentes;
    - possíveis direções de backlog ou spec, sem promovê-las.
+   - informações que o sistema talvez precise guardar, consultar, compartilhar
+     ou apagar, como sinal para conversa futura.
 6. Use `Não identificado no texto original.` quando não houver base. Não
    invente stakeholder, prioridade, prazo, regra, solução ou critério de aceite.
 
@@ -51,7 +66,7 @@ organiza sinais úteis, mas não decide requisitos nem autoriza implementação.
 Execute uma única vez:
 
 ```bash
-python3 -B <diretório-da-skill>/scripts/capturar_inbox.py \
+node <diretório-da-skill>/scripts/capturar_inbox.mjs \
   --input "<texto original integral>" \
   --title "<título derivado>" \
   --summary "<resumo>" \
@@ -59,6 +74,7 @@ python3 -B <diretório-da-skill>/scripts/capturar_inbox.py \
   --people "<pessoas afetadas>" \
   --value "<resultado ou valor>" \
   --signals "<sinais extraídos>" \
+  --data "<sinais sobre informações que talvez precisem ser guardadas>" \
   --risks "<riscos ou dependências>" \
   --directions "<direções futuras possíveis>" \
   --review "<pontos a revisar futuramente>" \
@@ -71,6 +87,16 @@ O script usa `.specsfy/templates/custom/Inbox.md` quando presente e recorre a
 existente. Se o template estiver ausente, relate a instalação incompleta; não
 crie um template paralelo dentro da skill.
 
+## Ciclo da captura
+
+A captura nasce com `Status: Capturada` e permanece em `specs/inbox/`, a fila
+ativa, enquanto qualquer parte do pedido estiver sem destino. Ela só sai dali
+quando specs com `Definition Gate: Passed` cobrirem o pedido inteiro: nesse
+momento `$specsfy-04-validate` executa `specsfy inbox process`, que a move para
+`specs/inbox/processed/` com `Status: Processada`, o texto original intacto e
+as specs derivadas registradas. Esta skill nunca executa esse comando: capturar
+e processar são atos de etapas diferentes.
+
 ## Orquestrar a conversa
 
 Esta skill é uma exceção deliberada ao handoff automático do framework:
@@ -79,6 +105,9 @@ transições. Após escrever, apenas sugira um destes próximos passos:
 
 - manter a entrada na Inbox;
 - usar `$specsfy-02-backlog` para refiná-la ou aprofundá-la.
+- usar `$specsfy-data-discovery` quando a entrada indicar informações que o
+  sistema precisará guardar. Essa conversa posterior registra somente o que
+  for confirmado em `.specsfy/DATABASE.md`.
 
 Somente carregue outra skill se o mesmo pedido também ordenar explicitamente
 esse trabalho. Nesse caso, anuncie
@@ -88,8 +117,11 @@ resultado esperado: <resultado>` depois de a captura estar segura.
 ## Limites
 
 - Não pesquisar duplicatas antes de salvar.
-- Não alterar nem apagar capturas anteriores.
+- Não alterar nem apagar capturas anteriores. Não mover uma captura para
+  `specs/inbox/processed/`; essa saída pertence à validação, depois do
+  Definition Gate.
 - Não transformar inferência em declaração do usuário.
-- Não criar `specs/backlog/`, `specs/specs/`, tarefas, research, testes ou
+- Não criar `specs/backlog/`, qualquer pasta de estado de spec, tarefas,
+  research, testes ou
   código.
 - Não usar a ideia como fonte normativa de comportamento.

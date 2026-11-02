@@ -9,6 +9,8 @@ substitui `specs/<estado>/<NNNN>-<slug>/spec.md`.
 ```text
 specs/
 ├── inbox/
+│   ├── processed/
+│   │   └── <AAAA-MM-DD-HHMMSS>-<slug>.md
 │   └── <AAAA-MM-DD-HHMMSS>-<slug>.md
 ├── backlog/
 │   └── <NNNN>-<slug>.md
@@ -23,7 +25,14 @@ specs/
         └── research/
 ```
 
-- `specs/inbox/` preserva inputs imediatamente, sem perguntas nem promoção.
+- `specs/inbox/` preserva inputs imediatamente, sem perguntas nem promoção. É
+  a fila ativa: só contém capturas que ainda precisam de tratamento.
+- `specs/inbox/processed/` guarda capturas cujo pedido está integralmente
+  coberto por specs com `Definition Gate: Passed`. A captura chega ali pelo
+  comando `specsfy inbox process`, com o texto original intacto, `Status`
+  `Processada`, as specs derivadas registradas e os vínculos atualizados. A
+  consulta da fila ativa ignora essa pasta; a busca por histórico e duplicatas
+  a inclui. Nada é apagado.
 - `specs/backlog/` organiza ideias escolhidas para refinamento.
 - `specs/<estado>/<NNNN>-<slug>/spec.md` é a única fonte normativa de uma
   fatia. Ela existe em uma única pasta de estado.
@@ -82,7 +91,8 @@ ou pendente.
 - Antes de iniciar qualquer skill do framework, executar obrigatoriamente
   `$specsfy-setup` para verificar e reconciliar os contextos iniciais e
   os blocos reservados em `AGENTS.md` e `CLAUDE.md`. A única exceção é a própria
-  `$specsfy-setup`, que não se chama recursivamente. Em uma transição automática,
+  `$specsfy-setup`, que não se chama recursivamente. Em uma transição
+  automática,
   executar novamente o setup com a mesma raiz já confirmada antes de carregar a
   skill de destino. Em projetos com GitHub Spec Kit, a mesma execução atualiza
   apenas o bloco gerenciado de `SPECKIT.md` e exige a leitura dos arquivos
@@ -113,10 +123,12 @@ ou pendente.
 
 ## Fluxo
 
+<!-- markdownlint-disable MD013 -->
 ```text
 input → inbox → backlog → spec → validate → tasks → TDD/BDD → implement → documentator → progress
                                       ↑ update-spec ← mudança tardia
 ```
+<!-- markdownlint-enable MD013 -->
 
 1. Use `specsfy-01-inbox` para preservar e pré-processar o texto em
    `specs/inbox/`, sem fazer perguntas.
@@ -126,7 +138,9 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
    registra automaticamente as respostas já declaradas e pergunta somente por
    lacuna, ambiguidade ou contradição aplicável.
 3. Use `specsfy-03-specify` para criar e consolidar a spec normativa inicial.
-4. Use `specsfy-04-validate` para comprovar a definição.
+4. Use `specsfy-04-validate` para comprovar a definição. Com o Definition
+   Gate aprovado, ela também retira da fila ativa as capturas de
+   `specs/inbox/` integralmente cobertas pela spec.
 5. Use `specsfy-05-tasks` e `specsfy-06-tdd-bdd` para planejar, derivar
    testes TDD do BDD de referência e observar RED válido.
 6. Use `specsfy-07-implement` para entregar em RED → GREEN → REFACTOR.
@@ -152,7 +166,8 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
 
 Toda aplicação Laravel usa Laravel Octane como servidor de aplicação. O pacote
 `laravel/octane` é obrigatório com Open Swoole. O Octane usa o identificador
-`swoole` para esse servidor. Código executado por workers persistentes não pode manter
+`swoole` para esse servidor. Código executado por workers persistentes não pode
+manter
 estado de uma requisição para a seguinte. Build, healthcheck, reload e deploy
 devem exercitar o processo Octane que atende o tráfego real.
 
@@ -213,7 +228,10 @@ pedido do usuário não é condição para acioná-la.
 
 Antes da primeira pergunta dessa área, leia `.specsfy/STACK.md`,
 `.specsfy/PACKAGES.md` quando existir, manifests, configurações e telas já
-publicadas. Execute `node .agents/skills/specsfy-setup/scripts/inspect_interface.mjs --project <raiz>` e use a saída para localizar as fontes relevantes. Quando houver sistema atual, percorra os fluxos e telas afetados,
+publicadas. Execute
+`node .agents/skills/specsfy-setup/scripts/inspect_interface.mjs --project <raiz>`
+e use a saída para localizar as fontes relevantes. Quando houver sistema atual,
+percorra os fluxos e telas afetados,
 incluindo navegação, conteúdo, componentes, permissões, estados e limites já
 visíveis. Analise antes de sugerir ou escrever: descreva o que cada tela atual
 permite fazer, o que precisa ser preservado e o que a entrega vai mudar.
@@ -245,7 +263,8 @@ algo reutilizável e registre nela cada arquivo criado ou reaproveitado, sua
 origem, seus consumidores e o componente shadcn/ui ou ReUI correspondente.
 
 Orquestre `$specsfy-specialist-interface-experience` para analisar o sistema
-atual e conduzir a descoberta; depois use `$specsfy-specialist-ux-design` para jornada e fluxo,
+atual e conduzir a descoberta; depois use `$specsfy-specialist-ux-design` para
+jornada e fluxo,
 `$specsfy-specialist-ui-design` para composição e estados e o especialista da
 stack de interface detectada, como `$specsfy-specialist-react` somente em
 projetos React, para materializar o que foi especificado. Esses especialistas
@@ -393,7 +412,8 @@ restritas aos registros do caso.
 
 - **Ato I — Definir:** intenção, requisitos e Gherkin; termina em
   `Definition Gate: Passed`.
-- **Ato II — Projetar e provar:** tarefas, testes TDD informados pelo BDD e RED; termina em
+- **Ato II — Projetar e provar:** tarefas, testes TDD informados pelo BDD e RED;
+  termina em
   `Plan Gate: Passed`.
 - **Ato III — Entregar e validar:** GREEN, regressão e evidência; termina em
   `Delivery Gate: Passed`.

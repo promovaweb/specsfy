@@ -239,7 +239,8 @@ describe("renderização e interação em terminal real", () => {
     expect(output).toContain("Skills");
     expect(output).toContain("Sobre");
     expect(output).toContain("Tarefas · 0");
-    expect(output).toContain("Itens · 0");
+    expect(output).toContain("Itens de tarefa");
+    expect(output).toContain("Outros checkboxes: 0");
     expect(output.match(/pendentes/gu)).toHaveLength(2);
     expect(output).toContain("atualização automática");
     expect(output).toContain("Tab/Shift+Tab");
@@ -253,7 +254,7 @@ describe("renderização e interação em terminal real", () => {
       ["j", "tests", "Executar testes"],
       ["k", "skills", "Buscar por nome"],
       ["o", "about", "Specsfy CLI"],
-      ["h", "home", "Visão consolidada"],
+      ["h", "home", "Outros checkboxes"],
     ] as const;
     for (const [key, tab, text] of shortcuts) {
       press(screen, key, true);

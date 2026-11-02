@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Progresso"
+  display_name: "Specsfy - Progresso"
   short_description: "Resume o progresso de todas as especificações"
   default_prompt: "Use $specsfy-progress para mostrar o progresso geral de todas as especificações. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."

@@ -7,10 +7,12 @@ Proponha especialistas capazes de tornar PREP/EXECUTE/VERIFY/IMPROVE concretos:
 - deploy: `-docker`, `-docker-swarm`, `-ansible` e `-delivery-engineering`;
 - qualidade: `-application-security`, `-web-accessibility`,
   `-performance-engineering` e `-observability`;
-- interface: `-shadcn-ui`, `-ui-design` e `-ux-design`.
+- interface: `-interface-experience`, `-shadcn-ui`, `-ui-design`, `-ux-design`
+  e `-react` quando a
+  stack usar React.
 
 ```bash
-specsfy skills add specsfy-specialist-<nome>
+npx skills add https://github.com/promovaweb/specsfy --skill specsfy-specialist-<nome> --agent universal --copy --full-depth
 ```
 
 A skill especialista não cria `tasks.md` nem altera dependências entre tarefas.

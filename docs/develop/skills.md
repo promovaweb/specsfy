@@ -72,6 +72,23 @@ de tarefas exige um arquivo versionado em um diretório de migrations. No Ato
 III, `verify_evidence.mjs` só aceita a conclusão depois de encontrar o arquivo,
 o comando que aplicou a migration e uma consulta posterior do estado.
 
+O consumidor pode ampliar o reconhecimento dos comandos por meio de
+`.specsfy/migrations.json`, relativo à raiz passada ao validador. O objeto
+contém `apply` e `status`, ambos arrays não vazios de strings com expressões
+regulares JavaScript, compiladas sem flags. Os padrões complementam os
+runners nativos. Erros de leitura, JSON ou expressão são devolvidos em
+`errors`, com `result: failed` e código de saída 1 no contrato estrito.
+A ausência do arquivo preserva o comportamento nativo, e o modo legado
+continua ignorando a configuração quando não há `Evidence Contract`.
+
+O reconhecimento apenas examina os comandos registrados; nenhum runner é
+executado por essa configuração. A conferência de arquivos e de saída zero
+permanece obrigatória. `update_stack.mjs` registra a declaração do runner sem
+reescrever sua configuração. Os casos executáveis ficam em
+`skills/tests/migration-runner.test.mjs`; o guia de
+[implementação](../user/skills/specsfy-07-implement.md#runner-próprio-de-migrations)
+mostra a configuração do consumidor.
+
 `specsfy-specialist-deploy` é a entrada para o fluxo completo de release ou
 deploy. Seu catálogo instala Versioning, Docker, Debian Server, Ansible e Docker
 Swarm como dependências. O gerador cria `compose.yaml` para desenvolvimento,
@@ -92,13 +109,15 @@ O gerador publica um wrapper `deploy` na raiz do consumidor. Esse arquivo
 mantém a interface humana curta e encaminha cada ação para a implementação em
 `ansible/`:
 
+<!-- markdownlint-disable MD013 -->
 | Entrada | Implementação | Contrato |
 | --- | --- | --- |
-| `check-hosts` | `check-hosts.py` | mostra hosts e testa conexões |
+| `check-hosts` | `check-hosts.mjs` | mostra hosts e testa conexões |
 | `secrets` | `create-vault.sh` | inclui valores ausentes no Vault |
 | `sync-keys` | `sync-keys.yml` e `keys.yml` | inclui chaves `.pub` |
-| `configure-vault` | `vault.py` | cadastra a senha fora do repositório |
-| `run` | `vault.py`, `check-hosts.py` e `deploy.yml` | confere e publica a stack |
+| `configure-vault` | `vault.mjs` | cadastra a senha fora do repositório |
+| `run` | `vault.mjs`, `check-hosts.mjs` e `deploy.yml` | confere e publica a stack |
+<!-- markdownlint-enable MD013 -->
 
 `run` sem opções mantém o prompt oculto. `run --non-interactive` resolve fontes
 explícitas, configuração nativa via `ansible-config` e cadastro local, nessa
@@ -116,20 +135,24 @@ altera o Vault criptografado. A senha manual usa temporário `600`, removido ao
 final do contexto de execução. `secrets` compartilha a resolução de fontes e
 preserva o YAML anterior quando um campo novo falha.
 
-Os assets `deploy.sh`, `create-vault.sh` e `vault.py` são copiados pelo scaffold.
+Os assets `deploy.sh`, `create-vault.sh` e `vault.mjs` são copiados pelo scaffold.
 Projetos existentes precisam de migração por diff dos quatro utilitários,
-incluindo `check-hosts.py`; o gerador continua recusando sobrescrita. O manual
+incluindo `check-hosts.mjs`; o gerador continua recusando sobrescrita. O manual
 de [operações de deploy](../user/deploy-vault.md) documenta cada comando,
 suas opções, permissões, falhas e exemplos.
 
-Os testes `specialists/tests/test_deploy_vault.py` usam Ansible real com um
-playbook local descartável e um terminal PTY. Cobrem arquivo, script, ambiente,
-`ansible.cfg`, Vault ID, prompt manual, cadastro, permissões e falhas antes das
-conexões. O BDD reutiliza esses contratos. A suíte integrada compara as opções
-do parser com o manual e exige cinco exemplos por comando.
+Os testes `specialists/tests/deploy-node.test.mjs` executam os utilitários
+Node.js em projetos temporários e exercitam prompts em um terminal PTY. Os
+comandos Ansible são substituídos por processos Node.js que verificam argumentos,
+ordem das chamadas e configuração do ambiente. Esses contratos cobrem arquivo,
+script, ambiente, `ansible.cfg`, Vault ID, cadastro, permissões e falhas antes
+das conexões. Eles não executam a criptografia do Ansible nem acessam servidores.
+A suíte integrada compara as opções do parser com o manual e exige cinco
+exemplos por comando.
 
-O job de especialistas instala ShellCheck e `ansible-core==2.19.4` antes das
-suítes, para executar os mesmos contratos de terminal e descriptografia no CI.
+O job de especialistas instala ShellCheck e executa os mesmos contratos Node.js
+de terminal no CI. A suíte usa substitutos dos comandos Ansible e não precisa
+instalar `ansible-core`.
 
 `ANSIBLE_INVENTORY` seleciona um inventário alternativo somente para o
 processo atual. Sem a variável, o wrapper exige
@@ -174,10 +197,12 @@ entrada, atualizam projeções derivadas ou encaminham a lacuna para uma skill
 conversacional.
 
 <!-- markdownlint-disable MD013 -->
+<!-- markdownlint-disable MD013 -->
 | Modo | Skills |
 | --- | --- |
 | perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-tdd-bdd`, `specsfy-07-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestone-governor`, `specsfy-mvp-milestone-interviewer`, `specsfy-data-discovery`, `specsfy-roadmap-milestone-interviewer`, `specsfy-setup`, `specsfy-update-spec` |
 | sem perguntas | `specsfy-01-inbox`, `specsfy-aux-database`, `specsfy-aux-stack`, `specsfy-documentator`, `specsfy-progress` |
+<!-- markdownlint-enable MD013 -->
 <!-- markdownlint-enable MD013 -->
 
 ## Handoff

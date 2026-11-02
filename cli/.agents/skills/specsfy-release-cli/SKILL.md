@@ -38,8 +38,8 @@ artefatos e seção do changelog e retome apenas a etapa ausente.
 ## 2. Preparar versão
 
 ```bash
-python3 -B \
-  cli/.agents/skills/specsfy-release-cli/scripts/release_changelog.py prepare \
+node \
+  cli/.agents/skills/specsfy-release-cli/scripts/release-changelog.mjs prepare \
   --cli cli --version X.Y.Z --date YYYY-MM-DD \
   --notes-file /caminho/notas.md
 cd cli
@@ -53,11 +53,13 @@ node dist/main.js --help
 ./bin/specsfy --version
 npm publish --dry-run
 cd ..
+npm --prefix .ebook ci --ignore-scripts
+npm exec --prefix .ebook -- playwright install chromium
 make ebook
 make verify-ebook
 make verify-version
-python3 -B \
-  cli/.agents/skills/specsfy-release-cli/scripts/release_changelog.py extract \
+node \
+  cli/.agents/skills/specsfy-release-cli/scripts/release-changelog.mjs extract \
   --changelog cli/CHANGELOG.md --version X.Y.Z \
   --output /caminho/release-notes.md
 ```
@@ -111,8 +113,8 @@ gh release view vX.Y.Z --repo promovaweb/specsfy \
   --json url,tagName,targetCommitish,body
 gh release view vX.Y.Z --repo promovaweb/specsfy \
   --json body > /caminho/release-publicado.json
-python3 -B \
-  cli/.agents/skills/specsfy-release-cli/scripts/release_changelog.py verify \
+node \
+  cli/.agents/skills/specsfy-release-cli/scripts/release-changelog.mjs verify \
   --changelog cli/CHANGELOG.md --version X.Y.Z \
   --release-json /caminho/release-publicado.json
 git ls-remote origin "refs/tags/vX.Y.Z^{}"

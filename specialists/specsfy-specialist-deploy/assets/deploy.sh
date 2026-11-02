@@ -17,18 +17,18 @@ require_inventory() {
 
 case "$action" in
   configure-vault|run)
-    exec python3 "$base_dir/ansible/vault.py" "$action" "$@"
+    exec node "$base_dir/ansible/vault.mjs" "$action" "$@"
     ;;
   secrets)
     exec "$base_dir/ansible/create-vault.sh" "$@"
     ;;
   check|check-hosts)
     require_inventory
-    exec python3 "$base_dir/ansible/check-hosts.py" --inventory "$inventory" "$@"
+    exec node "$base_dir/ansible/check-hosts.mjs" --inventory "$inventory" "$@"
     ;;
   keys|sync-keys)
     require_inventory
-    python3 "$base_dir/ansible/check-hosts.py" --inventory "$inventory"
+    node "$base_dir/ansible/check-hosts.mjs" --inventory "$inventory"
     exec ansible-playbook -i "$inventory" "$base_dir/ansible/sync-keys.yml" "$@"
     ;;
   *)

@@ -81,6 +81,20 @@ não altera código de produção e não implementa o pedido.
 
 ## Incorporar a mudança
 
+### Corrigir checklists residuais
+
+Quando o progresso apontar itens do ciclo sem tarefa, confira as linhas na
+spec e localize a tarefa correspondente. Se o texto apenas repetir uma tarefa
+concluída, ofereça convertê-lo em anotação sem checkbox, preservando o texto e
+citando o ID da tarefa que o substituiu. Preserve status e gates somente se
+nenhum trabalho ou significado mudar. Não apague o registro automaticamente.
+Se o trecho representar trabalho necessário, reconcilie o plano pelo Ato II.
+Ao promover um rascunho para tarefa, converta o bloco de origem em anotação
+com a referência à tarefa criada. Execute o progresso novamente para conferir
+as contagens e as linhas remanescentes.
+
+### Atualizar a fonte canônica
+
 1. Confirme que a pessoa autorizou incorporar o pedido à spec atual. O pedido
    explícito para mudar, adicionar, remover ou corrigir já constitui essa
    autorização; não repita a confirmação.

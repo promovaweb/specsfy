@@ -1,7 +1,8 @@
 # Guia de desenvolvimento da metodologia Specsfy
 
 Este `AGENTS.md` governa o módulo `skills/`. Ele contém a metodologia
-executável, as quatorze skills base, o setup, o documentador e as três skills auxiliares. Seus testes e fixtures pertencem a este
+executável, as quatorze skills base, o setup, o documentador e as três skills
+auxiliares. Seus testes e fixtures pertencem a este
 módulo. A raiz do monorepo não instala nem executa estas skills.
 
 Leia também [`Spec.md`](Spec.md), contrato central do framework publicado pelo
@@ -12,6 +13,7 @@ Ao consumir um template, respeite a precedência
 `.specsfy/templates/<Nome>.md`. O diretório `custom/` pertence ao usuário e
 nunca deve ser sobrescrito pelo instalador.
 
+<!-- markdownlint-disable MD013 -->
 <!-- specsfy:framework:start -->
 ## Framework Specsfy
 
@@ -59,6 +61,7 @@ arquivo contém o fluxo, os caminhos canônicos e os gates do framework.
 - Não crie `plan.md`, `tasks.md`, `research.md` ou outra fonte normativa
   paralela.
 <!-- specsfy:framework:end -->
+<!-- markdownlint-enable MD013 -->
 
 ## Fonte da verdade
 
@@ -109,8 +112,10 @@ Skills: `specsfy-02-backlog`, `specsfy-03-specify` e `specsfy-04-validate`.
 
 ### Ato II — Projetar e provar
 
-Definir plano técnico, persistência, contratos, falhas, rollback e tarefas. Usar o BDD
-da spec para escrever TDD e observar RED antes de alterar a implementação. O ato termina com
+Definir plano técnico, persistência, contratos, falhas, rollback e tarefas. Usar
+o BDD
+da spec para escrever TDD e observar RED antes de alterar a implementação. O ato
+termina com
 `Plan Gate: Passed`.
 
 Skills: `specsfy-05-tasks` e `specsfy-06-tdd-bdd` no modo `prepare`.
@@ -136,6 +141,7 @@ Draft → Defined → Planned → Implementing → Reviewing → Complete
 
 ## Responsabilidade das skills
 
+<!-- markdownlint-disable MD013 -->
 | Skill | Responsabilidade | Não deve fazer |
 | --- | --- | --- |
 | `specsfy-01-inbox` | preservar e pré-processar imediatamente um input | perguntar, criar backlog, spec, tarefas ou código |
@@ -152,6 +158,7 @@ Draft → Defined → Planned → Implementing → Reviewing → Complete
 | `specsfy-aux-stack` | mapear stack com evidência executável | copiar toda a árvore de dependências |
 | `specsfy-aux-rules` | registrar regras confirmadas | inventar ou decidir regras |
 | `specsfy-aux-database` | manter quadro tabular da persistência | copiar registros, segredos ou substituir schemas |
+<!-- markdownlint-enable MD013 -->
 
 Se duas skills puderem responder ao mesmo gatilho, ajuste `description` e os
 limites antes de publicar.
@@ -181,12 +188,8 @@ specsfy-<NN>-<nome>/
 1. Escreva o cenário BDD e o teste TDD de contrato nesta raiz.
 2. Use specs somente como fixtures temporárias quando o comportamento exigir.
 3. Execute ambos e registre RED causado pelo comportamento ausente.
-4. Para skill nova, inicialize nesta raiz:
-
-   ```bash
-   python3 /home/luizeof/.codex/skills/.system/skill-creator/scripts/init_skill.py \
-     <nome> --path .
-   ```
+4. Para skill nova, use o padrão dos diretórios vizinhos e publique
+   `SKILL.md`, `agents/openai.yaml` e as referências necessárias.
 
 5. Faça a menor alteração que satisfaz o contrato.
 6. Execute testes focais, refatore e repita a regressão desta raiz.
@@ -225,9 +228,7 @@ declara seu modo de interação.
 No diretório `skills/`:
 
 ```bash
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  specsfy-<NN>-<nome>
+node ../scripts/validate-skills.mjs specsfy-<NN>-<nome>
 ```
 
 Ainda nesta raiz:
@@ -236,8 +237,9 @@ Ainda nesta raiz:
 Execute os testes focais declarados pelo módulo alterado.
 ```
 
-Os arquivos em `tests/features/` preservam BDD como referência e não são
-executados. A prova automatizada pertence aos testes unitários derivados.
+Os arquivos `.test.mjs` executam os contratos e os cenários de
+`tests/features/` com steps Node.js. Projetos consumidores continuam mantendo
+o Gherkin normativo na própria spec.
 
 Não crie caches ou artefatos transitórios durante as validações.
 

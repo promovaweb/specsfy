@@ -83,9 +83,7 @@ obrigatórias por este guia, porque elevam a utilidade técnica real:
 5. Rode a suíte do catálogo antes de considerar concluído:
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  specsfy-specialist-<nome>
+npm run test:specialists
+node scripts/validate-skills.mjs \
+  specialists/specsfy-specialist-<nome>
 ```

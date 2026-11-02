@@ -18,7 +18,9 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
 
-Trate `spec.md` como a única fonte da verdade e como código em linguagem natural: verifique primeiro o formato rígido, depois clareza, completude, consistência e testabilidade semanticamente.
+Trate `spec.md` como a única fonte da verdade e como código em linguagem
+natural: verifique primeiro o formato rígido, depois clareza, completude,
+consistência e testabilidade semanticamente.
 
 ## Orquestrar a conversa
 
@@ -36,13 +38,18 @@ exigindo autorização específica.
 
 ## Executar a validação
 
-1. Resolva `specs/<estado>/<NNNN>-<slug>/spec.md` pelo caminho informado; se houver várias specs e nenhum slug, pergunte qual validar.
-2. Confirme `Formato: Specsfy/2.0`, os três atos na ordem, slug igual ao diretório e pacote restrito a `spec.md` e ao diretório opcional `research/`.
-3. Para toda API ou documentação externa consultada, confirme uma evidência local em `research/` e seu índice em `Artefatos de pesquisa armazenados`; esse material é informativo, nunca uma segunda fonte normativa.
+1. Resolva `specs/<estado>/<NNNN>-<slug>/spec.md` pelo caminho informado; se
+   houver várias specs e nenhum slug, pergunte qual validar.
+2. Confirme `Formato: Specsfy/2.0`, os três atos na ordem, slug igual ao
+   diretório e pacote restrito a `spec.md` e ao diretório opcional `research/`.
+3. Para toda API ou documentação externa consultada, confirme uma evidência
+   local em `research/` e seu índice em `Artefatos de pesquisa armazenados`;
+   esse material é informativo, nunca uma segunda fonte normativa.
 4. Enquanto `Status` ou `Definition Gate` ainda estiverem pendentes, execute:
 
 ```bash
-node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
 1. Leia `references/quality-gates.md` e faça a revisão semântica.
@@ -72,11 +79,14 @@ node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs specs/<estado>
 
 ## Classificar achados
 
-- `BLOCKER`: impede tarefa ou teste correto; requisito contraditório, sem comportamento observável, decisão de alto impacto ausente ou cenário principal não coberto.
+- `BLOCKER`: impede tarefa ou teste correto; requisito contraditório, sem
+  comportamento observável, decisão de alto impacto ausente ou cenário principal
+  não coberto.
 - `WARNING`: aumenta retrabalho ou risco, mas admite implementação segura.
 - `NOTE`: melhoria editorial sem efeito material.
 
-Para cada achado, cite seção ou ID, explique o impacto e proponha uma correção concreta.
+Para cada achado, cite seção ou ID, explique o impacto e proponha uma correção
+concreta.
 
 ## Gate
 
@@ -90,7 +100,8 @@ importantes e a transição automática:
 
 - `READY` → `$specsfy-05-tasks` para planejar a seção 14;
 - `NOT READY` → retorno a `$specsfy-02-backlog` quando faltar decisão; a
-  o refinamento do backlog executa seu ciclo completo e esta validação só é retomada depois
+  o refinamento do backlog executa seu ciclo completo e esta validação só é
+  retomada depois
   de fechar as lacunas ou registrar a saída explícita `avançar`; após essa
   saída, registre `NOT READY` e não reabra o mesmo ciclo nesta retomada;
   quando a correção já estiver decidida, use `$specsfy-update-spec` para
@@ -103,20 +114,46 @@ Anuncie o motivo e carregue imediatamente a skill escolhida.
 
 Sem alterar requisitos automaticamente:
 
-1. atualize `Gate do Ato I — Definição` na seção 13 com resultado, data e achados;
+1. atualize `Gate do Ato I — Definição` na seção 13 com resultado, data e
+   achados;
 2. em `READY`, defina `Definition Gate: Passed` e `Status: Defined`;
 3. em `NOT READY`, defina `Definition Gate: Failed`, `Plan Gate: Pending`,
    `Delivery Gate: Pending` e mantenha `Status: Draft`;
-4. execute novamente `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md` sem `--allow-draft` quando o gate passar;
+4. execute novamente `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md`
+   sem `--allow-draft` quando o gate passar;
 5. relate o resultado no chat.
 
 Quando o Definition Gate passar, execute `specsfy transition <id> defined`.
+
+Em seguida, retire da fila ativa as capturas que a spec esgotou:
+
+1. localize em `specs/inbox/` cada captura referenciada pela spec ou pelo
+   backlog que a originou;
+2. releia o texto original da captura e compare com o que a spec e outras
+   specs com `Definition Gate: Passed` definem;
+3. se o pedido estiver integralmente coberto, execute
+   `specsfy inbox process <captura> --spec <id>` (repita `--spec` para cada
+   spec que cobre a captura). O comando move o arquivo para
+   `specs/inbox/processed/`, marca `Status: Processada`, registra as specs
+   derivadas e atualiza os vínculos, sem tocar no texto original;
+4. se qualquer parte do pedido ainda não tiver spec aprovada, a captura
+   permanece em `specs/inbox/`; registre no chat o que resta encaminhar e não
+   force a saída.
+
+O comando recusa a spec que estiver na pasta `draft`, tiver `Status: Draft` ou
+não declarar `Status` e `Definition Gate: Passed` na primeira tabela de
+metadados. Tabelas do corpo e exemplos não comprovam aprovação. Com uma spec
+recusada, nenhuma captura sai da fila. Nunca mova uma captura por outro meio
+nem a apague.
+
 Em `review`, use a mesma análise para o aceite final. Com Delivery Gate passado,
-Status `Complete` e a DoD comprovada, execute `specsfy transition <id> completed`.
+Status `Complete` e a DoD comprovada, execute
+`specsfy transition <id> completed`.
 Antes disso, chame `$specsfy-interviewer` quando uma resposta puder mudar a
 entrega ou o Effort.
 
-Se o usuário pedir correções, edite as seções de origem, preserve IDs e revalide. Nunca crie outro arquivo de especificação ou validação.
+Se o usuário pedir correções, edite as seções de origem, preserve IDs e
+revalide. Nunca crie outro arquivo de especificação ou validação.
 
 ## Enforcement do repositório
 

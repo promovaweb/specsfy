@@ -38,6 +38,8 @@ if (existsSync(join(directory, "docker-compose.yml")) || existsSync(join(directo
 
   if (existsSync(join(directory, "pyproject.toml")) || existsSync(join(directory, "requirements.txt"))) add("Linguagem", "Python", prefix + (existsSync(join(directory, "pyproject.toml")) ? "pyproject.toml" : "requirements.txt"));
 }
+// Registra a declaração; a validade dos padrões pertence ao verify_evidence.
+if (existsSync(join(project, ".specsfy", "migrations.json"))) add("Migrations", "Runner próprio declarado", "`.specsfy/migrations.json`");
 const target = join(project, ".specsfy", "STACK.md"); let existing = existsSync(target) ? await readFile(target, "utf8") : "";
 /** Divide apenas separadores reais; barras escapadas permanecem na célula. */
 function tableCells(line) {

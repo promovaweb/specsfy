@@ -5,6 +5,19 @@ description: "Use quando o usuário esqueceu algo, quer adicionar, remover, corr
 
 # Atualizar uma especificação existente
 
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `perguntas`.
+Antes de formular qualquer pergunta, leia e aplique o
+`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+
 Incorpore um pedido surgido depois da definição inicial sem esconder a mudança,
 duplicar a fonte normativa ou obrigar a pessoa a conhecer atos e gates.
 
@@ -26,7 +39,7 @@ exigindo autorização específica.
 
 1. Preserve literalmente o novo pedido antes de interpretá-lo.
 2. Localize a spec canônica em
-   `specs/specs/<NNNN>-<slug>/spec.md` e leia seus metadados, requisitos,
+   `specs/<estado>/<NNNN>-<slug>/spec.md` e leia seus metadados, requisitos,
    cenários, plano, tarefas, gates e evidências.
 3. Leia as instruções do projeto, `PROJECT.md`, `.specsfy/STACK.md`,
    `.specsfy/RULES.md`, `.specsfy/DATABASE.md` e o research indexado aplicável.
@@ -58,14 +71,29 @@ pedido puder alterar comportamento, plano ou fronteira entre specs.
   `$specsfy-03-specify` conforme a maturidade do pedido.
 - Quando opções plausíveis mudarem materialmente o resultado, faça handoff para
   `$specsfy-02-backlog`, execute o ciclo adaptativo e
-  retome esta skill ao final do ciclo. Se a pessoa escolher `avançar`, preserve as lacunas abertas,
-  reabra o Ato I, não encaminhe a definição como aprovada e
+  retome esta skill ao final do ciclo. Se a pessoa escolher `avançar`, aplique a
+  confirmação e o registro definidos no contrato central, reabra o Ato I quando
+  restarem pontos aplicáveis, não encaminhe a definição como aprovada e
   não reabra o mesmo ciclo nesta retomada.
 
 Esta skill não cria uma spec nova, não decide requisito material pela pessoa,
 não altera código de produção e não implementa o pedido.
 
 ## Incorporar a mudança
+
+### Corrigir checklists residuais
+
+Quando o progresso apontar itens do ciclo sem tarefa, confira as linhas na
+spec e localize a tarefa correspondente. Se o texto apenas repetir uma tarefa
+concluída, ofereça convertê-lo em anotação sem checkbox, preservando o texto e
+citando o ID da tarefa que o substituiu. Preserve status e gates somente se
+nenhum trabalho ou significado mudar. Não apague o registro automaticamente.
+Se o trecho representar trabalho necessário, reconcilie o plano pelo Ato II.
+Ao promover um rascunho para tarefa, converta o bloco de origem em anotação
+com a referência à tarefa criada. Execute o progresso novamente para conferir
+as contagens e as linhas remanescentes.
+
+### Atualizar a fonte canônica
 
 1. Confirme que a pessoa autorizou incorporar o pedido à spec atual. O pedido
    explícito para mudar, adicionar, remover ou corrigir já constitui essa
@@ -84,8 +112,8 @@ não altera código de produção e não implementa o pedido.
 5. Execute a projeção de impacto:
 
 ```bash
-python3 -B .agents/skills/specsfy-update-spec/scripts/analyze_change.py \
-  specs/specs/<NNNN>-<slug>/spec.md --base HEAD --mode impact
+node .agents/skills/specsfy-update-spec/scripts/analyze_change.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md --base HEAD --mode impact
 ```
 
 Use `--mode changelog` para listar IDs adicionados, removidos e alterados. A
@@ -110,8 +138,8 @@ semântica com o pedido.
 Valide a estrutura intermediária:
 
 ```bash
-python3 -B .agents/skills/specsfy-04-validate/scripts/validate_spec.py \
-  specs/specs/<NNNN>-<slug>/spec.md --allow-draft
+node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
 ## Retomar o fluxo

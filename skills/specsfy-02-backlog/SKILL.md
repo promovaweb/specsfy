@@ -44,7 +44,9 @@ específica.
 1. Extraia termos derivados do pedido do usuário, incluindo nomes do domínio e
    equivalentes evidentes já usados na conversa.
 2. Antes de criar ou atualizar o item, pesquise esses termos em:
-   - `specs/inbox/*.md`;
+   - `specs/inbox/*.md`, a fila ativa;
+   - `specs/inbox/processed/*.md`, capturas já cobertas por specs aprovadas,
+     úteis para histórico e duplicatas;
    - `specs/backlog/*.md`;
    - `specs/<estado>/*/spec.md`;
    - `docs/**/*.md`.
@@ -122,7 +124,8 @@ ou prioridade. Esses dados podem amadurecer no aprofundamento.
 2. Se existir item correspondente, atualize-o sem mudar seu ID e preserve a
    formulação anterior.
 3. Se a origem for `specs/inbox/`, registre esse caminho em
-   `Referências relacionadas`; não altere nem apague a captura.
+   `Referências relacionadas`; não altere, mova nem apague a captura. Ela
+   continua na fila ativa até a validação da spec derivada.
 4. Para criar um item novo, execute:
 
 ```bash
@@ -136,7 +139,7 @@ node <diretório-da-skill>/scripts/iniciar_backlog.mjs \
   [--slug <slug>] [--root <raiz>]
 ```
 
-5. Use o caminho absoluto impresso pelo script. Ele prefere
+1. Use o caminho absoluto impresso pelo script. Ele prefere
    `.specsfy/templates/custom/Backlog.md` e recorre a
    `.specsfy/templates/Backlog.md`.
 
@@ -197,13 +200,15 @@ Quando a pessoa pedir aprofundamento, promoção ou criação de uma spec:
 
 Execute um ciclo com no máximo oito perguntas por área:
 
-1. Antes de cada rodada, releia a entrada, as decisões confirmadas, o contexto acumulado e as novas respostas, junto dos registros do MVP.
+1. Antes de cada rodada, releia a entrada, as decisões confirmadas, o contexto
+   acumulado e as novas respostas, junto dos registros do MVP.
 2. Reclassifique lacunas e dependências. Continue enquanto existir lacuna
    aplicável e restarem perguntas no limite; encerre quando cada uma estiver
    decidida, não aplicável ou resolvida por evidência.
 3. Selecione a lacuna real com maior `impacto × incerteza` e apresente a rodada
    conforme o contrato central.
-4. Registre cada resposta original, a decisão normalizada e seus efeitos. Volte ao
+4. Registre cada resposta original, a decisão normalizada e seus efeitos. Volte
+   ao
    primeiro passo; não reutilize uma fila fixa.
 
 Ao alcançar oito perguntas, apresente síntese, registre as lacunas abertas e
@@ -287,7 +292,8 @@ as lacunas que impedem o Definition Gate.
 
 ## Limites
 
-- Não alterar nem apagar entradas de Inbox.
+- Não alterar, mover nem apagar entradas de Inbox. Virar backlog não retira a
+  captura da fila ativa.
 - Não criar `spec.md`, tarefas, research, testes ou código.
 - Não inventar stakeholders, integrações, restrições ou decisões.
 - Não transformar hipótese técnica em requisito.

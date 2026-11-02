@@ -9,8 +9,8 @@ description: Manter a documentação oficial do próprio projeto Specsfy no mono
 
 <!-- markdownlint-disable MD013 -->
 ```bash
-python3 -B \
-  .agents/skills/specsfy-monorepo-documentator/scripts/collect_monorepo_evidence.py \
+node \
+  .agents/skills/specsfy-monorepo-documentator/scripts/collect-monorepo-evidence.mjs \
   --workspace .
 ```
 <!-- markdownlint-enable MD013 -->

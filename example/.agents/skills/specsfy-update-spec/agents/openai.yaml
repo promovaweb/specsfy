@@ -1,4 +1,4 @@
 interface:
-  display_name: "Atualizar especificação"
+  display_name: "Specsfy - Atualizar especificação"
   short_description: "Atualiza uma spec quando algo muda depois"
   default_prompt: "Use $specsfy-update-spec para incorporar este novo pedido à especificação existente e orquestrar transições automáticas até a retomada."

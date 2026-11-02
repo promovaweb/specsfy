@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Regras Auxiliares"
+  display_name: "Specsfy - Regras Auxiliares"
   short_description: "Monitora e mantém regras explícitas do projeto"
   default_prompt: "Use $specsfy-aux-rules para revisar mudanças e registrar regras em .specsfy/RULES.md preservando o conteúdo atual."

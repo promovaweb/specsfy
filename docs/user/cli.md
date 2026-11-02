@@ -116,8 +116,19 @@ specsfy transition 0001-recuperar-senha in-progress --project .
 specsfy migrate --project .
 ```
 
-Use `migrate` apenas para converter o layout anterior `specs/specs/`. Para
-recalibrar a execução, registre Effort e sua justificativa diretamente na fonte
+Use `migrate` apenas para converter o layout anterior `specs/specs/`.
+
+Quando o Definition Gate aprovado esgota uma captura de `specs/inbox/`, a
+validação a retira da fila ativa sem apagar nada:
+
+```bash
+specsfy inbox process 2026-07-28-143205-recuperar-senha.md \
+  --spec 0001-recuperar-senha --project .
+```
+
+A captura vai para `specs/inbox/processed/` com `Status: Processada`, as specs
+derivadas registradas e os links atualizados. Para recalibrar a execução,
+registre Effort e sua justificativa diretamente na fonte
 normativa:
 
 ```bash
@@ -210,10 +221,12 @@ totais emitidos pelo Pest. A subaba **Testes** mantém a saída completa e
 rolável. Quando o projeto fornece um relatório Pest estruturado, cada falha é
 apresentada com nome do teste, arquivo, linha e mensagem.
 
-O progresso usa todos os checkboxes Markdown de
-`specs/<estado>/*/spec.md`. Tarefas com
-ID `T...` também ganham estatística própria. Quando uma spec não possui
-checkboxes, os três gates são usados como projeção de fallback.
+O progresso lê `specs/<estado>/*/spec.md` e separa os itens vinculados às
+tarefas dos demais checkboxes. O percentual considera as tarefas com ID
+`T...` e seus itens canônicos. Rascunhos soltos aparecem como outros
+checkboxes; itens do ciclo sem tarefa também recebem um aviso com as linhas
+para revisão. Exemplos dentro de blocos de código são ignorados. Quando uma
+spec não possui itens de tarefa, o percentual usa os três gates.
 
 A TUI calcula fingerprints dos backlogs, das specs e do `skills-lock.json`. Ela
 atualiza automaticamente as listas, previews, cards e seleção de skills quando

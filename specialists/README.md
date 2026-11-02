@@ -71,6 +71,5 @@ Nenhuma skill deste módulo é instalada ou executada pela raiz do
 ## Validar
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+node --test tests/*.test.mjs
 ```

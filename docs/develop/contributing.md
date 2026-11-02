@@ -59,11 +59,8 @@ tipografia nos estados e viewports aplicáveis e registre o resultado no item
 Skills:
 
 ```bash
-cd skills
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  <skill>
+npm run test:skills
+node scripts/validate-skills.mjs skills/<skill>
 ```
 
 CLI:
@@ -79,9 +76,7 @@ npm run check
 Especialistas:
 
 ```bash
-cd specialists
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm run test:specialists
 ```
 
 ## 6. Atualize documentação
@@ -101,8 +96,9 @@ documentação.
 Na raiz:
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm ci --ignore-scripts
+npm test
+npm run validate:skills
 ```
 
 Revise `git diff --check`, links, imagens, status e artefatos derivados.

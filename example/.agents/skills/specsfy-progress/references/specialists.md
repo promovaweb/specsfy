@@ -5,7 +5,7 @@ especialistas diretamente relacionados. O catálogo está em
 o catálogo de especialistas distribuído pelo CLI.
 
 ```bash
-specsfy skills add specsfy-specialist-<nome>
+npx skills add https://github.com/promovaweb/specsfy --skill specsfy-specialist-<nome> --agent universal --copy --full-depth
 ```
 
 A proposta não altera percentual, gates, blockers ou próxima tarefa. Se o

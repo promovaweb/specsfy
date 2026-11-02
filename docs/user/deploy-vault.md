@@ -23,10 +23,12 @@ real do checkout e separa projetos com nomes iguais. A variável
 `~/.config`. Mover o checkout exige configurar o novo caminho ou fornecer a
 fonte explicitamente.
 
+<!-- markdownlint-disable MD013 -->
 | Opção | Tipo e padrão | Efeito |
 | --- | --- | --- |
 | `--vault-password-file <arquivo>` | caminho opcional | escolhe outro arquivo externo |
 | `--show-path` | booleano, desativado | mostra somente o destino, sem criar nem ler a senha |
+<!-- markdownlint-enable MD013 -->
 
 O configurador recusa caminhos dentro do worktree e links simbólicos. Antes
 de substituir um arquivo, pede confirmação; responder `n` ou usar Enter
@@ -110,11 +112,13 @@ Antes de conectar aos servidores, valida localmente a descriptografia de
 Senha incorreta, fonte ausente ou falha do cofre encerram a execução, sem
 recorrer a uma pergunta ou tentar outra fonte.
 
+<!-- markdownlint-disable MD013 -->
 | Opção | Tipo e padrão | Uso |
 | --- | --- | --- |
 | `--non-interactive` | booleano, desativado | habilita execução pela IA ou CI/CD |
 | `--vault-password-file <fonte>` | caminho opcional | arquivo ou script executável que fornece a senha |
 | `--vault-id <id>@<fonte>` | texto opcional, repetível | associa uma fonte a um ambiente |
+<!-- markdownlint-enable MD013 -->
 
 As opções de fonte em `run` exigem `--non-interactive`. A ordem de escolha é:
 fontes explícitas do comando; configuração nativa resolvida pelo Ansible;
@@ -123,7 +127,7 @@ cadastro externo padrão deste checkout. A configuração nativa inclui
 a precedência do próprio Ansible. Os IDs permitem usar mais de uma senha no
 mesmo Vault. Fontes com `@prompt` são recusadas nesse modo.
 
-O comando exige Python 3.10 ou superior e os executáveis `ansible-config`,
+O comando exige Node.js 22 ou superior e os executáveis `ansible-config`,
 `ansible-inventory`, `ansible` e `ansible-playbook`. O ambiente também precisa
 de acesso SSH por chave e das permissões de elevação usadas pelo playbook.
 O modo sem interação desativa as perguntas de SSH, sudo e Vault; não concede
@@ -236,7 +240,7 @@ cancelamento.
 
 Atualizar a skill instalada não substitui os scripts do seu projeto. Peça à IA
 para comparar a versão atual de `deploy`, `ansible/create-vault.sh`,
-`ansible/check-hosts.py` e o novo `ansible/vault.py` com uma geração temporária,
+`ansible/check-hosts.mjs` e o novo `ansible/vault.mjs` com uma geração temporária,
 preservando suas personalizações. O scaffold recusa sobrescrever arquivos
 existentes. Depois da migração, valide os dois modos em um ambiente de teste e
 faça o cadastro externo na máquina que executará o deploy.

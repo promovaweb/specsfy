@@ -11,7 +11,10 @@ BRAND_GUIDE_SOURCES := \
 	brand/logo/icon.svg \
 	brand/logo/icon.png \
 	.pdf/build-brand-guide.sh \
-	.pdf/style.css
+	.pdf/style.css \
+	.ebook/render-pdf.mjs \
+	.ebook/package.json \
+	.ebook/package-lock.json
 
 brand-guide: $(BRAND_GUIDE_PDF)
 
@@ -23,12 +26,16 @@ EBOOK_BUILD_SOURCES := \
 	VERSION \
 	docs/user/reading-order.txt \
 	.ebook/build-ebook.sh \
-	.ebook/extract-document-metadata.py \
-	.ebook/prune-editions.py \
+	.ebook/extract-document-metadata.mjs \
+	.ebook/prune-editions.mjs \
 	.ebook/external-links.lua \
 	.ebook/strip-document-metadata.lua \
 	.ebook/metadata.yaml \
 	.ebook/template.html \
+	.ebook/verify-artifacts.mjs \
+	.ebook/render-pdf.mjs \
+	.ebook/package.json \
+	.ebook/package-lock.json \
 	.ebook/pdf.css \
 	.ebook/epub.css \
 	brand/logo/icon.svg \
@@ -42,4 +49,4 @@ verify-ebook:
 	./.ebook/build-ebook.sh --check
 
 verify-version:
-	python3 -B scripts/check_version_alignment.py
+	node scripts/check-version-alignment.mjs

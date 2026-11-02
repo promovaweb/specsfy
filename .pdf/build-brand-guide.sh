@@ -18,11 +18,10 @@ BUILD_DIR="$HUB_ROOT/.pdf/build"
 OUT_HTML="$BUILD_DIR/brand-guide.html"
 OUT_PDF="$BRAND_ROOT/Specsfy-Manual-de-Marca.pdf"
 
-for bin in pandoc weasyprint; do
+for bin in pandoc node; do
   if ! command -v "$bin" >/dev/null 2>&1; then
     echo "Erro: '$bin' não encontrado no PATH." >&2
-    echo "Instale com: brew install pandoc weasyprint" >&2
-    echo "         ou: apt-get install pandoc weasyprint" >&2
+    echo "Instale Pandoc e Node.js 22.20 ou superior." >&2
     exit 1
   fi
 done
@@ -79,10 +78,10 @@ pandoc "$MD_SOURCE" \
   --metadata date="$PT_DATE" \
   --output "$OUT_HTML"
 
-weasyprint \
+node "$HUB_ROOT/.ebook/render-pdf.mjs" \
   "$OUT_HTML" \
   "$OUT_PDF" \
-  --base-url "$BRAND_ROOT/guide" \
-  --stylesheet "$PDF_STYLE"
+  "$PDF_STYLE" \
+  "$BRAND_ROOT/guide"
 
 echo "OK: $OUT_PDF ($(du -h "$OUT_PDF" | cut -f1))"

@@ -61,7 +61,7 @@ async function writeScaffold(project, files) {
     ).replace(
       "  check)\n    require_inventory\n    exec ansible all -i \"$inventory\" -m ping",
       "  check|check-hosts)\n    require_inventory\n" +
-        "    exec python3 \"$base_dir/ansible/check-hosts.py\" --inventory \"$inventory\"",
+        "    exec node \"$base_dir/ansible/check-hosts.mjs\" --inventory \"$inventory\"",
     ).replace(
       "  keys)\n",
       "  keys|sync-keys)\n",
@@ -69,12 +69,12 @@ async function writeScaffold(project, files) {
       "  keys|sync-keys)\n    require_inventory\n" +
         "    exec ansible-playbook",
       "  keys|sync-keys)\n    require_inventory\n" +
-        "    python3 \"$base_dir/ansible/check-hosts.py\" --inventory \"$inventory\"\n" +
+        "    node \"$base_dir/ansible/check-hosts.mjs\" --inventory \"$inventory\"\n" +
         "    exec ansible-playbook",
     ).replace(
       "    ansible all -i \"$inventory\" -m ping\n" +
         "    exec ansible-playbook",
-      "    python3 \"$base_dir/ansible/check-hosts.py\" --inventory \"$inventory\"\n" +
+      "    node \"$base_dir/ansible/check-hosts.mjs\" --inventory \"$inventory\"\n" +
         "    exec ansible-playbook",
     ).replace(
       "Uso: ./deploy {check|secrets|keys|run}",
@@ -129,7 +129,7 @@ function buildFiles(image, version, checkHosts, proxy) {
     "stack.yaml": `services:\n  app:\n    image: ${taggedImage}\n    command: ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000"]\n    networks:\n      - app\n    secrets:\n      - app_key\n      - db_password\n    deploy:\n      replicas: 2\n      update_config:\n        order: start-first\n        failure_action: rollback\n      rollback_config:\n        order: stop-first\n      restart_policy:\n        condition: on-failure\n${cloudflareService}\nnetworks:\n  app:\n    driver: overlay\n\nsecrets:\n  app_key:\n    external: true\n  db_password:\n    external: true\n${cloudflareSecret}`,
     "ansible/requirements.yml": `collections:\n  - name: community.docker\n    version: ">=4.0.0,<5.0.0"\n  - name: ansible.posix\n    version: ">=2.0.0,<3.0.0"\n`,
     "ansible/vault-fields.txt": `vault_app_key\nvault_db_password\n${cloudflareVaultField}`,
-    "ansible/check-hosts.py": checkHosts,
+    "ansible/check-hosts.mjs": checkHosts,
     "ansible/secrets.yml": `---\n- name: Confirmar valor protegido para cada Docker Secret\n  ansible.builtin.assert:\n    that:\n      - "lookup('ansible.builtin.vars', 'vault_' + item, default='') | length > 0"\n    fail_msg: "Cadastre vault_{{ item }} com ansible/create-vault.sh"\n  loop: "{{ app_secret_names }}"\n  no_log: true\n\n- name: Criar Docker Secrets externos\n  community.docker.docker_secret:\n    name: "{{ item }}"\n    data: "{{ lookup('ansible.builtin.vars', 'vault_' + item) }}"\n    state: present\n  loop: "{{ app_secret_names }}"\n  no_log: true\n`,
     "ansible/keys.yml": `---\n- name: Localizar chaves públicas SSH no controlador\n  ansible.builtin.set_fact:\n    local_ssh_public_key_files: "{{ query('ansible.builtin.fileglob', local_ssh_public_key_pattern) }}"\n\n- name: Confirmar que existe uma chave pública local\n  ansible.builtin.assert:\n    that:\n      - local_ssh_public_key_files | length > 0\n    fail_msg: "Nenhuma chave pública encontrada em {{ local_ssh_public_key_pattern }}"\n\n- name: Autorizar chaves públicas locais para o usuário deploy\n  ansible.posix.authorized_key:\n    user: "{{ deploy_user }}"\n    key: "{{ lookup('ansible.builtin.file', item) }}"\n    state: present\n    exclusive: false\n    manage_dir: true\n  loop: "{{ local_ssh_public_key_files }}"\n  no_log: true\n`,
     "ansible/sync-keys.yml": `---\n- name: Sincronizar chaves públicas locais\n  hosts: all\n  become: true\n  tasks:\n    - name: Manter grupo de serviço deploy\n      ansible.builtin.group:\n        name: "{{ deploy_user }}"\n        state: present\n\n    - name: Manter usuário deploy apto a receber acesso SSH por chave\n      ansible.builtin.user:\n        name: "{{ deploy_user }}"\n        group: "{{ deploy_user }}"\n        groups: docker\n        append: true\n        create_home: true\n        shell: /bin/bash\n        password_lock: true\n\n    - name: Sincronizar chaves públicas sem remover acessos existentes\n      ansible.builtin.import_tasks: keys.yml\n`,
@@ -145,7 +145,7 @@ async function main() {
   const version = (await readFile(resolve(project, "SEMVER"), "utf8")).trim();
   if (!STABLE_SEMVER.test(version)) throw new Error(`SEMVER inválido: ${version}`);
   const checkHosts = await readFile(
-    new URL("../assets/check-hosts.py", import.meta.url),
+    new URL("../assets/check-hosts.mjs", import.meta.url),
     "utf8",
   );
   const files = buildFiles(image, version, checkHosts, proxy);
@@ -157,7 +157,7 @@ async function main() {
   for (const [destination, source] of Object.entries({
     deploy: "deploy.sh",
     "ansible/create-vault.sh": "create-vault.sh",
-    "ansible/vault.py": "vault.py",
+    "ansible/vault.mjs": "vault.mjs",
   })) {
     files[destination] = await readFile(new URL(`../assets/${source}`, import.meta.url), "utf8");
   }

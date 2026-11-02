@@ -1,4 +1,4 @@
 interface:
-  display_name: "01 · Inbox"
+  display_name: "Specsfy - 01 - Inbox"
   short_description: "Captura e preserva entradas sem fazer perguntas"
   default_prompt: "Use $specsfy-01-inbox para registrar este texto imediatamente, sem perguntas, em specs/inbox/."

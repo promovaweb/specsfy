@@ -9,6 +9,7 @@
 | Funcionalidade | A esclarecer |
 | Tipo | A esclarecer |
 | Prioridade | Não priorizado |
+| Milestones | |
 | Criado em | {{CURRENT_DATE}} |
 | Spec promovida | Nenhuma |
 

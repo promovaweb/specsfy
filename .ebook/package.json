@@ -1,0 +1,11 @@
+{
+  "name": "specsfy-ebook-build",
+  "private": true,
+  "type": "module",
+  "description": "Ferramentas Node.js para compilar e validar o guia do Specsfy.",
+  "dependencies": {
+    "@xmldom/xmldom": "0.9.12",
+    "pagedjs": "0.4.3",
+    "playwright": "1.64.1"
+  }
+}

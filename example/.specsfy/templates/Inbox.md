@@ -7,6 +7,8 @@
 | Slug | {{INBOX_SLUG}} |
 | Origem | Input do usuário |
 | Processamento | Análise inicial sem perguntas |
+| Sessão de descoberta | {{DISCOVERY_SESSION}} |
+| Turno da conversa | {{CONVERSATION_TURN}} |
 | Integridade do original | SHA-256 `{{ORIGINAL_INPUT_SHA256}}` |
 | Backlog derivado | Nenhum |
 | Spec derivada | Nenhuma |
@@ -14,6 +16,10 @@
 ## Texto original
 
 {{ORIGINAL_INPUT}}
+
+## Contexto consultado
+
+{{CONSULTED_SOURCES}}
 
 ## Resumo processado
 
@@ -36,6 +42,10 @@
 ### Sinais de escopo, regras ou solução
 
 **Sinais extraídos, não decisões:** {{EXTRACTED_SIGNALS}}
+
+### Informações que talvez precisem ser guardadas
+
+**Sinais para conversar depois, não confirmação:** {{DATA_SIGNALS}}
 
 ### Riscos e dependências
 

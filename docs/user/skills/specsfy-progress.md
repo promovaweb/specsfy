@@ -44,6 +44,27 @@ inventar um percentual confiável.
 
 ## O que esperar
 
+### Checklists fora das tarefas
+
+O relatório separa os itens vinculados às tarefas dos outros checkboxes. No
+CLI, o percentual usa a tarefa e seus itens canônicos; anotações soltas ficam
+na contagem de outros checkboxes. Exemplos dentro de blocos de código são
+ignorados. Sem itens de tarefa, o CLI calcula o percentual pelos três gates.
+
+Itens como `PREP` ou `VERIFY` fora de uma tarefa aparecem com o número da
+linha. O aviso permite localizar um rascunho residual sem alterar a spec
+durante a consulta. No JSON do CLI, consulte `orphan_checklist_lines` por spec
+e `orphan_checklist_items` no resumo. A skill expõe as mesmas linhas e mantém
+os totais de checklists separados dos totais de tarefas.
+
+Para corrigir um resíduo, peça a `$specsfy-update-spec` que confira as linhas
+indicadas. Quando o texto apenas duplica uma tarefa já concluída, a skill
+pode convertê-lo em anotação sem checkbox, preservando o conteúdo histórico
+e os gates. Se o trecho representar trabalho ainda necessário, ele precisa
+voltar ao planejamento da spec.
+
+## O que esperar
+
 - leitura somente das fontes canônicas.
 - totais de specs e tarefas.
 - gates pendentes.

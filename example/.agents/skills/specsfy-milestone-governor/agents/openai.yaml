@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Governança de milestones"
+  short_description: "Atualiza o mapa de marcos"
+  default_prompt: "Use $specsfy-milestone-governor para analisar milestones, manter o índice derivado de specs e backlog e sugerir ajustes confirmáveis."

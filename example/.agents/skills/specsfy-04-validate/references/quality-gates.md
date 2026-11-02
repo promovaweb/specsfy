@@ -54,7 +54,7 @@
 
 ## Fonte única
 
-- O pacote `specs/specs/<NNNN>-<slug>/` contém somente o `spec.md` normativo e, quando necessário, `research/` com evidências não normativas.
+- O pacote `specs/<estado>/<NNNN>-<slug>/` contém somente o `spec.md` normativo e, quando necessário, `research/` com evidências não normativas.
 - Não existem `plan.md`, `research.md`, `data-model.md`, `tasks.md` ou checklists paralelos.
 - Gates e evidências vivem na seção 13 de `spec.md`.
 - Tarefas e progresso vivem na seção 14 do mesmo arquivo.

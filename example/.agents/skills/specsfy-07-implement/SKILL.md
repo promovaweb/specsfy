@@ -5,7 +5,64 @@ description: "Use quando o usuário pede para implementar, executar ou concluir 
 
 # Implementar as tarefas e criar o código
 
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `perguntas`.
+Antes de formular qualquer pergunta, leia e aplique o
+`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+
 Execute a seção `14. Tarefas` de `spec.md` em ordem de dependência, mantendo a fonte única, testes, código, evidências e checkboxes coerentes.
+
+Para Laravel, consulte `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as
+fichas existentes antes de adicionar ou substituir uma dependência. Se a
+tarefa trouxer uma URL GitHub ou mudar Composer, carregue
+`$specsfy-specialist-laravel-package-manager` e reutilize pacotes já instalados
+quando eles atenderem ao requisito.
+
+## Proteção obrigatória do banco
+
+Antes de executar qualquer teste, suíte, regressão ou migration, rode:
+
+```bash
+node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
+  --project <raiz> --command "<comando-pretendido>"
+```
+
+Em Laravel, exija `.env.testing`, `APP_ENV=testing` e um banco explicitamente
+diferente do banco de desenvolvimento definido no `.env`. Enquanto o estado
+for `PENDING`, não execute teste algum. Corrija o ambiente, repita a
+conferência e continue somente após `SAFE`.
+
+Ignore todo comando classificado como `IGNORED`. Não execute, não transforme em
+tarefa e não peça autorização para rodar `migrate:fresh`, `migrate:refresh`,
+`migrate:reset`, `migrate:rollback`, `db:wipe`, `schema:drop`,
+`prisma migrate reset`, `DROP DATABASE`, `DROP SCHEMA`, `DROP TABLE`,
+`TRUNCATE` ou equivalentes. A mesma recusa vale para scripts indiretos e para
+testes com `RefreshDatabase` ou `DatabaseMigrations`. Use isolamento
+transacional e fixtures mínimas sem apagar o banco.
+
+## Revisão visual obrigatória
+
+Toda tarefa de desenvolvimento executa uma revisão visual, mesmo sem pedido da
+pessoa. O item `VISUAL` vem depois de `VERIFY` e precisa estar concluído antes
+de `EVIDENCE`.
+
+Para qualquer alteração com interface, leia `DESIGNSYSTEM.MD`, `INTERFACE.md` e
+os componentes afetados. Inspecione a renderização ou o DOM nos viewports e
+estados relevantes. Confira bordas, espaçamentos, margens, padding e tipografia
+do sistema, além de alinhamento, largura, overflow, foco, zoom e quebra de
+texto. Registre método, viewport, estados, ajustes e resultado na tarefa.
+
+Quando a tarefa não alterar interface, conclua `VISUAL` com `Não aplicável` e
+um motivo concreto. Nunca pule esse item porque a pessoa não pediu revisão
+visual.
 
 ## Orquestrar a conversa
 
@@ -23,22 +80,47 @@ exigindo autorização específica.
 
 ## Gate inicial
 
-1. Leia `specs/specs/<NNNN>-<slug>/spec.md`, evidências indexadas em `specs/specs/<NNNN>-<slug>/research/`, instruções do repositório e código relevante. Não procure `tasks.md`, `plan.md`, `research.md` ou `data-model.md`.
+1. Resolva a raiz pelo caminho confirmado no `$specsfy-setup`. Se a pessoa
+   informar um subdiretório, trate-o como projeto e não o promova para a raiz
+   Git. Leia `<raiz>/specs/planned/<NNNN>-<slug>/spec.md`, evidências indexadas
+   em `research/`, instruções do repositório e código relevante. Não procure
+   `tasks.md`, `plan.md`, `research.md` ou `data-model.md`.
 2. Exija `Formato: Specsfy/2.0`, `Status: Planned` ou `Implementing`,
    `Definition Gate: Passed` e `Plan Gate: Passed`.
-3. Execute os validadores contra `specs/specs/<NNNN>-<slug>/spec.md`. Se um gate
+3. Se `Interface para pessoas` for `Sim`, leia a seção 10 e confirme que o
+   plano contém tarefas para stack local, telas, menus e navegação principal,
+   formulários, ações, blocos React, componentes shadcn/ui/ReUI, estados e
+   testes de interação. Compare a stack, as telas e os fluxos atuais com o
+   projeto antes de alterar código. Preserve componentes, rotas, conteúdo,
+   permissões e comportamentos existentes fora do alcance registrado. Se faltar
+   algum deles ou a tecnologia proposta divergir sem confirmação, retorne automaticamente para
+   `$specsfy-05-tasks`; não implemente um CRUD somente como API ou persistência.
+   Antes de programar, confirme os itens escolhidos na tabela da seção 10 e em
+   `INTERFACE.md`; depois de programar, atualize `INTERFACE.md` com todos os
+   blocos criados, alterados ou reaproveitados.
+   Em projeto React, carregue obrigatoriamente
+   `$specsfy-specialist-react-ui-components` antes de escrever JSX ou TSX.
+   Se a skill não estiver instalada, retorne ao `$specsfy-setup` para instalar
+   o especialista detectado e não implemente a tela até concluir esse preparo.
+   Para um CRUD, confirme também um único `PageHeader` reutilizável em todas as
+   telas, `DataGrid` em largura total, coluna `ID` sempre visível, link da linha
+   para o detalhe e botões de editar e apagar independentes na linha.
+4. Execute os validadores contra `specs/<estado>/<NNNN>-<slug>/spec.md`. Se um gate
    falhar por tarefa, predecessor TDD ou RED ausente em um plano antes aprovado,
    anuncie a pendência e retorne automaticamente para
    `$specsfy-05-tasks`; não altere produção. Essa skill reabre o Ato II, chama
    TDD/BDD e retoma esta implementação depois de validar novamente o plano. Para
    outra falha, carregue automaticamente a skill responsável pelo gate.
-4. Execute a suite base relevante. Registre falhas preexistentes e não as atribua à nova mudança.
-5. Antes da primeira alteração de produção, defina `Status: Implementing` e
-   `Delivery Gate: In Progress`.
-6. Selecione trabalho pronto com:
+5. Confira o comando da suíte base com `check_database_safety.mjs`. Execute-a
+   somente após `SAFE`; sem ambiente de teste separado, não rode nenhum teste.
+   Registre falhas preexistentes e não as atribua à nova mudança.
+6. Antes da primeira alteração de produção, defina `Status: Implementing`,
+   `Delivery Gate: In Progress` e execute `specsfy transition <id> in-progress`.
+7. Selecione trabalho pronto com:
 
 ```bash
-python3 .agents/skills/specsfy-07-implement/scripts/next_task.py specs/specs/<NNNN>-<slug>/spec.md
+node .agents/skills/specsfy-07-implement/scripts/next_task.mjs \
+  <raiz>/specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
 Se não houver tarefa pronta, diferencie `concluído` de `bloqueado por dependência`.
@@ -56,11 +138,21 @@ Se não houver tarefa pronta, diferencie `concluído` de `bloqueado por dependê
    `$specsfy-05-tasks`, que reabre o plano, chama `$specsfy-06-tdd-bdd` e
    retoma esta skill depois do novo `Plan Gate: Passed`.
 4. Escreva a menor mudança de produção que torna o teste TDD verde.
+   Para uma tarefa de interface, implemente a tela, os menus, o formulário e a interação
+   definidos na spec com os estados descritos; não substitua o fluxo por uma
+   rota de API, um componente vazio ou um atalho sem a tela acordada.
+   Em React, siga `$specsfy-specialist-react-ui-components` para localizar,
+   reaproveitar, adaptar e registrar os componentes antes de criar uma nova
+   composição.
+   Quando a tarefa usa `[MIGRATION]`, crie primeiro o arquivo versionado no
+   caminho planejado. Passe o comando pelo `check_database_safety.mjs`, aplique
+   a migration no banco de teste e consulte o estado logo depois. Registre os
+   dois comandos com saída zero no comentário `specsfy:evidence` da tarefa.
 5. Depois de alterar produção e antes de marcar `EXECUTE`, monitore o contexto:
 
 ```bash
-python3 -B .agents/skills/specsfy-setup/scripts/monitor_context.py \
-  --project . --check
+node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
+  --project <raiz> --check
 ```
 
    Para stack pendente, faça handoff a `$specsfy-aux-stack`; para persistência,
@@ -79,7 +171,9 @@ python3 -B .agents/skills/specsfy-setup/scripts/monitor_context.py \
 7. Para `[DOC]` ou `[OPS]`, produza a evidência específica pedida.
 8. Marque `EXECUTE` somente quando a entrega e a documentação exigida existirem
    nos caminhos declarados.
-9. Execute o teste TDD focal, a suite relacionada e checks estáticos;
+9. Confira novamente cada comando de teste com `check_database_safety.mjs`.
+   Execute o teste TDD focal, a suite relacionada e checks estáticos somente
+   após `SAFE`;
    marque `VERIFY` somente com o resultado esperado.
 10. Refatore somente com tudo verde.
 11. Registre comando, resultado e IDs nas seções 11–13 e então marque `EVIDENCE`.
@@ -87,8 +181,8 @@ python3 -B .agents/skills/specsfy-setup/scripts/monitor_context.py \
    `specsfy:evidence` no bloco da tarefa e execute:
 
 ```bash
-python3 -B .agents/skills/specsfy-07-implement/scripts/verify_evidence.py \
-  specs/specs/<NNNN>-<slug>/spec.md . --task TNNN
+node .agents/skills/specsfy-07-implement/scripts/verify_evidence.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md . --task TNNN
 ```
 
 Quando uma execução completa produzir atestação schema 2, verifique novamente
@@ -96,8 +190,13 @@ com `--attestation PATH`. Exija commit compatível, binding da mesma spec/tarefa
 refs e comandos idênticos, checks realmente aprovados e SHA-256 atual de cada
 arquivo. Atestação de `--self-test` não prova entrega.
 12. Faça uma micro-retrospectiva: aplique uma melhoria segura encontrada ou registre “nenhuma melhoria necessária” com justificativa; então marque `IMPROVE`.
-13. Na seção 14 de `specs/specs/<NNNN>-<slug>/spec.md`, altere o pai de `- [ ]` para `- [x]` somente quando os cinco itens estiverem concluídos.
-14. Execute `validate_tasks.py`, recalcule a próxima tarefa e confira o próximo item retornado por `next_task.py`.
+13. Na seção 14 de `specs/<estado>/<NNNN>-<slug>/spec.md`, altere o pai de `- [ ]` para `- [x]` somente quando os seis itens estiverem concluídos, incluindo `VISUAL`.
+14. Execute `validate_tasks.mjs`, recalcule a próxima tarefa e confira o próximo item retornado por `next_task.mjs`.
+
+Uma tarefa `[MIGRATION]` não pode ser concluída apenas porque o model, a query
+ou o teste existe. `verify_evidence.mjs` exige o arquivo da migration, o comando
+que a aplicou e a consulta que confirma seu estado. Se faltar qualquer um,
+mantenha `EXECUTE`, `VERIFY` e a tarefa abertos.
 
 Atualize os itens conforme o trabalho acontece; não os marque em lote no encerramento. Tarefas `[P]` podem ser agrupadas apenas quando não tocam os mesmos arquivos ou estado. Se a execução revelar dependência oculta, torne-a explícita na seção 14.
 
@@ -112,7 +211,7 @@ TDD/BDD. Retome esta skill somente com os gates novamente aprovados. Atualize na
 ordem:
 
 ```text
-specs/specs/<NNNN>-<slug>/spec.md (seções 1–13) → tarefas (seção 14) → testes → código → evidências na mesma spec
+specs/<estado>/<NNNN>-<slug>/spec.md (seções 1–13) → tarefas (seção 14) → testes → código → evidências na mesma spec
 ```
 
 Correções internas reversíveis podem ser decididas no código e registradas no relato sem reabrir a especificação.
@@ -125,18 +224,22 @@ Quando todas as tarefas da seção 14 estiverem marcadas:
 2. execute a rastreabilidade de testes;
 3. compare cada `AC`, `FR`, `NFR` e item da Definition of Done com evidência atual;
 4. procure tarefas abertas, placeholders, testes pulados e falhas conhecidas;
-5. execute novamente `monitor_context.py --project . --check` e resolva toda
+5. execute novamente `monitor_context.mjs --project <raiz> --check` e resolva toda
    documentação pendente;
 6. carregue `$specsfy-documentator`, reconstrua `docs/` e exija que o
-   `build_documentation.py --project . --check` passe;
+   `build_documentation.mjs --project <raiz> --check` passe;
 7. não declare conclusão se alguma evidência estiver ausente;
-8. altere `Delivery Gate` para `Passed` somente com rastreabilidade completa e `Status` para `Complete` somente com os três gates e a DoD aprovados.
+8. para toda tarefa `[MIGRATION]`, execute `verify_evidence.mjs` e confirme o
+   arquivo, a aplicação e a consulta de estado;
+9. altere `Delivery Gate` para `Passed` somente com rastreabilidade completa,
+   defina `Status: Reviewing` e execute `specsfy transition <id> review`.
+   `$specsfy-04-validate` conclui o aceite e move a spec para `completed`.
 
 Depois do gate final, projete o resumo de entrega sem criar arquivo:
 
 ```bash
-python3 -B .agents/skills/specsfy-07-implement/scripts/render_delivery.py \
-  specs/specs/<NNNN>-<slug>/spec.md --format markdown
+node .agents/skills/specsfy-07-implement/scripts/render_delivery.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md --format markdown
 ```
 
 Use `--preview` enquanto a entrega estiver aberta. Publicar o texto em PR,

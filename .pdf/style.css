@@ -2,7 +2,7 @@
  * Tema de impressão do manual de marca do Specsfy.
  *
  * A paleta e as pilhas tipográficas acompanham brand/global.css, enquanto as
- * regras de página atendem às limitações do PDF gerado pelo WeasyPrint.
+ * regras de página são aplicadas por Paged.js e Chromium.
  */
 :root {
   --heading: 'Manrope', 'Avenir Next', 'Segoe UI', sans-serif;
@@ -152,7 +152,8 @@ h2 {
   page-break-before: always;
   page-break-after: avoid;
 }
-body > h2:first-of-type,
+/* Regras separadas evitam a remoção dupla do mesmo nó CSS no Paged.js. */
+body > h2:first-of-type { page-break-before: avoid; }
 #TOC + h2 { page-break-before: avoid; }
 
 h3 {

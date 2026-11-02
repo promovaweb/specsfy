@@ -84,14 +84,21 @@ Para desenvolver a partir do checkout:
 ```bash
 git clone https://github.com/promovaweb/specsfy.git
 cd specsfy
+npm ci --ignore-scripts
+npm --prefix .ebook ci --ignore-scripts
 ./scripts/install-cli.sh
 ```
 
 Para reconstruir o manual de marca após alterar suas fontes:
 
 ```bash
+npm --prefix .ebook ci --ignore-scripts
+npm exec --prefix .ebook -- playwright install chromium
 make brand-guide
 ```
+
+O build usa Pandoc, Paged.js e Chromium. Um Chromium já instalado pode ser
+selecionado por `SPECSFY_CHROMIUM_PATH`.
 
 Esta raiz não é um projeto consumidor e não recebe `specs/` ou skills
 instaladas.
@@ -116,12 +123,48 @@ templates, validadores e testes deste repositório.
 ## Validação
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm ci --ignore-scripts
+npm test
+npm run validate:skills
 ```
 
 Os módulos possuem verificações focais descritas em seus `AGENTS.md`. Consulte
 [`AGENTS.md`](AGENTS.md) antes de contribuir.
+
+O `package.json` da raiz organiza os contratos Node.js. Os testes de ebook
+também precisam de `xmllint`, `pdftohtml` e `unzip`, além das dependências de
+`.ebook/`. Os testes de deploy usam `shellcheck` e o comando `script` para
+abrir um terminal de teste. Eles não acessam servidores nem executam Ansible.
+
+| Comando | Escopo |
+| --- | --- |
+| `npm test` | integração, skills e especialistas |
+| `npm run test:integration` | contratos da raiz |
+| `npm run test:skills` | metodologia e validadores |
+| `npm run test:specialists` | catálogo e utilitários opcionais |
+| `npm run test:example` | documentação e cenários Pest do exemplo |
+| `npm run validate:skills` | frontmatter e placeholders das skills |
+
+Prepare as dependências e o banco separado conforme
+[`example/README.md`](example/README.md) antes de executar `test:example`.
+O validador de skills aceita diretórios opcionais e `--json`. Sem diretórios,
+ele confere as bibliotecas e as skills operacionais locais. Ele apenas lê os
+arquivos, retorna `0` quando todos passam, `1` para falha de contrato e `2`
+para argumentos ou diretórios inválidos.
+
+```bash
+# Conferir todas as bibliotecas
+npm run validate:skills
+# Conferir uma skill base
+node scripts/validate-skills.mjs skills/specsfy-setup
+# Conferir um especialista
+node scripts/validate-skills.mjs specialists/specsfy-specialist-deploy
+# Conferir a skill operacional de documentação
+node scripts/validate-skills.mjs .agents/skills/specsfy-monorepo-documentator
+# Obter resultados estruturados de duas skills
+node scripts/validate-skills.mjs skills/specsfy-setup \
+  skills/specsfy-progress --json
+```
 
 As skills locais [`specsfy-monorepo-documentator`][documentator] e
 [`specsfy-release-cli`](cli/.agents/skills/specsfy-release-cli/) mantêm,

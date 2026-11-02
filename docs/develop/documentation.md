@@ -21,8 +21,8 @@ o remoto e a raiz Git única antes de coletar evidências:
 
 <!-- markdownlint-disable MD013 -->
 ```bash
-python3 -B \
-  .agents/skills/specsfy-monorepo-documentator/scripts/collect_monorepo_evidence.py \
+node \
+  .agents/skills/specsfy-monorepo-documentator/scripts/collect-monorepo-evidence.mjs \
   --workspace .
 ```
 <!-- markdownlint-enable MD013 -->
@@ -62,9 +62,18 @@ ecossistema.
 Na raiz:
 
 ```bash
+npm --prefix .ebook ci --ignore-scripts
+npm exec --prefix .ebook -- playwright install chromium
 make ebook
 make verify-ebook
 ```
+
+O pipeline usa Node.js para extrair os metadados, conferir os artefatos e
+aplicar a retenção. O Chromium gera o PDF com a paginação do Paged.js; o
+Pandoc gera o EPUB. A instalação do navegador é necessária para compilar o
+PDF, mas a verificação de uma edição existente usa somente os utilitários
+de inspeção e as dependências Node. Para selecionar um Chromium já instalado,
+defina `SPECSFY_CHROMIUM_PATH` com o caminho absoluto do executável.
 
 O build gera os dois artefatos versionados e `ebook/build.json`. O manifesto
 registra o digest recursivo das páginas, imagens e fontes de build, além dos

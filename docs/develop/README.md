@@ -69,8 +69,9 @@ código.
 Na raiz do monorepo:
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm ci --ignore-scripts
+npm test
+npm run validate:skills
 ```
 
 Cada módulo possui comandos adicionais em seu `AGENTS.md`.

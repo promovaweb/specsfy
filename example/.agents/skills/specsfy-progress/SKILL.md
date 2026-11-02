@@ -5,7 +5,20 @@ description: Use quando o usuário pede progresso geral, status de todas as espe
 
 # Informar progresso geral
 
-Leia o estado exclusivamente de `specs/specs/*/spec.md`. O relatório é uma projeção da
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `sem perguntas`.
+Não formule perguntas nesta skill. Apresente a projeção observada e o próximo
+handoff aplicável.
+
+Leia o estado exclusivamente de `specs/<estado>/*/spec.md`. O relatório é uma projeção da
 fonte da verdade, nunca uma segunda fonte de estado.
 
 ## Orquestrar a conversa
@@ -27,35 +40,35 @@ exigindo autorização específica.
 Na raiz do repositório:
 
 ```bash
-python3 -B .agents/skills/specsfy-progress/scripts/progress.py .
+node .agents/skills/specsfy-progress/scripts/progress.mjs .
 ```
 
 Para integração com outras ferramentas:
 
 ```bash
-python3 -B .agents/skills/specsfy-progress/scripts/progress.py . --json
+node .agents/skills/specsfy-progress/scripts/progress.mjs . --json
 ```
 
 Para uma única especificação:
 
 ```bash
-python3 -B .agents/skills/specsfy-progress/scripts/progress.py . --slug <slug>
+node .agents/skills/specsfy-progress/scripts/progress.mjs . --slug <slug>
 ```
 
 Para observar o custo de contexto de uma spec:
 
 ```bash
-python3 -B .agents/skills/specsfy-progress/scripts/analyze_context.py \
-  specs/specs/<NNNN>-<slug>/spec.md --json
+node .agents/skills/specsfy-progress/scripts/analyze_context.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md --json
 ```
 
 Para projetar pendências documentais junto com o progresso:
 
 ```bash
-python3 -B .agents/skills/specsfy-setup/scripts/monitor_context.py \
+node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
   --project . --check
 
-python3 -B .agents/skills/specsfy-documentator/scripts/build_documentation.py \
+node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \
   --project . --check
 ```
 
@@ -78,7 +91,7 @@ estimativa como uso real.
 4. Mostre o próximo par `TNNN/ITEM` pronto quando existir.
 5. Trate um gate `Failed`, inconsistência de checklist ou dependência sem caminho
    pronto como blocker. Um gate `In Progress` isolado não é falha.
-6. Trate documentação obrigatória apontada por `monitor_context.py` como
+6. Trate documentação obrigatória apontada por `monitor_context.mjs` como
    blocker, mesmo que todos os checkboxes estejam marcados.
 7. Trate `docs/` ausente ou desatualizado segundo `$specsfy-documentator` como
    blocker da entrega.
@@ -95,7 +108,7 @@ estimativa como uso real.
 
 - Não edite specs, checkboxes, testes ou código durante a consulta.
 - Não conte `spec.md` dentro de `research/`; a descoberta é exatamente
-  `specs/specs/*/spec.md`.
+  `specs/<estado>/*/spec.md`.
 - Não invente progresso a partir de commits, arquivos ou memória do chat.
 - Para atualizar estado, anuncie e carregue automaticamente a skill responsável
   na mesma conversa. Retome automaticamente o progresso depois da atualização.

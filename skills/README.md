@@ -111,6 +111,7 @@ para reconstruir a documentação técnica do sistema existente.
 
 ## Catálogo
 
+<!-- markdownlint-disable MD013 -->
 | Skill | Responsabilidade | Limite principal |
 | --- | --- | --- |
 | [`specsfy-01-inbox`](specsfy-01-inbox/SKILL.md) | preservar e pré-processar o input sem perguntas | não refina, promove ou implementa |
@@ -131,6 +132,7 @@ para reconstruir a documentação técnica do sistema existente.
 | [`specsfy-aux-stack`](specsfy-aux-stack/SKILL.md) | manter `.specsfy/STACK.md` a partir de evidência executável | não inventa nem copia toda dependência |
 | [`specsfy-aux-rules`](specsfy-aux-rules/SKILL.md) | ajudar a registrar regras confirmadas em `.specsfy/RULES.md` | não decide regras pela pessoa |
 | [`specsfy-aux-database`](specsfy-aux-database/SKILL.md) | manter `.specsfy/DATABASE.md` após toda mudança persistente | não copia dados ou segredos |
+<!-- markdownlint-enable MD013 -->
 
 `PROJECT.md`, `INTERFACE.md` e `DESIGNSYSTEM.MD` ficam na raiz do projeto
 consumidor. `STACK.md`, `RULES.md`, `DATABASE.md`, `PACKAGES.md` e
@@ -167,6 +169,7 @@ preservando texto humano externo.
 As skills incorporam capacidades inspiradas em extensões de specification
 development sem instalar outro runtime ou criar fontes paralelas:
 
+<!-- markdownlint-disable MD013 -->
 | Capacidade | Responsável |
 | --- | --- |
 | Gates de qualidade | `specsfy-04-validate` |
@@ -184,6 +187,7 @@ development sem instalar outro runtime ou criar fontes paralelas:
 | Testes de qualidade | `specsfy-06-tdd-bdd` |
 | Análise de consumo de tokens | `specsfy-progress` |
 | Integração com PR | `specsfy-07-implement` |
+<!-- markdownlint-enable MD013 -->
 
 ## Especialistas sob demanda
 
@@ -207,7 +211,8 @@ recebe nenhuma categoria.
 ```text
 templates/
 ├── Inbox.md, Backlog.md, Spec.md e Tasks.md
-└── Project.md, Stack.md, Rules.md, Database.md, UserProfile.md, Interface.md e DESIGNSYSTEM.MD
+├── Project.md, Stack.md, Rules.md, Database.md e UserProfile.md
+└── Interface.md e DESIGNSYSTEM.MD
 examples/
 └── Spec.md        # fixture preenchida para agentes, CLI e testes
 specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
@@ -274,15 +279,13 @@ marcador `SPECSFY:`.
 Valide cada skill alterada:
 
 ```bash
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  specsfy-<NN>-<nome>
+node ../scripts/validate-skills.mjs specsfy-<NN>-<nome>
 ```
 
 Execute os contratos das skills a partir desta raiz:
 
 ```bash
-node -m unittest discover -s tests -p 'test_*.py'
+node --test tests/*.test.mjs
 node specsfy-04-validate/scripts/verify_repo.mjs . \
   --boundary local
 ```

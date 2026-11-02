@@ -15,7 +15,8 @@ demonstrar comportamento sem duplicar cenários de cada spec.
 
 ## Como usar
 
-Leia ao escolher o menor nível que prova uma regra ou ao alterar runners e gates.
+Leia ao escolher o menor nível que prova uma regra ou ao alterar runners e
+gates.
 Os IDs e cenários concretos permanecem na spec da fatia.
 
 ## Atualize quando
@@ -40,7 +41,7 @@ transversal.
 
 - Unidade para regra pura e transformação.
 - Integração ou contrato para limites reais.
-- Behave para comportamento observável descrito em Gherkin.
+- Steps Node.js para comportamento observável descrito em Gherkin.
 - Regressão completa antes de concluir o Delivery Gate.
 - Verificação manual somente quando o resultado não puder ser automatizado,
   com justificativa.
@@ -92,20 +93,22 @@ Os contratos integrados são executados no workspace
 [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy):
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm ci --ignore-scripts
+npm test
+npm run validate:skills
 ```
 
-Essa regressão não carrega nem executa as skills do projeto. A suíte própria das
-skills roda separadamente, a partir da raiz `skills/`.
+Essa regressão executa contratos de integração, skills e especialistas. Os
+testes usam fontes e projetos temporários, sem instalar o framework na raiz.
+Os comandos `npm run test:integration`, `npm run test:skills` e
+`npm run test:specialists` selecionam cada conjunto. Os cenários Gherkin deste
+monorepo são executados pelos respectivos arquivos `.test.mjs` e steps Node.
 
 Skills alteradas também passam pelo validador a partir da raiz
 `skills/`:
 
 ```bash
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  specsfy-<nome>
+node ../scripts/validate-skills.mjs specsfy-<nome>
 ```
 
 O contrato de `specsfy-update-spec` comprova catálogo e metadata,
@@ -120,7 +123,8 @@ Mermaid, o inventário retroativo, os links de pacotes, a criação de
 conteúdo humano e a detecção de documentação desatualizada por `--check`.
 
 O documentador exclusivo do projeto possui contrato que executa o coletor sobre
-o monorepo, compara o status da raiz antes e depois e usa um diretório temporário
+o monorepo, compara o status da raiz antes e depois e usa um diretório
+temporário
 inválido para provar a recusa fora do checkout oficial. Ele também
 comprova a separação entre documentação oficial do Specsfy e documentação
 gerada em projetos consumidores.
@@ -138,11 +142,9 @@ Especialistas executam contratos e validação de metadata em
 `specialists/`. O CLI mantém testes unitários, montagem da TUI e build:
 
 ```bash
-cd specialists
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
+npm run test:specialists
 
-cd ../cli
+cd cli
 npm ci
 npm run build:executable
 npm run check
@@ -196,8 +198,10 @@ Execute-a a partir da raiz:
 node --test skills/tests/github-regressions.test.mjs
 ```
 
-O teste `cli/tests/installer-real-cli.test.ts` usa a dependência `skills` instalada
-pelo lock do CLI para materializar especialistas de uma origem local. Ele compara
+O teste `cli/tests/installer-real-cli.test.ts` usa a dependência `skills`
+instalada
+pelo lock do CLI para materializar especialistas de uma origem local. Ele
+compara
 os fingerprints e repete a instalação para conferir a idempotência. O teste de
 restauração em `installer.test.ts` simula uma falha após a gravação dos arquivos
 e confere a recuperação das instruções e dos locks anteriores.
@@ -207,7 +211,8 @@ Eles exercitam caminhos com espaços e preservação de argumentos no processo
 Node.js. A execução nativa no Windows continua necessária para conferir o
 comportamento do sistema operacional.
 
-A reprodução do verificador de migrations usa um processo Node.js como substituto
+A reprodução do verificador de migrations usa um processo Node.js como
+substituto
 do PHP. A resposta simulada distingue migrations aplicadas das pendentes e cobre
 a falha da consulta. Esse teste não confirma uma conexão Laravel. O verificador
 consulta `migrate:status` somente após conferir o banco separado e exige uma
@@ -221,8 +226,13 @@ As reproduções verificam cinco comportamentos do consumidor:
 - Os IDs de testes de outra spec não alteram a cobertura da spec selecionada.
 - A atualização da stack preserva células com pipe escapado e é idempotente.
 - A verificação global respeita Draft e mantém os outros estados estritos.
-- A consulta de migrations só permite desconsiderar uma remoção histórica quando confirma que ela já foi aplicada. Saída vazia mantém a recusa histórica, e falha na consulta mantém o estado pendente.
+- A consulta de migrations só permite desconsiderar uma remoção histórica quando
+  confirma que ela já foi aplicada. Saída vazia mantém a recusa histórica, e
+  falha na consulta mantém o estado pendente.
 
 ## CI de preparação de versão
 
-Branches `release/**` executam o mesmo workflow da `main` para conferir a revisão antes da tag. O job do CLI depende dos jobs integrados, de skills e do exemplo. A publicação npm, restrita a tags, só ocorre depois desses jobs. Os testes Node de regressão também são executados no job integrado.
+Branches `release/**` executam o mesmo workflow da `main` para conferir a
+revisão antes da tag. O job do CLI depende dos jobs integrados, de skills e do
+exemplo. A publicação npm, restrita a tags, só ocorre depois desses jobs. Os
+testes Node de regressão também são executados no job integrado.

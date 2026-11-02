@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Configuração"
+  display_name: "Specsfy - Configuração"
   short_description: "Prepara e monitora o contexto do projeto"
-  default_prompt: "Use $specsfy-setup para detectar o stack, garantir os arquivos de contexto e monitorar pendências documentais."
+  default_prompt: "Use $specsfy-setup para detectar o stack, consultar respostas confirmadas, adaptar as perguntas ao nível de conhecimento e monitorar pendências documentais."

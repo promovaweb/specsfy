@@ -3,6 +3,8 @@ __pycache__/
 .pytest_cache/
 .pdf/build/
 .ebook/build/
+/.ebook/node_modules/
+/node_modules/
 
 # Brand
 /brand/guide/build/

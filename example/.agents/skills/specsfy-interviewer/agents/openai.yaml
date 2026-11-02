@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Entrevistador"
+  short_description: "Conversa a spec por estado"
+  default_prompt: "Use $specsfy-interviewer para conversar sobre a spec no estado atual e registrar apenas respostas confirmadas."

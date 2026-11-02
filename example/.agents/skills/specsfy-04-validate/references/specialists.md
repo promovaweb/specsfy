@@ -11,7 +11,7 @@ Selecione pela superfície de risco:
 - revisão independente: `-code-review`.
 
 ```bash
-specsfy skills add specsfy-specialist-<nome>
+npx skills add https://github.com/promovaweb/specsfy --skill specsfy-specialist-<nome> --agent universal --copy --full-depth
 ```
 
 Se estiver instalado, anuncie a transição automática e carregue o especialista

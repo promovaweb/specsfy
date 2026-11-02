@@ -5,9 +5,45 @@ description: "Use quando o usuário pede TDD, BDD, testes derivados do Gherkin d
 
 # Executar TDD orientado pelo BDD da especificação
 
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `perguntas`.
+Antes de formular qualquer pergunta, leia e aplique o
+`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+
 Leia o BDD como referência e converta o comportamento especificado em testes TDD
 executáveis e evidência rastreável. O Gherkin ajuda o usuário e o agente a
 entender contexto, ação e resultado; ele próprio não é uma suíte de testes.
+
+## Proteção obrigatória do banco
+
+Antes de executar qualquer teste focal, suíte ou regressão, confira o comando e
+o ambiente:
+
+```bash
+node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
+  --project <raiz> --command "<comando-de-teste>"
+```
+
+Em Laravel, a conferência exige `.env.testing`, `APP_ENV=testing` e um banco
+explicitamente diferente do banco de desenvolvimento registrado no `.env`.
+Não execute nenhum teste enquanto o resultado for `PENDING`. Corrija o ambiente
+de testes, repita a conferência e prossiga somente depois de `SAFE`.
+
+Trate `IGNORED` como descarte obrigatório do comando. Não execute, não adapte
+com `--force` e não peça autorização para rodar `migrate:fresh`,
+`migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`,
+`schema:drop`, `prisma migrate reset`, `DROP DATABASE`, `DROP SCHEMA`,
+`DROP TABLE`, `TRUNCATE` ou equivalentes. Não use `RefreshDatabase` nem
+`DatabaseMigrations`; em Laravel, prefira `DatabaseTransactions` e factories
+que criem somente os registros usados pelo caso.
 
 ## Orquestrar a conversa
 
@@ -33,7 +69,7 @@ Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não 
 
 ## Preparar
 
-1. Leia `specs/specs/<NNNN>-<slug>/spec.md`, testes e configuração do projeto.
+1. Leia `specs/<estado>/<NNNN>-<slug>/spec.md`, testes e configuração do projeto.
 2. Exija `Formato: Specsfy/2.0` e `Definition Gate: Passed`. No modo `prepare`,
    use `Status: Defined` e `Plan Gate: Pending`; nos modos `cycle` e `verify`,
    use `Status: Planned` ou `Implementing`.
@@ -44,9 +80,11 @@ Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não 
      instalar ou configurar; recomende Vitest por padrão;
    - outra stack: preserve o runner de testes existente ou pergunte quando não houver
      decisão reproduzível.
-5. Em Node, considere a decisão materializada quando `package.json` expuser o
+5. Confira o ambiente e o comando com `check_database_safety.mjs`. Se o estado
+   não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
+6. Em Node, considere a decisão materializada quando `package.json` expuser o
    script `test:tdd`; não escolha nem instale dependência silenciosamente.
-6. Leia `references/test-levels.md` para escolher o nível mais baixo que ainda prova o comportamento.
+7. Leia `references/test-levels.md` para escolher o nível mais baixo que ainda prova o comportamento.
 
 ## Usar o BDD para escrever TDD
 
@@ -106,7 +144,7 @@ Registre o comando de regressão na seção 11 e a evidência na matriz da seç�
 Execute:
 
 ```bash
-python3 .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.py specs/specs/<NNNN>-<slug>/spec.md .
+node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
 Trate como gap cada feature, `US`, `FR` ou `NFR` com menos de três casos TDD e
@@ -130,7 +168,11 @@ estiver comprovada.
 | “O líder autorizou.” | Autoridade pode mudar escopo, não transformar ausência de evidência em TDD. |
 | “Testar depois é equivalente.” | Test-first guia o contrato e prova sensibilidade antes da implementação. |
 
-Em uma tarefa de teste, atualize `PREP`, `EXECUTE`, `VERIFY`, `EVIDENCE` e `IMPROVE` conforme cada etapa acontecer. Não marque o pai como concluído sem arquivo, marcador, RED válido, comando/evidência e revisão do processo.
+Em uma tarefa de teste, atualize `PREP`, `EXECUTE`, `VERIFY`, `VISUAL`,
+`EVIDENCE` e `IMPROVE` conforme cada etapa acontecer. O item `VISUAL` também é
+obrigatório para confirmar se o teste toca uma interface; quando não tocar,
+registre `Não aplicável` e o motivo. Não marque o pai como concluído sem
+arquivo, marcador, RED válido, comando/evidência e revisão do processo.
 Não escreva código de produção antes que o predecessor TDD informado pelo BDD
 da mesma fatia esteja concluído e com RED registrado na spec.
 
@@ -140,8 +182,8 @@ Depois de executar os runners pertencentes ao repositório, registre `Passed` ou
 a falha na coluna Evidência da seção 12 e audite:
 
 ```bash
-python3 -B .agents/skills/specsfy-06-tdd-bdd/scripts/verify_acceptance.py \
-  specs/specs/<NNNN>-<slug>/spec.md .
+node .agents/skills/specsfy-06-tdd-bdd/scripts/verify_acceptance.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
 O auditor não executa comandos extraídos de Markdown. AC manual exige método,

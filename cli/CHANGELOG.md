@@ -4,6 +4,66 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-11-02
+
+### Adicionado
+
+- `specsfy inbox process <captura.md>` arquiva capturas em `inbox/processed/`
+  depois de conferir todas as specs relacionadas e atualizar suas referências.
+  O comando exige `Definition Gate: Passed` e `Status` explícitos na tabela
+  inicial. Recusa Draft, aprovação ausente e tabelas de exemplo no corpo.
+  Contribuição de Fabio Righetti na PR #44, adaptada com testes em Node.js e
+  verificação adicional do cabeçalho da spec.
+- `.specsfy/migrations.json` aceita padrões `apply` e `status` para reconhecer
+  comprovantes de runners de migrations próprios, preservando os padrões
+  nativos e recusando configuração inválida. Corrige a issue #52, de
+  @sandrolborges. A verificação não executa migrations.
+
+### Corrigido
+
+- O progresso considera somente o ciclo canônico de cada task. Checkboxes
+  residuais aparecem com seus números de linha, sem reduzir o progresso das
+  tasks concluídas. Corrige a issue #51, de @ricardolrm.
+- Os testes de arquivamento recusam aprovação em exemplos, em tabelas do corpo
+  e em specs sem Status escrito. Falhas de pré-validação preservam a captura.
+- O exemplo Laravel recebe as skills canônicas atuais, seus scripts Node.js e
+  os registros do instalador. O ESLint ignora as dependências instaladas.
+
+### Alterado
+
+- Scripts de regressão, validação de skills, versão, release, documentação,
+  geração de PDF/EPUB e utilitários de deploy usam Node.js. Os arquivos Python
+  do workspace foram removidos, incluindo as cópias instaladas no exemplo.
+- O CI executa as suítes Node.js de integração, skills e especialistas, além
+  das verificações nativas do CLI e da aplicação Laravel. Um teste impede a
+  reintrodução de arquivos Python e de etapas Python nos workflows.
+- PDFs usam Chromium, Playwright e Paged.js, com dependências fixadas em
+  `.ebook/package-lock.json`. O manual de marca e o ebook foram recompilados.
+- Os utilitários de vault e hosts usam Node.js e continuam chamando o Ansible
+  externo. O cancelamento aguarda o processo filho antes de remover arquivos
+  temporários de credenciais.
+
+### Atualização
+
+- Requer Node.js 22.20 ou superior. Atualize o CLI com
+  `npm install -g @promovaweb/specsfy@0.25.0` e atualize as skills do projeto
+  pelo instalador, preservando alterações locais.
+- Para contribuir: execute `npm ci --ignore-scripts` na raiz e use `npm test`,
+  `npm run validate:skills` e os comandos documentados dos módulos. Os antigos
+  comandos Python foram substituídos pelas entradas Node.js.
+- Para compilar PDFs: instale as dependências de `.ebook/` e o Chromium do
+  Playwright. O Ansible continua sendo uma dependência externa das operações
+  de deploy; não é instalado pelo workspace.
+
+### Validação
+
+- Regressão integrada em Node.js; testes, typecheck, build e empacotamento do
+  CLI; verificações nativas da aplicação Laravel; contratos de skills;
+  ShellCheck e sintaxe Bash; integridade do ebook e alinhamento de versões.
+- Os testes de deploy usam processos substitutos para verificar argumentos,
+  permissões, limpeza e cancelamento. Não comprovam criptografia real do
+  Ansible nem conexão com servidores de produção.
+
 ## [0.24.3] - 2026-10-20
 
 ### Corrigido

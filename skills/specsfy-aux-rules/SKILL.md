@@ -25,12 +25,12 @@ Antes de formular qualquer pergunta, leia e aplique o
 4. Formular regras verificáveis, com verbo e limite claros.
 5. Executar:
 
-```bash
-node scripts/add_rule.mjs \
-  --project <raiz> \
-  --section "<tema>" \
-  --rule "<regra confirmada>"
-```
+   ```bash
+   node scripts/add_rule.mjs \
+     --project <raiz> \
+     --section "<tema>" \
+     --rule "<regra confirmada>"
+   ```
 
 6. Revisar o resultado e preservar ordem, comentários e regras anteriores.
 7. Sinalizar conflitos sem escolher silenciosamente qual regra prevalece.

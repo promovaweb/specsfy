@@ -1,0 +1,71 @@
+#!/usr/bin/env node
+/** Valida evidência material das tarefas concluídas no contrato opt-in. */
+import { existsSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { resolve, relative, isAbsolute } from "node:path";
+import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
+
+/** Usa o caminho relativo para conferir contenção em Windows e POSIX. */
+const insideRoot = (root, candidate) => {
+  const inner = relative(root, candidate);
+  return !/^\.\.(?:[\\/]|$)/u.test(inner) && !isAbsolute(inner);
+};
+
+/**
+ * Lê padrões adicionais do consumidor, sem executar os comandos registrados.
+ * Ausência mantém os runners nativos; configuração inválida reprova o contrato.
+ * As expressões usam a sintaxe de RegExp do JavaScript, sem flags implícitas.
+ */
+async function loadMigrationPatterns(root, errors) {
+  const patterns = { apply: [], status: [] };
+  const path = resolve(root, ".specsfy/migrations.json");
+  let source;
+  try {
+    source = await readFile(path, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") return patterns;
+    errors.push(`.specsfy/migrations.json: ${error.message}`);
+    return patterns;
+  }
+  try {
+    const config = JSON.parse(source);
+    if (!config || typeof config !== "object" || Array.isArray(config)) {
+      throw new Error("esperado um objeto com apply e status");
+    }
+    for (const name of ["apply", "status"]) {
+      if (!Array.isArray(config[name]) || !config[name].length) {
+        throw new Error(`${name} exige uma lista não vazia de expressões`);
+      }
+      patterns[name] = config[name].map((pattern) => {
+        if (typeof pattern !== "string" || !pattern.trim()) {
+          throw new Error(`${name} exige expressões em strings não vazias`);
+        }
+        return new RegExp(pattern);
+      });
+    }
+  } catch (error) {
+    errors.push(`.specsfy/migrations.json: ${error.message}`);
+    return { apply: [], status: [] };
+  }
+  return patterns;
+}
+
+const args = process.argv.slice(2); const values = args.filter((arg) => !arg.startsWith("--")); const [spec, root] = values; const option = (name) => args.includes(name) ? args[args.indexOf(name) + 1] : undefined; const json = args.includes("--json"); const delivery = args.includes("--delivery"); const taskFilter = option("--task"); const attestation = option("--attestation");
+if (!spec || !root || !existsSync(spec) || !existsSync(root)) { console.error("ERRO: spec ou raiz inexistente."); process.exitCode = 2; }
+else {
+  const specPath = resolve(spec); const rootPath = resolve(root); const text = await readFile(specPath, "utf8"); const contract = text.match(/^\|\s*Evidence Contract\s*\|\s*(\d+)\s*\|\s*$/imu); let payload;
+  if (!contract) payload = { schema_version: 1, result: "passed", mode: "legacy", tasks: [], errors: [], warnings: ["Evidence Contract ausente; compatibilidade legada aplicada."] };
+  else if (contract[1] !== "1") payload = { schema_version: 1, result: "failed", mode: "strict", tasks: [], errors: [`Evidence Contract não suportado: ${contract[1]}`], warnings: [] };
+  else {
+    const definitions = new Set([...text.matchAll(/\b(?:US|FR|NFR|AC)-\d{3,}\b/g)].map((item) => item[0])); const errors = []; const evidence = new Map();
+    const migrationPatterns = await loadMigrationPatterns(rootPath, errors);
+    for (const found of text.matchAll(/^\s*<!--\s*specsfy:evidence\s+(\{.*?\})\s*-->\s*$/gm)) { try { const item = JSON.parse(found[1]); if (typeof item.task !== "string") errors.push("evidence sem task"); else { if (evidence.has(item.task)) errors.push(`${item.task}: evidence duplicada`); evidence.set(item.task, item); } } catch (error) { errors.push(`evidence JSON inválido: ${error.message}`); } }
+    const reports = [];
+    for (const found of text.matchAll(/^- \[([ xX])\] (T\d{3,})\b(.+?)[—-] Refs: (.+?) [—-] Depends:/gm)) { const complete = found[1].toLowerCase() === "x"; const id = found[2]; const taskText = found[3]; const migration = taskText.includes("[MIGRATION]"); if (taskFilter && taskFilter !== id) continue; if (delivery && migration && !complete) { const taskErrors = ["migration planejada ainda não foi concluída"]; reports.push({ task: id, errors: taskErrors }); errors.push(`${id}: ${taskErrors[0]}`); continue; } if (!complete || (!taskText.includes("[CODE]") && !migration && !(attestation && evidence.has(id)))) continue; const item = evidence.get(id); const taskErrors = []; if (!item) taskErrors.push("evidence ausente"); else { if (!Array.isArray(item.refs) || !item.refs.length) taskErrors.push("refs ausentes"); else { const invalid = item.refs.filter((ref) => typeof ref !== "string" || !definitions.has(ref)); if (invalid.length) taskErrors.push(`refs inválidas: ${invalid.join(", ")}`); } if (!Array.isArray(item.files) || !item.files.length) taskErrors.push("files ausentes"); else for (const file of item.files) { const candidate = resolve(rootPath, String(file)); if (typeof file !== "string" || !insideRoot(rootPath, candidate) || !existsSync(candidate)) taskErrors.push(`arquivo inexistente ou inseguro: ${file}`); } if (!Array.isArray(item.commands) || !item.commands.length || item.commands.some((command) => !command || typeof command.run !== "string" || !command.run || command.exit !== 0)) taskErrors.push("comando sem run ou exit 0"); if (migration) { const files = Array.isArray(item.files) ? item.files : []; const commands = Array.isArray(item.commands) ? item.commands.filter((command) => command?.exit === 0 && typeof command.run === "string").map((command) => command.run) : []; const migrationFile = files.some((file) => typeof file === "string" && /(?:^|\/)(?:database\/migrations|migrations|prisma\/migrations|supabase\/migrations)\//i.test(file)); const applied = commands.some((command) => /(?:artisan\s+migrate\b(?!:status)|prisma\s+migrate\s+(?:deploy|dev)|supabase\s+(?:db\s+push|migration\s+up)|(?:flyway|liquibase)\s+migrate\b)/i.test(command) || migrationPatterns.apply.some((pattern) => pattern.test(command))); const verified = commands.some((command) => /(?:artisan\s+migrate:status|prisma\s+migrate\s+status|supabase\s+migration\s+list|(?:flyway|liquibase)\s+(?:info|status)\b)/i.test(command) || migrationPatterns.status.some((pattern) => pattern.test(command))); if (!migrationFile) taskErrors.push("migration não aparece nos arquivos produzidos"); if (!applied) taskErrors.push("comando de aplicação da migration ausente"); if (!verified) taskErrors.push("comando de conferência da migration ausente"); } } reports.push({ task: id, errors: taskErrors }); errors.push(...taskErrors.map((message) => `${id}: ${message}`)); }
+    if (attestation) { try { const statement = JSON.parse(await readFile(attestation, "utf8")); if (statement.schema_version !== 2 || statement.result !== "passed") errors.push("atestação exige schema_version 2 com result passed"); if (!/^[0-9a-f]{64}$/.test(String(statement.policy_digest ?? ""))) errors.push("atestação possui policy_digest inválido"); const current = spawnSync("git", ["rev-parse", "HEAD"], { cwd: rootPath, encoding: "utf8" }).stdout.trim(); if (statement.commit_sha != null && statement.commit_sha !== current) errors.push(`commit divergente: atestado=${statement.commit_sha} atual=${current}`); const bindings = new Map((statement.evidence_bindings ?? []).filter((binding) => binding?.spec === relative(rootPath, specPath).replaceAll("\\", "/")).map((binding) => [binding.task, binding])); for (const report of reports) { const binding = bindings.get(report.task); const inline = evidence.get(report.task); if (!binding) { errors.push(`${report.task}: binding atestado ausente`); continue; } if (JSON.stringify(binding.refs) !== JSON.stringify(inline.refs) || JSON.stringify(binding.commands) !== JSON.stringify(inline.commands)) errors.push(`${report.task}: dados atestados divergentes`); for (const file of inline.files ?? []) { if (typeof file !== "string") continue; const currentHash = createHash("sha256").update(await readFile(resolve(rootPath, file))).digest("hex"); if (binding.files?.[file] !== currentHash) errors.push(`${report.task}: hash divergente para ${file}`); } } } catch (error) { errors.push(`atestação inválida: ${error.message}`); } }
+    payload = { schema_version: 1, result: errors.length ? "failed" : "passed", mode: attestation ? "attested" : "strict", tasks: reports, errors, warnings: [] };
+  }
+  if (json) console.log(JSON.stringify(payload, null, 2)); else { console.log(`Evidência: ${payload.result.toUpperCase()} (${payload.mode})`); payload.errors.forEach((error) => console.log(`ERRO: ${error}`)); payload.warnings.forEach((warning) => console.log(`AVISO: ${warning}`)); }
+  process.exitCode = payload.result === "passed" ? 0 : 1;
+}

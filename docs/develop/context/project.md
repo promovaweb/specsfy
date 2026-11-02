@@ -30,9 +30,11 @@ O Specsfy reduz a distância entre intenção, comportamento aceito, testes,
 tarefas, implementação e evidência. Ele evita que planos e checklists paralelos
 divirjam da especificação da fatia.
 
-Inputs podem permanecer em `specs/inbox/` como capturas sem refinamento do backlog. Ideias
+Inputs podem permanecer em `specs/inbox/` como capturas sem refinamento do
+backlog. Ideias
 escolhidas para refinamento podem permanecer no backlog antes da decisão de
-criar uma spec.
+criar uma spec. Uma captura só sai da fila ativa, para `specs/inbox/processed/`,
+quando specs com Definition Gate aprovado cobrem o pedido inteiro.
 Pedidos posteriores à definição atualizam explicitamente a mesma spec, reabrem
 somente os atos invalidados e retomam o trabalho.
 

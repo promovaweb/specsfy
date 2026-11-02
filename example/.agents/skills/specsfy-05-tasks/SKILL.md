@@ -5,7 +5,37 @@ description: "Use quando o usuário quer quebrar ou decompor a especificação e
 
 # Quebrar a especificação em tarefas
 
-Preencha a seção `14. Tarefas` de `specs/specs/<NNNN>-<slug>/spec.md`. O arquivo permanece a única fonte da verdade; cada tarefa precisa ser pequena, verificável, ordenada e ligada a IDs definidos nele.
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `perguntas`.
+Antes de formular qualquer pergunta, leia e aplique o
+`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+
+## Proteção do banco no plano
+
+Em projeto Laravel, execute
+`.agents/skills/specsfy-setup/scripts/check_database_safety.mjs --project
+<raiz>` antes de
+planejar ou liberar qualquer tarefa `[TEST]`. O plano precisa manter
+`.env.testing`, `APP_ENV=testing` e um banco de teste explicitamente diferente
+do banco do `.env`.
+
+Enquanto o resultado for `PENDING`, nenhuma tarefa de teste fica pronta e a
+skill não chama o runner. Quando o resultado for `IGNORED`, descarte o comando
+que apagaria estruturas ou registros. Nunca inclua `migrate:fresh`,
+`migrate:refresh`, `migrate:reset`, `migrate:rollback`, `db:wipe`,
+`schema:drop`, `prisma migrate reset`, `DROP DATABASE`, `DROP SCHEMA`,
+`DROP TABLE`, `TRUNCATE`, `RefreshDatabase`, `DatabaseMigrations` ou um
+equivalente em tarefa, teste, preparação, regressão ou Definition of Done.
+
+Preencha a seção `14. Tarefas` de `specs/<estado>/<NNNN>-<slug>/spec.md`. O arquivo permanece a única fonte da verdade; cada tarefa precisa ser pequena, verificável, ordenada e ligada a IDs definidos nele.
 
 ## Orquestrar a conversa
 
@@ -23,7 +53,7 @@ exigindo autorização específica.
 
 ## Pré-condições
 
-1. Leia a spec indicada em `specs/specs/<NNNN>-<slug>/spec.md` e exija
+1. Leia a spec indicada em `specs/defined/<NNNN>-<slug>/spec.md` e exija
    `Formato: Specsfy/2.0`, `Definition Gate: Passed` e `Status` `Defined`,
    `Planned` ou `Implementing`. Aceite os dois últimos somente para
    replanejamento automático de uma pendência detectada em etapa posterior.
@@ -34,7 +64,7 @@ exigindo autorização específica.
 4. Execute o monitor antes de planejar:
 
 ```bash
-python3 -B .agents/skills/specsfy-setup/scripts/monitor_context.py \
+node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
   --project .
 ```
 
@@ -50,7 +80,7 @@ python3 -B .agents/skills/specsfy-setup/scripts/monitor_context.py \
 Use `.specsfy/templates/custom/Tasks.md` como contrato quando existir e recorra
 a `.specsfy/templates/Tasks.md` caso contrário. Substitua somente o conteúdo
 das seções `14. Tarefas` e `15. Ordem de execução` em
-`<raiz>/specs/specs/<NNNN>-<slug>/spec.md`; preserve todas as outras seções.
+`<raiz>/specs/<estado>/<NNNN>-<slug>/spec.md`; preserve todas as outras seções.
 
 - Se a spec estiver `Planned` ou `Implementing`, anuncie a pendência, reabra o
   Ato II e defina `Status: Defined`, `Plan Gate: Pending` e
@@ -61,6 +91,24 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Preserve IDs existentes ao atualizar; não renumere tarefas concluídas.
 - Organize em setup mínimo, fundação indispensável, histórias em prioridade e fechamento.
 - Mantenha histórias como fatias verticais independentemente demonstráveis.
+- Quando `Interface para pessoas` for `Sim`, crie tarefas explícitas para as
+  telas, menus e navegação principal, formulário e ações descritos na seção 10,
+  além da camada de dados ou
+  API. Inclua testes de comportamento da interface para navegação, envio,
+  validação, recuperação de erro e o padrão de abertura escolhido, como painel
+  lateral ou modal. Use somente os componentes, convenções e runners da stack
+  de interface registrada; cada tarefa aponta os blocos React, componentes
+  shadcn/ui e ReUI ou rotas reais. Inclua uma tarefa para atualizar
+  `INTERFACE.md` com finalidade, arquivo, API, estados, consumidores e regra
+  de reaproveitamento de todos os blocos criados ou alterados.
+  Em projetos React, cada tarefa de tela deve registrar no `PREP` o uso de
+  `$specsfy-specialist-react-ui-components` antes da implementação. A skill
+  orienta a busca, o reaproveitamento e a adaptação dos componentes reais do
+  projeto. Se ela não estiver instalada, retorne ao `$specsfy-setup` para
+  instalar o especialista detectado antes de liberar a tarefa `[CODE]`.
+  Agrupe-as na subseção obrigatória `#### Fase de interface` da seção 14. Cada
+  tela registrada recebe ao menos uma tarefa própria; não esconda essa entrega
+  dentro de uma tarefa genérica de backend.
 - Para cada `AC`, crie uma tarefa `[TEST] [TDD]` distinta cujo desenho usa o
   Gherkin mantido na spec como referência. O conjunto dessas tarefas materializa pelo
   menos três casos TDD distintos para a feature inteira e para cada `US`, `FR`
@@ -70,6 +118,13 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
   Node, usa o runner confirmado pelo usuário e o script `test:tdd`.
 - Faça cada tarefa `[CODE]` depender do predecessor TDD da mesma fatia com RED.
+- Sempre que uma tarefa criar ou alterar schema, tabela, coluna, índice,
+  relação ou model persistente, crie uma tarefa `[CODE] [MIGRATION]` separada.
+  Ela aponta para o arquivo versionado dentro do diretório de migrations do
+  projeto, depende dos testes TDD e precede o código que usa a nova estrutura.
+- O item `VERIFY` da tarefa `[MIGRATION]` registra dois comandos aprovados pelo
+  `check_database_safety.mjs`: um aplica a migration no banco de teste e outro
+  consulta o estado das migrations. Não aprove o Plan Gate sem essa tarefa.
 - Quando a fatia alterar manifests ou configuração estrutural, crie uma tarefa
   `[DOC]` para `.specsfy/STACK.md`. Quando alterar banco, schema, model
   persistente, tabela, campo, relação ou migration, crie uma tarefa `[DOC]`
@@ -83,8 +138,18 @@ das seções `14. Tarefas` e `15. Ordem de execução` em
 - Quando uma convenção virar regra confirmada, crie tarefa `[DOC]` para
   `.specsfy/RULES.md`.
 - Dê a cada tarefa um resultado único, caminho exato e critério verificável.
+- Use a tag `[MIGRATION]` somente junto de `[CODE]` ou `[OPS]`. O caminho deve
+  ficar em `database/migrations/`, `migrations/`, `prisma/migrations/` ou
+  `supabase/migrations/`, conforme a stack encontrada.
+- Uma leitura, consulta ou uso de tabela existente não exige `[MIGRATION]` por
+  si só. A tag é obrigatória quando o plano cria ou altera a estrutura.
 - Anexe a cada tarefa, exatamente nesta ordem, os itens `PREP`, `EXECUTE`,
-  `VERIFY`, `EVIDENCE` e `IMPROVE` definidos no template `Tasks.md` resolvido.
+  `VERIFY`, `VISUAL`, `EVIDENCE` e `IMPROVE` definidos no template `Tasks.md`
+  resolvido.
+- O item `VISUAL` é obrigatório mesmo sem pedido da pessoa. Ele confere bordas,
+  espaçamentos, margens, padding e tipografia do sistema durante o
+  desenvolvimento. Sem interface, registre `Não aplicável` e o motivo
+  concreto.
 - Escreva os itens como resultados específicos da tarefa, não como frases genéricas copiadas.
 - Mantenha pai e itens abertos ao gerar tarefas; a skill de implementação atualiza um item imediatamente após sua evidência.
 - O item `IMPROVE` deve registrar uma melhoria concreta aplicada ou declarar que nenhuma foi necessária com justificativa.
@@ -112,7 +177,13 @@ Tags permitidas após o ID: `[P]`, `[TEST]`, `[TDD]`, `[CODE]`,
 Execute:
 
 ```bash
-python3 .agents/skills/specsfy-05-tasks/scripts/validate_tasks.py specs/specs/<NNNN>-<slug>/spec.md --allow-draft
+node .agents/skills/specsfy-05-tasks/scripts/validate_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+```
+
+Quando houver interface para pessoas, execute também:
+
+```bash
+node .agents/skills/specsfy-05-tasks/scripts/validate_interface_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
 Corrija IDs duplicados, dependências inválidas/cíclicas, referências inexistentes,
@@ -134,6 +205,10 @@ teste. Em seguida, retome automaticamente esta skill para:
 2. altere `Plan Gate` para `Passed` e defina `Status: Planned`;
 3. registre o resultado em `Gate do Ato II — Plano`;
 4. execute sem `--allow-draft`.
+
+Depois do Plan Gate, execute `specsfy transition <id> planned`. Quando a
+conversa alterar abrangência, dependência ou capacidade necessária, chame
+`$specsfy-interviewer` antes de replanejar e atualize Effort com justificativa.
 
 O modo estrito rejeita `Plan Gate: Passed` quando algum predecessor TDD
 de uma tarefa `[CODE]` continua aberto. Se a validação falhar, mantenha

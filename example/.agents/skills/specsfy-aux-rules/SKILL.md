@@ -5,19 +5,32 @@ description: Monitorar e ajudar a descobrir, formular e registrar regras duráve
 
 # Manter regras do projeto
 
+## Preparação obrigatória
+
+Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
+raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
+Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
+pendência.
+
+## Modo de interação
+
+Modo de interação: `perguntas`.
+Antes de formular qualquer pergunta, leia e aplique o
+`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+
 1. Ler instruções locais, `PROJECT.md` e todo o `RULES.md` existente.
 2. Distinguir regra declarada, inferência e sugestão.
-3. Perguntar uma decisão material por vez quando a formulação não estiver
-   confirmada.
+3. Quando a formulação não estiver confirmada, selecionar uma pergunta real e
+   aplicar o contrato central de perguntas numeradas.
 4. Formular regras verificáveis, com verbo e limite claros.
 5. Executar:
 
-```bash
-python3 -B scripts/add_rule.py \
-  --project <raiz> \
-  --section "<tema>" \
-  --rule "<regra confirmada>"
-```
+   ```bash
+   node scripts/add_rule.mjs \
+     --project <raiz> \
+     --section "<tema>" \
+     --rule "<regra confirmada>"
+   ```
 
 6. Revisar o resultado e preservar ordem, comentários e regras anteriores.
 7. Sinalizar conflitos sem escolher silenciosamente qual regra prevalece.

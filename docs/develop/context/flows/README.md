@@ -62,7 +62,10 @@ input → inbox → backlog → spec
 ```
 
 Inbox preserva sem perguntar. Backlog registra o item e refina as decisões.
-Somente a spec governa comportamento, gates, tarefas e evidência.
+Somente a spec governa comportamento, gates, tarefas e evidência. A captura
+fica em `specs/inbox/` até que specs com Definition Gate aprovado cubram o
+pedido inteiro; então `validate` a move para `specs/inbox/processed/` com
+`specsfy inbox process`, sem apagar texto nem vínculos.
 
 Durante os três atos, as etapas são bidirecionais:
 

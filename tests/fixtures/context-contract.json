@@ -1,0 +1,64 @@
+{
+  "minimum": [
+    "docs/README.md",
+    "docs/user/README.md",
+    "docs/user/skills/README.md",
+    "docs/develop/README.md",
+    "docs/develop/methodology.md",
+    "docs/develop/contributing.md",
+    "docs/develop/skills.md",
+    "docs/develop/cli.md",
+    "docs/develop/context/README.md",
+    "docs/develop/context/project.md",
+    "docs/develop/context/glossary.md",
+    "docs/develop/context/architecture/README.md",
+    "docs/develop/context/architecture/modules.md",
+    "docs/develop/context/architecture/dependencies.md",
+    "docs/develop/context/engineering/README.md",
+    "docs/develop/context/engineering/stack.md",
+    "docs/develop/context/engineering/packages.md",
+    "docs/develop/context/engineering/conventions.md",
+    "docs/develop/context/engineering/testing.md",
+    "docs/develop/context/data/README.md",
+    "docs/develop/context/data/persistence.md",
+    "docs/develop/context/data/privacy.md",
+    "docs/develop/context/flows/README.md",
+    "docs/develop/decisions/README.md"
+  ],
+  "headings": {
+    "docs/develop/context/README.md": [
+      "## Roteamento por tipo de alteração",
+      "## Precedência das fontes"
+    ],
+    "docs/develop/context/project.md": [
+      "## Problema e finalidade",
+      "## Limites normativos"
+    ],
+    "docs/develop/context/glossary.md": [
+      "## Termos canônicos",
+      "## Regras de vocabulário"
+    ],
+    "docs/develop/context/architecture/README.md": [
+      "## Roteamento de arquitetura",
+      "## Visão arquitetural",
+      "## Integrações",
+      "## Invariantes transversais"
+    ],
+    "docs/develop/context/engineering/README.md": [
+      "## Roteamento de engenharia"
+    ],
+    "docs/develop/context/data/README.md": [
+      "## Roteamento de dados",
+      "## Migrations"
+    ],
+    "docs/develop/context/flows/README.md": [
+      "## Fluxos transversais",
+      "## Contrato de um fluxo"
+    ],
+    "docs/develop/decisions/README.md": [
+      "## Índice de decisões",
+      "## Ciclo de vida de um ADR",
+      "## Formato de um ADR"
+    ]
+  }
+}

@@ -3,4 +3,4 @@
 set -eu
 base_dir=$(dirname -- "$0")
 base_dir=$(cd "$base_dir" && pwd)
-exec python3 "$base_dir/vault.py" secrets "$@"
+exec node "$base_dir/vault.mjs" secrets "$@"

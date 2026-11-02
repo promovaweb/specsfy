@@ -11,6 +11,28 @@ import {
 import { temporaryDirectory } from "./helpers.js";
 
 describe("progresso das specs", () => {
+  test("#51 separa resíduos do percentual e aponta suas linhas", async () => {
+    const project = await temporaryDirectory();
+    const path = join(project, "specs/completed/0001-concluida/spec.md");
+    await mkdir(join(path, ".."), { recursive: true });
+    const keys = ["PREP", "EXECUTE", "VERIFY", "VISUAL", "EVIDENCE", "IMPROVE"];
+    const block = (done: boolean) => keys.map(key => `  - [${done ? "x" : " "}] **${key}**: Conferir.\n`).join("");
+    await writeFile(path, "| Status | Complete |\n### 14. Tarefas\n" + block(false).repeat(9) + "- [x] T001 [DOC] Documentar docs/teste.md — Refs: FR-001 — Depends: none\n" + block(true) + "### 15. Evidências\n- [ ] Anotação externa\n");
+    const [spec] = await scanSpecs(project);
+    expect(spec).toMatchObject({ completed_task_items: 7, total_task_items: 7, total_other_items: 55, pending_other_items: 55, percent: 100 });
+    expect(spec!.orphan_checklist_lines).toHaveLength(54);
+    expect(summarizeSpecs([spec!])).toMatchObject({ total_task_items: 7, total_other_items: 55, orphan_checklist_items: 54, percent: 100 });
+  });
+
+  test("#51 ignora checkboxes de código e não adota checklist de outra seção", async () => {
+    const project = await temporaryDirectory();
+    const path = join(project, "specs/draft/0001-exemplo/spec.md");
+    await mkdir(join(path, ".."), { recursive: true });
+    await writeFile(path, "### 14. Tarefas\n- [x] T001 Completa\n```markdown\n- [ ] T002 Exemplo\n```\n### 15. Evidências\n  - [ ] **PREP**: Rascunho.\n");
+    const [spec] = await scanSpecs(project);
+    expect(spec).toMatchObject({ total_tasks: 1, total_task_items: 1, total_other_items: 1, percent: 100 });
+    expect(spec!.orphan_checklist_lines).toEqual([7]);
+  });
   test("lê layouts canônico e legado e consolida checklists", async () => {
     const project = await temporaryDirectory();
     const canonical = join(project, "specs/specs/0001-dashboard/spec.md");

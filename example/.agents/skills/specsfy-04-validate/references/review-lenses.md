@@ -48,6 +48,6 @@ Registre na seção 13:
 Valide com:
 
 ```bash
-python3 -B .agents/skills/specsfy-04-validate/scripts/review_findings.py \
-  specs/specs/<NNNN>-<slug>/spec.md
+node .agents/skills/specsfy-04-validate/scripts/review_findings.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md
 ```

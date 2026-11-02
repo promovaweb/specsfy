@@ -23,9 +23,9 @@ meu-projeto/
 └── ansible/
     ├── inventory.yml
     ├── inventory.example.yml
-    ├── check-hosts.py
+    ├── check-hosts.mjs
     ├── create-vault.sh
-    ├── vault.py
+    ├── vault.mjs
     ├── deploy.yml
     ├── keys.yml
     ├── sync-keys.yml
@@ -156,6 +156,7 @@ não remove o acesso de outra máquina administrativa.
 
 ## Comandos curtos para o Herdr
 
+<!-- markdownlint-disable MD013 -->
 | Comando | Finalidade | Efeito persistente |
 | --- | --- | --- |
 | `./deploy check-hosts` | listar o inventário e testar conexões | nenhum |
@@ -164,6 +165,7 @@ não remove o acesso de outra máquina administrativa.
 | `./deploy run` | aplicar o playbook com senha manual | atualiza Swarm e stack |
 | `./deploy configure-vault` | cadastrar senha externa | grava arquivo local fora do Git |
 | `./deploy run --non-interactive` | publicar com fonte de senha pronta | atualiza Swarm e stack |
+<!-- markdownlint-enable MD013 -->
 
 O inventário padrão é `ansible/inventory.yml`. Para conferir outro arquivo sem
 alterar o projeto, defina `ANSIBLE_INVENTORY` somente para aquela execução.

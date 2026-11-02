@@ -49,14 +49,14 @@ selecione a identidade de criptografia pela configuração nativa do Ansible.
 ## Atualização de um projeto existente
 
 Gere uma referência em pasta temporária com o mesmo `SEMVER` e compare
-`deploy`, `ansible/create-vault.sh`, `ansible/check-hosts.py` e
-`ansible/vault.py`. Incorpore as mudanças preservando argumentos, alvos e
+`deploy`, `ansible/create-vault.sh`, `ansible/check-hosts.mjs` e
+`ansible/vault.mjs`. Incorpore as mudanças preservando argumentos, alvos e
 tasks personalizados; não execute o scaffold diretamente sobre os arquivos
 existentes. Teste o fluxo em um alvo descartável antes de usar produção.
 
 ## Validação e documentação
 
-Os contratos executáveis ficam em `tests/test_deploy_vault.py` no catálogo.
+Os contratos executáveis ficam em `tests/deploy-node.test.mjs` no catálogo.
 Execute a suíte focal, o BDD e ShellCheck nos wrappers. O manual completo com
 opções, exemplos, troca e remoção da configuração pertence a
 `docs/user/deploy-vault.md` no repositório do Specsfy.

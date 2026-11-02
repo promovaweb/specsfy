@@ -1,3 +1,4 @@
+/** Valida o código da aplicação e exclui dependências e skills instaladas. */
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import prettier from 'eslint-config-prettier/flat';
@@ -104,6 +105,9 @@ export default [
     },
     {
         ignores: [
+            '.agents/**',
+            '.claude/**',
+            '.specsfy/**',
             'vendor',
             'node_modules',
             'public',

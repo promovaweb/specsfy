@@ -73,7 +73,7 @@ As categorias funcionam como lentes de investigação, e não como um formulári
 O rigor é constante, mas a profundidade varia com o risco:
 
 | Perfil | Uso recomendado | Profundidade mínima |
-|---|---|---|
+| --- | --- | --- |
 | Lite | correção pequena e reversível | finalidade, categorias críticas, uma afirmação e um cenário |
 | Standard | feature comum | matriz aplicável, vocabulário, regras, falhas e Gherkin |
 | Crítico | dinheiro, autorização, privacidade, irreversibilidade ou migração | matriz completa justificada, fontes, riscos, rollback e revisão humana |
@@ -200,7 +200,7 @@ O MCR-10 usa as categorias por analogia operacional. A tabela distingue o núcle
 da pergunta e sua aplicação moderna:
 
 | Categoria | Pergunta nuclear | Adaptação moderna para software |
-|---|---|---|
+| --- | --- | --- |
 | Substância | Quem ou o quê? | ator, entidade, agregado, value object, serviço externo e identidade |
 | Quantidade | Quanto ou quantos? | cardinalidade, limites, volume, precisão, quota e capacidade |
 | Qualidade | De que tipo ou qualidade? | atributos, invariantes, validação e requisitos não funcionais mensuráveis |
@@ -570,7 +570,7 @@ Sinais de risco:
 Alguns elementos podem parecer pertencer a mais de uma categoria. O objetivo não é forçar uma classificação única, mas compreender o papel de cada informação.
 
 | Fronteira | Regra de distinção | Exemplo |
-|---|---|---|
+| --- | --- | --- |
 | Qualidade × Posição | Qualidade descreve uma característica; posição descreve estado ou arranjo no fluxo. | `prioridade alta` pode ser qualidade; `aguardando aprovação` é posição. |
 | Relação × Posse | Relação descreve vínculo; posse descreve capacidade ou recurso disponível. | `tarefa pertence ao projeto` versus `usuário possui permissão para editar`. |
 | Ação × Afecção | Ação observa quem produz a mudança; afecção observa quem recebe a mudança. | `manager revoga o token` versus `token torna-se inválido`. |
@@ -700,7 +700,7 @@ Depois disso, converta as decisões confirmadas em:
 Toda informação deve receber um status.
 
 | Status | Significado |
-|---|---|
+| --- | --- |
 | Declarado | Foi afirmado diretamente pelo usuário ou pela fonte. |
 | Inferido | Foi deduzido a partir de outras informações, mas ainda não confirmado. |
 | Hipótese | É uma possibilidade proposta para orientar a conversa. |
@@ -976,7 +976,7 @@ risco: P1
 Campos mínimos:
 
 | Campo | Descrição |
-|---|---|
+| --- | --- |
 | ID | Identificador estável. |
 | Trecho de origem | Fala, documento ou passagem que originou a afirmação. |
 | Formulação normalizada | Afirmação atômica sem alteração do sentido. |
@@ -994,7 +994,7 @@ Campos mínimos:
 A cobertura é um instrumento de visibilidade, não uma nota absoluta de qualidade.
 
 | Pontuação | Estado | Critério |
-|---:|---|---|
+| ---: | --- | --- |
 | N/A | Não aplicável | A irrelevância foi justificada. |
 | 0 | Ausente | A categoria é relevante, mas não aparece. |
 | 1 | Mencionada | Existe referência, porém vaga, contraditória ou não operacional. |
@@ -1098,7 +1098,7 @@ Ligação entre trechos originais, decisões, regras e critérios.
 ### Análise inicial
 
 | Categoria | Conteúdo encontrado | Lacuna |
-|---|---|---|
+| --- | --- | --- |
 | Substância | manager, token MCP, módulo | O token pertence ao usuário ou à conta? |
 | Quantidade | um token é mencionado | Pode existir mais de um token ativo? |
 | Qualidade | não definida | Quais requisitos de segurança e exibição do segredo? |
@@ -1238,16 +1238,16 @@ critérios de aceitação, cobertura, riscos e rastreabilidade.
 
 Fontes:
 
-**Aristóteles. _Categorias; Da Interpretação_. Tradução e notas de Ricardo Santos. Imprensa Nacional-Casa da Moeda, 2016.**
+**Aristóteles. *Categorias; Da Interpretação*. Tradução e notas de Ricardo Santos. Imprensa Nacional-Casa da Moeda, 2016.**
 
 - Aristóteles, *Categories*, tradução de E. M. Edghill, em *The Works of
   Aristotle* (1928), texto e numeração Bekker:
-  https://en.wikisource.org/wiki/The_Works_of_Aristotle/Categories
+  <https://en.wikisource.org/wiki/The_Works_of_Aristotle/Categories>
 - Paul Studtmann, “Aristotle’s Categories”, *Stanford Encyclopedia of
   Philosophy*, arquivo Spring 2021:
-  https://plato.stanford.edu/archives/spr2021/entries/aristotle-categories/
+  <https://plato.stanford.edu/archives/spr2021/entries/aristotle-categories/>
 - “Aristotle’s Logic”, seção 7.3, *Stanford Encyclopedia of Philosophy*:
-  https://plato.stanford.edu/entries/aristotle-logic/
+  <https://plato.stanford.edu/entries/aristotle-logic/>
 
 Passagens utilizadas:
 

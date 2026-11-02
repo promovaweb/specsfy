@@ -73,7 +73,7 @@ As categorias funcionam como lentes de investigação, e não como um formulári
 O rigor é constante, mas a profundidade varia com o risco:
 
 | Perfil | Uso recomendado | Profundidade mínima |
-|---|---|---|
+| --- | --- | --- |
 | Lite | correção pequena e reversível | finalidade, categorias críticas, uma afirmação e um cenário |
 | Standard | feature comum | matriz aplicável, vocabulário, regras, falhas e Gherkin |
 | Crítico | dinheiro, autorização, privacidade, irreversibilidade ou migração | matriz completa justificada, fontes, riscos, rollback e revisão humana |
@@ -200,7 +200,7 @@ O MCR-10 usa as categorias por analogia operacional. A tabela distingue o núcle
 da pergunta e sua aplicação moderna:
 
 | Categoria | Pergunta nuclear | Adaptação moderna para software |
-|---|---|---|
+| --- | --- | --- |
 | Substância | Quem ou o quê? | ator, entidade, agregado, value object, serviço externo e identidade |
 | Quantidade | Quanto ou quantos? | cardinalidade, limites, volume, precisão, quota e capacidade |
 | Qualidade | De que tipo ou qualidade? | atributos, invariantes, validação e requisitos não funcionais mensuráveis |
@@ -570,7 +570,7 @@ Sinais de risco:
 Alguns elementos podem parecer pertencer a mais de uma categoria. O objetivo não é forçar uma classificação única, mas compreender o papel de cada informação.
 
 | Fronteira | Regra de distinção | Exemplo |
-|---|---|---|
+| --- | --- | --- |
 | Qualidade × Posição | Qualidade descreve uma característica; posição descreve estado ou arranjo no fluxo. | `prioridade alta` pode ser qualidade; `aguardando aprovação` é posição. |
 | Relação × Posse | Relação descreve vínculo; posse descreve capacidade ou recurso disponível. | `tarefa pertence ao projeto` versus `usuário possui permissão para editar`. |
 | Ação × Afecção | Ação observa quem produz a mudança; afecção observa quem recebe a mudança. | `manager revoga o token` versus `token torna-se inválido`. |
@@ -700,7 +700,7 @@ Depois disso, converta as decisões confirmadas em:
 Toda informação deve receber um status.
 
 | Status | Significado |
-|---|---|
+| --- | --- |
 | Declarado | Foi afirmado diretamente pelo usuário ou pela fonte. |
 | Inferido | Foi deduzido a partir de outras informações, mas ainda não confirmado. |
 | Hipótese | É uma possibilidade proposta para orientar a conversa. |
@@ -754,12 +754,15 @@ Evite:
 
 Os conceitos filosóficos orientam o analista. Eles não precisam aparecer na conversa quando não ajudarem o usuário.
 
-### 9.3 Fazer uma pergunta por vez
+### 9.3 Fazer uma pergunta numerada por rodada
 
-Como padrão, faça uma pergunta por rodada: a lacuna não respondida de maior
-impacto e incerteza. Agrupe até três perguntas somente quando o usuário pedir uma
-coleta em lote ou quando elas forem inseparáveis e puderem ser respondidas
-juntas sem ambiguidade.
+Em cada rodada, apresente uma pergunta real, numerada como `Pergunta 1`, e
+espere a resposta antes de formular a próxima. Se houver outras lacunas,
+reordene-as depois da resposta, sem antecipá-las na mesma rodada.
+
+Abaixo de cada pergunta, ofereça pelo menos três opções numeradas, seguidas das
+opções numeradas `Escrever outra resposta` e `Avançar`. Não apresente opção sem
+número.
 
 Isso permite:
 
@@ -822,10 +825,12 @@ Cada rodada deve conter:
 
 1. **Síntese:** o que foi entendido.
 2. **Decisões:** o que já foi confirmado.
-3. **Lacuna:** o próximo ponto aplicável ainda não definido.
-4. **Pergunta:** uma formulação concreta.
-5. **Registro:** resposta original e decisão normalizada.
-6. **Atualização:** categorias e regras afetadas.
+3. **Lacunas:** os próximos pontos aplicáveis ainda não definidos.
+4. **Pergunta:** uma formulação concreta e numerada.
+5. **Opções:** no mínimo três sugestões numeradas por pergunta, mais escrita
+   livre e avanço.
+6. **Registro:** respostas originais e escolhas normalizadas.
+7. **Atualização:** categorias e regras afetadas.
 
 ### 9.6 Perguntas com hipóteses
 
@@ -839,21 +844,26 @@ A hipótese não deve ser incorporada à especificação até ser confirmada.
 
 ### 9.7 Ciclo adaptativo e saída explícita
 
-O refinamento do backlog opera sem limite máximo de perguntas. Depois de cada resposta,
-reanalise o contexto acumulado e a nova resposta: entrada original, evidências
-do repositório, decisões confirmadas, respostas anteriores e dependências
-afetadas. Reclassifique as lacunas e formule a próxima pergunta enquanto existir lacuna aplicável.
+O refinamento do backlog faz no máximo oito perguntas por área. Depois de cada
+rodada, reanalise o contexto acumulado e as novas respostas: entrada original,
+evidências do repositório, escolhas confirmadas, respostas anteriores e
+dependências afetadas. Reclassifique as lacunas e formule a próxima rodada
+enquanto existir lacuna aplicável e restarem perguntas no limite.
 Uma fila anterior é apenas uma hipótese de análise e deve ser
 descartada quando a resposta mudar o contexto.
 
-Conte as perguntas do ciclo atual. A partir da 11ª pergunta, ofereça `avançar`
-como opção adicional em todas as rodadas. O número dez não encerra o refinamento do backlog;
-ele somente torna disponível uma saída controlada pela pessoa.
+Ofereça `Avançar` em cada pergunta desde a primeira rodada. Na rodada seguinte,
+pergunte se a pessoa quer encerrar definitivamente as perguntas daquela área,
+responder depois ou voltar a responder agora. Inclua essa confirmação entre as
+pergunta numerada da rodada seguinte.
 
-Quando a pessoa escolher `avançar`, encerre somente o ciclo atual. Preserve as
-lacunas não resolvidas, seu impacto e suas dependências no brief ou na spec em
-Draft. Não normalize ausência de resposta como decisão, não declare conclusão
-plena e não aprove o Definition Gate enquanto houver lacuna aplicável.
+Se a pessoa encerrar a área, registre
+`Área encerrada pelo usuário: <área>` no artefato aplicável e não volte ao
+assunto sem reabertura explícita. Se ela responder depois, registre
+`Área adiada pelo usuário: <área>` e preserve os pontos abertos para retomada.
+Não normalize ausência de resposta como escolha confirmada, não declare
+conclusão plena e não aprove o Definition Gate enquanto houver lacuna
+aplicável.
 
 ---
 
@@ -966,7 +976,7 @@ risco: P1
 Campos mínimos:
 
 | Campo | Descrição |
-|---|---|
+| --- | --- |
 | ID | Identificador estável. |
 | Trecho de origem | Fala, documento ou passagem que originou a afirmação. |
 | Formulação normalizada | Afirmação atômica sem alteração do sentido. |
@@ -984,7 +994,7 @@ Campos mínimos:
 A cobertura é um instrumento de visibilidade, não uma nota absoluta de qualidade.
 
 | Pontuação | Estado | Critério |
-|---:|---|---|
+| ---: | --- | --- |
 | N/A | Não aplicável | A irrelevância foi justificada. |
 | 0 | Ausente | A categoria é relevante, mas não aparece. |
 | 1 | Mencionada | Existe referência, porém vaga, contraditória ou não operacional. |
@@ -1088,7 +1098,7 @@ Ligação entre trechos originais, decisões, regras e critérios.
 ### Análise inicial
 
 | Categoria | Conteúdo encontrado | Lacuna |
-|---|---|---|
+| --- | --- | --- |
 | Substância | manager, token MCP, módulo | O token pertence ao usuário ou à conta? |
 | Quantidade | um token é mencionado | Pode existir mais de um token ativo? |
 | Qualidade | não definida | Quais requisitos de segurança e exibição do segredo? |
@@ -1148,9 +1158,11 @@ Uma especificação está suficientemente refinada quando:
 - os critérios permitem observar sucesso e falha;
 - cada decisão importante pode ser ligada à sua fonte.
 
-Escolher `avançar` encerra a rodada de descoberta, mas não satisfaz estes
-critérios. Nesse caso, a definição permanece em Draft com as lacunas abertas e
-o Definition Gate permanece Pending.
+Escolher `avançar` abre a confirmação de encerramento da área, adiamento ou
+retomada imediata. Encerrar uma área impede novas perguntas sobre ela até uma
+reabertura explícita. Adiar preserva os pontos abertos. A definição permanece
+em Draft e o Definition Gate permanece Pending enquanto houver lacuna
+aplicável.
 
 ---
 
@@ -1164,7 +1176,7 @@ Um assistente que utilize o MCR-10 deve:
 4. marcar toda inferência;
 5. não inventar decisões para completar a especificação;
 6. usar as categorias de forma adaptativa;
-7. fazer uma pergunta por vez, salvo pedido explícito por coleta em lote;
+7. fazer uma pergunta numerada por rodada e esperar a resposta;
 8. priorizar autorização, propriedade, dados, dinheiro, irreversibilidade e efeito principal;
 9. atualizar a análise incrementalmente;
 10. permitir que o usuário corrija uma definição;
@@ -1173,11 +1185,13 @@ Um assistente que utilize o MCR-10 deve:
 13. gerar uma versão resumida ou completa conforme a necessidade;
 14. tratar categorias não aplicáveis de maneira explícita;
 15. analisar antes de reescrever.
-16. executar o refinamento do backlog sem limite máximo de perguntas;
-17. reanalisar o contexto acumulado e a nova resposta depois de cada rodada;
+16. executar o refinamento do backlog com no máximo oito perguntas por área;
+17. reanalisar o contexto acumulado e as novas respostas depois de cada rodada;
 18. continuar enquanto existir lacuna aplicável;
-19. oferecer `avançar` a partir da 11ª pergunta;
-20. preservar lacunas e gates pendentes quando a pessoa escolher essa saída.
+19. oferecer pelo menos três opções numeradas, `Escrever outra resposta`,
+    `Gere outras opções` e `Avançar` em cada pergunta desde a primeira rodada;
+20. confirmar se a pessoa encerra a área, responde depois ou retoma agora;
+21. registrar e respeitar áreas encerradas ou adiadas.
 
 ---
 
@@ -1202,9 +1216,14 @@ hipótese, decisão, conflito ou questão aberta.
 Recombine os elementos em afirmações com sujeito, condição, ação ou predicado e
 efeito observável. Teste cada afirmação por negação, exceção, falha e limite.
 
-Antes de reescrever a especificação, apresente uma síntese e faça uma pergunta
-por vez. Priorize bloqueios de identidade, autorização, propriedade,
-dados, custo, irreversibilidade e efeito principal.
+Antes de reescrever a especificação, apresente uma síntese e faça exatamente
+uma pergunta numerada por rodada. Ofereça pelo menos três opções numeradas,
+`Escrever outra resposta`, `Gere outras opções` e `Avançar`. Priorize
+identidade,
+autorização, propriedade, dados, custo, irreversibilidade e efeito principal.
+Depois de `Avançar`, confirme encerramento da área, adiamento ou retomada
+imediata. Registre a escolha e não reabra uma área encerrada sem pedido
+explícito.
 
 Não invente respostas.
 
@@ -1219,16 +1238,16 @@ critérios de aceitação, cobertura, riscos e rastreabilidade.
 
 Fontes:
 
-**Aristóteles. _Categorias; Da Interpretação_. Tradução e notas de Ricardo Santos. Imprensa Nacional-Casa da Moeda, 2016.**
+**Aristóteles. *Categorias; Da Interpretação*. Tradução e notas de Ricardo Santos. Imprensa Nacional-Casa da Moeda, 2016.**
 
 - Aristóteles, *Categories*, tradução de E. M. Edghill, em *The Works of
   Aristotle* (1928), texto e numeração Bekker:
-  https://en.wikisource.org/wiki/The_Works_of_Aristotle/Categories
+  <https://en.wikisource.org/wiki/The_Works_of_Aristotle/Categories>
 - Paul Studtmann, “Aristotle’s Categories”, *Stanford Encyclopedia of
   Philosophy*, arquivo Spring 2021:
-  https://plato.stanford.edu/archives/spr2021/entries/aristotle-categories/
+  <https://plato.stanford.edu/archives/spr2021/entries/aristotle-categories/>
 - “Aristotle’s Logic”, seção 7.3, *Stanford Encyclopedia of Philosophy*:
-  https://plato.stanford.edu/entries/aristotle-logic/
+  <https://plato.stanford.edu/entries/aristotle-logic/>
 
 Passagens utilizadas:
 

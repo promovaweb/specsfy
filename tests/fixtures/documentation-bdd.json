@@ -1,0 +1,83 @@
+{
+  "public_journey": [
+    "### 1. Capture uma entrada — `$specsfy-01-inbox`",
+    "### 2. Refine no backlog — `$specsfy-02-backlog`",
+    "### 3. Crie a especificação — `$specsfy-03-specify`",
+    "### 4. Confira a especificação — `$specsfy-04-validate`",
+    "### 5. Divida o trabalho — `$specsfy-05-tasks`",
+    "### 6. Prepare a verificação — `$specsfy-06-tdd-bdd`",
+    "### 7. Implemente — `$specsfy-07-implement`",
+    "### 8. Altere a especificação — `$specsfy-update-spec`",
+    "### 9. Veja o progresso — `$specsfy-progress`"
+  ],
+  "basic_journey": [
+    "## Capture uma entrada",
+    "## Refine a proposta no backlog",
+    "## Crie a especificação única",
+    "## Comprove a definição",
+    "## Organize as tarefas",
+    "## Prove que o teste detecta a ausência da página",
+    "## Implemente e valide",
+    "## Incorpore uma mudança posterior",
+    "## Consulte o estado final"
+  ],
+  "base_flow": [
+    "$specsfy-01-inbox",
+    "$specsfy-02-backlog",
+    "$specsfy-03-specify",
+    "$specsfy-04-validate",
+    "$specsfy-05-tasks",
+    "$specsfy-06-tdd-bdd",
+    "$specsfy-07-implement",
+    "$specsfy-update-spec",
+    "$specsfy-progress"
+  ],
+  "public_basics": [
+    "get.specsfy.dev",
+    "specsfy --version",
+    "specsfy install --project .",
+    "npm update --global @promovaweb/specsfy",
+    "specsfy skills update --project .",
+    "specsfy-01-inbox",
+    "specsfy-02-backlog",
+    "Ato I — Definir",
+    "Ato II — Projetar e provar",
+    "Ato III — Entregar",
+    "specsfy progress --project ."
+  ],
+  "basic_results": [
+    "specs/inbox/2026-07-28-143205-pagina-boas-vindas.md",
+    "specs/backlog/0001-pagina-boas-vindas.md",
+    "specs/<estado>/0001-pagina-boas-vindas/spec.md",
+    "READY",
+    "Complete"
+  ],
+  "public_results": [
+    "Brief pronto para especificar",
+    "2 tarefas preparadas",
+    "Verificação preparada",
+    "Implementação concluída",
+    "Pedido incorporado na especificação 0001-pagina-boas-vindas",
+    "Implementação atualizada",
+    "nenhuma pendência",
+    "Use $specsfy-02-backlog para aprofundar este texto:",
+    "Use $specsfy-02-backlog em specs/backlog/0001-pagina-boas-vindas.md",
+    "Use $specsfy-03-specify para criar uma especificação a partir deste texto:",
+    "Use $specsfy-03-specify para promover specs/backlog/0001-pagina-boas-vindas.md",
+    "#### Refinar a partir de texto livre",
+    "#### Refinar a partir do backlog",
+    "#### Especificar a partir de texto livre",
+    "#### Especificar a partir do backlog",
+    "Use $specsfy-04-validate em specs/<estado>/0001-pagina-boas-vindas/spec.md",
+    "Use $specsfy-05-tasks em specs/<estado>/0001-pagina-boas-vindas/spec.md",
+    "Use $specsfy-06-tdd-bdd em specs/<estado>/0001-pagina-boas-vindas/spec.md",
+    "Use $specsfy-07-implement em specs/<estado>/0001-pagina-boas-vindas/spec.md"
+  ],
+  "cli_tips": [
+    "## Dicas para usar o CLI",
+    "specsfy --help",
+    "specsfy progress --project . --json",
+    "specsfy progress --project . --watch",
+    "Nada é instalado ou removido antes de **Aplicar**"
+  ]
+}

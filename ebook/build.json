@@ -1,19 +1,23 @@
 {
   "schema_version": 1,
-  "version": "0.24.3",
-  "edition": "v0.24.3",
-  "generated_at": "2026-10-20T18:52:12.562Z",
-  "source_sha256": "6017b338fa4cc6641d32d90f532a1fd768b24536a9ead8bb724c338e6bb9ffc8",
+  "version": "0.25.0",
+  "edition": "v0.25.0",
+  "generated_at": "2026-11-02T06:29:56Z",
+  "source_sha256": "b04ed2e20b510aa472fb6626bbde33d7e4d884972e53a570505faf3aaa772f5a",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
     ".ebook/external-links.lua",
-    ".ebook/extract-document-metadata.py",
+    ".ebook/extract-document-metadata.mjs",
     ".ebook/metadata.yaml",
+    ".ebook/package-lock.json",
+    ".ebook/package.json",
     ".ebook/pdf.css",
-    ".ebook/prune-editions.py",
+    ".ebook/prune-editions.mjs",
+    ".ebook/render-pdf.mjs",
     ".ebook/strip-document-metadata.lua",
     ".ebook/template.html",
+    ".ebook/verify-artifacts.mjs",
     "VERSION",
     "brand/logo/icon.png",
     "brand/logo/icon.svg",
@@ -63,30 +67,30 @@
     "docs/user/update-spec.md"
   ],
   "document_metadata": {
-    "docs/user/installation.md": {
-      "natureza": "normativo",
-      "escopo": "instalação do CLI e do framework em um projeto consumidor",
-      "autoridade": "interfaces públicas de `cli/` e `skills/`"
-    },
     "docs/user/getting-started.md": {
-      "natureza": "normativo",
+      "autoridade": "metodologia executável de `skills/`",
       "escopo": "primeira fatia de trabalho em um projeto consumidor",
-      "autoridade": "metodologia executável de `skills/`"
+      "natureza": "normativo"
+    },
+    "docs/user/installation.md": {
+      "autoridade": "interfaces públicas de `cli/` e `skills/`",
+      "escopo": "instalação do CLI e do framework em um projeto consumidor",
+      "natureza": "normativo"
     },
     "docs/user/milestones.md": {
-      "natureza": "guia de uso",
+      "autoridade": "uso público da capacidade de milestones",
       "escopo": "MVP, roadmap, specs e backlog de projetos consumidores",
-      "autoridade": "uso público da capacidade de milestones"
+      "natureza": "guia de uso"
     }
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.24.3.pdf",
-      "sha256": "eb9cc907d8d5fcdda32f6655e706592e39728c6719b21ba064a4666c1715b2d5"
+      "file": "Specsfy-Guia-do-Usuario-v0.25.0.pdf",
+      "sha256": "21240b483635f868a64246e78e5dc10dc4964f26955aff58808a93483201638f"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.24.3.epub",
-      "sha256": "425de4b2eabe3cd6f75d47563f76f55a6ca2cea7b178d548074b3a8302ae6f04"
+      "file": "Specsfy-Guia-do-Usuario-v0.25.0.epub",
+      "sha256": "1e2644f0c9e421f8a78b9397e3a1dc344d22af44a1527b089e5c745760a3a1fc"
     }
   }
 }

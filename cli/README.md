@@ -3,7 +3,8 @@
 <!-- markdownlint-disable MD033 -->
 <p align="center">
   <picture>
-    <source srcset="https://promovaweb.com/opensource/specsfy/icon.svg" type="image/svg+xml">
+    <source srcset="https://promovaweb.com/opensource/specsfy/icon.svg"
+    type="image/svg+xml">
     <img
       src="https://promovaweb.com/opensource/specsfy/icon.png"
       alt="Logo do Specsfy"
@@ -150,8 +151,10 @@ O bootstrap instala as treze skills base, incluindo `specsfy-01-inbox` e
 conversa e as de milestones,
 `specsfy-setup`,
 `specsfy-documentator` e as três skills `specsfy-aux-*`, publica as regras em
-`.specsfy/Spec.md`, os templates `Inbox.md`, `Backlog.md`, `Spec.md`, `Tasks.md`,
-`Project.md`, `Stack.md`, `Rules.md`, `Database.md`, `UserProfile.md`, `Interface.md` e
+`.specsfy/Spec.md`, os templates `Inbox.md`, `Backlog.md`, `Spec.md`,
+`Tasks.md`,
+`Project.md`, `Stack.md`, `Rules.md`, `Database.md`, `UserProfile.md`,
+`Interface.md` e
 `DESIGNSYSTEM.MD` em
 `.specsfy/templates/`, cria o diretório não gerenciado
 `.specsfy/templates/custom/`, publica um exemplo em
@@ -186,7 +189,8 @@ não existe em um projeto consumidor, o CLI cria o lock vazio compatível:
 ```
 
 O gerenciador lista exclusivamente `specsfy-setup`, `specsfy-documentator` e
-skills do catálogo base, `specsfy-aux-*` e `specsfy-specialist-*`. Skills externas
+skills do catálogo base, `specsfy-aux-*` e `specsfy-specialist-*`. Skills
+externas
 presentes no mesmo lock não aparecem na interface e nunca são removidas ou
 alteradas. O `.specsfy/skills-lock.json`
 mantém os fingerprints usados pelo Specsfy para impedir que uma atualização
@@ -241,7 +245,10 @@ valida o build e a correspondência da tag.
 
 Novas specs usam `specs/draft/<NNNN>-<slug>/spec.md`. Capturas imediatas ficam
 em `specs/inbox/<data-hora>-<slug>.md` e itens refináveis em
-`specs/backlog/<NNNN>-<slug>.md`. O dashboard mantém leitura do layout
+`specs/backlog/<NNNN>-<slug>.md`. `specsfy inbox process <captura> --spec <id>`
+move para `specs/inbox/processed/` a captura integralmente coberta por specs
+com Definition Gate aprovado, preservando o texto e atualizando os vínculos. O
+dashboard mantém leitura do layout
 legado. A skill de especificação renderiza cada arquivo novo a partir do
 template instalado. O CLI recusa instalação na raiz do monorepo oficial.
 

@@ -2,8 +2,9 @@
 
 set -euo pipefail
 
-readonly SCRIPT_DIRECTORY="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-readonly WORKSPACE_DIRECTORY="$(cd -- "${SCRIPT_DIRECTORY}/.." && pwd -P)"
+SCRIPT_DIRECTORY="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+WORKSPACE_DIRECTORY="$(cd -- "${SCRIPT_DIRECTORY}/.." && pwd -P)"
+readonly SCRIPT_DIRECTORY WORKSPACE_DIRECTORY
 readonly LOCAL_CLI_DIRECTORY="${WORKSPACE_DIRECTORY}/cli"
 readonly NPM_CLI_SOURCE="@promovaweb/specsfy@latest"
 
@@ -89,7 +90,7 @@ case ":${PATH}:" in
     *":${bin_directory}:"*)
         ;;
     *)
-        printf 'Aviso: adicione %s ao PATH para executar `specsfy` diretamente.\n' \
+        printf 'Aviso: adicione %s ao PATH para executar specsfy diretamente.\n' \
             "${bin_directory}" >&2
         ;;
 esac

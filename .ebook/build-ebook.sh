@@ -16,8 +16,8 @@ TEMPLATE="$SCRIPT_DIR/template.html"
 METADATA="$SCRIPT_DIR/metadata.yaml"
 LINK_FILTER="$SCRIPT_DIR/external-links.lua"
 METADATA_FILTER="$SCRIPT_DIR/strip-document-metadata.lua"
-METADATA_EXTRACTOR="$SCRIPT_DIR/extract-document-metadata.py"
-RETENTION_SCRIPT="$SCRIPT_DIR/prune-editions.py"
+METADATA_EXTRACTOR="$SCRIPT_DIR/extract-document-metadata.mjs"
+RETENTION_SCRIPT="$SCRIPT_DIR/prune-editions.mjs"
 LOGO_SVG="$ROOT/brand/logo/icon.svg"
 LOGO_PNG="$ROOT/brand/logo/icon.png"
 STYLE_GUIDE="$ROOT/brand/style-guide.html"
@@ -53,6 +53,10 @@ required_sources=(
   "$METADATA_FILTER"
   "$METADATA_EXTRACTOR"
   "$RETENTION_SCRIPT"
+  "$SCRIPT_DIR/verify-artifacts.mjs"
+  "$SCRIPT_DIR/render-pdf.mjs"
+  "$SCRIPT_DIR/package.json"
+  "$SCRIPT_DIR/package-lock.json"
   "$SCRIPT_DIR/build-ebook.sh"
   "$LOGO_SVG"
   "$LOGO_PNG"
@@ -119,128 +123,7 @@ check_manifest() {
   cmp -s "$EPUB_OUT" "$EPUB_ALIAS" || fail "ebook-specsfy.epub não corresponde à edição vigente."
 
   VERSION="$VERSION" SOURCE_SHA="$SOURCE_SHA" PDF_OUT="$PDF_OUT" \
-    EPUB_OUT="$EPUB_OUT" MANIFEST="$MANIFEST" python3 - <<'PY'
-import hashlib
-import json
-import os
-from pathlib import Path
-
-manifest = json.loads(Path(os.environ["MANIFEST"]).read_text(encoding="utf-8"))
-expected = {
-    "version": os.environ["VERSION"],
-    "edition": f"v{os.environ['VERSION']}",
-    "source_sha256": os.environ["SOURCE_SHA"],
-}
-for key, value in expected.items():
-    if manifest.get(key) != value:
-        raise SystemExit(
-            f"Erro: {key} desatualizado; execute make ebook."
-        )
-
-for kind, env_name in (("pdf", "PDF_OUT"), ("epub", "EPUB_OUT")):
-    path = Path(os.environ[env_name])
-    record = manifest.get("artifacts", {}).get(kind, {})
-    digest = hashlib.sha256(path.read_bytes()).hexdigest()
-    if record.get("file") != path.name or record.get("sha256") != digest:
-        raise SystemExit(
-            f"Erro: hash de {path.name} desatualizado; execute make ebook."
-        )
-PY
-  unzip -tqq "$EPUB_OUT" || fail "EPUB inválido: $(basename "$EPUB_OUT")"
-  while IFS= read -r entry; do
-    unzip -p "$EPUB_OUT" "$entry" | xmllint --noout - \
-      || fail "XML inválido no EPUB: $entry"
-  done < <(
-    unzip -Z1 "$EPUB_OUT" \
-      | grep -E '\.(xhtml|opf|ncx|xml)$'
-  )
-  PDF_OUT="$PDF_OUT" EPUB_OUT="$EPUB_OUT" python3 - <<'PY'
-import posixpath
-import subprocess
-import xml.etree.ElementTree as ET
-from urllib.parse import urlsplit
-from zipfile import ZipFile
-import os
-
-failures = []
-pdf_document = ET.fromstring(subprocess.run(
-    [
-        "pdftohtml",
-        "-xml",
-        "-hidden",
-        "-i",
-        os.environ["PDF_OUT"],
-        "-stdout",
-    ],
-    check=True,
-    text=True,
-    capture_output=True,
-).stdout)
-pdf_pages = {
-    node.attrib["number"]
-    for node in pdf_document.iter()
-    if node.tag == "page" and "number" in node.attrib
-}
-for node in pdf_document.iter():
-    target = node.attrib.get("href")
-    if not target:
-        continue
-    parsed = urlsplit(target)
-    if parsed.scheme or parsed.netloc:
-        failures.append(f"PDF -> link externo: {target}")
-    elif parsed.fragment and parsed.fragment not in pdf_pages:
-        failures.append(f"PDF -> página interna ausente: {target}")
-
-with ZipFile(os.environ["EPUB_OUT"]) as archive:
-    names = set(archive.namelist())
-    documents = {}
-    for name in sorted(
-        entry for entry in names if entry.endswith((".xhtml", ".html"))
-    ):
-        documents[name] = ET.fromstring(archive.read(name))
-    package = ET.fromstring(archive.read("EPUB/content.opf"))
-    identifier = package.find(
-        ".//{http://purl.org/dc/elements/1.1/}identifier"
-    )
-    if identifier is None or identifier.text != "urn:specsfy:guia-do-usuario":
-        failures.append("EPUB -> identificador não canônico")
-    document_ids = {
-        name: {
-            node.attrib["id"]
-            for node in document.iter()
-            if "id" in node.attrib
-        }
-        for name, document in documents.items()
-    }
-    for name, document in documents.items():
-        for node in document.iter():
-            target = node.attrib.get("href") or node.attrib.get("src")
-            if not target:
-                continue
-            parsed = urlsplit(target)
-            is_clickable = node.tag.endswith("}a")
-            if is_clickable and (parsed.scheme or parsed.netloc):
-                failures.append(f"{name} -> link externo: {target}")
-                continue
-            resolved = name
-            if parsed.path:
-                resolved = posixpath.normpath(
-                    posixpath.join(posixpath.dirname(name), parsed.path)
-                )
-                if resolved not in names:
-                    failures.append(f"{name} -> {target}")
-                    continue
-            if (
-                is_clickable
-                and parsed.fragment
-                and parsed.fragment not in document_ids.get(resolved, set())
-            ):
-                failures.append(f"{name} -> âncora ausente: {target}")
-if failures:
-    raise SystemExit(
-        "Erro: navegação inválida nos artefatos:\n" + "\n".join(failures)
-    )
-PY
+    EPUB_OUT="$EPUB_OUT" MANIFEST="$MANIFEST" node "$SCRIPT_DIR/verify-artifacts.mjs"
   echo "OK: edição v$VERSION sincronizada com docs/user/."
 }
 
@@ -250,14 +133,14 @@ if [ "${1:-}" = "--check" ]; then
 fi
 [ "$#" -eq 0 ] || fail "uso: ./.ebook/build-ebook.sh [--check]"
 
-for bin in pandoc weasyprint python3 unzip xmllint jq magick fc-match; do
+for bin in pandoc node unzip xmllint jq magick fc-match; do
   command -v "$bin" >/dev/null 2>&1 || fail "'$bin' não encontrado no PATH."
 done
 
 mkdir -p "$BUILD_ROOT"
 
 DOCUMENT_METADATA_JSON="$BUILD_ROOT/document-metadata.json"
-python3 "$METADATA_EXTRACTOR" \
+node "$METADATA_EXTRACTOR" \
   --root "$ROOT" \
   "${page_paths[@]}" > "$DOCUMENT_METADATA_JSON"
 jq -e 'type == "object"' "$DOCUMENT_METADATA_JSON" >/dev/null \
@@ -332,11 +215,7 @@ magick \
     --output "$HTML_OUT"
 )
 
-weasyprint \
-  "$HTML_OUT" \
-  "$PDF_OUT" \
-  --base-url "$ROOT" \
-  --stylesheet "$PDF_STYLE"
+node "$SCRIPT_DIR/render-pdf.mjs" "$HTML_OUT" "$PDF_OUT" "$PDF_STYLE"
 
 (
   cd "$DOCS_ROOT"
@@ -401,7 +280,7 @@ cp "$PDF_OUT" "$PDF_ALIAS"
 cp "$EPUB_OUT" "$EPUB_ALIAS"
 
 check_manifest
-python3 "$RETENTION_SCRIPT" \
+node "$RETENTION_SCRIPT" \
   --ebook-root "$EBOOK_ROOT" \
   --keep 5 \
   --protect-version "$VERSION"

@@ -52,8 +52,9 @@ não cria outra versão.
 ## Evidência
 
 - `cli/.agents/skills/specsfy-release-cli/SKILL.md`.
-- `cli/.agents/skills/specsfy-release-cli/scripts/release_changelog.py`.
-- `tests/test_cli_release_skill.py`.
+- `cli/.agents/skills/specsfy-release-cli/scripts/release-changelog.mjs`.
+- `tests/release-changelog.test.mjs`, `tests/release-documentation.test.mjs`
+  e `tests/release-bdd.test.mjs`.
 - testes e artefatos em `cli/`.
 
 ## Atualize quando

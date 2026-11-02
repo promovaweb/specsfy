@@ -511,8 +511,8 @@ export class SpecsfyTui {
         "#C4B5FD",
       ],
       [
-        `Itens · ${summary.pending_items} pendentes`,
-        `${summary.completed_items}/${summary.total_items}`,
+        `Itens de tarefa · ${summary.pending_task_items} pendentes`,
+        `${summary.completed_task_items}/${summary.total_task_items}`,
         "#03212A",
         "#37E1D0",
       ],
@@ -548,8 +548,9 @@ export class SpecsfyTui {
       padding: { left: 2, right: 2 },
       valign: "middle",
       content:
-        "Visão consolidada do andamento das especificações. " +
-        "Os números são recalculados quando os arquivos mudam.",
+        `Outros checkboxes: ${summary.total_other_items}. ` +
+        `Itens do ciclo sem tarefa: ${summary.orphan_checklist_items}. ` +
+        "Consulte os detalhes da spec para revisar as linhas indicadas.",
       style: {
         fg: TUI_THEME.text,
         bg: TUI_THEME.surface,
@@ -654,7 +655,7 @@ export class SpecsfyTui {
           `${spec.status.slice(0, 12).padEnd(12)} ` +
           `${`${spec.passed_gates}/${spec.total_gates}`.padEnd(7)} ` +
           `${`${spec.completed_tasks}/${spec.total_tasks}`.padEnd(8)} ` +
-          `${`${spec.completed_items}/${spec.total_items}`.padEnd(8)} ` +
+          `${`${spec.completed_task_items}/${spec.total_task_items}`.padEnd(8)} ` +
           `${progressBar(spec.percent)} ${spec.percent}%`,
       ),
       keys: true,
@@ -692,7 +693,9 @@ export class SpecsfyTui {
       content:
         `${spec.title} · Gates ${spec.passed_gates}/${spec.total_gates} · ` +
         `Tarefas ${spec.completed_tasks}/${spec.total_tasks} · ` +
-        `Checklist ${spec.completed_items}/${spec.total_items} · ${spec.percent}%\n` +
+        `Checklist ${spec.completed_task_items}/${spec.total_task_items} · ${spec.percent}%\n` +
+        `Outros checkboxes: ${spec.total_other_items} · Itens do ciclo sem tarefa: ${spec.orphan_checklist_lines.length}\n` +
+        (spec.orphan_checklist_lines.length ? `Revisar linhas ${spec.orphan_checklist_lines.join(", ")} com $specsfy-update-spec.\n` : "") +
         `${spec.path}\n\n${renderMarkdown(spec.content)}\n\n` +
         "Esc: voltar para a lista de specs",
       scrollable: true,

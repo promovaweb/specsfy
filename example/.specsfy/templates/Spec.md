@@ -6,10 +6,16 @@
 | ID | {{SPEC_ID}} |
 | Slug | {{SPEC_NUMBER}}-{{SPEC_SLUG}} |
 | Status | Draft |
+| Effort | 1 |
+| Effort updated at | {{CURRENT_DATE}} |
+| Effort rationale | Estimativa inicial; revisar durante a descoberta. |
+| ClickUp Task | |
+| Milestones | |
 | Definition Gate | Pending |
 | Plan Gate | Pending |
 | Delivery Gate | Pending |
 | Evidence Contract | 1 |
+| Interface para pessoas | A definir |
 | Atualizada em | {{CURRENT_DATE}} |
 
 ## Ato I — Definir
@@ -45,7 +51,7 @@
 
 #### Artefatos de pesquisa armazenados
 
-- `specs/specs/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/research/[fonte]/`: [origem, versão/data, licença quando aplicável e propósito], ou “Nenhum artefato externo”.
+- `specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/research/[fonte]/`: [origem, versão/data, licença quando aplicável e propósito], ou “Nenhum artefato externo”.
 - Toda fonte externa efetivamente consultada deve ter uma evidência local em `research/`; registre aqui o caminho e mantenha conclusões normativas no `spec.md`.
 
 #### Dúvidas respondidas
@@ -181,7 +187,7 @@ Feature: [capacidade observável]
 #### Estrutura de arquivos
 
 ```text
-specs/specs/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/
+specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/
   spec.md
   research/
 src/
@@ -207,6 +213,74 @@ tests/
 - [Estratégia ou “Não aplicável”.]
 
 ### 10. Interfaces e contratos
+
+#### Interface para pessoas
+
+- **Há interface para pessoas**: [Sim ou Não, com justificativa quando Não.]
+
+#### Stack e convenções de interface
+
+- [Framework, roteamento, componentes, estilos, formulários, testes, telas atuais afetadas e fontes locais observadas. Explique “A confirmar” quando a stack não definir a camada.]
+
+#### Telas e responsabilidades
+
+- [Tela, pessoa que a usa, tarefa principal, entrada e saída, ou “Não aplicável”.]
+
+#### Fluxo de informação e navegação
+
+- [Como a pessoa chega, consulta, altera, confirma, retorna ou recupera o contexto. Registre o `Breadcrumb` de cada tela com equipe, módulo e tela atual.]
+
+#### Menus e navegação principal
+
+- [Menu principal e menus secundários, seus itens, destinos ou rotas, permissões e comportamento responsivo. Se não houver menu, declare como a pessoa chega às telas e por que a navegação direta é suficiente.]
+
+#### Formulários e ações
+
+- [Campos, agrupamentos, obrigatoriedade, ajuda, validações, erros, ação principal e padrão: página, painel lateral, modal, área expandida ou outro.]
+
+#### Composição e disposição
+
+- [Hierarquia, navegação, `Breadcrumb` no shell, regiões da tela, densidade,
+  responsividade e componentes existentes.]
+- [Em aplicação Laravel, Laravel Octane com Open Swoole e `laravel/octane` são
+  obrigatórios. Registre `--server=swoole`, o healthcheck e o reload dos
+  workers persistentes.]
+
+#### Blocos React e componentes selecionados
+
+| Tela | Bloco React | Responsabilidade | Arquivo previsto | Componente ou composição | Origem | Reuso ou extensão |
+| --- | --- | --- | --- | --- | --- |
+| [Tela] | [Bloco] | [O que concentra] | [Caminho] | [Nome] | [shadcn/ui, ReUI ou próprio] | [Bloco existente ou novo, com motivo] |
+
+- [Para Laravel com React, shadcn/ui e ReUI são obrigatórios: escolha as
+  primitives shadcn/ui e as composições ReUI gratuitas `@reui/c-*` desta
+  entrega. Registre também cada bloco próprio que compõe a tela.]
+- [A lista deve corresponder a `INTERFACE.md`; não usar somente nomes de
+  bibliotecas sem informar os componentes selecionados.]
+
+#### Estados e acessibilidade
+
+- [Loading, vazio, erro, sucesso, permissão insuficiente, teclado, foco e tecnologia assistiva.]
+- [O `Breadcrumb` mantém a equipe visível, usa links válidos nos itens
+  anteriores e marca a tela atual com semântica de página.]
+
+#### Contrato CRUD
+
+- [Quando houver CRUD, todas as telas usam o mesmo `PageHeader` componentizado
+  e reutilizável para lista, detalhe, criação e edição.]
+- [A listagem usa `DataGrid` em largura total, mantém a coluna `ID` visível,
+  transforma a linha inteira em link para o detalhe e oferece botões
+  independentes de editar e apagar.]
+- [Registre em `INTERFACE.md` os componentes reaproveitados e os novos, com
+  seus consumidores, estados e regra de extensão.]
+
+#### Revisão visual durante o desenvolvimento
+
+- [A revisão visual ocorre durante a implementação, mesmo sem pedido da
+  pessoa, e confere bordas, espaçamentos, margens, padding e tipografia do
+  sistema nos estados e viewports relevantes.]
+- [Registre método, viewport, estados, achados e ajustes na tarefa. Para uma
+  tarefa sem interface, registre `Não aplicável` e o motivo concreto.]
 
 #### APIs expostas
 
@@ -258,7 +332,7 @@ tests/
 #### Gate do Ato I — Definição
 
 - **Resultado**: Pending
-- **Comando**: `python3 .agents/skills/specsfy-04-validate/scripts/validate_spec.py specs/specs/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
+- **Comando**: `node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
 - **Achados**: [Pending.]
 - Findings especializados, quando aplicáveis, seguem `FIND-PROD|ARCH|SEC-NNN`,
   severidade `P1|P2|P3`, estado `Open|Resolved|Accepted`, refs e evidência.
@@ -266,13 +340,13 @@ tests/
 #### Gate do Ato II — Plano
 
 - **Resultado**: Pending
-- **Comando**: `python3 .agents/skills/specsfy-05-tasks/scripts/validate_tasks.py specs/specs/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
+- **Comando**: `node .agents/skills/specsfy-05-tasks/scripts/validate_tasks.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md`
 - **Achados**: [Pending.]
 
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Pending
-- **Comando**: `python3 .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.py specs/specs/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md .`
+- **Comando**: `node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md .`
 - **Achados**: [Pending.]
 
 ### 14. Tarefas
@@ -286,6 +360,7 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
   - [ ] **PREP**: Confirmar escopo, IDs, dependências e baseline.
   - [ ] **EXECUTE**: Produzir a entrega no caminho declarado.
   - [ ] **VERIFY**: Executar a verificação focal adequada.
+  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia do sistema; se não houver interface, registrar `Não aplicável` e o motivo.
   - [ ] **EVIDENCE**: Registrar comando, resultado e IDs nas seções 11–13.
   - [ ] **IMPROVE**: Registrar melhoria aplicada ou ausência justificada.
 ```
@@ -296,6 +371,7 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
   - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível de teste.
   - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
   - [ ] **VERIFY**: Observar RED válido.
+  - [ ] **VISUAL**: Conferir a interface afetada ou registrar `Não aplicável` porque a tarefa só materializa teste.
   - [ ] **EVIDENCE**: Registrar comando e causa do RED.
   - [ ] **IMPROVE**: Revisar a cobertura e registrar aprendizado.
 
@@ -303,6 +379,7 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
   - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível de teste.
   - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
   - [ ] **VERIFY**: Observar RED válido.
+  - [ ] **VISUAL**: Conferir a interface afetada ou registrar `Não aplicável` porque a tarefa só materializa teste.
   - [ ] **EVIDENCE**: Registrar comando e causa do RED.
   - [ ] **IMPROVE**: Revisar a cobertura e registrar aprendizado.
 
@@ -310,6 +387,7 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
   - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível de teste.
   - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
   - [ ] **VERIFY**: Observar RED válido.
+  - [ ] **VISUAL**: Conferir a interface afetada ou registrar `Não aplicável` porque a tarefa só materializa teste.
   - [ ] **EVIDENCE**: Registrar comando e causa do RED.
   - [ ] **IMPROVE**: Revisar a cobertura e registrar aprendizado.
 
@@ -322,24 +400,37 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
   - [ ] **PREP**: Confirmar RED TDD e dependências.
   - [ ] **EXECUTE**: Implementar a menor mudança.
   - [ ] **VERIFY**: Executar testes focais e regressão.
+  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia do sistema na interface afetada; registrar `Não aplicável` com motivo quando não houver superfície visual.
   - [ ] **EVIDENCE**: Registrar GREEN e arquivos alterados.
   - [ ] **IMPROVE**: Aplicar melhoria de processo ou justificar nenhuma.
   <!-- specsfy:evidence {"task":"T004","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["app/Services/RecursoService.php"],"commands":[{"run":"comando focal","exit":0}]} -->
 
 **Checkpoint**: [como demonstrar a história isoladamente].
 
+#### Fase de interface
+
+- [ ] T005 [CODE] [US-001] Implementar a tela de [responsabilidade] em src/features/recurso/ListaRecurso.tsx — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
+  - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10; em React, carregar `$specsfy-specialist-react-ui-components` antes de escrever JSX ou TSX.
+  - [ ] **EXECUTE**: Implementar os blocos React, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `INTERFACE.md`.
+  - [ ] **VERIFY**: Exercitar Breadcrumb, navegação, validações, feedback e teclado.
+  - [ ] **VISUAL**: Conferir PageHeader reutilizado, DataGrid em largura total, coluna `ID`, link da linha, ações de editar e apagar, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes.
+  - [ ] **EVIDENCE**: Registrar arquivos, comando e resultado da interação.
+  - [ ] **IMPROVE**: Aplicar melhoria de interface ou justificar nenhuma.
+  <!-- specsfy:evidence {"task":"T005","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["src/features/recurso/ListaRecurso.tsx"],"commands":[{"run":"comando focal","exit":0}]} -->
+
 #### Fase final — Qualidade
 
-- [ ] T005 [TEST] Executar regressão e rastreabilidade em tests/Feature/RecursoTest.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T004
+- [ ] T006 [TEST] Executar regressão e rastreabilidade em tests/Feature/RecursoTest.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T004, T005
   - [ ] **PREP**: Identificar suites, checks e gates.
   - [ ] **EXECUTE**: Executar regressão e rastreabilidade.
   - [ ] **VERIFY**: Confirmar ausência de gaps.
+  - [ ] **VISUAL**: Repassar a conferência visual final ou registrar `Não aplicável` com motivo concreto.
   - [ ] **EVIDENCE**: Registrar contagens e comandos finais.
   - [ ] **IMPROVE**: Registrar retrospectiva do processo.
 
 ### 15. Ordem de execução
 
-- Caminho crítico: T001/T002/T003 → T004 → T005.
+- Caminho crítico: T001/T002/T003 → T004 → T005 → T006.
 - Tarefas paralelas: [IDs e motivo, ou “Nenhuma”.]
 - Estratégia de MVP: [menor conjunto de histórias entregável].
 

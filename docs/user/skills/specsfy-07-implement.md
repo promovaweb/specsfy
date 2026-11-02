@@ -68,6 +68,36 @@ Durante o aceite final, `--delivery` também recusa qualquer tarefa
 Depois de cada tarefa de código, a skill chama o documentador do projeto
 consumidor. A execução só continua quando `docs/` estiver atualizado.
 
+## Runner próprio de migrations
+
+Se o projeto aplica migrations com um script próprio, declare os comandos em
+`.specsfy/migrations.json`, na raiz do projeto consumidor. Assim, você pode
+registrar os comandos realmente executados sem editar o validador instalado.
+Por exemplo, para um script Node com ações `apply` e `status`:
+
+```json
+{
+  "apply": ["^node scripts/migrate\\.mjs apply$"],
+  "status": ["^node scripts/migrate\\.mjs status$"]
+}
+```
+
+Cada lista contém expressões regulares JavaScript sem flags. No exemplo,
+`apply` reconhece a aplicação e `status` reconhece a consulta do estado.
+Adapte os padrões aos comandos do seu projeto, incluindo os argumentos usados
+no banco de teste. Prefira padrões específicos: uma expressão como `.*`
+aceitaria qualquer comando como comprovação.
+
+As duas listas precisam conter pelo menos uma expressão válida e não vazia.
+JSON inválido ou padrão inválido faz a validação falhar com o caminho do
+arquivo no diagnóstico. Os comandos nativos de migrations continuam aceitos.
+O arquivo da migration precisa existir e os comandos registrados precisam ter
+saída zero; declarar um runner não executa migrations nem comprova que o banco
+foi atualizado. O comentário `specsfy:evidence` deve refletir a execução real.
+
+Ao atualizar a stack, `specsfy-aux-stack` registra a presença dessa configuração
+em `.specsfy/STACK.md` e preserva o conteúdo de `migrations.json`.
+
 ## O que esperar
 
 - uma tarefa por vez.

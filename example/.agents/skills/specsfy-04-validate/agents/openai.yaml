@@ -1,4 +1,4 @@
 interface:
-  display_name: "04 · Validar"
+  display_name: "Specsfy - 04 - Validar"
   short_description: "Audita clareza e completude da especificação"
-  default_prompt: "Use $specsfy-04-validate para auditar specs/specs/<NNNN>-<slug>/spec.md, seu research/ e os gates antes das tarefas. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."
+  default_prompt: "Use $specsfy-04-validate para auditar specs/<estado>/<NNNN>-<slug>/spec.md, seu research/ e os gates antes das tarefas. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."

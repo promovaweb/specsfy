@@ -14,6 +14,8 @@ evidências da entrega.
 ```text
 specs/
 ├── inbox/
+│   ├── processed/
+│   │   └── 2026-06-10-091500-ideia-ja-especificada.md
 │   └── 2026-07-28-143205-ideia.md
 ├── backlog/
 │   └── 0001-ideia.md
@@ -103,8 +105,9 @@ regras detalhadas, aceite e solução técnica podem ser refinados depois.
 
 ### Duplicatas e referências
 
-Antes de criar, a skill pesquisa termos da ideia em `specs/backlog/*.md`,
-`specs/<estado>/*/spec.md` e `docs/**/*.md`. Ela separa possível duplicata de
+Antes de criar, a skill pesquisa termos da ideia em `specs/inbox/*.md`,
+`specs/inbox/processed/*.md`, `specs/backlog/*.md`, `specs/<estado>/*/spec.md`
+e `docs/**/*.md`. Ela separa possível duplicata de
 backlog relacionado, spec relacionada ou documentação útil.
 
 Uma possível duplicata exige confirmar se o item existente será atualizado ou

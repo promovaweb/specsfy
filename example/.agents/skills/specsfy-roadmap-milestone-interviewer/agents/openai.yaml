@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Entrevista de roadmap"
+  short_description: "Planeja milestones pós-MVP"
+  default_prompt: "Use $specsfy-roadmap-milestone-interviewer para entrevistar a evolução pós-MVP e propor milestones sem alterar o núcleo aceito sem confirmação."

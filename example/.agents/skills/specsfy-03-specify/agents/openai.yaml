@@ -1,4 +1,4 @@
 interface:
-  display_name: "03 · Especificar"
+  display_name: "Specsfy - 03 - Especificar"
   short_description: "Inicializa e refina specs numeradas"
   default_prompt: "Use $specsfy-03-specify para iniciar uma spec numerada no diretório atual e consolidar seus requisitos. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."

@@ -11,6 +11,7 @@ import { stdin, stdout } from "node:process";
 import { Catalog } from "./catalog.js";
 import { clickUpfyHandoff } from "./clickupfy.js";
 import { loadConfig, updateConfig } from "./config.js";
+import { processInboxCapture } from "./inbox.js";
 import { SkillInstaller } from "./installer.js";
 import {
   migrateSpecs,
@@ -261,6 +262,29 @@ export function buildProgram(): Command {
       }
     });
 
+  const inbox = program
+    .command("inbox")
+    .description("mantém a fila ativa de capturas em specs/inbox/");
+  inbox
+    .command("process")
+    .description("retira da fila ativa uma captura coberta por specs com Definition Gate aprovado")
+    .argument("<captura>", "arquivo .md em specs/inbox/, por nome ou caminho")
+    .requiredOption("--spec <id>", "spec que cobre a captura; pode ser repetida", collect, [])
+    .addOption(projectOption())
+    .option("--json", "emite resultado JSON")
+    .action(async (
+      capture: string,
+      options: ProjectOptions & { spec: string[]; json?: boolean },
+    ) => {
+      const result = await processInboxCapture(options.project, capture, options.spec);
+      if (options.json) console.log(JSON.stringify(result));
+      else {
+        console.log(`${result.name}\t${result.from} → ${result.to}\t${result.status}`);
+        for (const spec of result.specs) console.log(`Spec\t${spec.identifier}\t${spec.path}`);
+        for (const path of result.updated_references) console.log(`Referência\t${path}`);
+      }
+    });
+
   program
     .command("progress")
     .description("exibe progresso das specs")
@@ -431,15 +455,20 @@ function printProgress(
   console.log(
     `Resumo\t${summary.total_specs} specs\t` +
       `${summary.completed_tasks}/${summary.total_tasks} tarefas\t` +
-      `${summary.completed_items}/${summary.total_items} itens\t` +
+      `${summary.completed_task_items}/${summary.total_task_items} itens de tarefa\t` +
+      `${summary.total_other_items} outros checkboxes\t` +
       `${summary.percent}%`,
   );
   for (const spec of specs) {
     console.log(
       `${spec.slug}\t${spec.status}\t` +
         `${spec.completed_tasks}/${spec.total_tasks} tarefas\t` +
-        `${spec.completed_items}/${spec.total_items} itens\t${spec.percent}%`,
+        `${spec.completed_task_items}/${spec.total_task_items} itens de tarefa\t` +
+        `${spec.total_other_items} outros checkboxes\t${spec.percent}%`,
     );
+    if (spec.orphan_checklist_lines.length) {
+      console.log(`Aviso: ${spec.slug} possui itens do ciclo sem tarefa nas linhas ${spec.orphan_checklist_lines.join(", ")}. Revise com $specsfy-update-spec.`);
+    }
   }
 }
 

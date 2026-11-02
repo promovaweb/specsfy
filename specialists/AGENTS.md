@@ -28,15 +28,12 @@ cria specs, avança gates ou é instalada automaticamente na raiz do monorepo.
 
 ## Desenvolvimento
 
-Inicialize novas skills com `init_skill.py`, escreva o contrato em
+Use `templates/SKILL.template.md` para novas skills, escreva o contrato em
 `tests/`, observe RED, implemente e valide:
 
 ```bash
-python3 -B -m unittest discover -s tests -p 'test_*.py'
-uv run --quiet --with behave behave tests/features --no-capture
-uv run --quiet --with pyyaml python \
-  /home/luizeof/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
-  specsfy-specialist-<nome>
+node --test tests/*.test.mjs
+node ../scripts/validate-skills.mjs specsfy-specialist-<nome>
 ```
 
-Use `python3 -B` para não criar caches. Revise o diff do módulo a partir da raiz Git única.
+Execute os comandos com Node.js. Revise o diff a partir da raiz Git única.
