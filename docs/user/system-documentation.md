@@ -42,8 +42,11 @@ implementação só continua quando `docs/` representar o código atual.
 
 A skill lê o código completo e as fontes que descrevem a aplicação. Isso inclui
 os manifests, as migrations, as rotas e os testes, além das informações
-permanentes do projeto. Cada execução reconstrói blocos delimitados nos
-seguintes arquivos e preserva o texto humano externo:
+permanentes do projeto. Quando o projeto está no Git, a leitura ignora tudo o
+que o `.gitignore` ignora, como pastas de build e saídas de teste; assim, rodar
+o build ou os testes não deixa a documentação desatualizada. Cada execução
+reconstrói blocos delimitados nos seguintes arquivos e preserva o texto humano
+externo:
 
 | Arquivo no consumidor | Conteúdo |
 | --- | --- |

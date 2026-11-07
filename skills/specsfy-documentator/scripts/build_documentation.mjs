@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /** Reconstrói documentação técnica a partir do código existente, sem sobrescrever notas humanas. */
-import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { existsSync, statSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, extname, join, relative, resolve } from "node:path";
 
@@ -14,15 +15,28 @@ const blank = "Finalidade não descrita nos metadados locais.";
 
 async function json(path) { try { return JSON.parse(await readFile(path, "utf8")); } catch { return {}; } }
 async function text(path) { try { return await readFile(path, "utf8"); } catch { return ""; } }
+const skip = (name) => ignored.has(name) || name.startsWith("venv_");
 async function walk(folder) {
   const output = [];
   for (const entry of await readdir(folder, { withFileTypes: true })) {
-    if (ignored.has(entry.name) || entry.name.startsWith("venv_")) continue;
+    if (skip(entry.name)) continue;
     const path = join(folder, entry.name);
     if (entry.isDirectory()) output.push(...await walk(path)); else output.push(path);
   }
   return output;
 }
+/** Lista arquivos rastreados e não ignorados pelo Git; devolve null fora de um repositório. */
+function gitFiles(folder) {
+  const result = spawnSync("git", ["-C", folder, "ls-files", "-z", "--cached", "--others", "--exclude-standard"], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+  if (result.error || result.status !== 0) return null;
+  const isFile = (path) => { try { return statSync(path).isFile(); } catch { return false; } };
+  return [...new Set(result.stdout.split("\0").filter(Boolean))]
+    .filter((local) => !local.split("/").some(skip))
+    .map((local) => join(folder, ...local.split("/")))
+    .filter(isFile);
+}
+/** Prefere o Git, que respeita o .gitignore do projeto; a lista fixa vale nos dois caminhos. */
+async function sourceFiles(folder) { return (gitFiles(folder) ?? await walk(folder)).sort(); }
 function table(headers, rows) {
   return `| ${headers.join(" | ")} |\n| ${headers.map(() => "---").join(" | ")} |\n${rows.map((row) => `| ${row.map((value) => String(value ?? "—").replaceAll("|", "\\|").replaceAll("\n", " ")).join(" | ")} |`).join("\n")}`;
 }
@@ -53,7 +67,7 @@ if (!existsSync(project)) {
   console.error(`projeto inexistente: ${project}`);
   process.exitCode = 2;
 } else {
-  const files = await walk(project);
+  const files = await sourceFiles(project);
   const manifests = files.filter((path) => path.endsWith("package.json"));
   const rootPackage = await json(join(project, "package.json"));
   const composer = await json(join(project, "composer.json"));

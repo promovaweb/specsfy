@@ -3,6 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { ROOT, read, temporary, put, node } from '../../tests/helpers.mjs';
 
 const expected = ['README.md', 'architecture.md', 'application.md', 'database.md', 'flows.md', 'testing.md', 'frontend.md', 'packages.md', 'integrations.md', 'decisions.md'].sort();
@@ -84,6 +85,44 @@ test('registra pacotes diretos, transitivos e legados com descrições e atualiz
   const stale = run(root, '--check');
   assert.equal(stale.status, 1, stale.stdout + stale.stderr);
   includes(stale.stderr, ['.specsfy/PACKAGES.md']);
+});
+
+const git = (root, ...args) => assert.equal(spawnSync('git', ['-C', root, ...args], { encoding: 'utf8' }).status, 0, args.join(' '));
+const astroBuild = root => {
+  put(root, '.teste/completo/_astro/index.Bx1.js', 'export function Saida(){}\n');
+  put(root, '.teste/completo/_astro/index.Cy2.css', ':root { --gerado: 1px; }\n');
+  put(root, '.astro/types.d.ts', 'declare module "astro:content" {}\n');
+  put(root, '.astro/content.d.ts', 'export interface Gerado {}\n');
+};
+const excludes = (text, terms) => terms.forEach(term => assert.ok(!text.includes(term), term));
+
+test('respeita o .gitignore e ignora saídas de build e teste fora da lista fixa', t => {
+  const root = temporary(t);
+  git(root, 'init', '-q');
+  put(root, '.gitignore', '.teste/\n.astro/\n');
+  json(root, 'package.json', { dependencies: { astro: '^5.0' } });
+  put(root, 'src/pages/index.astro', '---\nconst titulo = "Início";\n---\n<h1>{titulo}</h1>\n');
+  put(root, 'src/components/Cabecalho.astro', '<header>Cabeçalho</header>\n');
+  git(root, 'add', 'package.json', '.gitignore', 'src/pages/index.astro');
+  astroBuild(root);
+  successful(run(root));
+  const output = combined(root);
+  includes(output, ['src/pages/index.astro', 'src/components/Cabecalho.astro']);
+  excludes(output, ['.teste/', '.astro/', '_astro', 'types.d.ts', '--gerado']);
+  put(root, '.teste/completo/_astro/outra.Dz3.js', 'export function Nova(){}\n');
+  successful(run(root, '--check'));
+});
+
+test('usa a lista fixa como reserva quando o projeto não está no Git', t => {
+  const root = temporary(t);
+  json(root, 'package.json', { dependencies: { astro: '^5.0' } });
+  put(root, 'src/pages/index.astro', '<h1>Início</h1>\n');
+  put(root, 'dist/index.js', 'export function Construido(){}\n');
+  put(root, 'node_modules/astro/index.js', 'export function Dependencia(){}\n');
+  successful(run(root));
+  const output = combined(root);
+  includes(output, ['src/pages/index.astro']);
+  excludes(output, ['dist/index.js', 'node_modules/astro', 'Construido', 'Dependencia']);
 });
 
 test('skill documental é independente e obrigatória após implementação', () => {

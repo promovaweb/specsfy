@@ -4,6 +4,16 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- `$specsfy-documentator` respeita o `.gitignore` do projeto. Dentro de um
+  repositório Git, `build_documentation.mjs` lê a lista de
+  `git ls-files --cached --others --exclude-standard` e mantém a lista fixa de
+  pastas como reserva fora do Git. Saídas de build e de teste, como `.astro/`
+  e `.teste/` de projetos Astro, deixam de entrar em `docs/application.md` e
+  `docs/frontend.md`, e o `--check` não acusa documentação desatualizada a cada
+  build de teste.
+
 ## [0.25.0] - 2026-11-02
 
 ### Adicionado

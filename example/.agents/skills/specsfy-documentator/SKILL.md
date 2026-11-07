@@ -74,6 +74,9 @@ páginas, rotas de API, componentes, módulos, scripts e Vitest/Jest/Node Test.
 ## Limites
 
 - Não copiar segredos, valores de `.env`, dados de produção ou código inteiro.
+- Não documentar arquivos ignorados pelo Git. Dentro de um repositório, o script
+  lê somente arquivos rastreados ou não ignorados pelo `.gitignore`; fora dele,
+  usa a lista fixa de pastas geradas.
 - Não apresentar heurística como decisão confirmada.
 - Não substituir specs, `PROJECT.md` ou arquivos humanos em `.specsfy/`.
   `PACKAGES.md` é a única projeção reconstruída pela skill nesse diretório e
