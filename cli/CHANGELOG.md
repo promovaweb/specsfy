@@ -4,6 +4,8 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-11-11
+
 ### Alterado
 
 - As 19 skills base foram reescritas para agentes atuais da OpenAI e da
