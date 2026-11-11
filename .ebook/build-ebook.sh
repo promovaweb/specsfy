@@ -95,14 +95,14 @@ while IFS= read -r relative; do
     || fail "página não ordenada em docs/user/reading-order.txt: $relative"
 done < <(
   find "$DOCS_ROOT" -type f -name '*.md' -print0 \
-    | sort -z \
+    | LC_ALL=C sort -z \
     | xargs -0 -r realpath --relative-to="$ROOT"
 )
 
 source_files=()
 while IFS= read -r -d '' source; do
   source_files+=("$source")
-done < <(find "$DOCS_ROOT" -type f -print0 | sort -z)
+done < <(find "$DOCS_ROOT" -type f -print0 | LC_ALL=C sort -z)
 source_files+=("${required_sources[@]}")
 
 SOURCE_SHA="$(
@@ -242,7 +242,7 @@ node "$SCRIPT_DIR/render-pdf.mjs" "$HTML_OUT" "$PDF_OUT" "$PDF_STYLE"
 sources_json="$(
   printf '%s\n' "${source_files[@]}" \
     | while IFS= read -r source; do relative_path "$source"; done \
-    | sort -u \
+    | LC_ALL=C sort -u \
     | jq -R . \
     | jq -s .
 )"

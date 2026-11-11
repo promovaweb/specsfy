@@ -4,6 +4,16 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.26.1] - 2026-11-11
+
+### Corrigido
+
+- O hash das fontes do ebook (`source_sha256` em `ebook/build.json`) deixa de
+  depender do idioma do sistema. `build-ebook.sh` ordena `docs/user/` com
+  `LC_ALL=C`, e o manifesto gerado numa máquina em `en_US.UTF-8` passa na
+  verificação do CI, que roda com a ordenação C. Com isso, o job da tag volta a
+  publicar `@promovaweb/specsfy` no npm.
+
 ## [0.26.0] - 2026-11-11
 
 ### Alterado

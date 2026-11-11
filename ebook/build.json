@@ -1,13 +1,28 @@
 {
   "schema_version": 1,
-  "version": "0.26.0",
-  "edition": "v0.26.0",
-  "generated_at": "2026-11-11T08:20:15Z",
-  "source_sha256": "79e18c9ce793a3ffee87b5c07e3a802cbaab7b699bbb90d3b7a49328873ea12d",
+  "version": "0.26.1",
+  "edition": "v0.26.1",
+  "generated_at": "2026-11-11T08:23:21Z",
+  "source_sha256": "4a3698df6be72be83225b2ebd5cb541af04c0a496dacd89ae65d20450fc31f02",
   "sources": [
+    ".ebook/build-ebook.sh",
+    ".ebook/epub.css",
+    ".ebook/external-links.lua",
+    ".ebook/extract-document-metadata.mjs",
+    ".ebook/metadata.yaml",
+    ".ebook/package-lock.json",
+    ".ebook/package.json",
+    ".ebook/pdf.css",
+    ".ebook/prune-editions.mjs",
+    ".ebook/render-pdf.mjs",
+    ".ebook/strip-document-metadata.lua",
+    ".ebook/template.html",
+    ".ebook/verify-artifacts.mjs",
+    "VERSION",
     "brand/logo/icon.png",
     "brand/logo/icon.svg",
     "brand/style-guide.html",
+    "docs/user/README.md",
     "docs/user/advanced-usage.md",
     "docs/user/assets/cli/cli-backlogs.png",
     "docs/user/assets/cli/cli-dash.png",
@@ -15,24 +30,23 @@
     "docs/user/assets/cli/cli-specs.png",
     "docs/user/astro.md",
     "docs/user/backlog.md",
-    "docs/user/cli.md",
     "docs/user/cli-reference.md",
+    "docs/user/cli.md",
     "docs/user/credits.md",
-    "docs/user/deploy.md",
     "docs/user/deploy-operations.md",
     "docs/user/deploy-vault.md",
+    "docs/user/deploy.md",
     "docs/user/design-system.md",
     "docs/user/getting-started.md",
     "docs/user/inbox.md",
     "docs/user/installation.md",
     "docs/user/laravel.md",
-    "docs/user/method.md",
     "docs/user/method-reference.md",
+    "docs/user/method.md",
     "docs/user/milestones.md",
     "docs/user/nextjs.md",
     "docs/user/project-context.md",
     "docs/user/reading-order.txt",
-    "docs/user/README.md",
     "docs/user/skills/README.md",
     "docs/user/skills/specsfy-01-inbox.md",
     "docs/user/skills/specsfy-02-backlog.md",
@@ -50,21 +64,7 @@
     "docs/user/skills/specsfy-update-spec.md",
     "docs/user/specialists.md",
     "docs/user/system-documentation.md",
-    "docs/user/update-spec.md",
-    ".ebook/build-ebook.sh",
-    ".ebook/epub.css",
-    ".ebook/external-links.lua",
-    ".ebook/extract-document-metadata.mjs",
-    ".ebook/metadata.yaml",
-    ".ebook/package.json",
-    ".ebook/package-lock.json",
-    ".ebook/pdf.css",
-    ".ebook/prune-editions.mjs",
-    ".ebook/render-pdf.mjs",
-    ".ebook/strip-document-metadata.lua",
-    ".ebook/template.html",
-    ".ebook/verify-artifacts.mjs",
-    "VERSION"
+    "docs/user/update-spec.md"
   ],
   "document_metadata": {
     "docs/user/getting-started.md": {
@@ -85,12 +85,12 @@
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.26.0.pdf",
-      "sha256": "96f4417189803ddf07ca8a2819c74a02aafc7502669ccda4579590076dc8328a"
+      "file": "Specsfy-Guia-do-Usuario-v0.26.1.pdf",
+      "sha256": "1640471d462fb08c25e473c9bec216fa00e88c787f34d227b43acb5abd55ec88"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.26.0.epub",
-      "sha256": "2d4e313b023ba8887588cd2be99b7d4a21f2134d5db3ad45e0fb9cbda2533830"
+      "file": "Specsfy-Guia-do-Usuario-v0.26.1.epub",
+      "sha256": "a681a58977ba0496b59106b396f2a803260f5aab87b33789c307331208232497"
     }
   }
 }
