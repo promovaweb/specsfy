@@ -4,6 +4,17 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.26.2] - 2026-11-11
+
+### Corrigido
+
+- O manifesto do ebook volta a refletir as fontes atuais. A 0.26.1 alterou
+  `.ebook/build-ebook.sh`, que também entra no `source_sha256`, sem regenerar o
+  ebook; o CI da tag v0.26.1 falhou e o pacote não chegou ao npm. A 0.26.2
+  regenera a edição e substitui a 0.26.1.
+- A validação da ordem de leitura em `build-ebook.sh` também ordena com
+  `LC_ALL=C`.
+
 ## [0.26.1] - 2026-11-11
 
 ### Corrigido
