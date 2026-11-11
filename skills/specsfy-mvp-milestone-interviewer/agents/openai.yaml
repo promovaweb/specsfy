@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Entrevista de MVP"
   short_description: "Importa requisitos técnicos do MVP"
-  default_prompt: "Use $specsfy-mvp-milestone-interviewer para importar o MVP como M01 e gerar backlogs e specs Draft somente para requisitos de desenvolvimento, sem criar Inboxes nem copiar o contexto de negócio."
+  default_prompt: "Use $specsfy-mvp-milestone-interviewer para importar o MVP.md como M01, gerar backlog e spec Draft somente para requisitos de desenvolvimento, entrevistar cada backlog importado e manter o contexto de negócio apenas no MVP.md, sem criar Inboxes para temas contextuais."

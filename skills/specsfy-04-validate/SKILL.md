@@ -1,9 +1,15 @@
 ---
 name: specsfy-04-validate
-description: "Use quando o usuário pede para validar, revisar, auditar ou checar se `specs/{id}-{slug}/spec.md` segue o formato rígido Specsfy/2.0 e está pronto para planejar. Use também quando uma transição automática pedir prova do Definition Gate ou nova validação após correção. Use antes do Ato II. Registre gates na seção 13 do mesmo arquivo; não crie checklist, relatório, plan.md ou outro artefato."
+description: "Audita se a spec.md da fatia segue o formato Specsfy/2.0 e está pronta para planejar, registra o Definition Gate na seção 13 e conduz o aceite final em review. Use quando o usuário pedir para validar, revisar, auditar ou checar uma spec, quando uma transição automática pedir prova do Definition Gate, nova validação após correção ou aceite da entrega. Não decide requisitos nem cria checklist, relatório ou plan.md: lacunas de decisão vão para specsfy-02-backlog, correções de spec aprovada para specsfy-update-spec e o planejamento para specsfy-05-tasks."
 ---
 
 # Validar a especificação
+
+Esta skill prova, com scripts e revisão semântica, que a `spec.md` está clara,
+completa, consistente e testável antes do Ato II. Trate a spec como código em
+linguagem natural: confira primeiro o formato rígido e depois o significado. O
+resultado fica registrado no próprio arquivo, que continua sendo a única fonte
+da verdade.
 
 ## Preparação obrigatória
 
@@ -16,11 +22,19 @@ pendência.
 
 Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+`Contrato de perguntas numeradas` de `.specsfy/Spec.md`. A pergunta típica
+desta skill é qual spec validar quando houver várias e nenhum slug informado.
 
-Trate `spec.md` como a única fonte da verdade e como código em linguagem
-natural: verifique primeiro o formato rígido, depois clareza, completude,
-consistência e testabilidade semanticamente.
+## Pronto quando
+
+- `validate_spec.mjs` roda sem falha estrutural (com `--allow-draft` durante a
+  análise e sem ele quando o gate passa);
+- o resultado é exatamente `READY` ou `NOT READY`, com contagens, cobertura
+  mínima e os três achados mais importantes;
+- `Gate do Ato I — Definição` na seção 13 registra resultado, data e achados, e
+  os campos de `Status` e gates refletem esse resultado;
+- em `READY`, a spec foi movida com `specsfy transition <id> defined`, as
+  capturas esgotadas saíram da fila e `$specsfy-05-tasks` foi carregada.
 
 ## Orquestrar a conversa
 
@@ -38,55 +52,62 @@ exigindo autorização específica.
 
 ## Executar a validação
 
+Leia em paralelo a spec, o índice `Artefatos de pesquisa armazenados`, os
+arquivos de `research/` e `references/quality-gates.md`. Os passos abaixo são
+sequenciais.
+
 1. Resolva `specs/<estado>/<NNNN>-<slug>/spec.md` pelo caminho informado; se
    houver várias specs e nenhum slug, pergunte qual validar.
 2. Confirme `Formato: Specsfy/2.0`, os três atos na ordem, slug igual ao
    diretório e pacote restrito a `spec.md` e ao diretório opcional `research/`.
 3. Para toda API ou documentação externa consultada, confirme uma evidência
-   local em `research/` e seu índice em `Artefatos de pesquisa armazenados`;
-   esse material é informativo, nunca uma segunda fonte normativa.
+   local em `research/` e seu índice em `Artefatos de pesquisa armazenados`.
+   Esse material informa a spec; ele não é uma segunda fonte normativa.
 4. Enquanto `Status` ou `Definition Gate` ainda estiverem pendentes, execute:
 
-```bash
-node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
-```
+   ```bash
+   node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
+     specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
+   ```
 
-1. Leia `references/quality-gates.md` e faça a revisão semântica.
-2. Confira o campo `Interface para pessoas`. Se for `Sim`, exija na seção 10
+5. Faça a revisão semântica com `references/quality-gates.md`. Um arquivo bem
+   formatado não prova uma especificação correta.
+6. Confira o campo `Interface para pessoas`. Se for `Sim`, exija na seção 10
    stack e convenções observadas, telas e responsabilidades, fluxo de
    informação e navegação, menus e navegação principal, formulários e ações,
-   composição e disposição, estados e acessibilidade. Confira se a tecnologia
-   proposta segue as fontes
-   da stack ou se a lacuna foi registrada para a pessoa. Um CRUD sem telas e
-   formulário é `BLOCKER`; retorne automaticamente ao
-   `$specsfy-02-backlog` para esclarecer a lacuna.
-3. Compare research, requisitos, BDD, plano técnico, modelo de dados, contratos,
-   TDD, matriz e tarefas. Confirme no mínimo três `AC` distintos para a feature
-   inteira e para cada `US`, `FR` e `NFR`; não confunda “arquivo bem formatado”
-   com “especificação correta”.
-4. Quando produto, arquitetura ou segurança forem materiais, leia
-   `references/review-lenses.md`, registre findings na seção 13 e execute
-   `scripts/review_findings.mjs`. `P1 Open` mantém o gate pendente.
-5. Se a definição alterar stack ou persistência, exija que a Definition of Done
-   cite respectivamente `.specsfy/STACK.md` ou `.specsfy/DATABASE.md`. Para
-   mudança material de finalidade ou capacidade, exija revisão de `PROJECT.md`;
-   para regra nova confirmada, exija `.specsfy/RULES.md`.
-6. No aceite final, procure tarefas `[MIGRATION]` e execute
-   `verify_evidence.mjs --delivery` para cada uma. Mantenha o Delivery Gate
-   pendente quando a tarefa estiver aberta ou quando o arquivo, o comando de
-   aplicação ou a consulta de estado estiver ausente.
+   composição e disposição, estados e acessibilidade. Confirme que a tecnologia
+   proposta segue as fontes da stack ou que a lacuna foi registrada para a
+   pessoa. Um CRUD sem telas e formulário é `BLOCKER` e volta automaticamente
+   para `$specsfy-02-backlog`.
+7. Compare research, requisitos, BDD, plano técnico, modelo de dados,
+   contratos, TDD, matriz e tarefas. Confirme no mínimo três `AC` distintos
+   para a feature inteira e para cada `US`, `FR` e `NFR`.
+8. Quando produto, arquitetura ou segurança forem materiais, leia
+   `references/review-lenses.md`, registre os findings na seção 13 e execute
+   `scripts/review_findings.mjs`. Um finding `P1 Open` mantém o gate pendente.
+9. Confira o contexto persistente exigido pela mudança:
+
+   | A definição altera | A Definition of Done precisa citar |
+   | --- | --- |
+   | stack | `.specsfy/STACK.md` |
+   | persistência | `.specsfy/DATABASE.md` |
+   | finalidade ou capacidade, de forma material | revisão de `PROJECT.md` |
+   | regra nova confirmada | `.specsfy/RULES.md` |
+
+10. No aceite final, execute `verify_evidence.mjs --delivery` para cada tarefa
+    `[MIGRATION]`. Mantenha o Delivery Gate pendente quando a tarefa estiver
+    aberta ou faltar o arquivo, o comando de aplicação ou a consulta de estado.
 
 ## Classificar achados
 
-- `BLOCKER`: impede tarefa ou teste correto; requisito contraditório, sem
-  comportamento observável, decisão de alto impacto ausente ou cenário principal
-  não coberto.
-- `WARNING`: aumenta retrabalho ou risco, mas admite implementação segura.
-- `NOTE`: melhoria editorial sem efeito material.
+| Nível | Quando usar |
+| --- | --- |
+| `BLOCKER` | impede tarefa ou teste correto: requisito contraditório, sem comportamento observável, decisão de alto impacto ausente ou cenário principal sem cobertura |
+| `WARNING` | aumenta retrabalho ou risco, mas ainda admite implementação segura |
+| `NOTE` | melhoria editorial sem efeito material |
 
-Para cada achado, cite seção ou ID, explique o impacto e proponha uma correção
-concreta.
+Para cada achado, cite a seção ou o ID, explique o impacto e proponha uma
+correção concreta.
 
 ## Gate
 
@@ -95,65 +116,66 @@ Retorne exatamente um resultado:
 - `READY`: nenhuma falha de formato e nenhum `BLOCKER` sem resolução.
 - `NOT READY`: qualquer falha estrutural ou `BLOCKER`.
 
-Inclua contagens, cobertura mínima `US/FR/NFR ↔ 3 ACs` e os três achados mais
-importantes e a transição automática:
+Inclua contagens, cobertura mínima `US/FR/NFR ↔ 3 ACs`, os três achados mais
+importantes e a transição automática correspondente:
 
-- `READY` → `$specsfy-05-tasks` para planejar a seção 14;
-- `NOT READY` → retorno a `$specsfy-02-backlog` quando faltar decisão; a
-  o refinamento do backlog executa seu ciclo completo e esta validação só é
-  retomada depois
-  de fechar as lacunas ou registrar a saída explícita `avançar`; após essa
-  saída, registre `NOT READY` e não reabra o mesmo ciclo nesta retomada;
-  quando a correção já estiver decidida, use `$specsfy-update-spec` para
-  uma spec anteriormente aprovada e `$specsfy-03-specify` para a definição
-  inicial.
+- `READY` → `$specsfy-05-tasks` para planejar a seção 14.
+- `NOT READY` com decisão faltando → `$specsfy-02-backlog`. O refinamento do
+  backlog executa seu ciclo completo, e esta validação só é retomada depois de
+  fechar as lacunas ou registrar a saída explícita `avançar`. Após essa saída,
+  registre `NOT READY` e não reabra o mesmo ciclo nesta retomada.
+- `NOT READY` com correção já decidida → `$specsfy-update-spec` para uma spec
+  anteriormente aprovada ou `$specsfy-03-specify` para a definição inicial.
 
 Anuncie o motivo e carregue imediatamente a skill escolhida.
 
 ## Registrar no arquivo único
 
-Sem alterar requisitos automaticamente:
+Registre o resultado sem alterar requisitos por conta própria:
 
 1. atualize `Gate do Ato I — Definição` na seção 13 com resultado, data e
    achados;
 2. em `READY`, defina `Definition Gate: Passed` e `Status: Defined`;
 3. em `NOT READY`, defina `Definition Gate: Failed`, `Plan Gate: Pending`,
    `Delivery Gate: Pending` e mantenha `Status: Draft`;
-4. execute novamente `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md`
-   sem `--allow-draft` quando o gate passar;
+4. quando o gate passar, execute novamente
+   `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md` sem `--allow-draft`;
 5. relate o resultado no chat.
 
 Quando o Definition Gate passar, execute `specsfy transition <id> defined`.
 
-Em seguida, retire da fila ativa as capturas que a spec esgotou:
+### Retirar da fila as capturas esgotadas
+
+Depois da transição, confira as capturas que deram origem à spec:
 
 1. localize em `specs/inbox/` cada captura referenciada pela spec ou pelo
    backlog que a originou;
-2. releia o texto original da captura e compare com o que a spec e outras
-   specs com `Definition Gate: Passed` definem;
+2. releia o texto original e compare com o que esta spec e outras specs com
+   `Definition Gate: Passed` definem;
 3. se o pedido estiver integralmente coberto, execute
-   `specsfy inbox process <captura> --spec <id>` (repita `--spec` para cada
-   spec que cobre a captura). O comando move o arquivo para
+   `specsfy inbox process <captura> --spec <id>`, repetindo `--spec` para cada
+   spec que cobre a captura. O comando move o arquivo para
    `specs/inbox/processed/`, marca `Status: Processada`, registra as specs
-   derivadas e atualiza os vínculos, sem tocar no texto original;
+   derivadas e atualiza os vínculos sem tocar no texto original;
 4. se qualquer parte do pedido ainda não tiver spec aprovada, a captura
-   permanece em `specs/inbox/`; registre no chat o que resta encaminhar e não
-   force a saída.
+   permanece em `specs/inbox/`; registre no chat o que resta encaminhar.
 
 O comando recusa a spec que estiver na pasta `draft`, tiver `Status: Draft` ou
 não declarar `Status` e `Definition Gate: Passed` na primeira tabela de
-metadados. Tabelas do corpo e exemplos não comprovam aprovação. Com uma spec
-recusada, nenhuma captura sai da fila. Nunca mova uma captura por outro meio
-nem a apague.
+metadados. Tabelas do corpo e exemplos não comprovam aprovação, e com uma spec
+recusada nenhuma captura sai da fila. Use somente esse comando para mover uma
+captura e não apague capturas, porque o histórico serve à busca de duplicatas.
 
-Em `review`, use a mesma análise para o aceite final. Com Delivery Gate passado,
-Status `Complete` e a DoD comprovada, execute
+### Aceite final em `review`
+
+Use a mesma análise para o aceite final. Antes de concluir, chame
+`$specsfy-interviewer` quando uma resposta puder mudar a entrega ou o Effort.
+Com Delivery Gate passado, `Status: Complete` e a DoD comprovada, execute
 `specsfy transition <id> completed`.
-Antes disso, chame `$specsfy-interviewer` quando uma resposta puder mudar a
-entrega ou o Effort.
 
 Se o usuário pedir correções, edite as seções de origem, preserve IDs e
-revalide. Nunca crie outro arquivo de especificação ou validação.
+revalide. Mantenha tudo na própria spec, sem criar outro arquivo de
+especificação ou validação.
 
 ## Enforcement do repositório
 
@@ -164,25 +186,25 @@ node .agents/skills/specsfy-04-validate/scripts/verify_repo.mjs . \
   --boundary local --timeout-seconds 300 --max-output-bytes 65536
 ```
 
-As fronteiras `local`, `git` e `ci` não mudam a política. `--attestation PATH`
-é a única forma de persistir uma atestação; `--self-test` executa canários em
-diretório temporário e nunca produz binding probatório. A atestação schema 2
-liga commit, digest executável, checks aprovados, tarefas e hashes de arquivos.
-O digest cobre comandos, limites e os arquivos da política. Não aceite um gate
-que passa em apenas uma fronteira, excede limites ou trunca diagnóstico sem
-marcar `truncated`.
-
-O contrato do catálogo exige as quatorze skills base, `specsfy-setup`,
-`specsfy-documentator` e
-as três `specsfy-aux-*`; também valida cada `specsfy-specialist-*` instalada,
-sem impor um total máximo de especialistas.
-O Gherkin BDD é referência exclusiva da `spec.md`: o enforcement nunca executa
-`.feature`. Ele executa os testes derivados com Pest em projetos PHP, inclusive
-PHP + Node. Em projeto Node sem PHP, exige um script `test:tdd`; quando ausente,
-falha orientando a skill a perguntar ao usuário e sugerir Vitest.
+- As fronteiras `local`, `git` e `ci` aplicam a mesma política. Não aceite um
+  gate que passa em apenas uma fronteira, excede limites ou trunca diagnóstico
+  sem marcar `truncated`.
+- `--attestation PATH` é a única forma de persistir uma atestação. A atestação
+  schema 2 liga commit, digest executável, checks aprovados, tarefas e hashes
+  de arquivos; o digest cobre comandos, limites e os arquivos da política.
+- `--self-test` executa canários em diretório temporário e não produz binding
+  probatório.
+- O contrato do catálogo exige as quatorze skills base, `specsfy-setup`,
+  `specsfy-documentator` e as três `specsfy-aux-*`. Ele também valida cada
+  `specsfy-specialist-*` instalada, sem impor um total máximo de especialistas.
+- O Gherkin BDD é referência exclusiva da `spec.md`, e o enforcement não
+  executa `.feature`. Os testes derivados rodam com Pest em projetos PHP,
+  inclusive PHP + Node. Em projeto Node sem PHP, o runner exige um script
+  `test:tdd`; quando ele falta, a falha orienta a skill a perguntar ao usuário
+  e sugerir Vitest.
 
 ## Especialistas sob demanda
 
 Leia [references/specialists.md](references/specialists.md) quando um gate
-depender de revisão técnica específica. Instalação é recomendação explícita,
-nunca efeito colateral da validação.
+depender de revisão técnica específica. Recomende a instalação de forma
+explícita; ela nunca acontece como efeito colateral da validação.

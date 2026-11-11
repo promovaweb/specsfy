@@ -321,9 +321,14 @@ o trabalho para a raiz Git do Hub.
 ## Inventário de pacotes do consumidor
 
 `specsfy-documentator/scripts/build_documentation.mjs` percorre os manifests npm
-e Composer fora de árvores geradas. O script combina dependências diretas com
-entradas transitivas de `package-lock.json` e `composer.lock`, usa descrições
-locais quando disponíveis e escreve o bloco reconstruível de
+e Composer fora de árvores geradas. Dentro de um repositório Git, a varredura
+usa `git ls-files --cached --others --exclude-standard` e respeita o
+`.gitignore` do projeto, de modo que saídas de build e de teste, como `.astro/`
+ou `.teste/`, não entram em `docs/`. A lista fixa de pastas (`.git`,
+`node_modules`, `dist`, `docs`, `vendor` e outras) vale nos dois caminhos e é a
+única regra quando o projeto não está no Git. O script combina dependências
+diretas com entradas transitivas de `package-lock.json` e `composer.lock`, usa
+descrições locais quando disponíveis e escreve o bloco reconstruível de
 `.specsfy/PACKAGES.md`. O modo `--check` trata esse arquivo como parte do mesmo
 contrato de atualização de `docs/`.
 

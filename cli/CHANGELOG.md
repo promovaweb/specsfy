@@ -4,6 +4,39 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Alterado
+
+- As 19 skills base foram reescritas para agentes atuais da OpenAI e da
+  Anthropic. Cada `SKILL.md` abre com o objetivo, declara `Pronto quando`,
+  separa leituras paralelas de passos sequenciais e descreve na `description`
+  quando usar e quando não usar a skill. A ênfase excessiva deu lugar a
+  instruções com motivo, e trechos duplicados do `Spec.md` viraram referências.
+  Os prompts de `agents/openai.yaml` ficaram mais específicos.
+- `Spec.md` ganhou a seção `Compatibilidade entre agentes`, com a leitura de
+  `$<nome>` no Codex, no Claude Code e nos demais agentes, e a regra dos
+  caminhos de script.
+
+### Corrigido
+
+- Os estados canônicos em `Spec.md`, `skills/README.md` e
+  `quality-gates.md` passam a incluir `Reviewing`.
+- Listas numeradas que reiniciavam depois de blocos de código em
+  `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate` e
+  `specsfy-07-implement` voltaram a ter sequência contínua.
+- `specsfy-05-tasks` lista `[MIGRATION]` entre as tags aceitas pelo
+  `validate_tasks.mjs`.
+- Skills auxiliares, `specsfy-setup` e `specsfy-documentator` citam scripts com
+  o caminho completo `.agents/skills/<skill>/scripts/`.
+- `specsfy-mvp-milestone-interviewer` usa o formato canônico de transição e
+  oferece `Gere outras opções` em cada rodada.
+- `$specsfy-documentator` respeita o `.gitignore` do projeto. Dentro de um
+  repositório Git, `build_documentation.mjs` lê a lista de
+  `git ls-files --cached --others --exclude-standard` e mantém a lista fixa de
+  pastas como reserva fora do Git. Saídas de build e de teste, como `.astro/`
+  e `.teste/` de projetos Astro, deixam de entrar em `docs/application.md` e
+  `docs/frontend.md`, e o `--check` não acusa documentação desatualizada a cada
+  build de teste. Contribuição de Lucas Fuad na PR #53.
+
 ## [0.25.0] - 2026-11-02
 
 ### Adicionado

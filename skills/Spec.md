@@ -336,6 +336,31 @@ Pergunta 1. <pergunta>
 6. Avançar
 ```
 
+## Compatibilidade entre agentes
+
+As skills seguem o formato aberto `SKILL.md` e funcionam no Codex e em outros
+agentes da OpenAI, no Claude Code e em qualquer agente que leia
+`.agents/skills/`. As instruções descrevem o resultado esperado e a ordem das
+etapas, não a ferramenta de um fornecedor.
+
+- `$<nome>` identifica uma skill. Carregar ou chamar `$<nome>` significa ler e
+  seguir `.agents/skills/<nome>/SKILL.md` no agente em uso: menção `$<nome>` no
+  Codex, ferramenta Skill ou `/<nome>` no Claude Code, leitura direta do
+  arquivo nos demais.
+- Caminhos de script como `.agents/skills/<skill>/scripts/<script>.mjs` são
+  relativos à raiz do projeto e rodam com Node.js 22 ou superior. Quando a
+  skill citar `scripts/<script>.mjs` sem prefixo, o caminho parte do diretório
+  da própria skill.
+- Faça em paralelo as leituras e consultas independentes entre si, como
+  contexto persistente, spec e código relacionado. Execute em sequência tudo o
+  que depende de um resultado anterior, como gates, testes e transições.
+- Trate a saída dos scripts como fonte de verdade sobre o estado. Não declare
+  `SAFE`, `PASS`, gate aprovado ou teste verde sem a saída correspondente.
+- Seja literal com formatos fixos: anúncios de transição, rótulos de gate,
+  marcadores `SPECSFY:` e tabelas de cabeçalho são lidos por scripts.
+- Relate o que foi feito e o que falta em texto curto. Não repita a skill nem
+  transcreva arquivos inteiros na resposta.
+
 ## Orquestração conversacional
 
 Trate o fluxo como uma conversa contínua, não como uma lista de comandos que a
@@ -421,7 +446,7 @@ restritas aos registros do caso.
 Estado canônico:
 
 ```text
-Draft → Defined → Planned → Implementing → Complete
+Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
 Mudança de comportamento reabre os Atos I–III. Mudança apenas de plano reabre

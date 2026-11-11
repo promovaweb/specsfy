@@ -1,9 +1,22 @@
 ---
 name: specsfy-progress
-description: Use quando o usuário pede progresso geral, status de todas as especificações, percentual concluído, quanto falta, bloqueios ou próximo trabalho do repositório Specsfy, ou quando uma transição automática pedir a projeção final ou o roteamento pelo estado observado. Produz uma visão somente leitura de specs, gates, tarefas e checklists; não use para alterar a especificação ou implementar tarefas.
+description: "Projeta, sem escrever nada, o progresso de todas as specs do projeto: denominadores de specs, gates, tarefas e checklists, ato atual, blockers reais e próximo par TNNN/ITEM pronto. Use quando o usuário pedir progresso geral, status das especificações, percentual concluído, quanto falta, bloqueios ou próximo trabalho, ou quando uma transição automática pedir a projeção final ou o roteamento pelo estado observado. Não use para alterar spec, gates ou checkboxes (use a skill responsável, como specsfy-07-implement ou specsfy-update-spec)."
 ---
 
 # Informar progresso geral
+
+Esta skill responde onde o projeto está e qual é o próximo passo. O relatório
+é uma projeção de `specs/<estado>/*/spec.md`, nunca uma segunda fonte de
+estado: nada é editado durante a consulta.
+
+## Pronto quando
+
+- O relatório traz os denominadores de specs, gates, tarefas e itens de
+  checklist, calculados pelos scripts.
+- Cada spec que exige atenção aparece com seu blocker e a skill responsável.
+- Pendências de contexto e de documentação foram projetadas pelos checks.
+- O próximo trabalho foi indicado e, quando acionável, a transição automática
+  foi executada.
 
 ## Preparação obrigatória
 
@@ -18,111 +31,85 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Apresente a projeção observada e o próximo
 handoff aplicável.
 
-Leia o estado exclusivamente de `specs/<estado>/*/spec.md`. O relatório é uma projeção da
-fonte da verdade, nunca uma segunda fonte de estado.
-
 ## Orquestrar a conversa
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $specsfy-progress → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $specsfy-progress — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+Siga a seção `Orquestração conversacional` de `.specsfy/Spec.md`. Resumo:
+
+- Pendência dentro do escopo: anuncie
+  `Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva.
+- Troca de responsabilidade: anuncie `Transição automática:
+  $specsfy-progress → $<destino> — motivo: <motivo> — resultado esperado:
+  <resultado>` e carregue imediatamente a skill de destino, sem pedir
+  confirmação nem repetir o comando. Continue na mesma conversa.
+- Correção concluída: anuncie `Retomada automática: $<destino> →
+  $specsfy-progress — pendência resolvida: <resultado>` e retome.
+
+Reavalie o estado depois de cada handoff para não entrar em ciclo. O handoff
+dispensa confirmação; ações sensíveis continuam exigindo autorização
+específica.
 
 ## Executar
 
-Na raiz do repositório:
+Na raiz do projeto, os comandos abaixo são independentes e podem rodar em
+paralelo.
 
-```bash
-node .agents/skills/specsfy-progress/scripts/progress.mjs .
-```
+| Objetivo | Comando |
+| --- | --- |
+| progresso geral | `node .agents/skills/specsfy-progress/scripts/progress.mjs .` |
+| dados para automação | `node .agents/skills/specsfy-progress/scripts/progress.mjs . --json` |
+| uma única spec | `node .agents/skills/specsfy-progress/scripts/progress.mjs . --slug <slug>` |
+| custo de contexto de uma spec | `node .agents/skills/specsfy-progress/scripts/analyze_context.mjs specs/<estado>/<NNNN>-<slug>/spec.md --json` |
+| contexto persistente | `node .agents/skills/specsfy-setup/scripts/monitor_context.mjs --project . --check` |
+| documentação técnica | `node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs --project . --check` |
 
-Para integração com outras ferramentas:
-
-```bash
-node .agents/skills/specsfy-progress/scripts/progress.mjs . --json
-```
-
-Para uma única especificação:
-
-```bash
-node .agents/skills/specsfy-progress/scripts/progress.mjs . --slug <slug>
-```
-
-Para observar o custo de contexto de uma spec:
-
-```bash
-node .agents/skills/specsfy-progress/scripts/analyze_context.mjs \
-  specs/<estado>/<NNNN>-<slug>/spec.md --json
-```
-
-Para projetar pendências documentais junto com o progresso:
-
-```bash
-node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
-  --project . --check
-
-node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \
-  --project . --check
-```
-
-Trate `PENDING` como blocker da entrega e anuncie o handoff indicado pelo
-monitor. Retome esta skill depois que a auxiliar atualizar o documento ou que a
-avaliação sem impacto estiver registrada e reconhecida.
-Se o segundo comando indicar documentação ausente ou desatualizada, anuncie o
-handoff para `$specsfy-documentator`, reconstrua `docs/` e retome a projeção.
-
-Sem `--usage-json`, o resultado é sempre rotulado `estimated` e documenta a
-heurística. Métricas fornecidas explicitamente são `measured`; nunca apresente
-estimativa como uso real.
+- `PENDING` no monitor de contexto é blocker da entrega: anuncie o handoff
+  indicado pelo monitor e retome depois que a auxiliar atualizar o documento
+  ou que a avaliação sem impacto estiver registrada e reconhecida.
+- Documentação ausente ou desatualizada no segundo check leva a
+  `$specsfy-documentator`; retome a projeção depois da reconstrução de `docs/`.
+- Sem `--usage-json`, o custo de contexto sai rotulado `estimated` e descreve
+  a heurística. Só métricas fornecidas explicitamente são `measured`; não
+  apresente estimativa como uso real.
 
 ## Interpretar
 
 1. Informe os denominadores de specs, gates, tarefas e itens de checklist.
 2. Mostre o ato atual e a próxima skill responsável, ambos derivados do
    `Status`.
-3. Diferencie especificação concluída, trabalho em progresso e blocker real.
+3. Separe spec concluída, trabalho em progresso e blocker real.
 4. Mostre o próximo par `TNNN/ITEM` pronto quando existir.
-5. Trate um gate `Failed`, inconsistência de checklist ou dependência sem caminho
-   pronto como blocker. Um gate `In Progress` isolado não é falha.
-6. Trate documentação obrigatória apontada por `monitor_context.mjs` como
-   blocker, mesmo que todos os checkboxes estejam marcados.
-7. Trate `docs/` ausente ou desatualizado segundo `$specsfy-documentator` como
-   blocker da entrega.
-8. Se uma spec existente exigir mudança de comportamento ou plano, anuncie a
+5. Classifique como blocker: gate `Failed`, inconsistência de checklist,
+   dependência sem caminho pronto, documentação obrigatória apontada por
+   `monitor_context.mjs` (mesmo com todos os checkboxes marcados) e `docs/`
+   ausente ou desatualizado segundo `$specsfy-documentator`. Um gate
+   `In Progress` isolado não é falha.
+6. Se uma spec existente exigir mudança de comportamento ou de plano, anuncie a
    pendência e carregue automaticamente `$specsfy-update-spec`. Retome a
    projeção depois que a atualização percorrer os atos invalidados.
-9. Se nenhuma spec existir, preserve o código 2. Capturas em `specs/inbox/` e
-   itens em `specs/backlog/` não contam como progresso normativo. Quando o
-   pedido também exigir avançar uma captura existente, anuncie a pendência e
-   carregue `$specsfy-02-backlog`; quando já
+7. Sem nenhuma spec, preserve o código de saída 2. Capturas em `specs/inbox/` e
+   itens em `specs/backlog/` não contam como progresso normativo. Se o pedido
+   também exigir avançar uma captura, carregue `$specsfy-02-backlog`; se já
    houver intenção e definição suficientes, carregue `$specsfy-03-specify`.
 
 ## Preservar a fonte
 
 - Não edite specs, checkboxes, testes ou código durante a consulta.
-- Não conte `spec.md` dentro de `research/`; a descoberta é exatamente
-  `specs/<estado>/*/spec.md`.
-- Não invente progresso a partir de commits, arquivos ou memória do chat.
-- Para atualizar estado, anuncie e carregue automaticamente a skill responsável
-  na mesma conversa. Retome automaticamente o progresso depois da atualização.
+- A descoberta é exatamente `specs/<estado>/*/spec.md`; não conte `spec.md`
+  dentro de `research/`.
+- Não deduza progresso de commits, arquivos soltos ou memória do chat.
+- Para mudar estado, anuncie e carregue a skill responsável na mesma conversa
+  e retome o progresso depois.
 
 ## Relatar
 
-Entregue primeiro o resumo global, depois specs que exigem atenção, blockers e
-próximo trabalho. Quando houver etapa acionável, anuncie e execute a transição
-automaticamente. Use a saída JSON sem reinterpretar nomes de campos quando o
-usuário pedir automação ou dados estruturados.
+Entregue primeiro o resumo global, depois as specs que exigem atenção, os
+blockers e o próximo trabalho. Quando houver etapa acionável, anuncie e
+execute a transição automaticamente. Se o usuário pedir automação ou dados
+estruturados, use a saída JSON sem renomear campos.
 
 ## Especialistas sob demanda
 
-Leia [references/specialists.md](references/specialists.md) somente para propor
-contexto para a próxima tarefa. Carregue automaticamente a skill base ou o
-especialista já instalado que seja responsável; instalação exige autorização
-específica.
+Leia [references/specialists.md](references/specialists.md) somente para
+propor contexto para a próxima tarefa. Carregue automaticamente a skill base
+ou o especialista já instalado que seja responsável; instalação exige
+autorização específica.

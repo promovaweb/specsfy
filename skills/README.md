@@ -60,7 +60,7 @@ Cada fatia usa uma única fonte normativa em
 `specs/<estado>/<NNNN>-<slug>/spec.md` e atravessa:
 
 ```text
-Draft → Defined → Planned → Implementing → Complete
+Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
 Nenhum `Definition Gate`, `Plan Gate` ou `Delivery Gate` passa sem evidência

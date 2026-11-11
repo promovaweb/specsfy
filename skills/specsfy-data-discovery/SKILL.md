@@ -1,9 +1,14 @@
 ---
 name: specsfy-data-discovery
-description: Converse em linguagem cotidiana quando o produto precisar guardar informações, sugira formatos adequados e registre respostas confirmadas em `.specsfy/DATABASE.md`.
+description: Conversa em linguagem cotidiana sobre as informações que o produto precisa guardar, sugere uma forma simples de registrar cada uma e grava somente respostas confirmadas em .specsfy/DATABASE.md. Use quando backlog, importação do MVP ou spec dependerem de informações lembradas pelo sistema que ainda estão ausentes ou ambíguas. Não use para mapear o banco já existente no código (specsfy-aux-database), escolher tecnologia ou modelar tabelas.
 ---
 
 # Descobrir as informações que o sistema precisa guardar
+
+Descubra, com a pessoa e nas palavras dela, o que o sistema precisa lembrar,
+quem usa cada informação e quando ela muda ou deixa de valer. O resultado é um
+registro confirmado em `.specsfy/DATABASE.md` que backlog e spec usam como
+contexto.
 
 ## Preparação obrigatória
 
@@ -18,31 +23,37 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
 
-Converse em Português do Brasil sobre informações do sistema sem pedir que a
-pessoa descreva banco de dados, tabela, campo, chave ou relacionamento. Use
-palavras do próprio produto:
-o que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
+Converse em Português do Brasil sem pedir que a pessoa descreva banco de
+dados, tabela, campo, chave ou relacionamento. Use as palavras do produto: o
+que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
+
+## Pronto quando
+
+- Cada informação a guardar aplicável está confirmada, adiada ou encerrada pela
+  pessoa, dentro do limite de oito perguntas por área.
+- Cada resposta confirmada foi gravada pelo script na seção
+  `Informações a guardar confirmadas` de `.specsfy/DATABASE.md`, com fontes.
+- Nenhuma hipótese, dado real, credencial ou informação pessoal sensível foi
+  gravada.
+- O controle voltou à skill que chamou esta descoberta.
 
 ## Preparar a conversa
 
-1. Leia a Inbox, a descoberta de `MVP.md`, o backlog, a spec ou o pedido que
-   originou a descoberta.
-2. Leia `PROJECT.md` e `.specsfy/DATABASE.md` quando existirem. Separe o que
-   já foi confirmado do que ainda precisa de conversa.
-3. Procure somente informações que o sistema precise guardar, consultar,
-   comparar, mostrar, compartilhar, corrigir ou apagar. Não pergunte sobre
-   dados que não alteram a jornada ou a operação.
-4. Preserve fontes e formulações da pessoa. Uma hipótese não vira conteúdo
-   confirmado no arquivo de dados.
+1. Leia em paralelo a origem da descoberta (Inbox, `MVP.md`, backlog, spec ou
+   pedido), `PROJECT.md` e `.specsfy/DATABASE.md` quando existirem.
+2. Separe o que já está confirmado do que ainda precisa de conversa.
+3. Considere só informações que o sistema precise guardar, consultar,
+   comparar, mostrar, compartilhar, corrigir ou apagar. Dado que não altera a
+   jornada nem a operação fica fora da conversa.
+4. Preserve fontes e formulações da pessoa. Hipótese não entra no arquivo como
+   conteúdo confirmado.
 
 ## Perguntar sem linguagem técnica
 
-Em cada rodada, escolha uma informação aplicável de maior impacto ainda não
-confirmada e siga o contrato central. Mantenha uma lista das informações a
-guardar ausentes ou ambíguas. Depois de cada resposta, atualize a lista e
-pergunte sobre a próxima até que todas estejam confirmadas, adiadas ou
-encerradas, respeitando o máximo de oito perguntas por área. Prefira perguntas
-como estas, ajustadas ao contexto:
+Mantenha uma lista das informações a guardar ausentes ou ambíguas. Em cada
+rodada, escolha a de maior impacto ainda não confirmada. Depois de cada
+resposta, atualize a lista e siga para a próxima. Ajuste ao contexto perguntas
+como:
 
 - "O que você precisa lembrar sobre cada pedido, pessoa ou atendimento?"
 - "Quem pode ver ou mudar essa informação?"
@@ -50,34 +61,33 @@ como estas, ajustadas ao contexto:
 - "Quando essa informação muda, deixa de valer ou precisa ser apagada?"
 - "Que informação não pode aparecer para outras pessoas?"
 
-Evite explicar a mecânica interna. Se a pessoa usar termos técnicos, confirme
-o efeito no trabalho dela antes de registrar a resposta.
+Não explique a mecânica interna. Se a pessoa usar termos técnicos, confirme o
+efeito no trabalho dela antes de registrar.
 
 ## Sugerir como cada informação será registrada
 
-Depois de entender a finalidade, proponha uma forma simples de registrar cada
-informação e peça confirmação. Escolha a sugestão pelo uso esperado, sem citar
-tecnologias ou partes internas do sistema:
+Depois de entender a finalidade, proponha uma forma simples de registro,
+escolhida pelo uso esperado e sem citar tecnologia:
 
-- texto curto para nomes, títulos e códigos lidos rapidamente;
-- texto livre para observações e descrições maiores;
-- número para quantidades, medidas e contagens;
-- valor em dinheiro para preços, cobranças e descontos;
-- data ou horário para agendamentos, prazos e acontecimentos;
-- escolha entre opções para situação, categoria ou prioridade;
-- sim ou não para confirmações;
-- arquivo ou imagem para comprovantes e anexos.
+| Uso | Sugestão |
+| --- | --- |
+| nomes, títulos e códigos lidos rapidamente | texto curto |
+| observações e descrições maiores | texto livre |
+| quantidades, medidas e contagens | número |
+| preços, cobranças e descontos | valor em dinheiro |
+| agendamentos, prazos e acontecimentos | data ou horário |
+| situação, categoria ou prioridade | escolha entre opções |
+| confirmações | sim ou não |
+| comprovantes e anexos | arquivo ou imagem |
 
-Apresente a sugestão como hipótese do produto, explique seu motivo em uma
-frase e pergunte se ela representa o uso real. Registre o `formato sugerido`
-somente depois da confirmação. Quando uma mesma informação tiver usos
-distintos, registre cada uso separadamente.
+Apresente a sugestão como hipótese, explique o motivo em uma frase e pergunte
+se ela representa o uso real. Registre o `formato sugerido` só depois da
+confirmação. Uma informação com usos distintos gera um registro por uso.
 
 ## Registrar o que foi confirmado
 
-Depois de uma resposta confirmada, entregue o contexto para o script abaixo.
-Use um nome do domínio e frases curtas compreensíveis para quem opera o
-produto.
+Depois de cada resposta confirmada, chame o script com nome do domínio e frases
+curtas que quem opera o produto entenda:
 
 ```bash
 node .agents/skills/specsfy-data-discovery/scripts/\
@@ -94,20 +104,17 @@ registrar_dados_conversados.mjs \
 ```
 
 Registre somente respostas confirmadas na seção `Informações a guardar
-confirmadas`. Mantenha essa seção separada do que foi observado no código. Não
-altere o trecho detectado automaticamente e não copie dados reais, credenciais
-ou informações pessoais sensíveis.
+confirmadas`, separada do que foi observado no código. O trecho detectado
+automaticamente pertence a `$specsfy-aux-database` e fica intocado.
 
 ## Handoffs
 
-- No backlog, faça esta descoberta antes de declarar o brief pronto quando a
-  jornada depender de informações guardadas.
-- Durante a descoberta do MVP, preserve `MVP.md` como fonte e carregue esta
-  skill para cada informação a guardar ausente ou ambígua em um backlog
-  importado.
-- Na especificação, carregue esta skill se a fonte de dados não explicar o que
-  a jornada precisa lembrar ou quem pode consultar cada informação.
-- A Inbox não faz perguntas. Ela apenas preserva sinais para esta etapa.
+| Origem | Quando chamar esta skill |
+| --- | --- |
+| `$specsfy-02-backlog` | antes de declarar o brief pronto, se a jornada depender de informações guardadas |
+| `$specsfy-mvp-milestone-interviewer` | para cada informação a guardar ausente ou ambígua em um backlog importado, preservando `MVP.md` como fonte |
+| `$specsfy-03-specify` | quando a fonte de dados não explicar o que a jornada precisa lembrar ou quem consulta cada informação |
+| `$specsfy-01-inbox` | nunca chama: a Inbox não pergunta, só preserva sinais para esta etapa |
 
 ## Limites
 

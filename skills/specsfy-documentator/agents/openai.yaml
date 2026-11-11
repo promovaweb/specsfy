@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Documentador"
-  short_description: "Reconstrói documentação e inventário de pacotes"
-  default_prompt: "Use $specsfy-documentator para reconstruir a documentação técnica em docs/ e o inventário .specsfy/PACKAGES.md."
+  short_description: "Reconstrói documentação e registro de pacotes"
+  default_prompt: "Use $specsfy-documentator para reconstruir a documentação técnica em docs/ e o registro .specsfy/PACKAGES.md a partir do código existente e confirmar o resultado com --check."

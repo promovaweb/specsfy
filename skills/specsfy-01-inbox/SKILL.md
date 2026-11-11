@@ -1,9 +1,13 @@
 ---
 name: specsfy-01-inbox
-description: "Use quando o usuário enviar uma ideia, pensamento, necessidade, oportunidade ou texto livre para guardar, capturar, anotar ou retomar depois. Preserve o input integral, faça pré-processamento silencioso e crie imediatamente um arquivo timestampado em `specs/inbox/`. Não faça perguntas, não peça confirmação e não crie backlog, spec, tarefas, testes ou código."
+description: "Captura uma ideia, necessidade, oportunidade ou texto livre em `specs/inbox/` sem perguntas. Use quando o usuário quiser guardar, anotar, capturar ou retomar depois um pensamento: preserva o input integral, faz pré-processamento silencioso e cria um arquivo timestampado. Não use para refinar a ideia (use specsfy-02-backlog) nem para criar spec, tarefas, testes ou código."
 ---
 
 # Registrar uma entrada na Inbox
+
+Grave o texto recebido em `specs/inbox/` no mesmo turno, sem conversa. A Inbox
+é uma entrada durável anterior ao backlog: preserva a intenção e organiza
+sinais úteis, mas não decide requisitos nem autoriza implementação.
 
 ## Preparação obrigatória
 
@@ -15,51 +19,46 @@ pendência.
 ## Modo de interação
 
 Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Registre pontos ausentes para uma etapa
-posterior sem interromper a captura.
+Não faça perguntas e não peça confirmação, mesmo diante de ideia vaga,
+contraditória ou incompleta: o valor da captura está em não interromper quem
+pensou nela. Lacunas viram itens de `Pontos a revisar no futuro`. Duplicata,
+falta de contexto ou incerteza não impedem a gravação.
 
-Registre imediatamente o texto recebido em `specs/inbox/`. Trate a Inbox como
-uma entrada durável anterior ao backlog: ela preserva intenção e
-organiza sinais úteis, mas não decide requisitos nem autoriza implementação.
+## Pronto quando
 
-## Não interromper a captura
-
-- Não faça perguntas, mesmo quando a ideia estiver vaga, contraditória ou
-  incompleta.
-- Não peça confirmação antes de escrever.
-- Não bloqueie a captura por duplicata, falta de contexto ou incerteza.
-- Registre lacunas em `Pontos a revisar no futuro`; não tente resolvê-las com o
-  usuário nesta etapa.
-- Depois de salvar, informe somente o caminho, um resumo breve do que foi
-  processado e o próximo passo opcional. Não inicie o próximo passo
-  automaticamente.
+- existe um novo `specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` criado pelo script;
+- o texto original está integral, sem correções;
+- a análise separa declaração, inferência e pontos a revisar;
+- a resposta traz somente o caminho, um resumo breve do que foi processado e o
+  próximo passo opcional, sem iniciá-lo.
 
 ## Preservar e pré-processar
 
-1. Faça uma verificação silenciosa de credenciais, tokens, chaves privadas e
-   dados pessoais sensíveis evidentes. Se encontrar algum, não grave o arquivo
-   nem faça perguntas; informe que a política de privacidade exige remover o
-   dado sensível e reenviar a ideia.
-2. Use como texto original todo o input que expressa a ideia. Preserve sua
-   formulação integral, sem “corrigi-la” ou substituir palavras.
-3. Derive silenciosamente um título curto, concreto e fiel. Gere o slug a
-   partir dele.
-4. Separe a análise nas categorias:
-   - **Declaração:** conteúdo explicitamente presente no texto original;
+Faça estes passos em silêncio, na ordem:
+
+1. Verifique credenciais, tokens, chaves privadas e dados pessoais sensíveis
+   evidentes. Se encontrar algum, não grave o arquivo e não pergunte: informe
+   que a política de privacidade exige remover o dado sensível e reenviar a
+   ideia.
+2. Use como texto original todo o input que expressa a ideia, com a formulação
+   integral. Não corrija nem substitua palavras.
+3. Derive um título curto, concreto e fiel; o slug sai dele.
+4. Classifique o conteúdo:
+   - **Declaração:** o que está explícito no texto original;
    - **Inferência:** interpretação plausível, sempre identificada como tal;
    - **A revisar:** lacuna, conflito ou decisão que poderá ser revista depois.
-5. Extraia somente quando houver evidência:
+5. Extraia apenas o que tiver base no texto:
    - resumo em uma frase;
    - problema ou oportunidade;
    - pessoas afetadas ou beneficiadas;
    - resultado ou valor esperado;
    - sinais de escopo, regra, restrição, canal ou solução mencionada;
    - riscos, dependências e relações evidentes;
-   - possíveis direções de backlog ou spec, sem promovê-las.
+   - possíveis direções de backlog ou spec, sem promovê-las;
    - informações que o sistema talvez precise guardar, consultar, compartilhar
      ou apagar, como sinal para conversa futura.
-6. Use `Não identificado no texto original.` quando não houver base. Não
-   invente stakeholder, prioridade, prazo, regra, solução ou critério de aceite.
+6. Sem base, escreva `Não identificado no texto original.`. Não invente
+   stakeholder, prioridade, prazo, regra, solução ou critério de aceite.
 
 ## Criar o arquivo
 
@@ -81,38 +80,38 @@ node <diretório-da-skill>/scripts/capturar_inbox.mjs \
   [--root <raiz>]
 ```
 
-O script usa `.specsfy/templates/custom/Inbox.md` quando presente e recorre a
-`.specsfy/templates/Inbox.md` caso contrário. Ele cria
-`specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` e nunca sobrescreve uma captura
-existente. Se o template estiver ausente, relate a instalação incompleta; não
-crie um template paralelo dentro da skill.
+O script resolve o template em `.specsfy/templates/custom/Inbox.md` e, na
+ausência dele, em `.specsfy/templates/Inbox.md`. Ele cria
+`specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` e não sobrescreve capturas
+existentes. Se nenhum template existir, relate a instalação incompleta em vez
+de criar um template paralelo dentro da skill.
 
 ## Ciclo da captura
 
-A captura nasce com `Status: Capturada` e permanece em `specs/inbox/`, a fila
-ativa, enquanto qualquer parte do pedido estiver sem destino. Ela só sai dali
-quando specs com `Definition Gate: Passed` cobrirem o pedido inteiro: nesse
-momento `$specsfy-04-validate` executa `specsfy inbox process`, que a move para
+A captura nasce com `Status: Capturada` e fica em `specs/inbox/`, a fila
+ativa, enquanto alguma parte do pedido estiver sem destino. Quando specs com
+`Definition Gate: Passed` cobrirem o pedido inteiro, `$specsfy-04-validate`
+executa `specsfy inbox process`, que move a captura para
 `specs/inbox/processed/` com `Status: Processada`, o texto original intacto e
-as specs derivadas registradas. Esta skill nunca executa esse comando: capturar
-e processar são atos de etapas diferentes.
+as specs derivadas registradas. Capturar e processar pertencem a etapas
+diferentes; esta skill não executa esse comando.
 
 ## Orquestrar a conversa
 
-Esta skill é uma exceção deliberada ao handoff automático do framework:
-capturar é o resultado final do pedido e precisa ocorrer sem perguntas nem
-transições. Após escrever, apenas sugira um destes próximos passos:
+Esta skill é uma exceção deliberada ao handoff automático do framework: a
+captura é o resultado final do pedido. Depois de gravar, apenas sugira um
+destes próximos passos:
 
 - manter a entrada na Inbox;
-- usar `$specsfy-02-backlog` para refiná-la ou aprofundá-la.
+- usar `$specsfy-02-backlog` para refiná-la ou aprofundá-la;
 - usar `$specsfy-data-discovery` quando a entrada indicar informações que o
   sistema precisará guardar. Essa conversa posterior registra somente o que
   for confirmado em `.specsfy/DATABASE.md`.
 
-Somente carregue outra skill se o mesmo pedido também ordenar explicitamente
-esse trabalho. Nesse caso, anuncie
+Carregue outra skill apenas se o mesmo pedido também ordenar esse trabalho de
+forma explícita. Nesse caso, com a captura já gravada, anuncie
 `Transição automática: $specsfy-01-inbox → $<destino> — motivo: <motivo> —
-resultado esperado: <resultado>` depois de a captura estar segura.
+resultado esperado: <resultado>`.
 
 ## Limites
 
@@ -121,7 +120,6 @@ resultado esperado: <resultado>` depois de a captura estar segura.
   `specs/inbox/processed/`; essa saída pertence à validação, depois do
   Definition Gate.
 - Não transformar inferência em declaração do usuário.
-- Não criar `specs/backlog/`, qualquer pasta de estado de spec, tarefas,
-  research, testes ou
-  código.
+- Não criar `specs/backlog/`, pastas de estado de spec, tarefas, research,
+  testes ou código.
 - Não usar a ideia como fonte normativa de comportamento.

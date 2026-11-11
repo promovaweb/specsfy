@@ -1,9 +1,13 @@
 ---
 name: specsfy-milestone-governor
-description: Use para projetar o estado dos milestones a partir de specs e backlog, identificar vínculos ausentes, sugerir ajustes e atualizar somente os blocos derivados. Não use para inventar objetivos de produto, alterar condições de saída confirmadas ou concluir marcos sem validação humana.
+description: Projeta o estado dos milestones a partir de specs e backlog com specsfy milestones sync, aponta vínculos ausentes ou incoerentes, sugere ajustes confirmáveis e atualiza somente os blocos derivados. Use para conferir progresso e vínculos dos marcos, depois de importar o MVP ou quando specs mudarem de estado. Não use para descobrir o MVP (specsfy-mvp-milestone-interviewer), planejar evolução pós-MVP (specsfy-roadmap-milestone-interviewer), inventar objetivos ou concluir marcos sem validação humana.
 ---
 
 # Governar milestones a partir das fontes do projeto
+
+Mantenha o mapa de milestones coerente com o que specs e backlog realmente
+dizem. Cada artefato tem um papel: o marco descreve um estado demonstrável, a
+spec define uma capacidade e o backlog registra trabalho ainda refinável.
 
 ## Preparação obrigatória
 
@@ -18,47 +22,52 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
 
-Leia `specs.md`, `specs/milestones/`, `specs/backlog/` e as specs existentes.
-Milestone, spec e backlog possuem responsabilidades distintas: o marco descreve
-um estado demonstrável; a spec define uma capacidade; o backlog registra
-trabalho ainda refinável.
+## Pronto quando
+
+- `specsfy milestones sync` rodou e os blocos derivados estão atuais.
+- Cada inconsistência encontrada foi apresentada com fonte e efeito no mapa.
+- Mudanças estruturais só foram aplicadas após confirmação da pessoa.
+- Nenhum marco foi declarado concluído sem a verificação da seção
+  `Concluir um marco`.
 
 ## Projetar o estado atual
 
-Execute:
+1. Leia em paralelo `specs.md`, `specs/milestones/`, `specs/backlog/` e as
+   specs existentes.
+2. Execute:
 
-```bash
-specsfy milestones sync --project .
-```
+   ```bash
+   specsfy milestones sync --project .
+   ```
 
-O comando atualiza somente blocos marcados em `specs.md` e nos arquivos de
-milestone. Ele calcula specs completas pelo `Status: Complete` e mostra itens
-de backlog sem usá-los para fechar o marco.
+O comando atualiza somente os blocos marcados em `specs.md` e nos arquivos de
+milestone. Conta como completa a spec com `Status: Complete` e mostra itens de
+backlog sem usá-los para fechar o marco.
 
 ## Analisar e sugerir
 
-Depois da projeção, procure por:
+Depois da projeção, procure:
 
-- spec ou backlog ligado a um marco inexistente;
+- spec ou backlog ligado a marco inexistente;
 - milestone sem condição de saída confirmada;
-- spec sem milestone quando sua finalidade já for conhecida;
-- dependência que torna a ordem atual incoerente;
+- spec sem milestone quando a finalidade já for conhecida;
+- dependência que deixa a ordem atual incoerente;
 - conjunto de specs que parece formar um novo estado demonstrável.
 
-Explique a sugestão, o material que a sustenta e o efeito no mapa. Peça
-confirmação antes de mudar relações estruturais. Para falta de descoberta do
-MVP, encaminhe a conversa para `$specsfy-mvp-milestone-interviewer`; para
-evolução posterior, use `$specsfy-roadmap-milestone-interviewer`.
+Para cada achado, explique a sugestão, o material que a sustenta e o efeito no
+mapa. Peça confirmação antes de mudar relações estruturais. Falta de descoberta
+do MVP vai para `$specsfy-mvp-milestone-interviewer`; evolução posterior, para
+`$specsfy-roadmap-milestone-interviewer`.
 
 ## Concluir um marco
 
-Uma milestone só pode ser declarada concluída quando suas specs necessárias
-estiverem completas e a pessoa responsável confirmar a condição de saída por
-uma demonstração, teste de aceite ou outra verificação registrada. O comando
-de sincronização informa progresso; ele não substitui essa confirmação.
+Um milestone só é concluído quando as specs necessárias estão completas e a
+pessoa responsável confirma a condição de saída por demonstração, teste de
+aceite ou outra verificação registrada. O sincronismo mostra progresso; não
+substitui essa confirmação.
 
 ## Limites
 
 - Não alterar texto humano fora dos blocos gerados.
-- Não mover specs, editar gates, tarefas ou código.
-- Não usar uma lista de tarefas fechadas como aceite da milestone.
+- Não mover specs nem editar gates, tarefas ou código.
+- Não usar lista de tarefas fechadas como aceite do milestone.

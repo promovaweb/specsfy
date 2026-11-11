@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Descoberta de dados"
   short_description: "Conversa sobre o que o sistema deve guardar"
-  default_prompt: "Use $specsfy-data-discovery para conversar em linguagem simples sobre o que o sistema precisa guardar e registrar apenas respostas confirmadas em DATABASE.md."
+  default_prompt: "Use $specsfy-data-discovery para conversar em linguagem simples sobre o que o sistema precisa guardar, sugerir uma forma de registro para cada informação e gravar apenas respostas confirmadas em .specsfy/DATABASE.md."

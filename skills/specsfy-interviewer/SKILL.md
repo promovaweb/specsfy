@@ -1,9 +1,14 @@
 ---
 name: specsfy-interviewer
-description: "Use quando uma spec em draft, defined, planned, in-progress ou review precisar de conversa para resolver lacunas, recalibrar Effort ou registrar respostas confirmadas antes da próxima transição. Não use para capturar Inbox sem perguntas, executar implementação, aprovar gates ou mover pastas diretamente."
+description: "Conversa com uma spec em draft, defined, planned, in-progress ou review para resolver lacunas, recalibrar Effort ou registrar respostas confirmadas antes da próxima transição. Use quando a spec já existe e precisa de esclarecimento da pessoa responsável. Não use para capturar Inbox sem perguntas (specsfy-01-inbox), refinar backlog (specsfy-02-backlog), executar implementação, aprovar gates ou mover pastas diretamente."
 ---
 
 # Conversar com uma spec pelo estado atual
+
+Resolva, por conversa, a lacuna que mais atrapalha a próxima etapa de uma spec
+existente. A pasta de estado é o estado operacional e `Status` é seu espelho
+verificável. A spec continua sendo a fonte normativa: registre apenas
+respostas, escolhas e justificativas confirmadas pela pessoa responsável.
 
 ## Preparação obrigatória
 
@@ -18,23 +23,26 @@ Modo de interação: `perguntas`.
 Antes de formular qualquer pergunta, leia e aplique o
 `Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
 
-Leia a `spec.md` pelo ID informado e confirme a pasta de estado. A pasta é o
-estado operacional; `Status` é seu espelho verificável. Preserve a spec como
-fonte normativa e registre apenas respostas, escolhas e justificativas
-confirmadas pela pessoa responsável.
+## Pronto quando
+
+- cada resposta confirmada está registrada na seção adequada da spec;
+- o Effort foi recalibrado com `specsfy effort` sempre que a nova informação
+  mudou a capacidade necessária;
+- a próxima responsabilidade foi entregue à skill correspondente, sem gate
+  aprovado nem pasta movida por esta skill.
 
 ## Conduzir a conversa
 
-1. Leia a spec, seus gates, tarefas, evidências e o contexto do projeto.
+1. Localize a `spec.md` pelo ID informado e confirme a pasta de estado. Leia em
+   paralelo a spec, seus gates, tarefas, evidências e o contexto do projeto.
 2. Identifique a lacuna real que mais afeta a próxima etapa e monte uma rodada
    conforme o contrato central.
 3. Reavalie a spec depois de cada rodada. Não repita informação confirmada nem
    use perguntas como ritual.
-4. Atualize a seção adequada da spec após confirmar a resposta. Quando a nova
-   informação mudar capacidade necessária, ajuste também o Effort.
-5. Entregue a responsabilidade de validação, implementação ou transição à skill
-   correspondente. Esta skill não aprova gate, não executa tarefa e não move a
-   spec.
+4. Depois de confirmar a resposta, atualize a seção adequada da spec. Quando a
+   nova informação mudar a capacidade necessária, ajuste também o Effort.
+5. Entregue validação, implementação ou transição à skill correspondente. Esta
+   skill não aprova gate, não executa tarefa e não move a spec.
 
 ## Adaptar o foco à pasta
 
@@ -52,30 +60,33 @@ confirmadas pela pessoa responsável.
 
 ## Atualizar Effort
 
-Use Effort como estimativa de capacidade de raciocínio e execução necessária,
-nunca como prazo. Escolha um inteiro de 1 a 10 e uma justificativa curta:
+Effort estima a capacidade de raciocínio e execução necessária, não prazo.
+Escolha um inteiro de 1 a 10 e uma justificativa curta:
 
-- 1–2: alteração atômica e padrão conhecido;
-- 3–4: mudança local e testes diretos;
-- 5–6: vários arquivos ou integração conhecida;
-- 7–8: mudança transversal, migração ou integração externa;
-- 9–10: arquitetura, alta incerteza ou revisão humana frequente.
+| Faixa | Situação típica |
+| --- | --- |
+| 1–2 | alteração atômica e padrão conhecido |
+| 3–4 | mudança local e testes diretos |
+| 5–6 | vários arquivos ou integração conhecida |
+| 7–8 | mudança transversal, migração ou integração externa |
+| 9–10 | arquitetura, alta incerteza ou revisão humana frequente |
 
-Execute após a confirmação:
+Depois da confirmação, execute:
 
 ```bash
 specsfy effort <id-da-spec> <1-10> --reason "<o que mudou a estimativa>"
 ```
 
-O comando atualiza `Effort`, data, justificativa e histórico em `spec.md`.
-Não vincule a estimativa ao nome de um modelo: use a faixa para escolher o
-perfil de execução `light`, `standard`, `high` ou `maximum`.
+O comando atualiza `Effort`, data, justificativa e histórico em `spec.md`. Não
+vincule a estimativa ao nome de um modelo, porque modelos mudam e a faixa
+continua válida: use-a para escolher o perfil de execução `light`, `standard`,
+`high` ou `maximum`.
 
 ## Integrar ClickUpfy quando presente
 
 Se o projeto contiver uma skill `clickupfy-*` e a spec tiver `ClickUp Task`,
-depois de uma transição ou ajuste de Effort carregue a skill ClickUpfy
-apropriada. Use o mapeamento configurado pelo projeto ou, quando ausente,
+carregue a skill ClickUpfy apropriada depois de uma transição ou ajuste de
+Effort. Use o mapeamento configurado pelo projeto ou, quando ausente,
 `draft`/`defined`/`planned` para `To Do`, `in-progress` para `In Progress`,
 `review` para `In Review` e `completed` para `Complete`.
 

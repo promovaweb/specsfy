@@ -1,9 +1,22 @@
 ---
 name: specsfy-aux-database
-description: Monitorar e manter a documentação completa da persistência em .specsfy/DATABASE.md, com inventário tabular de bancos, schemas, tabelas, campos, relações e migrations. Use quando o monitor de contexto apontar persistência pendente, sempre que banco, tabela, coleção, model persistente, coluna, índice, relação, schema ou migration for criado ou alterado, e ao auditar se o mapa de dados corresponde ao código. Preserva notas e decisões humanas fora do inventário detectado.
+description: "Mantém .specsfy/DATABASE.md como mapa tabular e completo da persistência: bancos, schemas, tabelas, campos, relações, índices e migrations, conferido contra o código. Use quando o monitor de contexto apontar persistência pendente, quando banco, tabela, coleção, model persistente, coluna, índice, relação, schema ou migration for criado ou alterado, ou ao auditar se o mapa corresponde ao código. Não use para descobrir com a pessoa quais dados guardar (use specsfy-data-discovery) nem para o stack (use specsfy-aux-stack)."
 ---
 
 # Manter o mapa de dados
+
+Esta skill garante que `.specsfy/DATABASE.md` mostre a estrutura de dados que
+o código realmente implementa, ao lado do que a conversa definiu. Uma mudança
+de dados só está completa quando o mapa a reflete.
+
+## Pronto quando
+
+- O bloco `specsfy:database` corresponde a schemas, migrations, models e
+  configurações presentes.
+- Relações, índices, constraints, ownership, retenção e finalidade estão
+  preenchidos ou marcados como desconhecidos, nunca inventados.
+- Os testes relevantes à mudança de dados estão verdes.
+- `monitor_context.mjs --check` não aponta mais `.specsfy/DATABASE.md`.
 
 ## Preparação obrigatória
 
@@ -18,24 +31,41 @@ Modo de interação: `sem perguntas`.
 Não formule perguntas nesta skill. Quando faltar informação confirmada,
 sinalize o campo pendente para a etapa conversacional responsável.
 
-1. Ler instruções locais, `PROJECT.md`, `STACK.md` e todo o `DATABASE.md`.
-2. Inspecionar schemas, migrations, models persistentes e configurações sem
+## Executar
+
+1. Leia em paralelo as instruções locais, `PROJECT.md`, `STACK.md` e todo o
+   `DATABASE.md`.
+2. Inspecione schemas, migrations, models persistentes e configurações sem
    revelar valores de ambiente ou credenciais.
-3. Executar `node scripts/update_database.mjs --project <raiz>`.
-4. Conferir o inventário detectado contra as fontes executáveis.
-5. Completar relações, índices, constraints, ownership, retenção e finalidade
-   que não possam ser inferidos com segurança; marcar desconhecidos em vez de
-   inventar.
-6. Preservar todo conteúdo fora do bloco `specsfy:database`.
-7. Considerar a mudança de dados incompleta até `DATABASE.md` refletir a nova
-   estrutura e os testes relevantes estarem verdes.
-8. Executar `$specsfy-setup` em modo de monitoramento antes de devolver o
-   handoff e exigir que `.specsfy/DATABASE.md` deixe de aparecer como pendência.
+3. Atualize o bloco detectado:
 
-Quando `$specsfy-data-discovery` registrar respostas confirmadas, preserve a
-seção `Informações a guardar confirmadas` e compare-a com o que o código
-revela. A conversa descreve o produto; este mapa continua mostrando também o
-que já foi implementado.
+   ```bash
+   node .agents/skills/specsfy-aux-database/scripts/update_database.mjs \
+     --project <raiz>
+   ```
 
-Usar tabelas Markdown para permitir busca e comparação. Nunca copiar dados de
-produção, strings de conexão, senhas, tokens ou valores de `.env`.
+4. Confira o resultado contra as fontes executáveis.
+5. Complete à mão o que não pode ser inferido com segurança: relações,
+   índices, constraints, ownership, retenção e finalidade. Marque como
+   desconhecido o que nenhuma fonte sustentar.
+6. Confirme que a persistência deixou de aparecer como pendência:
+
+   ```bash
+   node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
+     --project <raiz> --check
+   ```
+
+## Conversa e código
+
+Quando `$specsfy-data-discovery` tiver registrado respostas confirmadas,
+preserve a seção `Informações a guardar confirmadas` e compare-a com o que o
+código revela. A conversa descreve o produto; este mapa mostra também o que já
+foi implementado, e divergências ficam visíveis em vez de corrigidas em
+silêncio.
+
+## Limites
+
+- Preserve todo conteúdo fora do bloco `specsfy:database`.
+- Use tabelas Markdown, que facilitam busca e comparação.
+- Não copie dados de produção, strings de conexão, senhas, tokens ou valores
+  de `.env`.
