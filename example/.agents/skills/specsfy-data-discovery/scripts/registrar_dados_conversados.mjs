@@ -62,7 +62,7 @@ async function main() {
   const currentBlock = current.match(new RegExp(`${START.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}[\\s\\S]*?${END.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")}`));
   const rows = currentBlock?.[0].split(/\r?\n/gu).filter((line) => line.startsWith("| ") && !line.startsWith("| Informação ") && !line.startsWith("| ---")) ?? [];
   const nextBlock = block(values, rows);
-  const next = currentBlock ? current.replace(currentBlock[0], nextBlock) : `${current.trimEnd()}\n\n${nextBlock}\n`;
+  const next = currentBlock ? current.replace(currentBlock[0], () => nextBlock) : `${current.trimEnd()}\n\n${nextBlock}\n`;
   await mkdir(join(project, ".specsfy"), { recursive: true });
   await writeFile(target, next, "utf8");
   console.log(target);

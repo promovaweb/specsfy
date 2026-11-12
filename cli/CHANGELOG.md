@@ -4,6 +4,23 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- `load_research.mjs` lê a seção inteira. Com o `$` em modo multilinha, a
+  expressão parava no fim da primeira linha: só o primeiro artefato e o
+  primeiro claim eram conferidos, e um claim `critical` não verificado na
+  segunda linha passava.
+- Texto livre entra literal nos templates. Os scripts de inbox, backlog, spec,
+  setup, descoberta de dados e importação do MVP passam a substituir com função,
+  e `$&`, `` $` `` ou `$'` no texto do usuário deixam de virar padrões especiais
+  de `String.replace`.
+- `analyze_change.mjs` resolve o caminho real da spec antes de compará-lo com a
+  raiz do Git. Aberta por link simbólico (no macOS, `/tmp` e `/var` apontam
+  para `/private`), a spec era dada como fora do repositório.
+- `check_traceability.mjs` ignora `.claude/`, onde ficam as worktrees aninhadas
+  do Claude Code. As cópias dos testes contavam como cobertura duplicada, como
+  o documentador já evitava.
+
 ## [0.26.2] - 2026-11-11
 
 ### Corrigido
