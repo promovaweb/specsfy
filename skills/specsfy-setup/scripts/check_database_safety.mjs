@@ -44,6 +44,11 @@ const destructiveTestTraits = /\b(?:RefreshDatabase|DatabaseMigrations)\b/u;
 const errors = [];
 const ignored = [];
 
+/** Normalização do destino do banco; precisa existir antes da primeira inspeção. */
+const DRIVER_ALIASES = { postgres: "pgsql", postgresql: "pgsql", mariadb: "mysql", sqlite3: "sqlite" };
+const DEFAULT_PORTS = { pgsql: "5432", mysql: "3306", sqlsrv: "1433" };
+const LOCAL_HOSTS = new Set(["", "localhost", "127.0.0.1", "::1", "[::1]"]);
+
 if (!existsSync(project)) {
   errors.push(`projeto não encontrado: ${project}`);
 } else {
@@ -209,16 +214,27 @@ function parseEnv(source) {
 /** Produz uma identidade comparável sem revelar credenciais ou nomes na saída. */
 function databaseTarget(environment, fallback = new Map()) {
   const get = (name) => environment.get(name) ?? fallback.get(name);
+  let connection = get("DB_CONNECTION") ?? "";
+  let host = get("DB_HOST") ?? "";
+  let port = get("DB_PORT") ?? "";
+  let database = get("DB_DATABASE") ?? "";
   const url = get("DB_URL");
-  if (url) return `url:${url}`;
-  const database = get("DB_DATABASE");
+  if (url) {
+    // Como no Laravel, as partes da URL prevalecem; usuário e senha ficam fora da identidade.
+    try {
+      const parsed = new URL(url);
+      connection = parsed.protocol.replace(/:$/u, "") || connection;
+      host = parsed.hostname || host;
+      port = parsed.port || port;
+      database = decodeURIComponent(parsed.pathname.replace(/^\/+/u, "")) || database;
+    } catch {
+      return `url:${url}`;
+    }
+  }
   if (!database) return "";
-  return [
-    get("DB_CONNECTION") ?? "",
-    get("DB_HOST") ?? "",
-    get("DB_PORT") ?? "",
-    database,
-  ].join("|");
+  const driver = DRIVER_ALIASES[connection.toLowerCase()] ?? connection.toLowerCase();
+  const normalizedHost = LOCAL_HOSTS.has(host.toLowerCase()) ? "localhost" : host.toLowerCase();
+  return [driver, normalizedHost, port || DEFAULT_PORTS[driver] || "", database].join("|");
 }
 
 /** Confere o conteúdo do alias de pacote acionado pelo comando informado. */

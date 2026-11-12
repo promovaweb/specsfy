@@ -4,6 +4,15 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- A proteção do banco reconhece o banco de desenvolvimento escrito de outra
+  forma no `.env.testing`. `check_database_safety.mjs` decompõe `DB_URL` em
+  driver, host, porta e banco (como o Laravel faz) e normaliza aliases de driver
+  (`postgres`/`pgsql`, `mariadb`/`mysql`), hosts locais e portas padrão. Antes,
+  um `DB_URL` ou um `localhost` no lugar de `127.0.0.1` apontando para o mesmo
+  banco passava como banco separado. Usuário e senha ficam fora da identidade.
+
 ## [0.26.2] - 2026-11-11
 
 ### Corrigido
