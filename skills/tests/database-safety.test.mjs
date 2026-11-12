@@ -31,6 +31,21 @@ for (const testing of [separate.replace('produto_test', 'produto_dev'), 'APP_ENV
     assert.match(result.stdout, /banco de desenvolvimento/);
   });
 }
+for (const testing of [
+  'APP_ENV=testing\nDB_URL=mysql://root:outra-senha@127.0.0.1:3306/produto_dev\n',
+  'APP_ENV=testing\nDB_CONNECTION=mariadb\nDB_HOST=localhost\nDB_DATABASE=produto_dev\n',
+]) {
+  test('recusa o banco de desenvolvimento escrito de outra forma: ' + testing, t => {
+    const result = check(fixture(t, testing));
+    assert.equal(result.status, 1);
+    assert.match(result.stdout, /banco de desenvolvimento/);
+    assert.ok(!result.stdout.includes('outra-senha'));
+  });
+}
+test('aceita DB_URL que aponta para outro banco', t => {
+  const result = check(fixture(t, 'APP_ENV=testing\nDB_URL=mysql://root:x@127.0.0.1:3306/produto_test\n'));
+  assert.equal(result.status, 0, result.stdout);
+});
 test('recusa nome de banco herdado do .env', t => {
   const result = check(fixture(t, 'APP_ENV=testing\n'));
   assert.equal(result.status, 1);
