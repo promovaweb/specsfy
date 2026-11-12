@@ -98,7 +98,7 @@ function render(content, number, title, slug) {
   let rendered = content;
   for (const [token, value] of Object.entries(replacements)) {
     if (!rendered.includes(token)) fail(`token obrigatório ausente no modelo: ${token}`);
-    rendered = rendered.replaceAll(token, value);
+    rendered = rendered.replaceAll(token, () => value);
   }
   const unresolved = [...new Set(rendered.match(/\{\{[A-Z0-9_]+\}\}/gu) ?? [])];
   if (unresolved.length) fail(`tokens não preenchidos no modelo: ${unresolved.join(", ")}`);
