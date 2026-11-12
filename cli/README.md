@@ -188,6 +188,9 @@ não existe em um projeto consumidor, o CLI cria o lock vazio compatível:
 }
 ```
 
+O CLI lê o lock nas versões 1 e 2. A versão 2 é a que o `skills` grava hoje, com
+a origem e o hash de cada skill; outras versões são recusadas.
+
 O gerenciador lista exclusivamente `specsfy-setup`, `specsfy-documentator` e
 skills do catálogo base, `specsfy-aux-*` e `specsfy-specialist-*`. Skills
 externas

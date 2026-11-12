@@ -4,6 +4,14 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- `specsfy update` lê o `skills-lock.json` na versão 2. O gerenciador `skills`,
+  chamado pelo próprio `specsfy install`, grava o lock nessa versão, e o
+  `update` recusava o arquivo com "versão de lock não suportada" ao conferir as
+  skills instaladas. As versões 1 e 2 têm o mesmo mapa `skills`; outras
+  versões continuam recusadas.
+
 ## [0.26.2] - 2026-11-11
 
 ### Corrigido

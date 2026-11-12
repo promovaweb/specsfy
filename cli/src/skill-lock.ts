@@ -13,9 +13,12 @@ import {
 
 export const LOCK_FILENAME = "skills-lock.json";
 
+/** Versões do lock lidas pelo CLI; o gerenciador `skills` grava a 2 desde que passou a registrar a origem de cada skill. */
+const SUPPORTED_LOCK_VERSIONS: ReadonlySet<unknown> = new Set([1, 2]);
+
 /** Estrutura mínima compatível com o CLI `skills`. */
 export interface SkillsLock {
-  version: 1;
+  version: 1 | 2;
   skills: Record<string, unknown>;
   [key: string]: unknown;
 }
@@ -52,7 +55,7 @@ export async function readSkillsLock(project: string): Promise<SkillsLock> {
     throw new Error(`lock inválido: ${path}`);
   }
   const lock = payload as Partial<SkillsLock>;
-  if (lock.version !== 1) {
+  if (!SUPPORTED_LOCK_VERSIONS.has(lock.version)) {
     throw new Error(`versão de lock não suportada em ${path}`);
   }
   if (!lock.skills || typeof lock.skills !== "object" || Array.isArray(lock.skills)) {

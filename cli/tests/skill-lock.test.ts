@@ -26,11 +26,32 @@ describe("lock de skills", () => {
     );
   });
 
-  test("recusa lock inválido", async () => {
+  test("lê o lock na versão 2 gravada pelo gerenciador skills", async () => {
     const project = await temporaryDirectory();
     await writeFile(
       join(project, "skills-lock.json"),
-      JSON.stringify({ version: 2, skills: {} }),
+      JSON.stringify({
+        version: 2,
+        skills: {
+          "specsfy-setup": {
+            source: "skills",
+            sourceType: "local",
+            computedHash: "abc",
+            installMode: "copy",
+          },
+        },
+      }),
+    );
+    expect(await installedSkillNames(project, false)).toEqual(
+      new Set(["specsfy-setup"]),
+    );
+  });
+
+  test("recusa versão de lock desconhecida", async () => {
+    const project = await temporaryDirectory();
+    await writeFile(
+      join(project, "skills-lock.json"),
+      JSON.stringify({ version: 3, skills: {} }),
     );
     await expect(readSkillsLock(project)).rejects.toThrow("não suportada");
   });
