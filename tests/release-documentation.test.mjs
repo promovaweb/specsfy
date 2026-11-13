@@ -1,4 +1,4 @@
-/** Preserva ownership e sequência atômica da release durante a conversão para Node. */
+/** Preserva ownership e sequência atômica da release do CLI compilado em Bun. */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, lstatSync, realpathSync } from 'node:fs';
@@ -16,7 +16,7 @@ test('skill de release pertence ao CLI e não ao framework instalado', () => {
 
 test('skill documenta conferência remota, push atômico e retomada', () => {
   const source = read(skill + '/SKILL.md');
-  for (const term of ['git remote get-url origin', 'git status --porcelain', 'git fetch origin main --tags', 'git rev-parse HEAD', 'git rev-parse origin/main', 'npm ci', 'npm test', 'npm run build:executable', 'npm publish', 'git tag -a', 'git push --atomic origin main', 'gh release create', '--notes-file', 'gh release view', 'release-changelog.mjs verify', 'release-changelog.mjs extract', 'git ls-remote origin', 'gh run list', 'não recriar', 'cli/']) assert.ok(source.includes(term), term);
+  for (const term of ['git remote get-url origin', 'git status --porcelain', 'git fetch origin main --tags', 'git rev-parse HEAD', 'git rev-parse origin/main', 'bun install --frozen-lockfile', 'bun test', 'bun run build:all', 'npm publish', 'cli/npm/package.json', 'SHA256SUMS', 'CLI Release', 'git tag -a', 'git push --atomic origin main', 'gh release create', '--notes-file', 'gh release view', 'release-changelog.mjs verify', 'release-changelog.mjs extract', 'git ls-remote origin', 'gh run list', 'não recriar', 'cli/']) assert.ok(source.includes(term), term);
 });
 
 test('workspace e CLI documentam ownership da publicação', () => {

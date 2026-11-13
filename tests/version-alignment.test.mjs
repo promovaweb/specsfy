@@ -15,10 +15,8 @@ function fixture(t) {
     writeFileSync(join(root, path), typeof content === 'string' ? content : JSON.stringify(content));
   };
   put('VERSION', '1.2.3\n');
-  put('cli/src/version.ts', 'export const VERSION = "1.2.3";\n');
   put('cli/package.json', { version: '1.2.3' });
-  put('cli/package-lock.json', { version: '1.2.3', packages: { '': { version: '1.2.3' } } });
-  put('cli/bin/specsfy.build.json', { version: '1.2.3' });
+  put('cli/npm/package.json', { name: '@promovaweb/specsfy', version: '1.2.3' });
   const artifacts = {};
   for (const extension of ['pdf', 'epub']) {
     const file = `Specsfy-Guia-do-Usuario-v1.2.3.${extension}`;
@@ -32,7 +30,7 @@ function fixture(t) {
 test('aceita projeções alinhadas', t => {
   assert.deepEqual(checkVersionAlignment(fixture(t).root), { version: '1.2.3', errors: [] });
 });
-for (const path of ['cli/package.json', 'cli/package-lock.json', 'cli/bin/specsfy.build.json', 'ebook/build.json']) {
+for (const path of ['cli/package.json', 'cli/npm/package.json', 'ebook/build.json']) {
   test('recusa projeção divergente: ' + path, t => {
     const { root, put } = fixture(t);
     put(path, { version: '1.2.2' });
@@ -44,10 +42,10 @@ test('recusa versão da raiz inválida', t => {
   put('VERSION', '01.2.3');
   assert.throws(() => checkVersionAlignment(root), /SemVer/);
 });
-test('recusa fonte TypeScript sem declaração', t => {
-  const { root, put } = fixture(t);
-  put('cli/src/version.ts', '');
-  assert.throws(() => checkVersionAlignment(root), /não declara VERSION/);
+test('recusa wrapper npm ausente', t => {
+  const { root } = fixture(t);
+  rmSync(join(root, 'cli/npm/package.json'));
+  assert.throws(() => checkVersionAlignment(root), /ENOENT/);
 });
 test('recusa arquivo de ebook ausente', t => {
   const { root } = fixture(t);

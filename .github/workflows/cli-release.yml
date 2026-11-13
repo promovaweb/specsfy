@@ -1,0 +1,99 @@
+name: CLI Release
+
+# On a vX.Y.Z tag: compiles the five targets of cli/scripts/build.ts --all,
+# attaches them and SHA256SUMS to the GitHub Release of the tag (creating it
+# with the CHANGELOG section when the release skill has not yet), then
+# publishes the npm wrapper in cli/npm/, which downloads those binaries.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  binaries:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: cli
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: '1.4.4'
+      - run: bun install --frozen-lockfile
+      - name: Validate tag version
+        run: |
+          version="$(bun -p 'require("./package.json").version')"
+          test "v${version}" = "${GITHUB_REF_NAME}"
+          test "$(bun -p 'require("./npm/package.json").version')" = "${version}"
+          test "$(cat ../VERSION)" = "${version}"
+      # Native OpenTUI packages of every platform at the lockfile version.
+      - name: Install native packages for all targets
+        run: bun install --frozen-lockfile --os="*" --cpu="*" --libc="*"
+      - run: bun run validate
+      - name: Compile the five targets
+        run: bun run build:all
+      - name: Smoke test the Linux binary
+        run: ./dist/specsfy-linux-x64 --version | grep -F "${GITHUB_REF_NAME#v}"
+      - name: Generate checksums
+        working-directory: cli/dist
+        run: sha256sum specsfy-*-* > SHA256SUMS
+      # Same extraction as the release skill, so the notes match its verify step.
+      - name: Extract release notes
+        working-directory: cli/.agents/skills/specsfy-release-cli
+        run: |
+          bun scripts/release-changelog.mjs extract \
+            --changelog ../../../CHANGELOG.md --version "${GITHUB_REF_NAME#v}" \
+            --output "${RUNNER_TEMP}/release-notes.md"
+      - name: Attach binaries to the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if ! gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release create "${GITHUB_REF_NAME}" --verify-tag \
+              --title "Specsfy CLI ${GITHUB_REF_NAME}" \
+              --notes-file "${RUNNER_TEMP}/release-notes.md"
+          fi
+          gh release upload "${GITHUB_REF_NAME}" dist/specsfy-*-* dist/SHA256SUMS --clobber
+
+  npm:
+    needs: binaries
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        working-directory: cli/npm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.20.0'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Smoke test the wrapper against the release
+        if: ${{ !github.event.repository.private }}
+        env:
+          SPECSFY_CACHE_DIR: ${{ runner.temp }}/specsfy-cache
+        run: node bin/specsfy.cjs --version | grep -F "${GITHUB_REF_NAME#v}"
+      - run: npm pack --dry-run
+      - name: Publish npm package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          if [ "${REPOSITORY_PRIVATE}" = "true" ]; then
+            npm publish --access public
+          else
+            npm publish --access public --provenance
+          fi

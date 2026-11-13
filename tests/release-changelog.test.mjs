@@ -11,11 +11,11 @@ function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'specsfy-release-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
   const cli = join(root, 'cli');
-  mkdirSync(join(cli, 'src'), { recursive: true });
+  mkdirSync(join(cli, 'npm'), { recursive: true });
   const files = {
     VERSION: '1.2.3\n',
     'cli/package.json': '{"name":"teste","version":"1.2.3"}\n',
-    'cli/src/version.ts': 'export const VERSION = "1.2.3";\n',
+    'cli/npm/package.json': '{"name":"@promovaweb/specsfy","version":"1.2.3"}\n',
     'cli/CHANGELOG.md': '# Changelog\n\n## [Unreleased]\n\n## [1.2.3] - 2026-10-01\n\nAnterior.\n',
     'notes.md': '### Corrigido\n\n- Preserva $& e caracteres acentuados.\n',
   };
@@ -28,7 +28,7 @@ test('prepara versão maior sem alterar as notas ou a seção anterior', t => {
   prepare(f.cli, '1.10.0', '2026-11-02', f.notes);
   assert.equal(readFileSync(join(f.root, 'VERSION'), 'utf8'), '1.10.0\n');
   assert.equal(JSON.parse(readFileSync(join(f.cli, 'package.json'))).version, '1.10.0');
-  assert.equal(readFileSync(join(f.cli, 'src/version.ts'), 'utf8'), 'export const VERSION = "1.10.0";\n');
+  assert.equal(JSON.parse(readFileSync(join(f.cli, 'npm/package.json'))).version, '1.10.0');
   assert.equal(releaseNotes(f.changelog, '1.10.0'), f.files['notes.md']);
   assert.equal(releaseNotes(f.changelog, '1.2.3'), 'Anterior.\n');
 });
