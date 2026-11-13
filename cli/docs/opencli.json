@@ -1,0 +1,877 @@
+{
+  "$schema": "https://opencli.org/draft.json",
+  "opencli": "0.1",
+  "info": {
+    "title": "Termfy",
+    "version": "0.9.2",
+    "summary": "CLI, TUI and MCP stdio server skeleton in Bun, with the Termfy framework skills installed.",
+    "description": "CLI, TUI and MCP stdio server skeleton in Bun, with the Termfy framework skills installed. Without arguments it opens the TUI; \"termfy mcp\" starts the MCP server over stdio; any other command runs as a CLI with text or --json output.",
+    "contact": {
+      "name": "Promovaweb",
+      "url": "https://promovaweb.com"
+    },
+    "license": {
+      "name": "UNLICENSED"
+    }
+  },
+  "conventions": {
+    "groupOptions": false,
+    "optionSeparator": " "
+  },
+  "command": {
+    "name": "termfy",
+    "description": "CLI, TUI and MCP stdio server skeleton in Bun, with the Termfy framework skills installed.",
+    "options": [
+      {
+        "name": "--help",
+        "description": "Show help for the current command and exit with code 0.",
+        "aliases": [
+          "-h"
+        ],
+        "recursive": true
+      },
+      {
+        "name": "--version",
+        "description": "Print the version and exit with code 0.",
+        "aliases": [
+          "-V"
+        ],
+        "recursive": true
+      },
+      {
+        "name": "--json",
+        "description": "Return JSON output with the envelope { ok, command, data } or { ok, command, error }. Errors are JSON too.",
+        "recursive": true
+      },
+      {
+        "name": "--skill",
+        "description": "Print the full documentation embedded in the binary, written for AI agents. With a topic, print only that section.",
+        "recursive": true,
+        "arguments": [
+          {
+            "name": "topic",
+            "required": false,
+            "arity": {
+              "minimum": 0,
+              "maximum": 1
+            },
+            "acceptedValues": [
+              "cli",
+              "tui",
+              "mcp",
+              "config",
+              "exit-codes",
+              "reference"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "--opencli",
+        "description": "Print the OpenCLI description (JSON) of the whole command tree.",
+        "recursive": true
+      },
+      {
+        "name": "--no-color",
+        "description": "Disable ANSI colors in text output. Same as NO_COLOR=1.",
+        "recursive": true
+      }
+    ],
+    "commands": [
+      {
+        "name": "tui",
+        "description": "Open the terminal interface (Overview and About). Requires a TTY.",
+        "options": [
+          {
+            "name": "--tab",
+            "description": "Initial tab. Overrides tui.initialTab from settings.json.",
+            "arguments": [
+              {
+                "name": "tab",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                },
+                "acceptedValues": [
+                  "overview",
+                  "about"
+                ]
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "termfy",
+          "termfy tui --tab about"
+        ],
+        "interactive": true,
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 8,
+            "description": "NO_TTY: The TUI requires an interactive terminal (TTY)."
+          }
+        ]
+      },
+      {
+        "name": "about",
+        "description": "Show version, executable, runtime, platform and credits.",
+        "examples": [
+          "termfy about",
+          "termfy about --json"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "config",
+        "description": "Read and write preferences in ~/.termfy/settings.json.",
+        "commands": [
+          {
+            "name": "list",
+            "description": "List every key with its effective value (file merged with defaults).",
+            "aliases": [
+              "ls"
+            ],
+            "examples": [
+              "termfy config list",
+              "termfy config list --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 3,
+                "description": "CONFIG: settings.json missing, invalid or unknown key."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          },
+          {
+            "name": "get",
+            "description": "Show the value of a key.",
+            "arguments": [
+              {
+                "name": "key",
+                "description": "Key in dot notation, e.g. output.format.",
+                "required": true
+              }
+            ],
+            "examples": [
+              "termfy config get tui.initialTab"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 3,
+                "description": "CONFIG: settings.json missing, invalid or unknown key."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          },
+          {
+            "name": "set",
+            "description": "Write a value to settings.json, converting the type according to the schema.",
+            "arguments": [
+              {
+                "name": "key",
+                "description": "Key in dot notation.",
+                "required": true
+              },
+              {
+                "name": "value",
+                "description": "Value as text. Booleans accept true/false, yes/no, 1/0, on/off.",
+                "required": true
+              }
+            ],
+            "examples": [
+              "termfy config set output.format json",
+              "termfy config set output.colors false"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 3,
+                "description": "CONFIG: settings.json missing, invalid or unknown key."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          },
+          {
+            "name": "unset",
+            "description": "Remove a key from the file. The key falls back to its default, if any.",
+            "aliases": [
+              "rm"
+            ],
+            "arguments": [
+              {
+                "name": "key",
+                "description": "Key in dot notation.",
+                "required": true
+              }
+            ],
+            "examples": [
+              "termfy config unset telemetry.enabled"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 3,
+                "description": "CONFIG: settings.json missing, invalid or unknown key."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          },
+          {
+            "name": "path",
+            "description": "Print the data directory and file paths.",
+            "examples": [
+              "termfy config path"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "schema",
+            "description": "List the known keys with type, default and description.",
+            "examples": [
+              "termfy config schema --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 3,
+            "description": "CONFIG: settings.json missing, invalid or unknown key."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
+            "code": 7,
+            "description": "PERMISSION: Permission denied on the file system."
+          }
+        ]
+      },
+      {
+        "name": "credentials",
+        "description": "Store encrypted secrets (AES-256-GCM) in ~/.termfy/credentials.json.",
+        "aliases": [
+          "cred"
+        ],
+        "commands": [
+          {
+            "name": "set",
+            "description": "Save or replace a credential. The value is read without echo or from stdin.",
+            "arguments": [
+              {
+                "name": "name",
+                "description": "Credential identifier: lower-case letters, digits, dot, hyphen and underscore (e.g. openai.api_key).",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--stdin",
+                "description": "Force reading the value from the first stdin line, even on an interactive terminal."
+              }
+            ],
+            "examples": [
+              "termfy credentials set openai.api_key",
+              "printf '%s' \"$TOKEN\" | termfy credentials set github.token --stdin"
+            ],
+            "interactive": true,
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 130,
+                "description": "INTERRUPTED: Input cancelled or process interrupted."
+              }
+            ]
+          },
+          {
+            "name": "get",
+            "description": "Show a masked credential. Use --reveal for the full value.",
+            "arguments": [
+              {
+                "name": "name",
+                "description": "Credential identifier.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--reveal",
+                "description": "Print the value in clear. In --json the field becomes `value`."
+              }
+            ],
+            "examples": [
+              "termfy credentials get openai.api_key",
+              "termfy credentials get openai.api_key --reveal"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 130,
+                "description": "INTERRUPTED: Input cancelled or process interrupted."
+              }
+            ]
+          },
+          {
+            "name": "list",
+            "description": "List saved names. Never shows values.",
+            "aliases": [
+              "ls"
+            ],
+            "examples": [
+              "termfy credentials list --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 130,
+                "description": "INTERRUPTED: Input cancelled or process interrupted."
+              }
+            ]
+          },
+          {
+            "name": "remove",
+            "description": "Remove a credential from the vault.",
+            "aliases": [
+              "rm"
+            ],
+            "arguments": [
+              {
+                "name": "name",
+                "description": "Credential identifier.",
+                "required": true
+              }
+            ],
+            "examples": [
+              "termfy credentials remove github.token"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 130,
+                "description": "INTERRUPTED: Input cancelled or process interrupted."
+              }
+            ]
+          },
+          {
+            "name": "status",
+            "description": "Show file, master key source and number of credentials.",
+            "examples": [
+              "termfy credentials status"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "clear",
+            "description": "Delete credentials.json entirely. Keeps master.key. Asks for confirmation on a terminal.",
+            "options": [
+              {
+                "name": "--yes",
+                "description": "Skip the confirmation.",
+                "aliases": [
+                  "-y"
+                ]
+              }
+            ],
+            "examples": [
+              "termfy credentials clear --yes"
+            ],
+            "interactive": true,
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 130,
+                "description": "INTERRUPTED: Input cancelled or process interrupted."
+              }
+            ]
+          },
+          {
+            "name": "rotate-key",
+            "description": "Re-encrypt the existing vault with a new master key and write master.key with mode 0600.",
+            "options": [
+              {
+                "name": "--from-env",
+                "description": "Use TERMFY_MASTER_KEY (64 hex characters) as the new key; read the current key from master.key."
+              }
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 130,
+                "description": "INTERRUPTED: Input cancelled or process interrupted."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 4,
+            "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+          },
+          {
+            "code": 7,
+            "description": "PERMISSION: Permission denied on the file system."
+          },
+          {
+            "code": 130,
+            "description": "INTERRUPTED: Input cancelled or process interrupted."
+          }
+        ]
+      },
+      {
+        "name": "mcp",
+        "description": "Start the MCP server (stdio) with tools, resources and prompts for agents.",
+        "options": [
+          {
+            "name": "--list",
+            "description": "Instead of starting the server, list registered tools, resources and prompts and exit."
+          }
+        ],
+        "examples": [
+          "termfy mcp",
+          "termfy mcp --list --json"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 9,
+            "description": "MCP: The MCP server failed to start or lost the stdio transport."
+          }
+        ]
+      },
+      {
+        "name": "skill",
+        "description": "Print the embedded documentation, whole or by topic. Same effect as --skill.",
+        "arguments": [
+          {
+            "name": "topic",
+            "description": "Desired section. Without it, prints everything.",
+            "required": false,
+            "acceptedValues": [
+              "cli",
+              "tui",
+              "mcp",
+              "config",
+              "exit-codes",
+              "reference"
+            ]
+          }
+        ],
+        "examples": [
+          "termfy skill",
+          "termfy skill mcp",
+          "termfy --skill cli"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "doctor",
+        "description": "Check runtime, terminal, settings, key source and vault readability without changing files.",
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 3,
+            "description": "CONFIG: settings.json missing, invalid or unknown key."
+          }
+        ]
+      },
+      {
+        "name": "completion",
+        "description": "Print a registry-generated completion script for bash, zsh or fish.",
+        "arguments": [
+          {
+            "name": "shell",
+            "description": "Shell to generate completion for: bash, zsh or fish.",
+            "required": true,
+            "acceptedValues": [
+              "bash",
+              "zsh",
+              "fish"
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      }
+    ],
+    "examples": [
+      "termfy",
+      "termfy about --json",
+      "termfy config set output.format json",
+      "termfy credentials set openai.api_key",
+      "termfy mcp",
+      "termfy --skill"
+    ],
+    "exitCodes": [
+      {
+        "code": 0,
+        "description": "SUCCESS: Operation completed."
+      },
+      {
+        "code": 1,
+        "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+      },
+      {
+        "code": 2,
+        "description": "USAGE: Invalid arguments, options or subcommand."
+      },
+      {
+        "code": 3,
+        "description": "CONFIG: settings.json missing, invalid or unknown key."
+      },
+      {
+        "code": 4,
+        "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+      },
+      {
+        "code": 5,
+        "description": "NETWORK_OR_API: Network failure or unexpected API response."
+      },
+      {
+        "code": 6,
+        "description": "NOT_FOUND: Requested resource does not exist."
+      },
+      {
+        "code": 7,
+        "description": "PERMISSION: Permission denied on the file system."
+      },
+      {
+        "code": 8,
+        "description": "NO_TTY: The TUI requires an interactive terminal (TTY)."
+      },
+      {
+        "code": 9,
+        "description": "MCP: The MCP server failed to start or lost the stdio transport."
+      },
+      {
+        "code": 130,
+        "description": "INTERRUPTED: Input cancelled or process interrupted."
+      }
+    ]
+  }
+}

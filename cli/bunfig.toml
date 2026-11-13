@@ -1,0 +1,5 @@
+# Bun configuration for the starter kit.
+# Tests live in tests/ and use the native `bun test` runner.
+[test]
+root = "./tests"
+coverage = false

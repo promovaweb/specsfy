@@ -1,232 +1,128 @@
-/** Contratos observáveis da interface de linha de comando. */
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+/** End-to-end CLI runs in a subprocess with an isolated data directory. */
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import { buildProgram, runCli } from "../src/cli.js";
-import { temporaryDirectory } from "./helpers.js";
+import { HOME_VARIABLE } from "../src/config/paths.ts";
+import { manifest } from "../src/app/manifest.ts";
+import { root } from "../src/cli/commands.ts";
 
-describe("CLI público", () => {
-  afterEach(() => {
-    process.exitCode = 0;
+let dir: string;
+
+beforeAll(() => {
+  dir = mkdtempSync(join(tmpdir(), "termfy-cli-"));
+});
+afterAll(() => rmSync(dir, { recursive: true, force: true }));
+
+async function run(args: string[], stdin?: string) {
+  const proc = Bun.spawn(["bun", "run", "src/main.ts", ...args], {
+    cwd: join(import.meta.dir, ".."),
+    env: { ...process.env, [HOME_VARIABLE]: dir, NO_COLOR: "1" },
+    stdin: stdin === undefined ? "ignore" : new Response(stdin),
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  const [stdout, stderr] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text()]);
+  const code = await proc.exited;
+  return { code, stdout, stderr };
+}
+
+describe("cli", () => {
+  test("--version", async () => {
+    const r = await run(["--version"]);
+    expect(r.code).toBe(0);
+    expect(r.stdout.trim()).toBe(`${manifest.bin} ${manifest.version}`);
   });
 
-  test("expõe todos os comandos e subcomandos compatíveis", () => {
-    const program = buildProgram();
-    expect(
-      program.commands.find((command) => command.name() === "install")?.aliases(),
-    ).toEqual([]);
-    expect(program.commands.map((command) => command.name())).toEqual([
-      "install",
-      "doctor",
-      "update",
-      "upgrade",
-      "skills",
-      "transition",
-      "migrate",
-      "effort",
-      "inbox",
-      "progress",
-      "milestones",
-      "test",
-      "tui",
-      "config",
-    ]);
-    expect(
-      program.commands
-        .find((command) => command.name() === "inbox")
-        ?.commands.map((command) => command.name()),
-    ).toEqual(["process"]);
-    expect(
-      program.commands
-        .find((command) => command.name() === "skills")
-        ?.commands.map((command) => command.name()),
-    ).toEqual(["list", "detect", "install", "remove", "update"]);
-    expect(
-      program.commands
-        .find((command) => command.name() === "config")
-        ?.commands.map((command) => command.name()),
-    ).toEqual(["show", "set"]);
-    expect(
-      program.commands
-        .find((command) => command.name() === "milestones")
-        ?.commands.map((command) => command.name()),
-    ).toEqual(["sync"]);
+  test("--help lists commands and exit codes", async () => {
+    const r = await run(["--help"]);
+    expect(r.code).toBe(0);
+    for (const c of ["about", "config", "credentials", "mcp", "skill", "tui"]) expect(r.stdout).toContain(c);
+    expect(r.stdout).toContain("NO_TTY");
   });
 
-  test("progress JSON mantém summary e remove conteúdo bruto", async () => {
-    const project = await temporaryDirectory();
-    const path = join(project, "specs/specs/0001-dashboard/spec.md");
-    await mkdir(join(path, ".."), { recursive: true });
-    await writeFile(
-      path,
-      "# Dashboard\n\n**Status**: Implementing\n\n" +
-        "- [x] T001 Feita\n- [ ] T002 Pendente\n",
+  test("the skeleton registers only its own commands", () => {
+    // Derived projects add commands; the template itself ships only these.
+    if (manifest.bin !== "termfy") return;
+    const names = (root.subcommands ?? []).map((c) => c.name).sort();
+    expect(names).toEqual(["about", "completion", "config", "credentials", "doctor", "mcp", "skill", "tui"]);
+  });
+
+  test("no arguments and no TTY prints help and exits with 2", async () => {
+    const r = await run([]);
+    expect(r.code).toBe(2);
+    expect(r.stdout).toContain("Usage");
+  });
+
+  test("about --json returns the envelope", async () => {
+    const r = await run(["about", "--json"]);
+    expect(r.code).toBe(0);
+    const json = JSON.parse(r.stdout);
+    expect(json.ok).toBe(true);
+    expect(json.command).toBe(`${manifest.bin} about`);
+    expect(json.data.version).toBe(manifest.version);
+  });
+
+  test("config set/get and a config error as JSON", async () => {
+    expect((await run(["config", "set", "tui.theme", "day"])).code).toBe(0);
+    const get = await run(["config", "get", "tui.theme"]);
+    expect(get.stdout.trim()).toBe("day");
+    const errorJson = await run(["config", "get", "does.not.exist", "--json"]);
+    expect(errorJson.code).toBe(3);
+    expect(JSON.parse(errorJson.stdout).error.name).toBe("CONFIG");
+  });
+
+  test("credentials set via stdin, list and masked get", async () => {
+    const set = await run(["credentials", "set", "github.token", "--stdin"], "ghp_abcdefghijklmnop\n");
+    expect(set.code).toBe(0);
+    const list = await run(["credentials", "list", "--json"]);
+    expect(JSON.parse(list.stdout).data.names).toEqual(["github.token"]);
+    const get = await run(["credentials", "get", "github.token"]);
+    expect(get.stdout.trim()).not.toContain("abcdefghijklmnop");
+    const reveal = await run(["credentials", "get", "github.token", "--reveal"]);
+    expect(reveal.stdout.trim()).toBe("ghp_abcdefghijklmnop");
+    const missing = await run(["credentials", "get", "x.y"]);
+    expect(missing.code).toBe(4);
+  });
+
+  test("an unknown option exits with 2", async () => {
+    const r = await run(["about", "--nothing"]);
+    expect(r.code).toBe(2);
+    expect(r.stderr).toContain("Unknown option");
+  });
+
+  test("tui without a TTY exits with 8", async () => {
+    const r = await run(["tui"]);
+    expect(r.code).toBe(8);
+  });
+
+  test("--skill prints the documentation with the generated reference", async () => {
+    const r = await run(["--skill"]);
+    expect(r.code).toBe(0);
+    expect(r.stdout).toContain("# CLI");
+    expect(r.stdout).toContain("# MCP");
+    expect(r.stdout).toContain(`\`${manifest.bin} credentials set\``);
+    const topic = await run(["--skill", "exit-codes", "--json"]);
+    expect(JSON.parse(topic.stdout).data.topic).toBe("exit-codes");
+  });
+
+  test("--opencli returns a valid document", async () => {
+    const r = await run(["--opencli"]);
+    const doc = JSON.parse(r.stdout);
+    expect(doc.opencli).toBe("0.1");
+    expect(doc.command.name).toBe(manifest.bin);
+    expect(doc.command.commands.map((c: { name: string }) => c.name)).toContain("credentials");
+    expect(doc.command.exitCodes.find((e: { code: number }) => e.code === 0)).toBeTruthy();
+  });
+
+  test("mcp --list enumerates tools, resources and prompts", async () => {
+    const r = await run(["mcp", "--list", "--json"]);
+    expect(r.code).toBe(0);
+    const d = JSON.parse(r.stdout).data;
+    expect(d.tools.map((t: { name: string }) => t.name)).toEqual(
+      expect.arrayContaining(["about", "exit_codes", "skill", "config_list", "config_get", "credentials_status"]),
     );
-    const output = vi.spyOn(console, "log").mockImplementation(() => undefined);
-
-    expect(
-      await runCli([
-        "node",
-        "specsfy",
-        "progress",
-        "--project",
-        project,
-        "--json",
-      ]),
-    ).toBe(0);
-
-    const payload = JSON.parse(String(output.mock.calls[0]?.[0])) as {
-      summary: Record<string, number>;
-      specs: Array<Record<string, unknown>>;
-    };
-    expect(payload.summary.percent).toBe(50);
-    expect(payload.specs[0]?.slug).toBe("0001-dashboard");
-    expect(payload.specs[0]).not.toHaveProperty("content");
-  });
-
-  test("progress vazio preserva exit code 2", async () => {
-    const project = await temporaryDirectory();
-    vi.spyOn(console, "log").mockImplementation(() => undefined);
-    expect(
-      await runCli(["node", "specsfy", "progress", "--project", project]),
-    ).toBe(2);
-  });
-
-  test("install interrompe antes de escrever quando o preflight falha", async () => {
-    const project = await temporaryDirectory();
-    const previousPath = process.env.PATH;
-    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
-    process.env.PATH = "";
-    try {
-      expect(
-        await runCli(["node", "specsfy", "install", "--project", project]),
-      ).toBe(1);
-      expect(String(error.mock.calls.at(-1)?.[0])).toContain(
-        "pré-requisitos ausentes",
-      );
-    } finally {
-      if (previousPath === undefined) delete process.env.PATH;
-      else process.env.PATH = previousPath;
-    }
-  });
-
-  test("transition e migrate expõem o ciclo de vida físico", async () => {
-    const project = await temporaryDirectory();
-    const path = join(project, "specs/planned/0001-dashboard/spec.md");
-    await mkdir(join(path, ".."), { recursive: true });
-    await writeFile(path, "# Dashboard\n\n| Status | Planned |\n| Milestones | M01 |\n");
-    const output = vi.spyOn(console, "log").mockImplementation(() => undefined);
-
-    expect(
-      await runCli([
-        "node", "specsfy", "transition", "0001-dashboard", "in-progress",
-        "--project", project, "--json",
-      ]),
-    ).toBe(0);
-    expect(JSON.parse(String(output.mock.calls.at(-1)?.[0]))).toMatchObject({
-      to: "in-progress",
-      status: "Implementing",
-    });
-    expect(await readFile(join(project, "specs.md"), "utf8")).toContain("M01");
-  });
-
-  test("inbox process retira a captura da fila ativa com rastreabilidade", async () => {
-    const project = await temporaryDirectory();
-    const capture = "2026-07-28-143205-avisar-clientes.md";
-    await mkdir(join(project, "specs/inbox"), { recursive: true });
-    await writeFile(
-      join(project, "specs/inbox", capture),
-      "# Inbox: Avisar clientes\n\n| Metadado | Valor |\n| --- | --- |\n" +
-        "| Status | Capturada |\n| Spec derivada | Nenhuma |\n\n## Texto original\n\nAvisar.\n",
-    );
-    const spec = join(project, "specs/defined/0001-avisos/spec.md");
-    await mkdir(join(spec, ".."), { recursive: true });
-    await writeFile(
-      spec,
-      "# Avisos\n\n| Status | Defined |\n| Definition Gate | Passed |\n\n" +
-        `Origem: specs/inbox/${capture}\n`,
-    );
-    const output = vi.spyOn(console, "log").mockImplementation(() => undefined);
-
-    expect(
-      await runCli([
-        "node", "specsfy", "inbox", "process", capture,
-        "--spec", "0001-avisos", "--project", project, "--json",
-      ]),
-    ).toBe(0);
-    expect(JSON.parse(String(output.mock.calls.at(-1)?.[0]))).toMatchObject({
-      name: capture,
-      to: `specs/inbox/processed/${capture}`,
-      status: "Processada",
-      updated_references: ["specs/defined/0001-avisos/spec.md"],
-    });
-    expect(await readFile(join(project, "specs/inbox/processed", capture), "utf8")).toContain(
-      "| Status | Processada |",
-    );
-    expect(await readFile(spec, "utf8")).toContain(`specs/inbox/processed/${capture}`);
-  });
-
-  test("inbox process recusa spec sem Definition Gate aprovado", async () => {
-    const project = await temporaryDirectory();
-    const capture = "2026-07-28-143205-avisar-clientes.md";
-    await mkdir(join(project, "specs/inbox"), { recursive: true });
-    await writeFile(join(project, "specs/inbox", capture), "# Inbox\n\n| Status | Capturada |\n");
-    const spec = join(project, "specs/draft/0001-avisos/spec.md");
-    await mkdir(join(spec, ".."), { recursive: true });
-    await writeFile(spec, "# Avisos\n\n| Status | Draft |\n| Definition Gate | Pending |\n");
-    vi.spyOn(console, "log").mockImplementation(() => undefined);
-    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
-
-    expect(
-      await runCli([
-        "node", "specsfy", "inbox", "process", capture,
-        "--spec", "0001-avisos", "--project", project,
-      ]),
-    ).toBe(1);
-    expect(String(error.mock.calls.at(-1)?.[0])).toContain("Definition Gate");
-    expect(await readFile(join(project, "specs/inbox", capture), "utf8")).toContain("Capturada");
-  });
-
-  test("effort registra estimativa e justificativa na spec", async () => {
-    const project = await temporaryDirectory();
-    const path = join(project, "specs/draft/0001-dashboard/spec.md");
-    await mkdir(join(path, ".."), { recursive: true });
-    await writeFile(path, "# Dashboard\n\n| Status | Draft |\n");
-    const output = vi.spyOn(console, "log").mockImplementation(() => undefined);
-
-    expect(
-      await runCli([
-        "node", "specsfy", "effort", "0001-dashboard", "6",
-        "--reason", "Mudança atravessa CLI e skills.", "--project", project, "--json",
-      ]),
-    ).toBe(0);
-    expect(JSON.parse(String(output.mock.calls.at(-1)?.[0]))).toMatchObject({
-      effort: 6,
-      identifier: "0001-dashboard",
-    });
-  });
-
-  test("config set e show usam o mesmo contrato", async () => {
-    const project = await temporaryDirectory();
-    const output = vi.spyOn(console, "log").mockImplementation(() => undefined);
-
-    expect(
-      await runCli([
-        "node",
-        "specsfy",
-        "config",
-        "set",
-        "--project",
-        project,
-        "--watch-interval",
-        "0.5",
-        "--json",
-      ]),
-    ).toBe(0);
-
-    expect(JSON.parse(String(output.mock.calls.at(-1)?.[0]))).toMatchObject({
-      project,
-      watch_interval: 0.5,
-    });
+    expect(d.resources.length).toBeGreaterThanOrEqual(4);
+    expect(d.prompts[0].name).toBe("operate");
   });
 });

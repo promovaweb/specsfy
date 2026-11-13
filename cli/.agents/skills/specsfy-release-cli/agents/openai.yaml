@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy · Publicação do CLI"
-  short_description: "Publica versões verificadas do Specsfy CLI"
-  default_prompt: "Use $specsfy-release-cli para publicar uma nova versão estável do CLI com changelog, tag e GitHub Release."
