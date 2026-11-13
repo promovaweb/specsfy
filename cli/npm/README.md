@@ -39,3 +39,8 @@ O binário iniciado pelo wrapper recebe `SPECSFY_NPM_WRAPPER=1`; com isso,
 `specsfy upgrade` atualiza o pacote pelo npm em vez de trocar o executável.
 Sem npm, instale o binário avulso com `scripts/install-cli.sh` do
 repositório.
+
+## Licença
+
+Distribuído sob a [GNU AGPL 3.0](LICENSE). A licença não concede o uso do
+nome e do logo do Specsfy nem da marca Promovaweb (AGPL 3.0, seção 7, item e).

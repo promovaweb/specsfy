@@ -245,6 +245,5 @@ versão é uma operação de quem mantém o projeto.
 
 ## Licença
 
-O CLI em `cli/` usa a licença MIT, registrada em
-[`cli/LICENSE`](cli/LICENSE). A raiz do monorepo ainda não tem um arquivo
-`LICENSE`. Contribuições para o CLI entram sob a mesma licença MIT.
+O projeto é distribuído sob a [GNU AGPL 3.0](LICENSE). Contribuições entram
+sob a mesma licença do projeto, registrada no arquivo [`LICENSE`](LICENSE).

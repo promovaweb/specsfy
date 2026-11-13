@@ -2,6 +2,7 @@
   "name": "specsfy-workspace",
   "private": true,
   "type": "module",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=22.20.0"
   },

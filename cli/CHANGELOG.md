@@ -4,6 +4,25 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-11-13
+
+### Alterado
+
+- A partir desta versão, o projeto é distribuído sob a GNU AGPL 3.0 (SPDX
+  `AGPL-3.0-only`); versões anteriores continuam sob a licença com que foram
+  publicadas.
+- O texto oficial e integral da AGPL 3.0 está no `LICENSE` da raiz, que não
+  existia, e substitui a MIT em `cli/LICENSE`, `cli/npm/LICENSE` e
+  `specialists/LICENSE`.
+- O campo `license` de `package.json`, `package-lock.json`,
+  `cli/package.json` e `cli/npm/package.json` passa a `AGPL-3.0-only`. O
+  `specsfy about` e o `cli/docs/opencli.json` mostram a nova licença.
+- O `README.md` ganhou o badge de licença e a seção Licença, que também entra
+  no `cli/npm/README.md` do pacote npm. A licença não concede o uso do nome e
+  do logo do Specsfy nem da marca Promovaweb (AGPL 3.0, seção 7, item e).
+- O `CONTRIBUTING.md` registra que as contribuições entram sob a mesma
+  licença do projeto.
+
 ## [0.27.3] - 2026-11-13
 
 ### Documentação

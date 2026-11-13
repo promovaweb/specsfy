@@ -19,6 +19,7 @@
   <a href="https://github.com/promovaweb/specsfy/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/promovaweb/specsfy"></a>
   <a href="https://www.npmjs.com/package/@promovaweb/specsfy"><img alt="npm" src="https://img.shields.io/npm/v/@promovaweb/specsfy"></a>
   <a href="https://github.com/promovaweb/specsfy/actions/workflows/specsfy.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/promovaweb/specsfy/specsfy.yml"></a>
+  <a href="LICENSE"><img alt="Licença" src="https://img.shields.io/github/license/promovaweb/specsfy"></a>
 </p>
 
 <p align="center">
@@ -272,7 +273,5 @@ Quer usar o Specsfy em projetos de verdade, com acompanhamento? Conheça os
 
 ## Licença
 
-O pacote npm [`@promovaweb/specsfy`](https://www.npmjs.com/package/@promovaweb/specsfy)
-e o CLI em `cli/` são distribuídos sob a licença MIT, registrada em
-[`cli/LICENSE`](cli/LICENSE). Os demais módulos do monorepo não declaram
-licença própria.
+Distribuído sob a [GNU AGPL 3.0](LICENSE). A licença não concede o uso do
+nome e do logo do Specsfy nem da marca Promovaweb (AGPL 3.0, seção 7, item e).
