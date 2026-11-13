@@ -13,15 +13,20 @@ testes e CI.
 
 ## settings.json
 
-Keys em notação de ponto. O schema do esqueleto:
+Keys em notação de ponto. O schema do Specsfy:
 
 | Key | Tipo | Padrão | Função |
 | --- | --- | --- | --- |
 | `output.format` | `text` ou `json` | `text` | formato padrão da saída do CLI |
 | `output.colors` | boolean | `true` | cores ANSI na saída de texto |
-| `tui.initialTab` | `overview` ou `about` | `overview` | aba aberta ao iniciar a TUI |
+| `tui.initialTab` | `overview`, `specs`, `backlog`, `gates`, `tests`, `skills` ou `about` | `overview` | aba aberta ao iniciar a TUI |
 | `tui.theme` | `night` ou `day` | `night` | paleta da TUI |
-| `telemetry.enabled` | boolean | `false` | reservado para projetos derivados |
+| `tui.watchInterval` | number | `0.75` | segundos entre as checagens de arquivos alterados na TUI e no `progress --watch` |
+| `catalog.repository` | string | `https://github.com/promovaweb/specsfy` | repositório Git de onde as skills são instaladas |
+| `skills.agents` | string | `universal` | agentes passados ao `npx skills add`, separados por vírgula |
+| `update.check` | boolean | `true` | checa uma vez por dia se existe versão nova |
+| `gate.timeoutSeconds` | number | `300` | tempo máximo de cada checagem do `verify` |
+| `telemetry.enabled` | boolean | `false` | reservado; nada é enviado |
 
 Commands:
 
@@ -47,7 +52,9 @@ O arquivo guarda um envelope:
 ```
 
 `data` é o JSON `{ "name": "value" }` cifrado. Names seguem
-`[a-z0-9][a-z0-9_.-]{0,63}`, por exemplo `openai.api_key` ou `github.token`.
+`[a-z0-9][a-z0-9_.-]{0,63}`. O Specsfy usa `github.token` para a API do
+GitHub (catálogo de especialistas e checagem de versões). Sem ela, o token
+vem de `GH_TOKEN`, `GITHUB_TOKEN` ou `gh auth token`, nesta ordem.
 
 A master key tem 32 bytes e vem, nesta ordem:
 
@@ -60,10 +67,10 @@ está definida, `master.key` é ignorado.
 Commands:
 
 ```bash
-{{bin}} credentials set openai.api_key            # digita sem eco
+{{bin}} credentials set github.token              # digita sem eco
 printf '%s' "$TOKEN" | {{bin}} credentials set github.token --stdin
-{{bin}} credentials get openai.api_key            # mascarado
-{{bin}} credentials get openai.api_key --reveal   # em claro
+{{bin}} credentials get github.token            # mascarado
+{{bin}} credentials get github.token --reveal   # em claro
 {{bin}} credentials list
 {{bin}} credentials remove github.token
 {{bin}} credentials status

@@ -1,16 +1,30 @@
 # Documentação do {{title}}
 
-`{{bin}}` é um executável único com três modos de uso:
+`{{bin}}` é a ferramenta do método Specsfy: instala e atualiza o framework, lê e altera o estado das specs dentro das regras, roda os gates e serve tudo isso a agentes de IA. É um executável único com três modos de uso:
 
 | Modo | Como entrar | Para quem |
 | --- | --- | --- |
-| TUI | `{{bin}}` sem argumentos em um terminal interativo | pessoas |
-| CLI | `{{bin}} <command> [options]`, com saída em texto ou `--json` | pessoas, scripts e agentes |
+| TUI | `{{bin}}` sem argumentos em um terminal interativo | pessoas acompanhando o projeto |
+| CLI | `{{bin}} <command> [options]`, com saída em texto ou `--json` | pessoas, scripts e CI |
 | MCP | `{{bin}} mcp`, servidor Model Context Protocol via stdio | agentes de IA |
 
 Os três modos compartilham a mesma identidade (`src/app/manifest.ts`), a
 mesma configuração (`~/.{{bin}}/settings.json`), o mesmo cofre de credenciais
 (`~/.{{bin}}/credentials.json`, cifrado) e a mesma tabela de exit codes.
+
+## Para agentes
+
+Comece por `project_status` (MCP) ou `{{bin}} status --json` para ver o
+projeto. Onde uma tool ou command pede `spec`, vale o número (`1`,
+`0001`), o nome da pasta, o slug sem número ou o caminho do `spec.md`. Todo
+command de projeto aceita `--project <dir>`; sem ele, a raiz é a pasta mais
+próxima, subindo a partir da atual, que tem `specs/`, `.specsfy/` ou
+`skills-lock.json`. Gates reprovados saem com o exit code 10
+(`GATE_FAILED`).
+
+O binário carrega os scripts, templates e regras das skills do framework e
+os executa com o próprio runtime, sem Node.js. Prefira o command ou a tool a
+rodar `node scripts/<arquivo>.mjs` de uma skill.
 
 ## Mapa
 
@@ -20,7 +34,6 @@ mesma configuração (`~/.{{bin}}/settings.json`), o mesmo cofre de credenciais
 - [configuration.md](configuration.md): settings.json, credentials.json, master key e variáveis de ambiente.
 - [exit-codes.md](exit-codes.md): tabela de exit codes e como tratá-los.
 - [architecture.md](architecture.md): pastas, camadas e fluxo de execução.
-- [customize-template.md](customize-template.md): usar este repositório como ponto de partida de um novo binário.
 - [release.md](release.md): versão, changelog, tag, GitHub Release e binários.
 - [opencli.json](opencli.json): descrição OpenCLI gerada por `bun run opencli`.
 

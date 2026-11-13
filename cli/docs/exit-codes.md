@@ -15,6 +15,7 @@ devem tratar o code antes de interpretar a mensagem.
 | 7 | `PERMISSION` | permissão negada no sistema de arquivos |
 | 8 | `NO_TTY` | a TUI exige um terminal interativo |
 | 9 | `MCP` | o servidor MCP falhou ao iniciar ou perdeu o transporte |
+| 10 | `GATE_FAILED` | um gate ou validação do Specsfy encontrou problemas no projeto; leia `data` no `--json` |
 | 130 | `INTERRUPTED` | entrada cancelada ou processo interrompido com Ctrl+C |
 
 A fonte única é `src/app/exit-codes.ts`. A mesma tabela aparece em `--help`,
