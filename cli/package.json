@@ -1,6 +1,6 @@
 {
   "name": "specsfy",
-  "version": "0.26.2",
+  "version": "0.27.0",
   "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
   "type": "module",
   "private": true,
@@ -32,10 +32,12 @@
     "skills:update": "npx -y skills update -y -p",
     "skills:check": "bun run scripts/check-skills.ts",
     "init": "bun run scripts/init.ts",
-    "validate": "bun run embed:check && bun run typecheck && bun test && bun run skills:check && bun run opencli:check && bun run docs:check && bun run build",
+    "validate": "bun run embed:check && bun run launcher:check && bun run typecheck && bun test && bun run skills:check && bun run opencli:check && bun run docs:check && bun run build",
     "docs:check": "bun run scripts/check-docs.ts",
     "embed": "bun run scripts/embed-skills.ts",
-    "embed:check": "bun run scripts/embed-skills.ts --check"
+    "embed:check": "bun run scripts/embed-skills.ts --check",
+    "launcher": "bun run scripts/build-launcher.ts",
+    "launcher:check": "bun run scripts/build-launcher.ts --check"
   },
   "engines": {
     "bun": ">=1.4.4"

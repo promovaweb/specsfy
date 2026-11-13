@@ -4,6 +4,72 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-11-13
+
+### Alterado
+
+- O CLI foi reescrito em Bun sobre o Termfy e passa a ser um binário
+  compilado para Linux (x64 e arm64), macOS (x64 e arm64) e Windows (x64),
+  sem Node.js nem Bun na máquina. Os executáveis e o `SHA256SUMS` saem em cada
+  GitHub Release; o pacote npm `@promovaweb/specsfy` vira um wrapper que baixa
+  o binário da plataforma na primeira execução, e `scripts/install-cli.sh`
+  instala o binário direto.
+- O binário carrega a árvore `skills/` e executa os scripts das skills com o
+  próprio runtime. As skills base passam a indicar o command do `specsfy` e a
+  tool MCP equivalente, e mantêm os scripts `.mjs` como alternativa.
+- `transition`, `effort` e `migrate` passam para `specs transition`,
+  `specs effort` e `specs migrate`. Os nomes antigos continuam aceitos como
+  aliases ocultos.
+- Saída `--json` em envelope `{ ok, command, data }`, com `ok: false` e `code`
+  quando o exit code não é 0. Gates reprovados saem com o exit code 10
+  (`GATE_FAILED`).
+  Scripts que liam o JSON direto, como o `progress --json` da 0.26, passam a
+  ler o campo `data`.
+- `config show`, `config set --watch-interval` e `progress --interval`
+  continuam aceitos, e o `watch_interval` de `.specsfy/config.json` segue
+  valendo para o `progress --watch`.
+- O token do GitHub vem da credencial cifrada `github.token`, de `GH_TOKEN`,
+  de `GITHUB_TOKEN` ou de `gh auth token`, nesta ordem. `upgrade` troca o
+  binário a partir da última release, conferindo o `SHA256SUMS`.
+
+### Adicionado
+
+- Servidor MCP (`specsfy mcp`) com tools para ler o projeto
+  (`project_status`, `specs_list`, `spec_get`), mover o trabalho pelo método
+  (`spec_transition`, `spec_effort`, `task_check`, `inbox_capture`,
+  `inbox_process`), rodar gates (`gate_*`, `verify`), testes
+  (`project_test`), contexto, milestones, documentação e gerenciar skills.
+- Commands `status`, `specs list|show|new|research|change`,
+  `tasks next|check|delivery`, `inbox list|capture`, `backlog list|start`,
+  `gate spec|tasks|interface|trace|acceptance|evidence|findings|database`,
+  `verify`, `context setup|inspect|interface|monitor|stack|rule|database|data|usage`,
+  `milestones import-mvp`, `docs build`, `scripts list|run`.
+- `<spec>` aceita número, nome da pasta, slug ou caminho, e todo command de
+  projeto acha a raiz subindo a partir da pasta atual ou usa `--project`.
+- TUI com as abas Overview, Specs, Backlog, Gates, Tests, Skills e About,
+  atualizada sozinha quando os arquivos das specs mudam.
+- Documentação embutida (`specsfy --skill`), descrição OpenCLI
+  (`specsfy --opencli`), settings em `~/.specsfy/settings.json` e
+  `CLISPEC.md` com as specs 0001 a 0011 do binário.
+
+### Corrigido
+
+- `skills remove` volta a tirar a entrada do `skills-lock.json`.
+- Saídas grandes deixam de ser cortadas quando o stdout é um pipe.
+- Identificadores de spec, nomes de skill e o `--attestation` ficam presos ao
+  projeto: nenhum command ou tool MCP lê, grava ou remove arquivos fora dele.
+- Gates que executam código do projeto (`gate tasks`, `gate evidence`,
+  `gate database`) deixam de se anunciar como só leitura no MCP.
+- Um token do GitHub vencido não impede mais a checagem de versão.
+- O `upgrade` de uma instalação npm local ou via `npx` não instala o pacote
+  globalmente.
+
+### Observações
+
+- A primeira execução pelo npm ou pelo `get.specsfy.dev` baixa o binário da
+  plataforma, com cerca de 125 MB.
+- Não há build para musl; em Alpine, use uma imagem com glibc.
+
 ## [0.26.2] - 2026-11-11
 
 ### Corrigido
