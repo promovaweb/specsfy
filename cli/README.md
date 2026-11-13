@@ -1,172 +1,156 @@
-# Specsfy
+# Specsfy CLI
 
-Esqueleto de binário em [Bun](https://bun.sh) para construir ferramentas de
-terminal com três modos no mesmo executável. É o template do GitHub do
-framework [Termfy](https://github.com/promovaweb/termfy), e já vem com as
-skills do framework instaladas em `.agents/skills/`.
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <picture>
+    <source srcset="https://promovaweb.com/opensource/specsfy/icon.svg"
+    type="image/svg+xml">
+    <img
+      src="https://promovaweb.com/opensource/specsfy/icon.png"
+      alt="Logo do Specsfy"
+      width="128"
+    >
+  </picture>
+</p>
+<!-- markdownlint-enable MD033 -->
+
+O `specsfy` é a ferramenta do método Specsfy no terminal. O mesmo executável
+instala e atualiza o framework, lê e altera o estado das specs dentro das
+regras do método, roda os gates de definição, plano e entrega e serve tudo
+isso a agentes de IA pelo MCP. Ele tem três modos:
 
 | Modo | Entrada | Para quem |
 | --- | --- | --- |
-| TUI | `specsfy` sem argumentos, em terminal interativo | pessoas |
-| CLI | `specsfy <command> [options]`, saída em texto ou `--json` | pessoas, scripts e agentes |
-| MCP | `specsfy mcp`, servidor Model Context Protocol via stdio | agentes de IA |
+| TUI | `specsfy` sem argumentos, em terminal interativo | pessoas acompanhando o projeto |
+| CLI | `specsfy <command> [options]`, saída em texto ou `--json` | pessoas, scripts e CI |
+| MCP | `specsfy mcp`, servidor Model Context Protocol via stdio | Claude Code, Codex, OpenCode e outros agentes |
 
-Os três modos compartilham identidade, configuração (`~/.specsfy/settings.json`),
-cofre de credenciais cifrado (`~/.specsfy/credentials.json`) e a tabela de
-exit codes. A TUI usa o [OpenTUI](https://opentui.com); o CLI publica sua
-interface no formato [OpenCLI](https://opencli.org); o MCP usa o
-[SDK oficial](https://github.com/modelcontextprotocol/typescript-sdk).
+O binário é compilado com o [Bun](https://bun.sh) e não depende de Node.js nem
+de Bun na máquina. Ele carrega dentro de si os scripts, templates e regras das
+skills do framework e os executa com o próprio runtime. As skills continuam
+trazendo os scripts `.mjs` como alternativa para quem ainda não instalou o
+binário.
 
-Todo o código é em inglês: arquivos, identificadores, comentários, mensagens,
-commands, options, keys e campos do `--json`. A documentação é em português.
+## Instalação
 
-```text
- ▌ Specsfy v0.9.2  │  CLI, TUI and MCP stdio server skeleton in Bun, with the  linux-x64 • Bun 1.4.4
- ──────────────────────────────────────────────────────────────────────────────────────────────────
- Overview      About
-▬▬▬▬▬▬▬▬▬▬▬▬▬▬
- ╭─ Environment ────────────────────────────────────╮╭─ State ────────────────────────────────────╮
- │ Binary    specsfy v0.9.2                          ││ settings.json     • defaults               │
- │ Runtime   Bun 1.4.4                              ││ credentials.json  • empty                  │
- │ Platform  linux-x64                              ││ master key        not created              │
- │ Terminal  100×24  xterm-256color                 ││ MCP               specsfy mcp               │
- │ Data      ~/.specsfy                              ││                                            │
- ╰──────────────────────────────────────────────────╯╰────────────────────────────────────────────╯
- ╭─ Settings in effect ─────────────────────────────╮╭─ Next steps ───────────────────────────────╮
- │ output.colors      true                          ││ In the terminal                            │
- │ output.format      "text"                        ││ → specsfy --help                            │
- │ telemetry.enabled  false                         ││ → specsfy credentials set <name>            │
- │ tui.initialTab     "overview"                    ││ → specsfy config set tui.theme day          │
- │ tui.theme          "night"                       ││ → specsfy --skill                           │
- │                                                  ││                                            │
- │                                                  ││ For agents                                 │
- │                                                  ││ MCP client: { "command": "specsfy", "args": │
- │                                                  ││ ["mcp"] }                                  │
- │                                                  ││                                            │
- ╰──────────────────────────────────────────────────╯╰────────────────────────────────────────────╯
-  ←/→  tab   1-9  go   ?  help   q  quit
-```
+O executável de cada plataforma (Linux x64 e arm64, macOS x64 e arm64,
+Windows x64) é publicado em `get.specsfy.dev` e anexado a cada GitHub
+Release do repositório. Coloque o arquivo em um diretório do `PATH` e
+preserve a permissão de execução.
 
-## Sobre o template
-
-Este repositório é um template do GitHub. Clique em **Use this template**,
-abra o clone no agente e peça: "Use termfy-init para fazer o setup deste
-projeto". Informe o nome do executável e o propósito da ferramenta. O agente
-conduz a configuração e as verificações pela skill.
-
-O guia completo está em [docs/customize-template.md](docs/customize-template.md).
-Para atualizar ou reparar as skills, use `termfy-init` no modo de
-manutenção. O guia do método e o ebook ficam no
-[framework](https://github.com/promovaweb/termfy).
-
-## Requisitos
-
-Bun 1.4.4 ou superior. Node.js não é usado.
-
-## Rodar em desenvolvimento
+Pelo npm, o pacote `@promovaweb/specsfy` instala um wrapper que baixa o
+binário da plataforma na primeira execução:
 
 ```bash
-bun install
-bun run dev                 # TUI
-bun run dev -- --help       # help do CLI
-bun run dev -- about --json
-bun run dev -- mcp --list
+npm install --global @promovaweb/specsfy
+specsfy --version
 ```
+
+Para atualizar, rode `specsfy upgrade`. Com `--check`, o comando só informa
+se existe versão nova.
+
+## Primeiros passos
+
+```bash
+specsfy install                 # skills base, .specsfy/ e blocos do AGENTS.md
+specsfy status                  # visão geral do projeto
+specsfy                         # abre a TUI
+specsfy --skill                 # documentação completa, escrita para agentes
+```
+
+Todo command de projeto aceita `--project <dir>`. Sem ele, o `specsfy` sobe a
+partir da pasta atual até encontrar `specs/`, `.specsfy/` ou
+`skills-lock.json`. Onde um command pede `<spec>`, vale o número (`1` ou
+`0001`), o nome da pasta (`0001-recuperar-senha`), o slug sem número ou o
+caminho do `spec.md`.
 
 ## Commands
 
-| Command | Função |
+| Grupo | Commands |
 | --- | --- |
-| `specsfy` | abre a TUI (abas Overview e About) |
-| `specsfy tui [--tab overview\|about]` | abre a TUI em uma aba |
-| `specsfy about` | version, executable, runtime, platform e credits |
-| `specsfy config list\|get\|set\|unset\|path\|schema` | preferências em `settings.json` |
-| `specsfy credentials set\|get\|list\|remove\|status\|clear` | segredos cifrados em `credentials.json` |
-| `specsfy mcp [--list]` | servidor MCP via stdio |
-| `specsfy skill [topic]` | documentação embutida |
+| Projeto | `status`, `progress [--watch]`, `specs list`, `specs show`, `backlog list`, `inbox list` |
+| Ciclo da spec | `inbox capture`, `inbox process`, `backlog start`, `specs new`, `specs transition`, `specs effort`, `specs migrate`, `specs research`, `specs change`, `tasks next`, `tasks check`, `tasks delivery` |
+| Gates | `gate spec`, `gate tasks`, `gate interface`, `gate trace`, `gate acceptance`, `gate evidence`, `gate findings`, `gate database`, `verify` |
+| Contexto | `context setup`, `context inspect`, `context interface`, `context monitor`, `context stack`, `context rule`, `context database`, `context data`, `context usage` |
+| Entrega | `test`, `milestones sync`, `milestones import-mvp`, `docs build` |
+| Framework | `install`, `update`, `upgrade`, `skills list`, `skills detect`, `skills install`, `skills remove`, `skills update` |
+| Utilitários | `scripts list`, `scripts run`, `doctor`, `config`, `credentials`, `about`, `mcp`, `skill`, `completion` |
 
-Options globais: `--help`, `--version`, `--json`, `--skill [topic]`,
-`--opencli`, `--no-color`. Referência completa em [docs/cli.md](docs/cli.md).
+A referência completa, gerada do registry de commands, sai em
+`specsfy --skill cli`. A descrição em OpenCLI sai em `specsfy --opencli`.
 
-## Documentação embutida
+## Gates no CI
+
+Os gates saem com o código 0 quando aprovam e com o código 10
+(`GATE_FAILED`) quando encontram problemas. O `verify` roda a política
+inteira do framework e é a entrada indicada para o CI:
 
 ```bash
-specsfy --skill            # tudo, em Markdown
-specsfy --skill mcp        # uma seção: cli, tui, mcp, config, exit-codes
-specsfy --opencli          # descrição OpenCLI em JSON
+specsfy verify --boundary ci --json
+specsfy gate spec 0001 --json
 ```
-
-A pasta [docs/](docs/README.md) entra no binário em tempo de build. Um agente
-lê a documentação sem acesso ao repositório.
-
-## Exit codes
-
-| Code | Name |
-| --- | --- |
-| 0 | `SUCCESS` |
-| 1 | `GENERIC_ERROR` |
-| 2 | `USAGE` |
-| 3 | `CONFIG` |
-| 4 | `CREDENTIALS` |
-| 5 | `NETWORK_OR_API` |
-| 6 | `NOT_FOUND` |
-| 7 | `PERMISSION` |
-| 8 | `NO_TTY` |
-| 9 | `MCP` |
-| 130 | `INTERRUPTED` |
-
-Detalhes em [docs/exit-codes.md](docs/exit-codes.md).
-
-## Configuração e credenciais
-
-```bash
-specsfy config set tui.theme day
-specsfy credentials set openai.api_key        # digita sem eco
-printf '%s' "$TOKEN" | specsfy credentials set github.token --stdin
-specsfy credentials status
-```
-
-Os arquivos ficam em `~/.specsfy/` com permissão 0600. As credenciais são
-cifradas com AES-256-GCM; a master key vem de `SPECSFY_MASTER_KEY` ou de
-`~/.specsfy/master.key`. Veja [docs/configuration.md](docs/configuration.md).
 
 ## MCP
+
+Configure o agente com:
 
 ```json
 { "mcpServers": { "specsfy": { "command": "specsfy", "args": ["mcp"] } } }
 ```
 
-Tools: `about`, `exit_codes`, `skill`, `config_list`, `config_get`,
-`credentials_status`. Resources: `specsfy://about`, `specsfy://exit-codes`,
-`specsfy://skill`, `specsfy://skill/{topic}`. Prompt: `operate`.
-Detalhes em [docs/mcp.md](docs/mcp.md).
+O agente lê o projeto (`project_status`, `specs_list`, `spec_get`), move o
+trabalho pelo método (`spec_transition`, `spec_effort`, `task_check`,
+`inbox_capture`), roda os gates (`gate_spec`, `verify`) e os testes
+(`project_test`). `specsfy mcp --list` mostra todas as tools, resources e
+prompts.
 
-## Estrutura
+## TUI
 
-```text
-src/        código do binário (app, cli, config, mcp, tui, skill)
-docs/       documentação embutida e opencli.json
-template/   stubs de command, screen e tool
-.agents/    skills do framework instaladas via npx skills (skills-lock.json)
-scripts/    build, init e checks
-tests/      bun test
-```
+A TUI abre na raiz do projeto e se atualiza sozinha quando os arquivos das
+specs mudam. As abas são Overview, Specs, Backlog, Gates, Tests, Skills e
+About.
 
-Arquitetura em [docs/architecture.md](docs/architecture.md).
+![Dashboard Home](https://promovaweb.com/docs/specsfy/cli/cli-dash.png)
 
-## Validar, compilar e publicar
+![Backlogs](https://promovaweb.com/docs/specsfy/cli/cli-backlogs.png)
+
+![Specs](https://promovaweb.com/docs/specsfy/cli/cli-specs.png)
+
+![Skills](https://promovaweb.com/docs/specsfy/cli/cli-skills.png)
+
+## Configuração e credenciais
+
+As preferências ficam em `~/.specsfy/settings.json` e os segredos em
+`~/.specsfy/credentials.json`, cifrados com AES-256-GCM:
 
 ```bash
-bun run validate      # typecheck, testes, skills:check, opencli:check, docs:check, build
-bun run build         # dist/specsfy
-bun run build:all     # linux-x64, linux-arm64, darwin-x64, darwin-arm64, windows-x64
+specsfy config set tui.watchInterval 0.5
+printf '%s' "$TOKEN" | specsfy credentials set github.token --stdin
 ```
 
-Releases seguem [docs/release.md](docs/release.md): versão em
-`package.json`, entrada no `CHANGELOG.md`, tag `vX.Y.Z` e GitHub Release com
-binários gerados pelo workflow. O guia do método em PDF e EPUB fica no
-framework, não aqui.
+O catálogo de especialistas e a checagem de versões usam a API do GitHub. O
+token vem da credencial `github.token`, de `GH_TOKEN`, de `GITHUB_TOKEN` ou da
+sessão de `gh auth token`, nesta ordem.
 
-## Licença
+## Desenvolvimento
 
-Repositório privado da Promovaweb. Uso interno e dos alunos autorizados.
+O código fica em `src/` (TypeScript, Bun 1.4.4 ou superior) e segue o
+[Termfy](https://github.com/promovaweb/termfy). A visão macro do binário está
+em [CLISPEC.md](CLISPEC.md) e cada evolução em [specs/](specs/).
+
+```bash
+bun install
+bun run dev -- status --project ../example
+bun run validate                # tipos, testes, docs embutidas, OpenCLI e build
+bun run build:all               # executáveis das cinco plataformas em dist/
+```
+
+Depois de mudar qualquer arquivo de `../skills/`, rode `bun run embed` para
+regenerar a árvore embutida.
+
+## Versões e publicação
+
+A versão do CLI acompanha a do framework. Cada publicação atualiza o
+`CHANGELOG.md`, cria a tag `vX.Y.Z` e a GitHub Release com os executáveis.
+O fluxo completo está na skill
+[`specsfy-release-cli`](.agents/skills/specsfy-release-cli/SKILL.md).

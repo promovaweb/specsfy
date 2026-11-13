@@ -32,8 +32,10 @@
     "skills:update": "npx -y skills update -y -p",
     "skills:check": "bun run scripts/check-skills.ts",
     "init": "bun run scripts/init.ts",
-    "validate": "bun run typecheck && bun test && bun run skills:check && bun run opencli:check && bun run docs:check && bun run build",
-    "docs:check": "bun run scripts/check-docs.ts"
+    "validate": "bun run embed:check && bun run typecheck && bun test && bun run skills:check && bun run opencli:check && bun run docs:check && bun run build",
+    "docs:check": "bun run scripts/check-docs.ts",
+    "embed": "bun run scripts/embed-skills.ts",
+    "embed:check": "bun run scripts/embed-skills.ts --check"
   },
   "engines": {
     "bun": ">=1.4.4"
