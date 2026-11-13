@@ -164,6 +164,20 @@ export async function executeScriptCommand(def: ScriptCommandDef, values: Record
   return { data, run, code };
 }
 
+/**
+ * Human-readable output of a script-backed command. Scripts asked for JSON
+ * print a document; the text mode shows a status line and that document
+ * indented, so people never read a single compact JSON line.
+ */
+export function renderScriptText(def: ScriptCommandDef, run: ScriptRun): string {
+  const parts: string[] = [];
+  if (def.gate) parts.push(run.code === 0 ? "✓ passed" : `✗ failed (script exit ${run.code})`);
+  if (run.json !== undefined) parts.push(JSON.stringify(run.json, null, 2));
+  else if (run.stdout.trim()) parts.push(run.stdout.trimEnd());
+  if (run.stderr.trim()) parts.push(run.stderr.trimEnd());
+  return parts.join("\n");
+}
+
 /** CLI `Command` for a definition. */
 export function toCommand(def: ScriptCommandDef): Command {
   const args: ArgumentDefinition[] = [];
@@ -203,7 +217,7 @@ export function toCommand(def: ScriptCommandDef): Command {
         throw error.usage(`Missing required ${missing.kind === "spec" || missing.kind === "positional" ? "argument" : "option"}: ${missing.name}`);
       }
       const { data, run, code } = await executeScriptCommand(def, values, ctx.options.project);
-      const text = () => [run.stdout.trimEnd(), run.stderr.trimEnd()].filter(Boolean).join("\n");
+      const text = () => renderScriptText(def, run);
       return { data, text, code };
     },
   };

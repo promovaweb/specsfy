@@ -33,9 +33,12 @@ function prefersJson(): boolean {
   }
 }
 
-/** Prints the JSON success envelope. */
-export function printJson(command: string, data: unknown): void {
-  write(JSON.stringify({ ok: true, command, data }, null, 2));
+/**
+ * Prints the JSON result envelope. `ok` follows the exit code, so a gate
+ * that fails (code 10) returns `ok: false` with its findings in `data`.
+ */
+export function printJson(command: string, data: unknown, code: ExitCode = ExitCode.SUCCESS): void {
+  write(JSON.stringify({ ok: code === ExitCode.SUCCESS, command, ...(code === ExitCode.SUCCESS ? {} : { code }), data }, null, 2));
 }
 
 /** Prints the JSON error envelope. */
@@ -92,7 +95,7 @@ export async function runCli(argv: readonly string[]): Promise<number> {
     };
 
     const result: Result = await command.run(ctx);
-    if (json) printJson(commandName, result.data);
+    if (json) printJson(commandName, result.data, result.code ?? ExitCode.SUCCESS);
     else write(typeof result.text === "function" ? result.text() : result.text);
     return result.code ?? ExitCode.SUCCESS;
   } catch (e) {
