@@ -17,7 +17,7 @@ Feature: Captura imediata na Inbox
     When a saída da Inbox é inspecionada
     Then a estrutura canônica declara specs/inbox/processed/
     And a captura permanece na Inbox até o Definition Gate das specs que a cobrem
-    And só a validação move a captura, pelo CLI, depois de specsfy transition para defined
+    And só a validação move a captura, pelo CLI, depois de specsfy specs transition para defined
     And a busca por duplicatas do backlog inclui as capturas processadas
 
   Scenario: Instalar todos os templates documentais do framework

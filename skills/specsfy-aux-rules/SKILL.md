@@ -14,7 +14,7 @@ inferências e sugestões ficam na conversa até serem aceitas.
 - Cada regra nova foi confirmada pela pessoa e tem verbo e limite claros.
 - Ordem, comentários e regras anteriores continuam intactos.
 - Conflitos encontrados foram sinalizados, sem escolha silenciosa.
-- `monitor_context.mjs --check` não aponta mais a revisão de regras, ou a
+- `specsfy context monitor --check` não aponta mais a revisão de regras, ou a
   justificativa de nenhuma regra nova foi registrada e reconhecida.
 
 ## Preparação obrigatória
@@ -41,6 +41,16 @@ Antes de formular qualquer pergunta, leia e aplique o
 5. Registre:
 
    ```bash
+   specsfy context rule \
+     --project <raiz> \
+     --section "<tema>" \
+     --rule "<regra confirmada>"
+   ```
+
+   Pelo MCP, use a tool `context_rule`. Sem o binário instalado, rode o script
+   equivalente:
+
+   ```bash
    node .agents/skills/specsfy-aux-rules/scripts/add_rule.mjs \
      --project <raiz> \
      --section "<tema>" \
@@ -51,6 +61,13 @@ Antes de formular qualquer pergunta, leia e aplique o
    foram preservados.
 7. Sinalize conflitos entre regras e deixe a escolha para a pessoa.
 8. Confira o monitor antes de devolver o handoff:
+
+   ```bash
+   specsfy context monitor --project <raiz> --check
+   ```
+
+   Pelo MCP, use a tool `context_monitor`. Sem o binário instalado, rode o
+   script equivalente:
 
    ```bash
    node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \

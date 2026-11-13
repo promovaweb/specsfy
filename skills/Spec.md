@@ -51,14 +51,14 @@ draft → defined → planned → in-progress → review → completed
 Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
-Use `specsfy transition <id> <pasta>` para transições adjacentes. O comando
-move todo o pacote e atualiza `Status`. Use `specsfy migrate` uma única vez
+Use `specsfy specs transition <id> <pasta>` para transições adjacentes. O comando
+move todo o pacote e atualiza `Status`. Use `specsfy specs migrate` uma única vez
 para mover o layout anterior `specs/specs/` para as pastas atuais.
 
 Toda spec tem `Effort` de 1 a 10, `Effort updated at` e `Effort rationale` no
 metadado. A pontuação estima a capacidade de raciocínio e execução necessária,
 não prazo: 1–2 usa perfil `light`, 3–6 `standard`, 7–8 `high` e 9–10
-`maximum`. Atualize-a com `specsfy effort <id> <1-10> --reason "<motivo>"`
+`maximum`. Atualize-a com `specsfy specs effort <id> <1-10> --reason "<motivo>"`
 sempre que a descoberta, o plano ou a execução trouxer informação material.
 
 `ClickUp Task` pode vincular a spec a uma tarefa externa. Quando houver skills

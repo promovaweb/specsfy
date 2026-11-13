@@ -27,21 +27,24 @@ desta skill é qual runner de testes adotar em projeto Node sem PHP.
 
 ## Pronto quando
 
-- `validate_tasks.mjs` passa com e sem `--allow-draft` e, havendo interface
-  para pessoas, `validate_interface_tasks.mjs` também passa;
+- `specsfy gate tasks <spec>` passa com e sem `--allow-draft` e, havendo
+  interface para pessoas, `specsfy gate interface <spec>` também passa;
 - todo `FR`, `NFR` e `AC` aplicável tem tarefa, e toda tarefa `[CODE]` depende
   de um predecessor TDD com RED registrado;
 - `Plan Gate: Passed`, `Status: Planned` e `Gate do Ato II — Plano` estão
-  registrados, e `specsfy transition <id> planned` foi executado;
+  registrados, e `specsfy specs transition <id> planned`, equivalente a
+  `specsfy specs transition <id> planned`, foi executado;
 - `$specsfy-07-implement` foi carregada.
 
 ## Proteção do banco no plano
 
-Em projeto Laravel, execute
-`.agents/skills/specsfy-setup/scripts/check_database_safety.mjs --project
-<raiz>` antes de planejar ou liberar qualquer tarefa `[TEST]`. O plano mantém
-`.env.testing`, `APP_ENV=testing` e um banco de teste explicitamente diferente
-do banco do `.env`, para que nenhum teste toque dados de desenvolvimento.
+Em projeto Laravel, execute `specsfy gate database --project <raiz>` antes de
+planejar ou liberar qualquer tarefa `[TEST]`. Pelo MCP, use a tool
+`gate_database`. Sem o binário instalado, rode
+`node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs --project
+<raiz>`. O plano mantém `.env.testing`, `APP_ENV=testing` e um banco de
+teste explicitamente diferente do banco do `.env`, para que nenhum teste toque
+dados de desenvolvimento.
 
 - Com `PENDING`, nenhuma tarefa de teste fica pronta e a skill não chama o
   runner.
@@ -82,6 +85,13 @@ configurações do repositório. Depois siga a ordem:
    Pest para TDD; em Node sem PHP, pergunte qual runner adotar e recomende
    Vitest antes de gerar caminhos ou comandos.
 4. Execute o monitor antes de planejar:
+
+   ```bash
+   specsfy context monitor --project .
+   ```
+
+   Pelo MCP, use a tool `context_monitor`. Sem o binário instalado, rode o
+   script equivalente:
 
    ```bash
    node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
@@ -177,7 +187,7 @@ Quando `Interface para pessoas` for `Sim`:
 - Leitura, consulta ou uso de tabela existente não exige `[MIGRATION]` por si
   só. A tag é obrigatória quando o plano cria ou altera a estrutura.
 - O item `VERIFY` da tarefa `[MIGRATION]` registra dois comandos aprovados pelo
-  `check_database_safety.mjs`: um aplica a migration no banco de teste e outro
+  `specsfy gate database`: um aplica a migration no banco de teste e outro
   consulta o estado das migrations. Não aprove o Plan Gate sem essa tarefa.
 
 ### Contexto persistente
@@ -223,10 +233,23 @@ Tags permitidas após o ID: `[P]`, `[TEST]`, `[TDD]`, `[CODE]`, `[DOC]`,
 Execute:
 
 ```bash
+specsfy gate tasks <spec> --allow-draft
+```
+
+Pelo MCP, use a tool `gate_tasks`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
 node .agents/skills/specsfy-05-tasks/scripts/validate_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md --allow-draft
 ```
 
 Quando houver interface para pessoas, execute também:
+
+```bash
+specsfy gate interface <spec>
+```
+
+Pelo MCP, use a tool `gate_interface`. Sem o binário, rode o script equivalente:
 
 ```bash
 node .agents/skills/specsfy-05-tasks/scripts/validate_interface_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md
@@ -251,8 +274,9 @@ de teste. Ao retomar esta skill, siga em ordem:
 1. execute novamente o validador com `--allow-draft`;
 2. altere `Plan Gate` para `Passed` e defina `Status: Planned`;
 3. registre o resultado em `Gate do Ato II — Plano`;
-4. execute o validador sem `--allow-draft`;
-5. execute `specsfy transition <id> planned`.
+4. execute `specsfy gate tasks <spec>` sem `--allow-draft`;
+5. execute `specsfy specs transition <id> planned`, equivalente a
+   `specsfy specs transition <id> planned`.
 
 O modo estrito rejeita `Plan Gate: Passed` enquanto algum predecessor TDD de
 uma tarefa `[CODE]` continuar aberto. Se a validação falhar, mantenha

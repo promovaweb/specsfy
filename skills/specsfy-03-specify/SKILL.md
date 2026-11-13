@@ -33,7 +33,7 @@ Antes de formular qualquer pergunta, leia e aplique o
   template, sem placeholders do modelo;
 - cada `US`, `FR`, `NFR` e a feature inteira têm no mínimo três `AC` que os
   declaram em `**Cobre**`;
-- `validate_spec.mjs --allow-draft` passa;
+- `specsfy gate spec <spec> --allow-draft` passa;
 - research material está indexada e nenhum claim `critical` segue sem
   verificação;
 - a transição automática para `$specsfy-04-validate` foi anunciada.
@@ -61,11 +61,19 @@ exigindo autorização específica.
    escrever:
 
    ```bash
+   specsfy specs new \
+     --title "<nome da especificação>" [--slug <slug>] [--project <raiz>]
+   ```
+
+   Pelo MCP, use a tool `spec_create`. Sem o binário instalado, rode o script
+   equivalente:
+
+   ```bash
    node <diretório-da-skill>/scripts/iniciar_spec.mjs \
      --title "<nome da especificação>" [--slug <slug>] [--root <raiz>]
    ```
 
-   Use o caminho absoluto impresso pelo script. Ele aloca o próximo ID local,
+   Use o caminho absoluto impresso pelo comando. Ele aloca o próximo ID local,
    prefere `.specsfy/templates/custom/Spec.md`, recorre ao template gerenciado
    `.specsfy/templates/Spec.md` e cria somente
    `specs/draft/<NNNN>-<slug>/spec.md`. Não renomeie o arquivo para incluir o
@@ -224,6 +232,13 @@ Antes do planejamento, carregue somente as evidências indexadas e valide os
 claims com:
 
 ```bash
+specsfy specs research <spec>
+```
+
+`<spec>` aceita número, nome da pasta, slug ou caminho. Pelo MCP, use a tool
+`spec_research`. Sem o binário instalado, rode o script equivalente:
+
+```bash
 node .agents/skills/specsfy-03-specify/scripts/load_research.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md
 ```
@@ -238,6 +253,13 @@ precisa existir no arquivo local.
 
 Enquanto o arquivo estiver em Draft, execute a validação estrutural
 intermediária:
+
+```bash
+specsfy gate spec <spec> --allow-draft
+```
+
+Pelo MCP, use a tool `gate_spec`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \

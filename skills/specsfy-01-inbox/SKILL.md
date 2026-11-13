@@ -26,7 +26,7 @@ falta de contexto ou incerteza não impedem a gravação.
 
 ## Pronto quando
 
-- existe um novo `specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` criado pelo script;
+- existe um novo `specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` criado pelo comando;
 - o texto original está integral, sem correções;
 - a análise separa declaração, inferência e pontos a revisar;
 - a resposta traz somente o caminho, um resumo breve do que foi processado e o
@@ -65,6 +65,25 @@ Faça estes passos em silêncio, na ordem:
 Execute uma única vez:
 
 ```bash
+specsfy inbox capture \
+  --input "<texto original integral>" \
+  --title "<título derivado>" \
+  --summary "<resumo>" \
+  --problem "<problema ou oportunidade>" \
+  --people "<pessoas afetadas>" \
+  --value "<resultado ou valor>" \
+  --signals "<sinais extraídos>" \
+  --data "<sinais sobre informações que talvez precisem ser guardadas>" \
+  --risks "<riscos ou dependências>" \
+  --directions "<direções futuras possíveis>" \
+  --review "<pontos a revisar futuramente>" \
+  [--project <raiz>]
+```
+
+Pelo MCP, use a tool `inbox_capture`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
 node <diretório-da-skill>/scripts/capturar_inbox.mjs \
   --input "<texto original integral>" \
   --title "<título derivado>" \
@@ -80,7 +99,7 @@ node <diretório-da-skill>/scripts/capturar_inbox.mjs \
   [--root <raiz>]
 ```
 
-O script resolve o template em `.specsfy/templates/custom/Inbox.md` e, na
+O comando resolve o template em `.specsfy/templates/custom/Inbox.md` e, na
 ausência dele, em `.specsfy/templates/Inbox.md`. Ele cria
 `specs/inbox/AAAA-MM-DD-HHMMSS-<slug>.md` e não sobrescreve capturas
 existentes. Se nenhum template existir, relate a instalação incompleta em vez

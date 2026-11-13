@@ -70,7 +70,7 @@ O comando atualiza blocos identificados em `specs.md` e em
 referenciado por spec ou backlog e ainda sem arquivo recebe um esqueleto, para
 você completar na entrevista.
 
-`specsfy transition` também sincroniza o mapa depois de mover uma spec. Use o
+`specsfy specs transition` também sincroniza o mapa depois de mover uma spec. Use o
 comando direto quando tiver alterado vínculos no Markdown ou refinado backlog.
 
 ## Cinco usos do comando

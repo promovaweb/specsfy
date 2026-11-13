@@ -31,7 +31,7 @@ que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
 
 - Cada informação a guardar aplicável está confirmada, adiada ou encerrada pela
   pessoa, dentro do limite de oito perguntas por área.
-- Cada resposta confirmada foi gravada pelo script na seção
+- Cada resposta confirmada foi gravada pelo comando na seção
   `Informações a guardar confirmadas` de `.specsfy/DATABASE.md`, com fontes.
 - Nenhuma hipótese, dado real, credencial ou informação pessoal sensível foi
   gravada.
@@ -88,6 +88,22 @@ confirmação. Uma informação com usos distintos gera um registro por uso.
 
 Depois de cada resposta confirmada, chame o script com nome do domínio e frases
 curtas que quem opera o produto entenda:
+
+```bash
+specsfy context data \
+  --project <raiz> \
+  --name "<informação do produto>" \
+  --purpose "<finalidade>" \
+  --store "<informações necessárias>" \
+  --format "<forma confirmada de registrar>" \
+  --links "<o que permanece ligado a quê>" \
+  --access "<quem consulta ou altera>" \
+  --lifecycle "<quando muda, deixa de valer ou é apagado>" \
+  --sources "<caminhos de Inbox, backlog, MVP ou spec>"
+```
+
+Pelo MCP, use a tool `context_data`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-data-discovery/scripts/\

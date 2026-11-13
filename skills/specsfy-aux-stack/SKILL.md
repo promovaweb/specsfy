@@ -16,7 +16,7 @@ dependências.
   presentes.
 - Toda linha acrescentada à mão cita sua fonte na coluna `Evidência`.
 - Conteúdo humano fora do bloco continua intacto.
-- `monitor_context.mjs --check` não aponta mais `.specsfy/STACK.md`.
+- `specsfy context monitor --check` não aponta mais `.specsfy/STACK.md`.
 
 ## Preparação obrigatória
 
@@ -38,6 +38,13 @@ sinalize o campo pendente para a etapa conversacional responsável.
 2. Atualize o bloco detectado:
 
    ```bash
+   specsfy context stack --project <raiz>
+   ```
+
+   Pelo MCP, use a tool `context_stack`. Sem o binário instalado, rode o script
+   equivalente:
+
+   ```bash
    node .agents/skills/specsfy-aux-stack/scripts/update_stack.mjs \
      --project <raiz>
    ```
@@ -48,6 +55,13 @@ sinalize o campo pendente para a etapa conversacional responsável.
    essa fonte na coluna `Evidência`.
 5. Se a mudança também alterou persistência, carregue `$specsfy-aux-database`.
 6. Confirme que o stack deixou de aparecer como pendência:
+
+   ```bash
+   specsfy context monitor --project <raiz> --check
+   ```
+
+   Pelo MCP, use a tool `context_monitor`. Sem o binário instalado, rode o
+   script equivalente:
 
    ```bash
    node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \

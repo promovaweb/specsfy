@@ -26,7 +26,7 @@ Antes de formular qualquer pergunta, leia e aplique o
 ## Pronto quando
 
 - cada resposta confirmada está registrada na seção adequada da spec;
-- o Effort foi recalibrado com `specsfy effort` sempre que a nova informação
+- o Effort foi recalibrado com `specsfy specs effort` sempre que a nova informação
   mudou a capacidade necessária;
 - a próxima responsabilidade foi entregue à skill correspondente, sem gate
   aprovado nem pasta movida por esta skill.
@@ -74,7 +74,7 @@ Escolha um inteiro de 1 a 10 e uma justificativa curta:
 Depois da confirmação, execute:
 
 ```bash
-specsfy effort <id-da-spec> <1-10> --reason "<o que mudou a estimativa>"
+specsfy specs effort <id-da-spec> <1-10> --reason "<o que mudou a estimativa>"
 ```
 
 O comando atualiza `Effort`, data, justificativa e histórico em `spec.md`. Não
@@ -97,6 +97,6 @@ registre a pendência na spec sem declarar sincronização concluída.
 
 - Não inventar respostas, Effort, vínculo de tarefa ou status remoto.
 - Não alterar uma spec em `completed` como forma de iniciar mudança nova.
-- Não mover pastas por comando do sistema; use `specsfy transition` somente na
+- Não mover pastas por comando do sistema; use `specsfy specs transition` somente na
   skill responsável depois de seus gates.
 - Não exigir ClickUp para uma spec sem integração configurada.

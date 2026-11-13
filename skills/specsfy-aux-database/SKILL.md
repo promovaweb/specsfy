@@ -16,7 +16,7 @@ de dados só está completa quando o mapa a reflete.
 - Relações, índices, constraints, ownership, retenção e finalidade estão
   preenchidos ou marcados como desconhecidos, nunca inventados.
 - Os testes relevantes à mudança de dados estão verdes.
-- `monitor_context.mjs --check` não aponta mais `.specsfy/DATABASE.md`.
+- `specsfy context monitor --check` não aponta mais `.specsfy/DATABASE.md`.
 
 ## Preparação obrigatória
 
@@ -40,6 +40,13 @@ sinalize o campo pendente para a etapa conversacional responsável.
 3. Atualize o bloco detectado:
 
    ```bash
+   specsfy context database --project <raiz>
+   ```
+
+   Pelo MCP, use a tool `context_database`. Sem o binário instalado, rode o
+   script equivalente:
+
+   ```bash
    node .agents/skills/specsfy-aux-database/scripts/update_database.mjs \
      --project <raiz>
    ```
@@ -49,6 +56,13 @@ sinalize o campo pendente para a etapa conversacional responsável.
    índices, constraints, ownership, retenção e finalidade. Marque como
    desconhecido o que nenhuma fonte sustentar.
 6. Confirme que a persistência deixou de aparecer como pendência:
+
+   ```bash
+   specsfy context monitor --project <raiz> --check
+   ```
+
+   Pelo MCP, use a tool `context_monitor`. Sem o binário instalado, rode o
+   script equivalente:
 
    ```bash
    node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \

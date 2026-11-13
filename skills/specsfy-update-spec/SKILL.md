@@ -29,8 +29,8 @@ decisões materiais pertencem ao refinamento em `$specsfy-02-backlog`.
 - o pedido está preservado literalmente e classificado;
 - a `spec.md` reflete a mudança com IDs preservados, e a razão está registrada
   na seção adequada;
-- somente os gates afetados voltaram para `Pending`, e `validate_spec.mjs
-  --allow-draft` passa;
+- somente os gates afetados voltaram para `Pending`, e
+  `specsfy gate spec <spec> --allow-draft` passa;
 - a próxima skill do fluxo foi carregada, ou as lacunas foram relatadas quando
   o refinamento terminou por `avançar`.
 
@@ -124,13 +124,20 @@ remanescentes.
 5. Execute a projeção de impacto:
 
    ```bash
+   specsfy specs change <spec> --base HEAD --mode impact
+   ```
+
+   Pelo MCP, use a tool `spec_change_analyze`. Sem o binário instalado, rode o
+   script equivalente:
+
+   ```bash
    node .agents/skills/specsfy-update-spec/scripts/analyze_change.mjs \
      specs/<estado>/<NNNN>-<slug>/spec.md --base HEAD --mode impact
    ```
 
    Use `--mode changelog` para listar IDs adicionados, removidos e alterados.
    A classificação usa títulos canônicos, não números de seção, e `unknown`
-   reabre do Ato I por segurança. O script é somente leitura e não substitui a
+   reabre do Ato I por segurança. O comando é somente leitura e não substitui a
    comparação semântica com o pedido.
 
 ## Invalidar somente o necessário
@@ -146,6 +153,13 @@ Preserve tarefas e evidências ainda válidas; `$specsfy-05-tasks` reconcilia os
 itens afetados e suas dependências antes de novo RED.
 
 Valide a estrutura intermediária:
+
+```bash
+specsfy gate spec <spec> --allow-draft
+```
+
+Pelo MCP, use a tool `gate_spec`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \

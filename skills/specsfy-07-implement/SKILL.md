@@ -17,7 +17,7 @@ A spec é a fonte única: tudo o que for decidido ou comprovado volta para ela.
 - Suíte completa, lint, tipos e build disponíveis passaram depois de `SAFE`.
 - A rastreabilidade não tem lacunas e cada `AC`, `FR`, `NFR` e item da
   Definition of Done aponta para comprovação atual.
-- `monitor_context.mjs --check` e `build_documentation.mjs --check` passam.
+- `specsfy context monitor --check` e `specsfy docs build --check` passam.
 - `Delivery Gate: Passed`, `Status: Reviewing` e a spec está em `review/`.
 
 ## Preparação obrigatória
@@ -55,6 +55,13 @@ específica.
 
 Testes nunca rodam contra o banco de desenvolvimento. Rode esta conferência
 antes de executar qualquer teste, suíte, regressão ou migration:
+
+```bash
+specsfy gate database --project <raiz> --command "<comando-pretendido>"
+```
+
+Pelo MCP, use a tool `gate_database`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
@@ -106,6 +113,14 @@ são sequenciais.
 3. Valide a spec e as tarefas:
 
    ```bash
+   specsfy gate spec <spec>
+   specsfy gate tasks <spec>
+   ```
+
+   Pelo MCP, use as tools `gate_spec` e `gate_tasks`. Sem o binário instalado,
+   rode os scripts equivalentes:
+
+   ```bash
    node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
      specs/<estado>/<NNNN>-<slug>/spec.md
    node .agents/skills/specsfy-05-tasks/scripts/validate_tasks.mjs \
@@ -124,12 +139,20 @@ são sequenciais.
    tarefa trouxer uma URL do GitHub ou mudar o Composer, carregue
    `$specsfy-specialist-laravel-package-manager` e reutilize pacotes já
    instalados que atendam ao requisito.
-6. Confira o comando da suíte base com `check_database_safety.mjs` e execute-a
+6. Confira o comando da suíte base com `specsfy gate database` e execute-a
    somente após `SAFE`. Registre falhas preexistentes para não atribuí-las à
    nova mudança.
 7. Antes da primeira alteração de produção, defina `Status: Implementing`,
-   `Delivery Gate: In Progress` e execute `specsfy transition <id> in-progress`.
+   `Delivery Gate: In Progress` e execute `specsfy specs transition <id> in-progress`,
+   equivalente a `specsfy specs transition <id> in-progress`.
 8. Selecione o próximo trabalho pronto:
+
+   ```bash
+   specsfy tasks next <spec>
+   ```
+
+   Pelo MCP, use a tool `task_next`. Sem o binário instalado, rode o script
+   equivalente:
 
    ```bash
    node .agents/skills/specsfy-07-implement/scripts/next_task.mjs \
@@ -182,11 +205,18 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
      reaproveitar, adaptar e registrar componentes antes de criar uma nova
      composição.
    - `[MIGRATION]`: crie primeiro o arquivo versionado no caminho planejado,
-     passe o comando pelo `check_database_safety.mjs`, aplique a migration no
+     passe o comando pelo `specsfy gate database`, aplique a migration no
      banco de teste e consulte o estado logo depois. Registre os dois comandos
      com saída zero no comentário `specsfy:evidence` da tarefa.
    - `[DOC]` ou `[OPS]`: produza a comprovação específica pedida.
 5. **Contexto.** Depois de alterar produção, rode:
+
+   ```bash
+   specsfy context monitor --project <raiz> --check
+   ```
+
+   Pelo MCP, use a tool `context_monitor`. Sem o binário instalado, rode o
+   script equivalente:
 
    ```bash
    node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
@@ -206,7 +236,7 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
    `--check` da documentação passar.
 7. **EXECUTE.** Marque quando a entrega e a documentação exigida existirem nos
    caminhos declarados.
-8. **VERIFY.** Confira cada comando com `check_database_safety.mjs` e, após
+8. **VERIFY.** Confira cada comando com `specsfy gate database` e, após
    `SAFE`, execute o teste TDD focal, a suíte relacionada e os checks
    estáticos. Marque somente com o resultado esperado. Refatore apenas com
    tudo verde.
@@ -214,6 +244,13 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
 10. **EVIDENCE.** Registre comando, resultado e IDs nas seções 11 a 13. Com
     `Evidence Contract: 1`, grave também o comentário JSON `specsfy:evidence`
     no bloco da tarefa e verifique:
+
+    ```bash
+    specsfy gate evidence <spec> --task TNNN
+    ```
+
+    Pelo MCP, use a tool `gate_evidence`. Sem o binário instalado, rode o
+    script equivalente:
 
     ```bash
     node .agents/skills/specsfy-07-implement/scripts/verify_evidence.mjs \
@@ -227,12 +264,12 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
 11. **IMPROVE.** Faça uma micro-retrospectiva: aplique uma melhoria segura ou
     registre “nenhuma melhoria necessária” com justificativa.
 12. **Fechar.** Marque o pai `- [x]` somente com os seis itens concluídos,
-    rode `validate_tasks.mjs` e recalcule a próxima tarefa com
-    `next_task.mjs`.
+    rode `specsfy gate tasks <spec>` e recalcule a próxima tarefa com
+    `specsfy tasks next <spec>`.
 
 Uma tarefa `[MIGRATION]` não fecha só porque o model, a query ou o teste
-existe. `verify_evidence.mjs` exige o arquivo da migration, o comando que a
-aplicou e a consulta que confirma seu estado; se faltar algum, `EXECUTE`,
+existe. `specsfy gate evidence <spec>` exige o arquivo da migration, o comando
+que a aplicou e a consulta que confirma seu estado; se faltar algum, `EXECUTE`,
 `VERIFY` e a tarefa continuam abertos.
 
 Tarefas `[P]` podem ser agrupadas quando não tocam os mesmos arquivos ou
@@ -263,6 +300,13 @@ Quando todas as tarefas da seção 14 estiverem marcadas, execute em sequência:
 2. rastreabilidade:
 
    ```bash
+   specsfy gate trace <spec>
+   ```
+
+   Pelo MCP, use a tool `gate_trace`. Sem o binário instalado, rode o script
+   equivalente:
+
+   ```bash
    node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs \
      specs/<estado>/<NNNN>-<slug>/spec.md .
    ```
@@ -270,18 +314,26 @@ Quando todas as tarefas da seção 14 estiverem marcadas, execute em sequência:
 3. comparação de cada `AC`, `FR`, `NFR` e item da Definition of Done com
    comprovação atual;
 4. busca por tarefas abertas, placeholders, testes pulados e falhas conhecidas;
-5. `verify_evidence.mjs` para toda tarefa `[MIGRATION]`, confirmando arquivo,
-   aplicação e consulta de estado;
-6. `monitor_context.mjs --project <raiz> --check` sem pendências;
-7. `$specsfy-documentator` com `build_documentation.mjs --project <raiz>
-   --check` aprovado.
+5. `specsfy gate evidence <spec>` para toda tarefa `[MIGRATION]`, confirmando
+   arquivo, aplicação e consulta de estado;
+6. `specsfy context monitor --project <raiz> --check` sem pendências;
+7. `$specsfy-documentator` com `specsfy docs build --project <raiz> --check`
+   aprovado.
 
 Com tudo comprovado, altere `Delivery Gate` para `Passed`, defina
-`Status: Reviewing` e execute `specsfy transition <id> review`. O aceite final
-e a mudança para `completed` pertencem ao `$specsfy-04-validate`. Se alguma
-comprovação faltar, não declare conclusão.
+`Status: Reviewing` e execute `specsfy specs transition <id> review`, equivalente a
+`specsfy specs transition <id> review`. O aceite final e a mudança para
+`completed` pertencem ao `$specsfy-04-validate`. Se alguma comprovação faltar,
+não declare conclusão.
 
 Projete o resumo de entrega sem criar arquivo:
+
+```bash
+specsfy tasks delivery <spec> --format markdown
+```
+
+Pelo MCP, use a tool `delivery_render`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-07-implement/scripts/render_delivery.mjs \

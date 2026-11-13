@@ -139,6 +139,20 @@ nem prioridade; esses dados amadurecem no aprofundamento.
 4. Para criar um item novo, execute:
 
    ```bash
+   specsfy backlog start \
+     --title "<título curto>" \
+     --idea "<formulação original>" \
+     --problem "<problema percebido>" \
+     --person "<pessoa afetada ou beneficiada>" \
+     --result "<resultado ou valor esperado>" \
+     --context "<contexto que distingue a ideia>" \
+     [--slug <slug>] [--project <raiz>]
+   ```
+
+   Pelo MCP, use a tool `backlog_start`. Sem o binário instalado, rode o
+   script equivalente:
+
+   ```bash
    node <diretório-da-skill>/scripts/iniciar_backlog.mjs \
      --title "<título curto>" \
      --idea "<formulação original>" \
@@ -149,7 +163,7 @@ nem prioridade; esses dados amadurecem no aprofundamento.
      [--slug <slug>] [--root <raiz>]
    ```
 
-5. Use o caminho absoluto impresso pelo script. Ele prefere
+5. Use o caminho absoluto impresso pelo comando. Ele prefere
    `.specsfy/templates/custom/Backlog.md` e recorre a
    `.specsfy/templates/Backlog.md`.
 
