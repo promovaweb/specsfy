@@ -4,6 +4,22 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.27.1] - 2026-11-13
+
+### Corrigido
+
+- O validador de skills do framework (`npm run validate:skills`) deixa de
+  conferir as skills `termfy*` instaladas em `cli/.agents/skills/` pelo
+  `npx skills`. Elas seguem o contrato do repositório Termfy e têm o hash
+  conferido em `cli/skills-lock.json`; a descrição de `termfy-database`
+  derrubava o workflow `CLI Release` da 0.27.0.
+
+### Observações
+
+- A tag `v0.27.0` não chegou a gerar GitHub Release nem pacote npm, porque o
+  workflow parou antes da compilação. A 0.27.1 é a primeira versão publicada
+  do CLI em Bun e traz todas as mudanças descritas na seção 0.27.0.
+
 ## [0.27.0] - 2026-11-13
 
 ### Alterado

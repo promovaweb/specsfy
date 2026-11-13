@@ -1,6 +1,6 @@
 {
   "name": "specsfy",
-  "version": "0.27.0",
+  "version": "0.27.1",
   "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
   "type": "module",
   "private": true,

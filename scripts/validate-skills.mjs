@@ -46,9 +46,15 @@ export function validateSkill(directory) {
   return { valid: true, message: 'Skill válida.' };
 }
 
-/** Descobre somente as bibliotecas publicadas e skills operacionais locais. */
+/**
+ * Descobre somente as bibliotecas publicadas e skills operacionais locais.
+ * As skills `termfy*` de `cli/.agents/skills/` vêm do Termfy pelo
+ * `npx skills`, com hash conferido em `cli/skills-lock.json`, e seguem o
+ * contrato do repositório de origem; por isso ficam fora desta conferência.
+ */
 export function defaultDirectories() {
-  return ['skills', 'specialists', '.agents/skills', 'cli/.agents/skills'].flatMap(base => readdirSync(join(ROOT, base), { withFileTypes: true }).filter(entry => entry.isDirectory() && existsSync(join(ROOT, base, entry.name, 'SKILL.md'))).map(entry => join(ROOT, base, entry.name)));
+  const vendored = (base, name) => base === 'cli/.agents/skills' && name.startsWith('termfy');
+  return ['skills', 'specialists', '.agents/skills', 'cli/.agents/skills'].flatMap(base => readdirSync(join(ROOT, base), { withFileTypes: true }).filter(entry => entry.isDirectory() && !vendored(base, entry.name) && existsSync(join(ROOT, base, entry.name, 'SKILL.md'))).map(entry => join(ROOT, base, entry.name)));
 }
 
 /** Recebe diretórios opcionais; sem argumentos confere todas as bibliotecas do projeto. */
