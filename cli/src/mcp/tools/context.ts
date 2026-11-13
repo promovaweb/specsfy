@@ -1,6 +1,15 @@
 /**
- * MCP tools of the context commands. Filled by the spec that owns them.
+ * MCP tools of the project context (spec 0005): `context_setup`,
+ * `context_inspect`, `context_interface`, `context_monitor`,
+ * `context_stack`, `context_rule`, `context_database`, `context_data` and
+ * `context_usage`. They come from the same script definitions as the
+ * `context` commands.
  */
+import { registerScriptTools } from "../../engine/script-command.ts";
+import { contextScriptDefs } from "../../cli/commands/context.ts";
 import type { Registrar } from "../server.ts";
 
-export function registerContextTools(_registrar: Registrar): void {}
+/** Registers the context tools. */
+export function registerContextTools(registrar: Registrar): void {
+  registerScriptTools(registrar, contextScriptDefs);
+}
