@@ -4,6 +4,19 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.27.3] - 2026-11-13
+
+### Documentação
+
+- A tabela de códigos de saída de `docs/user/cli-reference.md` passa a seguir
+  `cli/src/app/exit-codes.ts`, a mesma fonte do `specsfy --help`. O código `7`
+  é permissão negada no sistema de arquivos, e projeto ou spec ausente sai com
+  `6`. A tabela ganhou a coluna com o nome de cada código e o `130` de
+  interrupção.
+- A descrição do `specsfy doctor` em `docs/user/cli-reference.md` e em
+  `docs/user/cli.md` informa o código real de uma checagem reprovada, `3`, no
+  lugar de `1`. A tabela resumida do `README.md` da raiz ganhou a linha do `3`.
+
 ## [0.27.2] - 2026-11-13
 
 ### Documentação

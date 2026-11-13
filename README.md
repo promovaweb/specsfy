@@ -204,7 +204,8 @@ specsfy gate spec 0001 --json
 | Código | Significado |
 | --- | --- |
 | `0` | sucesso |
-| `1` | falha geral ou requisito ausente no diagnóstico |
+| `1` | falha geral, sem classificação específica |
+| `3` | configuração inválida ou diagnóstico com requisito reprovado |
 | `2` | uso inválido de argumentos, opções ou subcomando |
 | `6` | recurso não encontrado, como o projeto ou a spec |
 | `10` | gate ou validação reprovada |

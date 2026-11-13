@@ -263,7 +263,7 @@ specsfy tui --project ./api --tab about
 | --- | --- |
 | `specsfy config` | Lê e grava preferências em `~/.specsfy/settings.json`. Os subcomandos são `list`, `get`, `set`, `unset`, `path` e `schema`. |
 | `specsfy credentials` | Guarda segredos cifrados em `~/.specsfy/credentials.json`. Os subcomandos são `set`, `get`, `list`, `remove`, `status` e `clear`. `--stdin` lê o valor da entrada padrão. A credencial `github.token` alimenta o catálogo, as releases e o diagnóstico do projeto. |
-| `specsfy doctor` | Confere o runtime embutido, o terminal, as configurações, a origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens do projeto (Git, `npx`, lock de skills e token do GitHub). Qualquer requisito ausente produz código de saída `1`. |
+| `specsfy doctor` | Confere o runtime embutido, o terminal, as configurações, a origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens do projeto (Git, `npx`, lock de skills e token do GitHub). Qualquer checagem reprovada produz código de saída `3`. |
 | `specsfy scripts run` | Executa um script embutido pelo nome impresso em `specsfy scripts list`. É a saída de emergência para um script sem command dedicado. Os argumentos depois de `--` chegam ao script sem alteração. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
@@ -287,19 +287,23 @@ specsfy mcp --list
 
 ## Códigos de saída
 
-| Código | Significado |
-| --- | --- |
-| `0` | sucesso |
-| `1` | diagnóstico com requisito ausente |
-| `2` | uso inválido, transição recusada ou nome desconhecido |
-| `3` | chave de configuração inválida |
-| `4` | credencial ausente ou inválida |
-| `5` | falha de rede ou de atualização |
-| `6` | tópico de documentação não encontrado |
-| `7` | projeto ausente ou inválido |
-| `8` | terminal incompatível |
-| `9` | falha ao iniciar o servidor MCP |
-| `10` | gate reprovado |
+| Código | Nome | Significado |
+| --- | --- | --- |
+| `0` | `SUCCESS` | sucesso |
+| `1` | `GENERIC_ERROR` | falha geral, sem classificação específica |
+| `2` | `USAGE` | uso inválido de argumentos, opções ou subcomando |
+| `3` | `CONFIG` | `settings.json` ausente ou inválido, chave desconhecida ou diagnóstico com requisito reprovado |
+| `4` | `CREDENTIALS` | cofre ilegível, chave mestra ausente ou credencial não encontrada |
+| `5` | `NETWORK_OR_API` | falha de rede ou resposta inesperada da API |
+| `6` | `NOT_FOUND` | recurso não encontrado, como o projeto, a spec ou o arquivo |
+| `7` | `PERMISSION` | permissão negada ao ler ou gravar no sistema de arquivos |
+| `8` | `NO_TTY` | a TUI exige um terminal interativo (TTY) |
+| `9` | `MCP` | o servidor MCP falhou ao iniciar ou perdeu o transporte stdio |
+| `10` | `GATE_FAILED` | gate ou validação do Specsfy reprovada |
+| `130` | `INTERRUPTED` | entrada cancelada ou processo interrompido (Ctrl+C) |
+
+A tabela segue `cli/src/app/exit-codes.ts`, a mesma fonte de `specsfy --help`
+e de `specsfy --skill exit-codes`.
 
 ## Confirmação e diagnóstico
 

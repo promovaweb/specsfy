@@ -372,7 +372,7 @@ A credencial `github.token` é usada para consultar o catálogo e as releases.
 `specsfy doctor` confere o runtime embutido, o terminal, as configurações, a
 origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens
 do projeto, como `git`, `npx`, o lock de skills e o token do GitHub. Qualquer
-requisito ausente produz código de saída `1`.
+checagem reprovada produz código de saída `3`.
 
 ## Justificativa de tamanho
 

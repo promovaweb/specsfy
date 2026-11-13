@@ -3,7 +3,7 @@
   "opencli": "0.1",
   "info": {
     "title": "Specsfy",
-    "version": "0.27.2",
+    "version": "0.27.3",
     "summary": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
     "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP. Without arguments it opens the TUI; \"specsfy mcp\" starts the MCP server over stdio; any other command runs as a CLI with text or --json output.",
     "contact": {
