@@ -33,6 +33,17 @@ import { projectDocsCommands } from "./commands/project-docs.ts";
 import { frameworkTopLevelCommands, skillsCommands } from "./commands/framework.ts";
 import type { Command } from "./registry.ts";
 
+/**
+ * Hidden top-level aliases for the commands the previous CLI exposed at the
+ * root (`specsfy transition`, `effort`, `migrate`), so existing scripts keep
+ * working. Help and OpenCLI show only the `specs` form.
+ */
+function legacyAliases(): Command[] {
+  return specsWriteCommands
+    .filter((command) => ["transition", "effort", "migrate"].includes(command.name))
+    .map((command) => ({ ...command, hidden: true }));
+}
+
 /** Group command, or nothing when no spec contributed subcommands. */
 function group(name: string, description: string, subcommands: readonly Command[]): Command[] {
   return subcommands.length ? [{ name, description, subcommands }] : [];
@@ -49,6 +60,7 @@ export const root: Command = {
     ...group("inbox", "Captures in specs/inbox/: list, capture and process.", [...inboxReadCommands, ...inboxWriteCommands]),
     ...group("backlog", "Backlog items in specs/backlog/.", [...backlogReadCommands, ...backlogWriteCommands]),
     progressCommand,
+    ...legacyAliases(),
     ...group("gate", "Run one Specsfy gate on a spec. Exit code 10 means the gate found problems.", gateCommands),
     ...gateTopLevelCommands,
     ...testingTopLevelCommands,

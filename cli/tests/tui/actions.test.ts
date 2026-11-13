@@ -81,7 +81,7 @@ describe("tests", () => {
         emit("Tests:  3 passed");
         const run: TestRun = {
           command: { label: "Laravel Pest", argv: ["php", "artisan", "test"], cwd: EXAMPLE, display: "php artisan test" },
-          exit_code: 0, duration_seconds: 1.5, summary_lines: ["Tests:  3 passed"],
+          exit_code: 0, duration_seconds: 1.5, summary_lines: ["Tests:  3 passed"], output: ["Tests:  3 passed"],
         };
         return run;
       },

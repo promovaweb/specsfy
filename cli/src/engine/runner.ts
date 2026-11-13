@@ -54,7 +54,8 @@ function treeDigest(): string {
 export function skillsRuntimeDir(): string {
   const override = process.env.SPECSFY_SKILLS_DIR;
   if (override && override.trim() !== "") return override;
-  if (cachedRoot) return cachedRoot;
+  // Reuse the cached tree only while it still exists (tests and cleanups may remove the data directory).
+  if (cachedRoot && cachedRoot.startsWith(baseDir()) && existsSync(join(cachedRoot, ".complete"))) return cachedRoot;
   const root = join(baseDir(), "runtime", `${manifest.version}-${treeDigest()}`, "skills");
   const marker = join(root, ".complete");
   if (!existsSync(marker)) {
