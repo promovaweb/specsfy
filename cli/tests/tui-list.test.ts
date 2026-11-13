@@ -44,13 +44,12 @@ test("empty lists do not activate or move", async () => {
 test("example screen handles j/k once and leaves global tab and quit keys working", async () => {
   const { createExampleScreen } = await import("../template/screen/example.ts");
   const exampleScreen = createExampleScreen();
-  const { screens } = await import("../src/tui/screens/index.ts");
+  const { aboutScreen } = await import("../src/tui/screens/about.ts");
+  const { EXAMPLE, fakeServices } = await import("./tui/helpers.ts");
   const { mountTui } = await import("../src/tui/index.ts");
   const setup = await createTestRenderer({ width: 100, height: 24 });
-  // Temporarily extend the registry for this integration fixture.
-  const fixtureScreens = screens as import("../src/tui/screen.ts").Screen[];
-  fixtureScreens.push(exampleScreen);
-  const closed = mountTui(setup.renderer, { initialTab: "example" }, themes.night);
+  // The host takes the screen set as an option, so the fixture never touches the default registry.
+  const closed = mountTui(setup.renderer, { initialTab: "example", project: EXAMPLE, services: fakeServices(), screens: [aboutScreen, exampleScreen] }, themes.night);
   try {
     await setup.renderOnce();
     setup.mockInput.pressKey("j"); await setup.renderOnce();
@@ -62,11 +61,10 @@ test("example screen handles j/k once and leaves global tab and quit keys workin
     setup.mockInput.pressKey("r"); await setup.renderOnce();
     expect(setup.captureCharFrame()).toContain("> First item");
     setup.mockInput.pressKey("1"); await setup.renderOnce();
-    expect(setup.captureCharFrame()).toContain("Environment");
+    expect(setup.captureCharFrame()).toContain("Credits");
     setup.mockInput.pressKey("q"); await closed;
     expect(setup.renderer.isDestroyed).toBe(true);
   } finally {
     setup.renderer.destroy(); await closed;
-    fixtureScreens.splice(fixtureScreens.indexOf(exampleScreen), 1);
   }
 });

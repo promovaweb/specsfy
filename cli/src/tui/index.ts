@@ -3,14 +3,17 @@
  *
  * Screen layout:
  *
- *   ┌ header: title, version and description ────────────────────────────┐
+ *   ┌ header: title, version and project root ───────────────────────────┐
  *   │ tabs (TabSelect)                                                   │
  *   │ active tab content (flexGrow)                                      │
  *   └ status bar: available keys ────────────────────────────────────────┘
  *
  * Global keys: Left/Right or [ ] switch tabs, 1..9 jump to the tab with
  * that number, Tab moves forward, q or Esc quit, ? toggles the help box.
- * The renderer is destroyed on every exit path to hand the terminal back.
+ * Each screen adds its own keys to the bottom bar. The host owns the
+ * project store: it starts polling after the first tab is shown and stops
+ * it when the renderer is destroyed. The renderer is destroyed on every
+ * exit path to hand the terminal back.
  */
 import {
   BoxRenderable,
@@ -26,14 +29,26 @@ import {
 import { manifest } from "../app/manifest.ts";
 import { readSettings, getPath } from "../config/settings.ts";
 import { glyphs, currentTheme, type Theme } from "./theme.ts";
-import { screens } from "./screens/index.ts";
+import { createScreens } from "./screens/index.ts";
+import { resolveProject } from "../core/project.ts";
+import { defaultServices, type TuiServices } from "./services.ts";
+import { createProjectStore, type ProjectStore } from "./store.ts";
 import type { ScreenContext, Screen } from "./screen.ts";
 
 export interface TuiOptions {
+  /** Tab id to open first; defaults to `tui.initialTab`. */
   initialTab?: string;
+  /** Project root (already resolved or a `--project` value); defaults to the nearest project. */
+  project?: string;
+  /** Services used by the screens; tests replace slow or remote parts. */
+  services?: TuiServices;
+  /** Screens to show instead of the default set (tests and derived tools). */
+  screens?: Screen[];
+  /** Store to use instead of creating one (tests). */
+  store?: ProjectStore;
 }
 
-function defaultInitialTab(): string {
+function defaultInitialTab(screens: readonly Screen[]): string {
   try {
     const value = getPath(readSettings(), "tui.initialTab");
     if (typeof value === "string") return value;
@@ -74,6 +89,8 @@ export async function startTui(options: TuiOptions = {}): Promise<void> {
  */
 export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, theme: Theme = currentTheme()): Promise<void> {
   const closed = new Promise<void>((resolve) => renderer.once("destroy", () => resolve()));
+  const store = options.store ?? createProjectStore(resolveProject(options.project), options.services ?? defaultServices());
+  const screens: readonly Screen[] = options.screens ?? createScreens(store);
   const quit = () => renderer.destroy();
 
   const app = new BoxRenderable(renderer, {
@@ -97,7 +114,7 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
   header.add(brand);
   header.add(
     new TextRenderable(renderer, {
-      content: `${glyphs.separator}  ${manifest.description}`,
+      content: `${glyphs.separator}  ${store.project}`,
       fg: theme.textDim,
       wrapMode: "none",
       flexGrow: 1,
@@ -123,14 +140,14 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
   const tabs = new TabSelectRenderable(renderer, {
     width: "100%",
     height: 2,
-    tabWidth: 14,
+    tabWidth: 11,
     options: screens.map((s) => ({ name: s.title, description: s.description })),
     backgroundColor: theme.background,
     textColor: theme.textDim,
     focusedBackgroundColor: theme.background,
     focusedTextColor: theme.textDim,
-    selectedBackgroundColor: theme.surfaceHigh,
-    selectedTextColor: theme.accent,
+    selectedBackgroundColor: theme.tabActive,
+    selectedTextColor: theme.tabActiveText,
     selectedDescriptionColor: theme.textDim,
     showDescription: false,
     showScrollArrows: false,
@@ -215,6 +232,7 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
         ["1 … 9", "go to the tab with that number"],
         ["?", "show or hide this help"],
         ["q  Esc  Ctrl+C", "quit"],
+        ["↑ ↓  PgUp PgDn", "move or scroll in a tab"],
       ];
       for (const [k, v] of rows) {
         const row = new BoxRenderable(renderer, { flexDirection: "row" });
@@ -254,13 +272,17 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
     }
   };
   renderer.keyInput.on("keypress", onKey);
-  renderer.once("destroy", () => renderer.keyInput.off("keypress", onKey));
+  renderer.once("destroy", () => {
+    renderer.keyInput.off("keypress", onKey);
+    store.stop();
+  });
 
-  const initial = options.initialTab ?? defaultInitialTab();
+  const initial = options.initialTab ?? defaultInitialTab(screens);
   const initialIndex = Math.max(0, screens.findIndex((s) => s.id === initial));
   tabs.focus();
   tabs.setSelectedIndex(initialIndex);
   show(initialIndex);
+  store.start();
 
   await closed;
 }
