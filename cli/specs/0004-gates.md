@@ -1,6 +1,6 @@
 # 0004 Gates e verificação
 
-Status: in_progress
+Status: done
 
 ## Goal
 
@@ -10,8 +10,7 @@ de validação.
 
 ## Behavior
 
-`gate spec <spec> [--allow-draft]`, `gate tasks <spec> [--allow-draft]
-[--delivery]`, `gate interface <spec>`, `gate trace <spec> [--kinds]
+`gate spec <spec> [--allow-draft]`, `gate tasks <spec> [--allow-draft]`, `gate interface <spec>`, `gate trace <spec> [--kinds]
 [--full-chain] [--minimum-tests]`, `gate acceptance <spec>`, `gate evidence
 <spec> [--delivery] [--task] [--attestation]`, `gate findings <spec>` e
 `gate database [--command]`. `verify [--boundary local|git|ci]
@@ -50,3 +49,8 @@ chama os scripts com `node` dentro do projeto; o binário passa
 - [x] `verify --json` devolve `result`
 
 ## Notes
+
+- 2026-11-13: `gate tasks` não expõe `--delivery`: o `validate_tasks.mjs` não
+  lê essa flag e já repassa `--delivery` ao `verify_evidence` nas specs em
+  Reviewing ou Complete. `gate acceptance` ganhou `--attestation`, que o script
+  aceita.

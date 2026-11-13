@@ -33,6 +33,8 @@ beforeAll(() => {
   spec(dir, "draft", "0001-recover-password");
   spec(dir, "defined", "0002-export-orders", "Defined");
   spec(dir, "planned", "0003-export-orders-csv", "Planned");
+  spec(dir, "draft", "0004-duplicate");
+  spec(dir, "review", "0005-duplicate", "Reviewing");
   mkdirSync(join(dir, "app", "deep"), { recursive: true });
 });
 afterAll(() => {
@@ -73,6 +75,12 @@ describe("resolveSpecPath", () => {
     expect((await rejection(resolveSpecPath(dir, "9999"))).code).toBe(ExitCode.NOT_FOUND);
   });
 
+  test("a slug shared by two specs is USAGE and lists the matches", async () => {
+    const e = await rejection(resolveSpecPath(dir, "duplicate"));
+    expect(e.code).toBe(ExitCode.USAGE);
+    expect(e.details?.matches).toEqual(["0004-duplicate", "0005-duplicate"]);
+  });
+
   test("an empty identifier is USAGE", async () => {
     expect((await rejection(resolveSpecPath(dir, " "))).code).toBe(ExitCode.USAGE);
   });
@@ -81,8 +89,8 @@ describe("resolveSpecPath", () => {
 describe("read model", () => {
   test("overview counts specs per state folder", async () => {
     const overview = await projectOverview(dir);
-    expect(overview.summary.total_specs).toBe(3);
-    expect(overview.states.draft).toBe(1);
+    expect(overview.summary.total_specs).toBe(5);
+    expect(overview.states.draft).toBe(2);
     expect(overview.states.defined).toBe(1);
     expect(overview.states.planned).toBe(1);
   });

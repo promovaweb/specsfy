@@ -1,6 +1,6 @@
 # 0005 Contexto do projeto
 
-Status: in_progress
+Status: done
 
 ## Goal
 

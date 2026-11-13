@@ -1,6 +1,6 @@
 # 0008 Documentação do projeto
 
-Status: in_progress
+Status: done
 
 ## Goal
 

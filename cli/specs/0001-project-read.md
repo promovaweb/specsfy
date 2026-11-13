@@ -1,6 +1,6 @@
 # 0001 Leitura do projeto
 
-Status: in_progress
+Status: done
 
 ## Goal
 
@@ -60,15 +60,15 @@ transforma uma definição de script em command e tool MCP.
 - [x] `findProjectRoot`, `resolveProject` e `resolveSpecPath` `#termfy-cli`
 - [x] Commands `status`, `specs list|show`, `progress`, `backlog list`, `inbox list`, `scripts list|run` `#termfy-cli`
 - [x] Tools MCP de leitura `#termfy-mcp`
-- [ ] Testes do núcleo (`tests/core/`) `#termfy-test`
-- [ ] Documentação em `docs/cli.md` e `docs/mcp.md` `#termfy-docs`
+- [x] Testes do núcleo (`tests/core/`) `#termfy-test`
+- [x] Documentação em `docs/cli.md` e `docs/mcp.md` `#termfy-docs`
 
 ## Tests
 
-- [ ] `resolveSpecPath` aceita número, pasta, slug e caminho; ambíguo sai com 2
-- [ ] `status --json` no projeto `example/` devolve 6 specs
-- [ ] `findProjectRoot` sobe de uma subpasta até a raiz com `specs/`
-- [ ] `scripts run specsfy-progress/progress` executa o script embutido
+- [x] `resolveSpecPath` aceita número, pasta, slug e caminho; ambíguo sai com 2
+- [x] `status --json` no projeto `example/` devolve 6 specs
+- [x] `findProjectRoot` sobe de uma subpasta até a raiz com `specs/`
+- [x] `scripts run specsfy-progress/progress` executa o script embutido
 
 ## Notes
 

@@ -1,6 +1,6 @@
 # 0003 Ciclo da spec
 
-Status: in_progress
+Status: done
 
 ## Goal
 

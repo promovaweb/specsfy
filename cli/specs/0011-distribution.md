@@ -1,6 +1,6 @@
 # 0011 Distribuição
 
-Status: in_progress
+Status: done
 
 ## Goal
 

@@ -136,8 +136,8 @@ Criação, captura e movimentação do trabalho pelo método.
 | `tasks delivery` | Monta o resumo de entrega: gates, IDs entregues, tarefas, provas e rollback. | `<spec>`, `--format markdown\|json`, `--preview`, `--project <dir>` |
 
 `tasks check` aceita como `[item]` uma key de checklist (`PREP`, `EXECUTE`,
-`VERIFY`, `VISUAL`, `EVIDENCE`, `IMPROVE`) ou a posição do item a partir de
-1. Sem `[item]`, a própria linha da tarefa muda. `tasks delivery` sem
+`VERIFY`, `VISUAL`, `EVIDENCE`, `IMPROVE`) ou a posição do item, contando a
+partir de 1. Sem `[item]`, a própria linha da tarefa muda. `tasks delivery` sem
 `--preview` exige Delivery Gate aprovado e nenhuma tarefa aberta.
 
 ### Gates

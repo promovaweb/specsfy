@@ -2,13 +2,13 @@
   "$schema": "https://opencli.org/draft.json",
   "opencli": "0.1",
   "info": {
-    "title": "Termfy",
-    "version": "0.9.2",
-    "summary": "CLI, TUI and MCP stdio server skeleton in Bun, with the Termfy framework skills installed.",
-    "description": "CLI, TUI and MCP stdio server skeleton in Bun, with the Termfy framework skills installed. Without arguments it opens the TUI; \"termfy mcp\" starts the MCP server over stdio; any other command runs as a CLI with text or --json output.",
+    "title": "Specsfy",
+    "version": "0.26.2",
+    "summary": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
+    "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP. Without arguments it opens the TUI; \"specsfy mcp\" starts the MCP server over stdio; any other command runs as a CLI with text or --json output.",
     "contact": {
       "name": "Promovaweb",
-      "url": "https://promovaweb.com"
+      "url": "https://promovaweb.com/docs/specsfy/cli/"
     },
     "license": {
       "name": "UNLICENSED"
@@ -19,8 +19,8 @@
     "optionSeparator": " "
   },
   "command": {
-    "name": "termfy",
-    "description": "CLI, TUI and MCP stdio server skeleton in Bun, with the Termfy framework skills installed.",
+    "name": "specsfy",
+    "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
     "options": [
       {
         "name": "--help",
@@ -80,7 +80,7 @@
     "commands": [
       {
         "name": "tui",
-        "description": "Open the terminal interface (Overview and About). Requires a TTY.",
+        "description": "Open the terminal interface (Overview, Specs, Backlog, Gates, Tests, Skills and About). Requires a TTY.",
         "options": [
           {
             "name": "--tab",
@@ -95,15 +95,35 @@
                 },
                 "acceptedValues": [
                   "overview",
+                  "specs",
+                  "backlog",
+                  "gates",
+                  "tests",
+                  "skills",
                   "about"
                 ]
+              }
+            ]
+          },
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
               }
             ]
           }
         ],
         "examples": [
-          "termfy",
-          "termfy tui --tab about"
+          "specsfy",
+          "specsfy tui --tab specs",
+          "specsfy tui --project ../app"
         ],
         "interactive": true,
         "exitCodes": [
@@ -120,8 +140,3425 @@
             "description": "USAGE: Invalid arguments, options or subcommand."
           },
           {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
             "code": 8,
             "description": "NO_TTY: The TUI requires an interactive terminal (TTY)."
+          }
+        ]
+      },
+      {
+        "name": "status",
+        "description": "Show the project overview: specs by state, progress, gates, backlog and inbox.",
+        "options": [
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "specsfy status",
+          "specsfy status --json",
+          "specsfy status --project ../app"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "specs",
+        "description": "Read and change specs: list, show, create, transition, effort.",
+        "commands": [
+          {
+            "name": "list",
+            "description": "List specs with state, gates and task progress.",
+            "options": [
+              {
+                "name": "--state",
+                "description": "Show only specs in this state folder.",
+                "arguments": [
+                  {
+                    "name": "state",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    },
+                    "acceptedValues": [
+                      "draft",
+                      "defined",
+                      "planned",
+                      "in-progress",
+                      "review",
+                      "completed",
+                      "legacy"
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs list",
+              "specsfy specs list --state in-progress --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "show",
+            "description": "Show one spec: metadata, gates, tasks and, with --content, the Markdown.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--content",
+                "description": "Include the spec Markdown."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs show 0001",
+              "specsfy specs show recover-password --content"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "new",
+            "description": "Create a spec in specs/draft/ with the next number, from the installed template.",
+            "options": [
+              {
+                "name": "--title",
+                "description": "One-line title of the spec.",
+                "arguments": [
+                  {
+                    "name": "title",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--slug",
+                "description": "ASCII kebab-case slug. Defaults to the slug of the title.",
+                "arguments": [
+                  {
+                    "name": "slug",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs new --title \"Recover password\" --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "transition",
+            "description": "Move a spec to another state folder and mirror its Status; only adjacent states of the method are accepted.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              },
+              {
+                "name": "state",
+                "description": "Destination state folder.",
+                "required": true,
+                "acceptedValues": [
+                  "draft",
+                  "defined",
+                  "planned",
+                  "in-progress",
+                  "review",
+                  "completed"
+                ]
+              }
+            ],
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs transition 0001 defined",
+              "specsfy specs transition recover-password in-progress --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "effort",
+            "description": "Record the estimated effort of a spec (integer 1 to 10) with a rationale.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              },
+              {
+                "name": "effort",
+                "description": "Integer from 1 to 10.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--reason",
+                "description": "Rationale of the estimate. Required.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs effort 0001 5 --reason \"Two integrations and a migration\""
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "migrate",
+            "description": "Move specs from the legacy layouts (specs/<slug>/, specs/specs/<slug>/) to the state folders, by their Status.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs migrate",
+              "specsfy specs migrate --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "research",
+            "description": "List and load the local research indexed by a spec and check its claims.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--emit-content",
+                "description": "Include the content of each artifact."
+              },
+              {
+                "name": "--max-bytes",
+                "description": "Maximum bytes read per artifact (default 65536).",
+                "arguments": [
+                  {
+                    "name": "bytes",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs research 0001 --json",
+              "specsfy specs research 0001 --emit-content --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "change",
+            "description": "Analyze the impact between the spec in Git and the worktree version: changed IDs, sections and gates to reopen.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--base",
+                "description": "Git revision to compare with (default HEAD).",
+                "arguments": [
+                  {
+                    "name": "rev",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--mode",
+                "description": "impact (default) or changelog.",
+                "arguments": [
+                  {
+                    "name": "value",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    },
+                    "acceptedValues": [
+                      "impact",
+                      "changelog"
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specs change 0001 --json",
+              "specsfy specs change 0001 --base main --mode changelog"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "tasks",
+        "description": "Next task and checklist items of a spec.",
+        "commands": [
+          {
+            "name": "next",
+            "description": "Show the next ready task of a spec, with its next checklist item; --all lists every ready task.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--all",
+                "description": "List every ready task instead of the first."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy tasks next 0001",
+              "specsfy tasks next 0001 --all --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "check",
+            "description": "Mark (or with --undo unmark) a task or one item of its checklist in spec.md.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              },
+              {
+                "name": "task",
+                "description": "Task ID, such as T001.",
+                "required": true
+              },
+              {
+                "name": "item",
+                "description": "Checklist key or 1-based position.",
+                "required": false
+              }
+            ],
+            "options": [
+              {
+                "name": "--undo",
+                "description": "Unmark instead of mark."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy tasks check 0001 T001 PREP",
+              "specsfy tasks check 0001 T001",
+              "specsfy tasks check 0001 T001 EXECUTE --undo --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "delivery",
+            "description": "Render the delivery summary of a spec: gates, delivered IDs, tasks, evidence and rollback.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--format",
+                "description": "markdown (default) or json.",
+                "arguments": [
+                  {
+                    "name": "value",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    },
+                    "acceptedValues": [
+                      "markdown",
+                      "json"
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "--preview",
+                "description": "Render even with open tasks or Delivery Gate not passed."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy tasks delivery 0001",
+              "specsfy tasks delivery 0001 --preview --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "inbox",
+        "description": "Captures in specs/inbox/: list, capture and process.",
+        "commands": [
+          {
+            "name": "list",
+            "description": "List captures in specs/inbox/; --all includes processed ones.",
+            "options": [
+              {
+                "name": "--all",
+                "description": "Include captures in specs/inbox/processed/."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy inbox list",
+              "specsfy inbox list --all --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "capture",
+            "description": "Record a capture in specs/inbox/ from the original text, without interaction.",
+            "options": [
+              {
+                "name": "--input",
+                "description": "Original text of the request, kept verbatim.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--title",
+                "description": "One-line title of the capture.",
+                "arguments": [
+                  {
+                    "name": "title",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--slug",
+                "description": "ASCII kebab-case slug. Defaults to the slug of the title.",
+                "arguments": [
+                  {
+                    "name": "slug",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--summary",
+                "description": "Short summary of the request.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--problem",
+                "description": "Problem or opportunity.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--people",
+                "description": "People affected.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--value",
+                "description": "Expected value.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--signals",
+                "description": "Signals extracted from the text.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--data",
+                "description": "Signals about information the system must keep.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--risks",
+                "description": "Risks and dependencies.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--directions",
+                "description": "Future directions.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--review",
+                "description": "Points to review before promotion.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--session",
+                "description": "Discovery session the capture came from.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--turn",
+                "description": "Conversation turn the capture came from.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--sources",
+                "description": "Context sources consulted.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy inbox capture --title \"Export orders\" --input \"Customers want to export their orders as CSV\" --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "process",
+            "description": "Move a capture out of the active inbox queue once specs with the Definition Gate passed cover it.",
+            "arguments": [
+              {
+                "name": "capture",
+                "description": "Capture file in specs/inbox/, by name or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--spec",
+                "description": "Spec(s) that cover the capture, comma-separated. Required.",
+                "arguments": [
+                  {
+                    "name": "ids",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy inbox process 2026-11-13-101500-export-orders.md --spec 0004,0005"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "backlog",
+        "description": "Backlog items in specs/backlog/.",
+        "commands": [
+          {
+            "name": "list",
+            "description": "List backlog items in specs/backlog/.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy backlog list",
+              "specsfy backlog list --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "start",
+            "description": "Create a numbered backlog item in specs/backlog/ without promoting a spec.",
+            "options": [
+              {
+                "name": "--title",
+                "description": "One-line title of the item.",
+                "arguments": [
+                  {
+                    "name": "title",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--idea",
+                "description": "Original idea.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--problem",
+                "description": "Perceived problem.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--person",
+                "description": "Person affected or benefited.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--result",
+                "description": "Expected result or value.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--context",
+                "description": "Context of the idea.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--slug",
+                "description": "ASCII kebab-case slug. Defaults to the slug of the title.",
+                "arguments": [
+                  {
+                    "name": "slug",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy backlog start --title \"Export orders\" --idea \"...\" --problem \"...\" --person \"...\" --result \"...\" --context \"...\""
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "progress",
+        "description": "Report progress of every spec or of one spec; --watch keeps refreshing on changes.",
+        "options": [
+          {
+            "name": "--spec",
+            "description": "Only this spec (number, folder name, slug or path).",
+            "arguments": [
+              {
+                "name": "spec",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          {
+            "name": "--watch",
+            "description": "Refresh when spec files change, until Ctrl+C. With --json, prints one JSON line per change."
+          },
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "specsfy progress",
+          "specsfy progress --spec 0001 --json",
+          "specsfy progress --watch"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
+            "code": 130,
+            "description": "INTERRUPTED: Input cancelled or process interrupted."
+          }
+        ]
+      },
+      {
+        "name": "gate",
+        "description": "Run one Specsfy gate on a spec. Exit code 10 means the gate found problems.",
+        "commands": [
+          {
+            "name": "spec",
+            "description": "Validate the structure of a spec (Specsfy/2.0 contract).",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--allow-draft",
+                "description": "Accept a spec in Draft and do not require the gate to be Passed."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate spec 0001",
+              "specsfy gate spec recover-password --allow-draft --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "tasks",
+            "description": "Validate the tasks in section 14 of a spec.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--allow-draft",
+                "description": "Accept a spec in Draft and do not require the gate to be Passed."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate tasks 0001",
+              "specsfy gate tasks 0001 --allow-draft --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "interface",
+            "description": "Validate the interface phase of the tasks of a spec with a human interface.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate interface 0001"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "trace",
+            "description": "Check traceability between the spec IDs and the test markers.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--kinds",
+                "description": "ID kinds to require: US, FR, NFR, AC. Default: US,FR,NFR,AC. Comma-separated list.",
+                "arguments": [
+                  {
+                    "name": "kinds",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--full-chain",
+                "description": "Also require a task and an evidence record for each ID."
+              },
+              {
+                "name": "--minimum-tests",
+                "description": "Minimum test cases per US, FR and NFR (AC needs 1). Default: 3.",
+                "arguments": [
+                  {
+                    "name": "n",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate trace 0001",
+              "specsfy gate trace 0001 --kinds US,AC --full-chain --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "acceptance",
+            "description": "Verify that every acceptance criterion (AC) of a spec has a passing result.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--attestation",
+                "description": "Attestation JSON written by verify --attestation, relative to the project root.",
+                "arguments": [
+                  {
+                    "name": "file",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate acceptance 0001",
+              "specsfy gate acceptance 0001 --attestation .specsfy/attestation.json --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "evidence",
+            "description": "Verify the material evidence of the tasks of a spec (Evidence Contract 1).",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--delivery",
+                "description": "Delivery mode: open [MIGRATION] tasks fail."
+              },
+              {
+                "name": "--task",
+                "description": "Check only this task, e.g. T003.",
+                "arguments": [
+                  {
+                    "name": "id",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--attestation",
+                "description": "Attestation JSON written by verify --attestation, relative to the project root.",
+                "arguments": [
+                  {
+                    "name": "file",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate evidence 0001",
+              "specsfy gate evidence 0001 --delivery --json",
+              "specsfy gate evidence 0001 --task T003"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "findings",
+            "description": "Validate the product, architecture and security findings recorded in a spec.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate findings 0001",
+              "specsfy gate findings 0001 --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "database",
+            "description": "Check that tests use a separate database and that a command cannot wipe data.",
+            "options": [
+              {
+                "name": "--command",
+                "description": "Command line to check before running it, e.g. \"php artisan test\".",
+                "arguments": [
+                  {
+                    "name": "command",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy gate database",
+              "specsfy gate database --command \"php artisan migrate:fresh\" --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "verify",
+        "description": "Run the whole Specsfy policy on the project: the CI entry point.",
+        "options": [
+          {
+            "name": "--boundary",
+            "description": "Verification boundary recorded in the attestation. Default: local.",
+            "arguments": [
+              {
+                "name": "boundary",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                },
+                "acceptedValues": [
+                  "local",
+                  "git",
+                  "ci"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "--attestation",
+            "description": "Write the attestation JSON to this file, relative to the project root.",
+            "arguments": [
+              {
+                "name": "file",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          {
+            "name": "--timeout-seconds",
+            "description": "Time limit of each check. Default: setting gate.timeoutSeconds (300).",
+            "arguments": [
+              {
+                "name": "seconds",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          {
+            "name": "--max-output-bytes",
+            "description": "Output kept per check. Default: 65536.",
+            "arguments": [
+              {
+                "name": "bytes",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          {
+            "name": "--self-test",
+            "description": "Exercise the policy and its canaries without checking the specs."
+          },
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "specsfy verify",
+          "specsfy verify --boundary ci --attestation .specsfy/attestation.json --json",
+          "specsfy verify --self-test --json"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
+            "code": 10,
+            "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+          }
+        ]
+      },
+      {
+        "name": "test",
+        "description": "Run the project test suite.",
+        "options": [
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "specsfy test",
+          "specsfy test --json",
+          "specsfy test --project ../app"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
+            "code": 10,
+            "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+          }
+        ]
+      },
+      {
+        "name": "context",
+        "description": "Project context files: setup, stack, rules, database, interface.",
+        "commands": [
+          {
+            "name": "setup",
+            "description": "Create the minimum project context (PROJECT.md, .specsfy/STACK.md, RULES.md, DATABASE.md...) without overwriting existing files.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context setup",
+              "specsfy context setup --project ../app --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "inspect",
+            "description": "Summarize the relevant sources of the project by group (instructions, manifests, routes, persistence, tests...) without changing files.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context inspect --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "interface",
+            "description": "Summarize the interface stack (frameworks, routing, styling, components, forms, tests) and the current routes and components.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context interface --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "monitor",
+            "description": "Point out the context documents that need review for the changed files (Git diff or --paths).",
+            "options": [
+              {
+                "name": "--check",
+                "description": "Fail (exit code 10) when a context document is pending."
+              },
+              {
+                "name": "--acknowledge-project-no-change",
+                "description": "Record that the application change needs no PROJECT.md update."
+              },
+              {
+                "name": "--acknowledge-rules-no-change",
+                "description": "Record that the convention change needs no RULES.md update."
+              },
+              {
+                "name": "--paths",
+                "description": "Changed paths to inspect instead of the Git diff. Comma-separated list.",
+                "arguments": [
+                  {
+                    "name": "paths",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context monitor",
+              "specsfy context monitor --check --json",
+              "specsfy context monitor --paths composer.json,database/migrations/x.php"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "stack",
+            "description": "Update the detected stack block in .specsfy/STACK.md, keeping human rows and notes.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context stack"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "rule",
+            "description": "Append a confirmed rule to a section of .specsfy/RULES.md without changing the rest of the document.",
+            "options": [
+              {
+                "name": "--section",
+                "description": "Section heading (without ##); created when missing.",
+                "arguments": [
+                  {
+                    "name": "title",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--rule",
+                "description": "Rule text, one line.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context rule --section \"Testes\" --rule \"Every endpoint has a feature test.\""
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "database",
+            "description": "Update the detected structures block in .specsfy/DATABASE.md from migrations, SQL and Prisma schemas.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context database"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "data",
+            "description": "Record information confirmed in conversation in the data map of .specsfy/DATABASE.md, one row per information name.",
+            "options": [
+              {
+                "name": "--name",
+                "description": "Information name.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--purpose",
+                "description": "What it is for.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--store",
+                "description": "What to keep.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--format",
+                "description": "Suggested format.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--links",
+                "description": "Links to other information.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--access",
+                "description": "Who uses it.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--lifecycle",
+                "description": "When it changes or is removed.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--sources",
+                "description": "Sources of the confirmation.",
+                "arguments": [
+                  {
+                    "name": "text",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context data --name Pedido --purpose \"...\" --store \"...\" --format \"...\" --links \"...\" --access \"...\" --lifecycle \"...\" --sources \"...\""
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "usage",
+            "description": "Estimate the context size of a spec by section, or ingest measured token usage from a JSON file.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec number, folder name, slug or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--usage-json",
+                "description": "JSON file with input_tokens and output_tokens measured by the agent.",
+                "arguments": [
+                  {
+                    "name": "file",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--compare",
+                "description": "Baseline to compare with: another spec file, or another usage JSON with --usage-json.",
+                "arguments": [
+                  {
+                    "name": "file",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy context usage 0001 --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "milestones",
+        "description": "Milestones of the project.",
+        "commands": [
+          {
+            "name": "sync",
+            "description": "Rebuild the progress of specs/milestones/ and the index in specs.md from the specs and backlog.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy milestones sync",
+              "specsfy milestones sync --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "import-mvp",
+            "description": "Import the development requirements of MVP.md as backlog items, Draft specs and milestone M01.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy milestones import-mvp --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "docs",
+        "description": "Project documentation generated from the specs.",
+        "commands": [
+          {
+            "name": "build",
+            "description": "Rebuild the project documentation in docs/ and .specsfy/PACKAGES.md; --check only verifies it is up to date.",
+            "options": [
+              {
+                "name": "--check",
+                "description": "Write nothing; exit with code 10 when the documentation is outdated."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy docs build",
+              "specsfy docs build --check"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "install",
+        "description": "Install the Specsfy framework in the project: base skills, .specsfy/ and the managed blocks of AGENTS.md and CLAUDE.md.",
+        "options": [
+          {
+            "name": "--detected",
+            "description": "Also install the specialists detected from the project's files and dependencies."
+          },
+          {
+            "name": "--specialist",
+            "description": "Specialist to install with its requirements. Comma-separated list.",
+            "arguments": [
+              {
+                "name": "name",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
+          {
+            "name": "--force",
+            "description": "Replace managed files and skills that have local changes."
+          },
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "specsfy install",
+          "specsfy install --detected --json",
+          "specsfy install --specialist specsfy-specialist-laravel --project ../app"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 4,
+            "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+          },
+          {
+            "code": 5,
+            "description": "NETWORK_OR_API: Network failure or unexpected API response."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
+            "code": 7,
+            "description": "PERMISSION: Permission denied on the file system."
+          }
+        ]
+      },
+      {
+        "name": "update",
+        "description": "Update the installed Specsfy skills, framework files and specialists that have no local changes.",
+        "options": [
+          {
+            "name": "--force",
+            "description": "Replace managed files and skills that have local changes."
+          },
+          {
+            "name": "--project",
+            "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
+        "examples": [
+          "specsfy update",
+          "specsfy update --force --json"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 5,
+            "description": "NETWORK_OR_API: Network failure or unexpected API response."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
+          },
+          {
+            "code": 7,
+            "description": "PERMISSION: Permission denied on the file system."
+          }
+        ]
+      },
+      {
+        "name": "upgrade",
+        "description": "Upgrade the specsfy binary to the latest GitHub Release; --check only reports the versions.",
+        "options": [
+          {
+            "name": "--check",
+            "description": "Only compare the running version with the latest release."
+          }
+        ],
+        "examples": [
+          "specsfy upgrade --check",
+          "specsfy upgrade",
+          "specsfy upgrade --check --json"
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          },
+          {
+            "code": 5,
+            "description": "NETWORK_OR_API: Network failure or unexpected API response."
+          },
+          {
+            "code": 7,
+            "description": "PERMISSION: Permission denied on the file system."
+          }
+        ]
+      },
+      {
+        "name": "skills",
+        "description": "Specsfy skills of the project: list, detect, install, remove, update.",
+        "commands": [
+          {
+            "name": "list",
+            "description": "List the specialist catalog of the framework repository.",
+            "examples": [
+              "specsfy skills list",
+              "specsfy skills list --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 5,
+                "description": "NETWORK_OR_API: Network failure or unexpected API response."
+              }
+            ]
+          },
+          {
+            "name": "detect",
+            "description": "Detect the specialists that match the project's files and dependencies.",
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy skills detect",
+              "specsfy skills detect --project ../app --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 5,
+                "description": "NETWORK_OR_API: Network failure or unexpected API response."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          },
+          {
+            "name": "install",
+            "description": "Install specialists from the catalog, with their requirements.",
+            "arguments": [
+              {
+                "name": "names",
+                "description": "Skill names.",
+                "required": true,
+                "arity": {
+                  "minimum": 1
+                }
+              }
+            ],
+            "options": [
+              {
+                "name": "--force",
+                "description": "Replace managed files and skills that have local changes."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy skills install specsfy-specialist-laravel",
+              "specsfy skills install specsfy-specialist-react specsfy-specialist-nextjs --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 4,
+                "description": "CREDENTIALS: credentials.json unreadable, master key missing or credential not found."
+              },
+              {
+                "code": 5,
+                "description": "NETWORK_OR_API: Network failure or unexpected API response."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          },
+          {
+            "name": "remove",
+            "description": "Remove Specsfy skills from the project; skills outside the Specsfy namespace are refused.",
+            "arguments": [
+              {
+                "name": "names",
+                "description": "Skill names.",
+                "required": true,
+                "arity": {
+                  "minimum": 1
+                }
+              }
+            ],
+            "options": [
+              {
+                "name": "--force",
+                "description": "Remove skills even when they have local changes."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy skills remove specsfy-specialist-react"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          },
+          {
+            "name": "update",
+            "description": "Update every installed Specsfy skill; same as the top-level update.",
+            "options": [
+              {
+                "name": "--force",
+                "description": "Replace managed files and skills that have local changes."
+              },
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy skills update"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 5,
+                "description": "NETWORK_OR_API: Network failure or unexpected API response."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              },
+              {
+                "code": 7,
+                "description": "PERMISSION: Permission denied on the file system."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "scripts",
+        "description": "List and run the framework scripts embedded in the binary.",
+        "commands": [
+          {
+            "name": "list",
+            "description": "List the framework scripts embedded in the binary.",
+            "examples": [
+              "specsfy scripts list"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              }
+            ]
+          },
+          {
+            "name": "run",
+            "description": "Run an embedded framework script by name, passing the remaining arguments unchanged.",
+            "arguments": [
+              {
+                "name": "script",
+                "description": "Script name from `scripts list`.",
+                "required": true
+              },
+              {
+                "name": "args",
+                "description": "Arguments for the script.",
+                "required": false,
+                "arity": {
+                  "minimum": 0
+                }
+              }
+            ],
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy scripts run specsfy-progress/progress -- . --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
           }
         ]
       },
@@ -129,8 +3566,8 @@
         "name": "about",
         "description": "Show version, executable, runtime, platform and credits.",
         "examples": [
-          "termfy about",
-          "termfy about --json"
+          "specsfy about",
+          "specsfy about --json"
         ],
         "exitCodes": [
           {
@@ -149,7 +3586,7 @@
       },
       {
         "name": "config",
-        "description": "Read and write preferences in ~/.termfy/settings.json.",
+        "description": "Read and write preferences in ~/.specsfy/settings.json.",
         "commands": [
           {
             "name": "list",
@@ -158,8 +3595,8 @@
               "ls"
             ],
             "examples": [
-              "termfy config list",
-              "termfy config list --json"
+              "specsfy config list",
+              "specsfy config list --json"
             ],
             "exitCodes": [
               {
@@ -199,7 +3636,7 @@
               }
             ],
             "examples": [
-              "termfy config get tui.initialTab"
+              "specsfy config get tui.initialTab"
             ],
             "exitCodes": [
               {
@@ -244,8 +3681,8 @@
               }
             ],
             "examples": [
-              "termfy config set output.format json",
-              "termfy config set output.colors false"
+              "specsfy config set output.format json",
+              "specsfy config set output.colors false"
             ],
             "exitCodes": [
               {
@@ -288,7 +3725,7 @@
               }
             ],
             "examples": [
-              "termfy config unset telemetry.enabled"
+              "specsfy config unset telemetry.enabled"
             ],
             "exitCodes": [
               {
@@ -321,7 +3758,7 @@
             "name": "path",
             "description": "Print the data directory and file paths.",
             "examples": [
-              "termfy config path"
+              "specsfy config path"
             ],
             "exitCodes": [
               {
@@ -342,7 +3779,7 @@
             "name": "schema",
             "description": "List the known keys with type, default and description.",
             "examples": [
-              "termfy config schema --json"
+              "specsfy config schema --json"
             ],
             "exitCodes": [
               {
@@ -389,7 +3826,7 @@
       },
       {
         "name": "credentials",
-        "description": "Store encrypted secrets (AES-256-GCM) in ~/.termfy/credentials.json.",
+        "description": "Store encrypted secrets (AES-256-GCM) in ~/.specsfy/credentials.json.",
         "aliases": [
           "cred"
         ],
@@ -411,8 +3848,8 @@
               }
             ],
             "examples": [
-              "termfy credentials set openai.api_key",
-              "printf '%s' \"$TOKEN\" | termfy credentials set github.token --stdin"
+              "specsfy credentials set openai.api_key",
+              "printf '%s' \"$TOKEN\" | specsfy credentials set github.token --stdin"
             ],
             "interactive": true,
             "exitCodes": [
@@ -459,8 +3896,8 @@
               }
             ],
             "examples": [
-              "termfy credentials get openai.api_key",
-              "termfy credentials get openai.api_key --reveal"
+              "specsfy credentials get openai.api_key",
+              "specsfy credentials get openai.api_key --reveal"
             ],
             "exitCodes": [
               {
@@ -496,7 +3933,7 @@
               "ls"
             ],
             "examples": [
-              "termfy credentials list --json"
+              "specsfy credentials list --json"
             ],
             "exitCodes": [
               {
@@ -539,7 +3976,7 @@
               }
             ],
             "examples": [
-              "termfy credentials remove github.token"
+              "specsfy credentials remove github.token"
             ],
             "exitCodes": [
               {
@@ -572,7 +4009,7 @@
             "name": "status",
             "description": "Show file, master key source and number of credentials.",
             "examples": [
-              "termfy credentials status"
+              "specsfy credentials status"
             ],
             "exitCodes": [
               {
@@ -602,7 +4039,7 @@
               }
             ],
             "examples": [
-              "termfy credentials clear --yes"
+              "specsfy credentials clear --yes"
             ],
             "interactive": true,
             "exitCodes": [
@@ -638,7 +4075,7 @@
             "options": [
               {
                 "name": "--from-env",
-                "description": "Use TERMFY_MASTER_KEY (64 hex characters) as the new key; read the current key from master.key."
+                "description": "Use SPECSFY_MASTER_KEY (64 hex characters) as the new key; read the current key from master.key."
               }
             ],
             "exitCodes": [
@@ -706,8 +4143,8 @@
           }
         ],
         "examples": [
-          "termfy mcp",
-          "termfy mcp --list --json"
+          "specsfy mcp",
+          "specsfy mcp --list --json"
         ],
         "exitCodes": [
           {
@@ -747,9 +4184,9 @@
           }
         ],
         "examples": [
-          "termfy skill",
-          "termfy skill mcp",
-          "termfy --skill cli"
+          "specsfy skill",
+          "specsfy skill mcp",
+          "specsfy --skill cli"
         ],
         "exitCodes": [
           {
@@ -768,7 +4205,23 @@
       },
       {
         "name": "doctor",
-        "description": "Check runtime, terminal, settings, key source and vault readability without changing files.",
+        "description": "Check runtime, terminal, settings, key source and vault readability without changing files; --project adds the project checks.",
+        "options": [
+          {
+            "name": "--project",
+            "description": "Also check this project: Git, skills CLI, skills-lock.json, GitHub token and the daily release check.",
+            "arguments": [
+              {
+                "name": "dir",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          }
+        ],
         "exitCodes": [
           {
             "code": 0,
@@ -785,6 +4238,10 @@
           {
             "code": 3,
             "description": "CONFIG: settings.json missing, invalid or unknown key."
+          },
+          {
+            "code": 6,
+            "description": "NOT_FOUND: Requested resource does not exist."
           }
         ]
       },
@@ -820,12 +4277,12 @@
       }
     ],
     "examples": [
-      "termfy",
-      "termfy about --json",
-      "termfy config set output.format json",
-      "termfy credentials set openai.api_key",
-      "termfy mcp",
-      "termfy --skill"
+      "specsfy",
+      "specsfy status",
+      "specsfy specs list --json",
+      "specsfy progress --watch",
+      "specsfy mcp",
+      "specsfy --skill"
     ],
     "exitCodes": [
       {
@@ -867,6 +4324,10 @@
       {
         "code": 9,
         "description": "MCP: The MCP server failed to start or lost the stdio transport."
+      },
+      {
+        "code": 10,
+        "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
       },
       {
         "code": 130,

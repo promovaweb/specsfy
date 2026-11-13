@@ -1,6 +1,6 @@
 # 0007 Milestones
 
-Status: in_progress
+Status: done
 
 ## Goal
 

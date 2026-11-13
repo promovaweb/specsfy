@@ -1,6 +1,6 @@
 # 0006 Testes do projeto
 
-Status: in_progress
+Status: done
 
 ## Goal
 

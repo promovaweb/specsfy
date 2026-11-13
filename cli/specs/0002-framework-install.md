@@ -1,6 +1,6 @@
 # 0002 Instalar e atualizar o framework
 
-Status: in_progress
+Status: done
 
 ## Goal
 

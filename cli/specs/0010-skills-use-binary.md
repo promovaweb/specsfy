@@ -1,6 +1,6 @@
 # 0010 Skills chamam o binário
 
-Status: draft
+Status: done
 
 ## Goal
 
@@ -25,11 +25,14 @@ Nenhuma mudança de superfície.
 
 ## Tasks
 
-- [ ] Atualizar as skills base `#termfy-docs`
-- [ ] Atualizar `docs/user/cli.md` e `cli-reference.md` `#termfy-docs`
+- [x] Atualizar as skills base `#termfy-docs`
+- [x] Atualizar `docs/user/cli.md` e `cli-reference.md` `#termfy-docs`
 
 ## Tests
 
-- [ ] `npm test` do framework continua verde
+- [x] `npm test` do framework continua verde
 
 ## Notes
+
+- 2026-11-13: `npm test` do framework passa, exceto os 8 testes de ebook que já
+  falhavam na `main` e dependem da recompilação do ebook.
