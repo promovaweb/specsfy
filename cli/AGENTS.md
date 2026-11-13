@@ -108,7 +108,8 @@ sai com o mesmo SemVer em `cli/package.json`, entrada em `cli/CHANGELOG.md`,
 tag `vX.Y.Z` no monorepo e GitHub Release com os cinco executáveis
 (linux-x64, linux-arm64, darwin-x64, darwin-arm64 e windows-x64) e
 `SHA256SUMS`. O npm `@promovaweb/specsfy` é o wrapper que baixa o binário da
-plataforma.
+plataforma. O workflow não publica no npm: o wrapper sai pela máquina local
+de quem mantém o projeto, depois que a GitHub Release existe.
 
 O fluxo está em `docs/release.md` e, quando existir, na skill
 [`specsfy-release-cli`](.agents/skills/specsfy-release-cli/SKILL.md). Tags não

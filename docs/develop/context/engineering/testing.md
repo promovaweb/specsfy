@@ -234,5 +234,6 @@ As reproduções verificam cinco comportamentos do consumidor:
 
 Branches `release/**` executam o mesmo workflow da `main` para conferir a
 revisão antes da tag. O job do CLI depende dos jobs integrados, de skills e do
-exemplo. A publicação npm, restrita a tags, só ocorre depois desses jobs. Os
+exemplo. A GitHub Release, restrita a tags, só ocorre depois desses jobs. O
+npm é publicado depois, pela máquina local. O CI não publica no npm. Os
 testes Node de regressão também são executados no job integrado.

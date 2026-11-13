@@ -31,18 +31,19 @@ notas confirmadas
 release-cli ──promove──► cli/CHANGELOG.md
        │                 + versão + lock + binário
        ├──valida──► testes do CLI + regressão aplicável
-       └──publica─► commit ─► tag vX.Y.Z ─► CI ─┬─► pacote npm
-                                                └─► GitHub Release
-                                                     ▲
-                                                     └─ mesma seção
+       ├──publica─► commit ─► tag vX.Y.Z ─► CI ─► GitHub Release
+       │                                            ▲
+       │                                            └─ mesma seção
+       └──máquina local─► npm pack na tag ─► npm publish ─► pacote npm
 ```
 
 - A skill local do módulo `cli/` governa a sequência.
 - `cli/` contém changelog, versão, lock e executável.
 - A raiz Git contém commit e tag.
 - GitHub hospeda o remoto, CI e release.
-- O registro npm hospeda `@promovaweb/specsfy`. O CI acrescenta proveniência
-  quando o repositório estiver público.
+- O registro npm hospeda `@promovaweb/specsfy`. O CI não publica no npm; o
+  pacote sai pela máquina local, com `npm pack` no commit da tag e
+  `npm publish <tgz> --access public`, depois que a GitHub Release existe.
 - A seção `## [X.Y.Z] - YYYY-MM-DD` origina o corpo do release.
 - O GitHub Release usa a mesma seção do changelog, sem regeneração.
 

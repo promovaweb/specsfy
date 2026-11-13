@@ -30,11 +30,11 @@ Release.
 O CLI fica no monorepo `promovaweb/specsfy`, e a tag pertence ao monorepo:
 
 ```bash
-git tag vX.Y.Z
-git push origin main vX.Y.Z
+git tag -a vX.Y.Z -m "Specsfy CLI vX.Y.Z"
+git push --atomic origin main vX.Y.Z
 ```
 
-A tag dispara o workflow `release.yml`, que:
+A tag dispara o workflow `cli-release.yml`, que:
 
 1. compila os cinco executáveis: linux-x64, linux-arm64, darwin-x64,
    darwin-arm64 e windows-x64;
@@ -61,6 +61,22 @@ npm install --global @promovaweb/specsfy
 
 O `upgrade` consulta a última release e troca o executável em uso. Com
 `--check`, apenas informa a versão publicada.
+
+O workflow de release não publica no npm. Depois que a GitHub Release
+`vX.Y.Z` existe com os binários, quem mantém o projeto publica o wrapper pela
+máquina local, logado como `contatopromovaweb`:
+
+```bash
+git switch --detach vX.Y.Z
+cd cli/npm
+SPECSFY_CACHE_DIR="$(mktemp -d)" node bin/specsfy.cjs --version
+npm pack
+npm publish promovaweb-specsfy-X.Y.Z.tgz --access public
+npm view @promovaweb/specsfy version license
+```
+
+O passo a passo completo está na skill
+[`specsfy-release-cli`](../.agents/skills/specsfy-release-cli/SKILL.md).
 
 ## Build local
 

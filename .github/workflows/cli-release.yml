@@ -4,7 +4,8 @@ name: CLI Release
 # passes, compiles the five targets of cli/scripts/build.ts --all, creates the
 # GitHub Release of the tag with the CHANGELOG section and the binaries plus
 # SHA256SUMS already attached (so "latest" never points to a release without
-# assets), then publishes the npm wrapper in cli/npm/, which downloads them.
+# assets). The npm wrapper in cli/npm/ is not published here: it is published
+# from the maintainer machine after this release exists (see the release skill).
 
 on:
   push:
@@ -71,36 +72,3 @@ jobs:
               dist/specsfy-*-* dist/SHA256SUMS
           fi
 
-  npm:
-    needs: binaries
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      id-token: write
-    defaults:
-      run:
-        working-directory: cli/npm
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: '22.20.0'
-          registry-url: 'https://registry.npmjs.org'
-      - name: Smoke test the wrapper against the release
-        if: ${{ !github.event.repository.private }}
-        env:
-          SPECSFY_CACHE_DIR: ${{ runner.temp }}/specsfy-cache
-        run: node bin/specsfy.cjs --version | grep -F "${GITHUB_REF_NAME#v}"
-      - run: npm pack --dry-run
-      - name: Publish npm package
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
-        run: |
-          if [ "${REPOSITORY_PRIVATE}" = "true" ]; then
-            npm publish --access public
-          else
-            npm publish --access public --provenance
-          fi

@@ -1,7 +1,7 @@
 name: Specsfy
 
 # Tags are covered by CLI Release, which calls this workflow before
-# publishing binaries and the npm wrapper.
+# publishing the binaries and the GitHub Release.
 on:
   push:
     branches: [main, 'release/**']

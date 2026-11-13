@@ -44,7 +44,9 @@ independentes.
 - Para lançar ou retomar uma versão do CLI, leia integralmente
   `cli/.agents/skills/specsfy-release-cli/SKILL.md`. Essa operação pertence ao
   módulo `cli/`; a tag e o GitHub Release pertencem ao monorepo e os artefatos
-  versionados do pacote ficam em `cli/`.
+  versionados do pacote ficam em `cli/`. O workflow `CLI Release` cria a
+  GitHub Release com os binários e não publica no npm; o wrapper
+  `@promovaweb/specsfy` é publicado só pela máquina local.
 - Projetos consumidores mantêm sua fonte normativa em
   `specs/<estado>/<NNNN>-<slug>/spec.md`; capturas imediatas ficam em
   `specs/inbox/` e itens escolhidos para refinamento ficam em

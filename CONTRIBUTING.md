@@ -234,9 +234,20 @@ especialistas, o ebook, a tag e a GitHub Release usam o mesmo SemVer.
 6. Crie a tag `vX.Y.Z` e envie a branch e a tag.
 
 A tag dispara [`cli-release.yml`](.github/workflows/cli-release.yml). O workflow
-compila os cinco executáveis, gera o `SHA256SUMS`, cria a GitHub Release e
-publica o wrapper no npm. Uma tag publicada não é movida. Correções recebem uma
-nova versão.
+compila os cinco executáveis, gera o `SHA256SUMS` e cria a GitHub Release. O
+workflow não publica no npm. Depois que a release existe, quem mantém o
+projeto publica o wrapper pela máquina local:
+
+```bash
+git switch --detach vX.Y.Z
+cd cli/npm
+npm pack
+npm publish promovaweb-specsfy-X.Y.Z.tgz --access public
+npm view @promovaweb/specsfy version license
+```
+
+A publicação usa a conta `contatopromovaweb` do npm. Uma tag publicada não é
+movida. Correções recebem uma nova versão.
 
 O passo a passo detalhado está em [`cli/docs/release.md`](cli/docs/release.md) e
 na skill local

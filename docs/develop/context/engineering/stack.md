@@ -73,7 +73,7 @@ não transforma PHP, JavaScript ou seu runtime em dependências do Specsfy.
 | --- | --- | --- |
 | TypeScript, Commander e APIs do Node.js | comandos, instalação, projeção, runners e detecção de versões | `cli/src/` |
 | neo-blessed, marked e marked-terminal | interface terminal e Markdown | `cli/package.json` e lockfile |
-| npm | instalação, atualização e publicação do CLI | `cli/package.json` e workflow |
+| npm | instalação, atualização e publicação local do wrapper | `cli/npm/package.json` |
 | Markdown/YAML | instruções e metadata das skills | `skills/` e `specialists/` |
 | JSON | catálogo detectável e lock de instalação | `specialists/catalog.json` e lock do consumidor |
 <!-- markdownlint-enable MD013 -->

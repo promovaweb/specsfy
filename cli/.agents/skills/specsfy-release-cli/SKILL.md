@@ -19,8 +19,11 @@ Os binários não são versionados no Git. O workflow `CLI Release`
 `cli/scripts/build.ts --all` (`specsfy-linux-x64`, `specsfy-linux-arm64`,
 `specsfy-darwin-x64`, `specsfy-darwin-arm64`, `specsfy-windows-x64.exe`),
 gera o `SHA256SUMS` e cria o GitHub Release da tag com a seção do changelog e
-os assets já anexados, depois de o workflow `Specsfy` passar. Só então publica
-o wrapper no npm, que baixa o binário dessa release.
+os assets já anexados, depois de o workflow `Specsfy` passar. O workflow não
+publica no npm e não usa `NPM_TOKEN`. O wrapper `@promovaweb/specsfy`, que
+baixa o binário dessa release, é publicado só pela máquina local de quem
+mantém o projeto, logado no npm como `contatopromovaweb`, depois que a GitHub
+Release existe.
 
 ## 1. Classificar o estado
 
@@ -130,13 +133,36 @@ bun \
   --release-json /caminho/release-publicado.json
 git ls-remote origin "refs/tags/vX.Y.Z^{}"
 gh run list --repo promovaweb/specsfy --branch vX.Y.Z --workflow Specsfy
-npm view @promovaweb/specsfy@X.Y.Z version
 ```
 
 Confirmar tag remota, os seis assets (cinco binários e `SHA256SUMS`), CI e
 equivalência exata das notas. Se as notas divergirem, corrija com
 `gh release edit vX.Y.Z --notes-file /caminho/release-notes.md`. Em outra
 falha, preservar o estado e reclassificar.
-O job `npm` do workflow publica `@promovaweb/specsfy` a partir de `cli/npm/`
-depois que os binários estão no release. A proveniência é incluída quando o
-repositório estiver público. Nunca crie uma tag compensatória.
+Nunca crie uma tag compensatória.
+
+## 5. Publicar o wrapper no npm pela máquina local
+
+Só depois de o `CLI Release` terminar verde e a GitHub Release ter os seis
+assets, gere o tarball no commit da tag e publique pela máquina local:
+
+```bash
+npm whoami
+git switch --detach vX.Y.Z
+cd cli/npm
+SPECSFY_CACHE_DIR="$(mktemp -d)" node bin/specsfy.cjs --version
+npm pack
+tar -tzf promovaweb-specsfy-X.Y.Z.tgz
+sha256sum promovaweb-specsfy-X.Y.Z.tgz
+npm publish promovaweb-specsfy-X.Y.Z.tgz --access public
+npm view @promovaweb/specsfy version license
+```
+
+`npm whoami` deve responder `contatopromovaweb`. O teste com
+`node bin/specsfy.cjs --version` baixa o binário da release, confere o
+`SHA256SUMS` e deve imprimir `X.Y.Z`. O tarball contém só
+`package/bin/specsfy.cjs`, `package/LICENSE`, `package/README.md` e
+`package/package.json`, com `version` igual a `X.Y.Z`. O `npm view` pode
+levar alguns minutos para mostrar a versão nova, com a licença
+`AGPL-3.0-only`. A release só está completa quando o npm mostra a mesma
+versão da tag. Apague o tarball depois da publicação; ele não entra no Git.

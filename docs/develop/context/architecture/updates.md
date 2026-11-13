@@ -75,7 +75,8 @@ executável usa `get.specsfy.dev`. A instalação gerenciada usa
 `specsfy upgrade`, que escolhe npm ou o executável avulso e só prossegue quando
 encontra uma versão publicada superior. Uma tag atualizável aponta para o
 commit cuja versão do pacote corresponde ao nome `v<versão>`, verificado pelo
-CI antes da publicação no npm.
+CI antes da GitHub Release. A publicação no npm é feita depois, pela máquina
+local.
 
 O executável Node versionado continua sendo um artefato de distribuição e
 validação do repositório. Ele contém as dependências do CLI e usa o runtime

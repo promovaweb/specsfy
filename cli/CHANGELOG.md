@@ -4,6 +4,20 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.28.1] - 2026-11-13
+
+### Alterado
+
+- A publicação no npm passa a ser feita só pela máquina local; o workflow de
+  release não publica mais no npm.
+- O `CLI Release` (`.github/workflows/cli-release.yml`) perde o job `npm` e
+  continua compilando os cinco binários, gerando o `SHA256SUMS` e criando a
+  GitHub Release. O workflow não usa mais `NPM_TOKEN` nem `id-token: write`.
+- A skill `specsfy-release-cli`, o `CONTRIBUTING.md`, o `cli/docs/release.md`,
+  os `AGENTS.md` e os fluxos de `docs/develop/` descrevem a publicação local:
+  `npm pack` em `cli/npm/` no commit da tag, `npm publish <tgz> --access public`
+  e conferência com `npm view @promovaweb/specsfy version license`.
+
 ## [0.28.0] - 2026-11-13
 
 ### Alterado

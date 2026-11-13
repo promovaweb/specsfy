@@ -48,8 +48,8 @@ sequência, responsabilidades e links para essas fontes.
 ## Fluxos transversais
 
 - [Release do CLI](cli-release.md): prepara pacote, changelog e executável em
-  `cli/`, cria a tag no commit validado do monorepo, publica o pacote npm e usa
-  as mesmas notas no GitHub Release.
+  `cli/`, cria a tag no commit validado do monorepo e usa as mesmas notas no
+  GitHub Release. O pacote npm é publicado depois, pela máquina local.
 
 O fluxo canônico do método permanece na
 [visão arquitetural](../architecture/README.md) porque é uma invariante do

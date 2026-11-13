@@ -34,7 +34,7 @@ pedido tardio ─► update-spec ─► spec.md
 implement ─► documentator ─► <projeto>/docs/ + <projeto>/.specsfy/PACKAGES.md
 package-manager ─► Composer autorizado ─► <projeto>/docs/packages/
 fontes dos módulos ─► monorepo-documentator ─► docs/
-release-cli ─► cli/CHANGELOG.md + versão + binário ─► tag + npm + GitHub Release
+release-cli ─► cli/CHANGELOG.md + versão + binário ─► tag + GitHub Release ─► npm local
 ```
 
 - Links entre módulos usam caminhos relativos.
