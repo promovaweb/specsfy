@@ -1,0 +1,30 @@
+#!/usr/bin/env node
+/**
+ * Development launcher for the framework's own Node.js tests.
+ *
+ * The framework test suite (`npm test` at the repository root) runs the CLI
+ * as `node cli/bin/specsfy <args>`. This file forwards the call to the Bun
+ * sources (`bun cli/src/main.ts`) or, when Bun is missing, to the compiled
+ * executable in `cli/dist/`. It is not published: end users run the
+ * compiled binary or the npm wrapper in `cli/npm/`.
+ */
+"use strict";
+const { spawnSync } = require("node:child_process");
+const { existsSync } = require("node:fs");
+const { join } = require("node:path");
+
+const cli = join(__dirname, "..");
+const args = process.argv.slice(2);
+const suffix = process.platform === "win32" ? ".exe" : "";
+const compiled = join(cli, "dist", `specsfy${suffix}`);
+const bun = process.env.BUN_BINARY || "bun";
+
+let result = spawnSync(bun, [join(cli, "src", "main.ts"), ...args], { stdio: "inherit" });
+if (result.error && result.error.code === "ENOENT" && existsSync(compiled)) {
+  result = spawnSync(compiled, args, { stdio: "inherit" });
+}
+if (result.error) {
+  process.stderr.write(`specsfy: could not start Bun or ${compiled}: ${result.error.message}\n`);
+  process.exit(1);
+}
+process.exit(result.status ?? 1);
