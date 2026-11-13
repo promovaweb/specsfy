@@ -1,6 +1,6 @@
 # 0003 Ciclo da spec
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -39,15 +39,15 @@ checkbox da tarefa ou do item no `spec.md`.
 
 ## Tasks
 
-- [ ] Definições de script do ciclo `#termfy-cli`
-- [ ] Commands nativos `transition`, `effort`, `migrate`, `inbox process`, `tasks check` `#termfy-cli`
-- [ ] Tools MCP `#termfy-mcp`
-- [ ] Testes `#termfy-test`
+- [x] Definições de script do ciclo `#termfy-cli`
+- [x] Commands nativos `transition`, `effort`, `migrate`, `inbox process`, `tasks check` `#termfy-cli`
+- [x] Tools MCP `#termfy-mcp`
+- [x] Testes `#termfy-test`
 
 ## Tests
 
-- [ ] `specs transition 0001 defined` move a pasta e atualiza o Status
-- [ ] `tasks check` marca e desmarca o checkbox
-- [ ] `inbox capture --json` cria o arquivo em `specs/inbox/`
+- [x] `specs transition 0001 defined` move a pasta e atualiza o Status
+- [x] `tasks check` marca e desmarca o checkbox
+- [x] `inbox capture --json` cria o arquivo em `specs/inbox/`
 
 ## Notes
