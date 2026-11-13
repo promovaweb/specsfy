@@ -1,6 +1,6 @@
 # 0005 Contexto do projeto
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -30,12 +30,12 @@ de `specsfy-setup`, `specsfy-aux-*`, `specsfy-data-discovery` e
 
 ## Tasks
 
-- [ ] Definições de script `#termfy-cli`
-- [ ] Tools MCP `#termfy-mcp`
-- [ ] Testes `#termfy-test`
+- [x] Definições de script `#termfy-cli`
+- [x] Tools MCP `#termfy-mcp`
+- [x] Testes `#termfy-test`
 
 ## Tests
 
-- [ ] `context inspect --json` no `example/` identifica Laravel
+- [x] `context inspect --json` no `example/` identifica Laravel
 
 ## Notes

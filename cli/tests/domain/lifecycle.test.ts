@@ -119,7 +119,7 @@ describe("ciclo de vida das specs", () => {
 
     await expect(
       transitionSpec(project, "0042-login-social", "planned"),
-    ).rejects.toThrow("completed para planned");
+    ).rejects.toThrow("completed to planned");
   });
 
   test("recusa transições que pulam estados", async () => {
@@ -128,7 +128,7 @@ describe("ciclo de vida das specs", () => {
 
     await expect(
       transitionSpec(project, "0042-login-social", "completed"),
-    ).rejects.toThrow("draft para completed");
+    ).rejects.toThrow("draft to completed");
   });
 
   test("migra a estrutura anterior para a pasta correspondente ao Status", async () => {
@@ -164,6 +164,6 @@ describe("ciclo de vida das specs", () => {
     expect(content).toContain("- 2026-08-08T14:00:00.000Z: 4 → 7. Integração externa descoberta.");
     await expect(
       updateSpecEffort(project, "0042-login-social", 11, "Fora da faixa."),
-    ).rejects.toThrow("entre 1 e 10");
+    ).rejects.toThrow("between 1 and 10");
   });
 });

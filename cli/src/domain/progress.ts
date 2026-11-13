@@ -1,10 +1,15 @@
 /**
- * Projeção de progresso das especificações Markdown.
+ * Progress projection of the Markdown specs.
+ *
+ * Also owns the checkbox edit used by `tasks check`: it walks the spec with
+ * the same task and checklist expressions used to count progress, so a task
+ * the counters see is exactly a task the command can mark.
  */
 
 import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { basename, dirname, relative } from "node:path";
+import { error } from "../app/errors.ts";
 import { resolvePath } from "./filesystem.ts";
 import { scanSpecPaths } from "./lifecycle.ts";
 
@@ -15,7 +20,7 @@ const TASK_ID = /^(?:\*\*|`)?T\d+\b/i;
 const CYCLE_ITEM = /^\*\*(PREP|EXECUTE|VERIFY|VISUAL|EVIDENCE|IMPROVE)\*\*:/;
 const GATE_NAMES = ["definition gate", "plan gate", "delivery gate"] as const;
 
-/** Métricas e conteúdo de uma especificação. */
+/** Metrics and content of a spec. */
 export interface SpecProgress {
   slug: string;
   title: string;
@@ -45,7 +50,7 @@ export interface SpecProgress {
   percent: number;
 }
 
-/** Totais consolidados de uma coleção de specs. */
+/** Consolidated totals of a collection of specs. */
 export interface ProgressSummary {
   total_specs: number;
   completed_specs: number;
@@ -67,13 +72,13 @@ export interface ProgressSummary {
   percent: number;
 }
 
-/** Lê specs no layout canônico e no layout legado. */
+/** Reads specs in the canonical and the legacy layout. */
 export async function scanSpecs(project: string): Promise<SpecProgress[]> {
   const root = resolvePath(project);
   return Promise.all((await scanSpecPaths(root)).map(parseSpec));
 }
 
-/** Consolida as métricas das specs fornecidas. */
+/** Consolidates the metrics of the given specs. */
 export function summarizeSpecs(specs: SpecProgress[]): ProgressSummary {
   const completedItems = sum(specs, "completed_items");
   const totalItems = sum(specs, "total_items");
@@ -109,7 +114,7 @@ export function summarizeSpecs(specs: SpecProgress[]): ProgressSummary {
   };
 }
 
-/** Calcula o fingerprint dos caminhos e conteúdos de spec. */
+/** Fingerprint of the spec paths and contents. */
 export async function specsFingerprint(project: string): Promise<string> {
   const root = resolvePath(project);
   const digest = createHash("sha256");
@@ -126,7 +131,7 @@ export async function specsFingerprint(project: string): Promise<string> {
   return digest.digest("hex");
 }
 
-/** Remove o conteúdo bruto antes de serializar a resposta pública. */
+/** Drops the raw content before serializing the public response. */
 export function serializeSpec(spec: SpecProgress): Omit<SpecProgress, "content"> {
   const { content: _content, ...serialized } = spec;
   return serialized;
@@ -178,7 +183,7 @@ async function parseSpec(path: string): Promise<SpecProgress> {
       completedTasks += Number(done);
       activeIndent = indent;
     }
-    // Somente a tarefa e seus itens canônicos alimentam o percentual de entrega.
+    // Only the task and its canonical items feed the delivery percentage.
     const belongsToTask = task || (inTasks && cycleItem && activeIndent !== null && indent > activeIndent);
     if (belongsToTask) {
       totalTaskItems += 1;
@@ -261,4 +266,139 @@ function ratio(completed: number, total: number): number {
   const fraction = value - floor;
   if (fraction !== 0.5) return Math.round(value);
   return floor % 2 === 0 ? floor : floor + 1;
+}
+
+/** One checklist item nested under a task. */
+export interface TaskChecklistItem {
+  /** Canonical key (`PREP`, `EXECUTE`...) or `null` for a free item. */
+  key: string | null;
+  checked: boolean;
+  text: string;
+  line_number: number;
+}
+
+/** A task line of section 14 and its nested checklist. */
+export interface TaskEntry {
+  id: string;
+  checked: boolean;
+  text: string;
+  line_number: number;
+  items: TaskChecklistItem[];
+}
+
+/** Result of `setTaskCheck`. */
+export interface TaskCheckResult {
+  /** Updated Markdown (equal to the input when nothing changed). */
+  content: string;
+  task: string;
+  /** Item key or position when an item was targeted, `null` for the task line. */
+  item: string | null;
+  checked: boolean;
+  changed: boolean;
+  line_number: number;
+  line: string;
+  /** State of the task after the change. */
+  task_entry: TaskEntry;
+}
+
+const TASK_CAPTURE = /^(?:\*\*|`)?T(\d+)\b/i;
+
+/**
+ * Lists the tasks of a spec as the progress counters see them: checklist
+ * lines starting with `T<number>` inside `14. Tarefas` (or anywhere when the
+ * section is absent), outside fenced blocks, with the checklist items
+ * indented below each one.
+ */
+export function parseTasks(content: string): TaskEntry[] {
+  const tasks: TaskEntry[] = [];
+  const hasTaskSection = /^#{1,6}\s+14\.\s+Tarefas\s*$/mu.test(content);
+  let inTasks = !hasTaskSection;
+  let fence: { marker: string; length: number } | null = null;
+  let active: { entry: TaskEntry; indent: number } | null = null;
+  for (const [index, line] of content.split("\n").entries()) {
+    const delimiter = /^\s{0,3}(`{3,}|~{3,})/u.exec(line)?.[1];
+    if (delimiter) {
+      if (!fence) fence = { marker: delimiter[0]!, length: delimiter.length };
+      else if (delimiter[0] === fence.marker && delimiter.length >= fence.length && line.trim() === delimiter) fence = null;
+      continue;
+    }
+    if (fence) continue;
+    if (/^#{1,6}\s/u.test(line)) {
+      active = null;
+      if (hasTaskSection && /^#{1,6}\s+\d+\./u.test(line)) inTasks = /^#{1,6}\s+14\.\s+Tarefas\s*$/u.test(line.trimEnd());
+      continue;
+    }
+    if (!inTasks) continue;
+    const item = CHECKLIST_ITEM.exec(line);
+    if (!item) continue;
+    const checked = item[1]?.toLowerCase() === "x";
+    const text = item[2] ?? "";
+    const indent = line.length - line.trimStart().length;
+    const task = TASK_CAPTURE.exec(text);
+    if (task && (!active || indent <= active.indent)) {
+      active = { entry: { id: `T${task[1]}`, checked, text, line_number: index + 1, items: [] }, indent };
+      tasks.push(active.entry);
+      continue;
+    }
+    if (active && indent > active.indent) {
+      const key = CYCLE_ITEM.exec(text)?.[1] ?? null;
+      active.entry.items.push({ key, checked, text, line_number: index + 1 });
+    } else active = null;
+  }
+  return tasks;
+}
+
+/** `T001`, `t1`, `001` or `1` → task number. */
+function taskNumber(value: string): number | undefined {
+  const match = /^t?(\d+)$/iu.exec(value.trim());
+  return match ? Number(match[1]) : undefined;
+}
+
+/**
+ * Marks (`checked = true`) or unmarks the checkbox of a task, or of one of
+ * its checklist items, in the spec Markdown. `item` is a canonical key
+ * (`PREP`, `EXECUTE`, `VERIFY`, `VISUAL`, `EVIDENCE`, `IMPROVE`, any case) or
+ * the 1-based position of the item under the task. Throws NOT_FOUND when the
+ * task or the item does not exist.
+ */
+export function setTaskCheck(content: string, task: string, item: string | undefined, checked: boolean): TaskCheckResult {
+  const wanted = taskNumber(task);
+  if (wanted === undefined) throw error.usage(`Invalid task identifier: ${task}. Use the task ID, such as T001.`);
+  const tasks = parseTasks(content);
+  const entry = tasks.find((candidate) => Number(candidate.id.slice(1)) === wanted);
+  if (!entry) {
+    throw error.notFound(`Task not found: ${task}`, { tasks: tasks.map((candidate) => candidate.id) });
+  }
+  let lineNumber = entry.line_number;
+  let itemLabel: string | null = null;
+  if (item !== undefined && item.trim() !== "") {
+    const value = item.trim();
+    const position = /^\d+$/u.test(value) ? Number(value) : undefined;
+    const target = position !== undefined
+      ? entry.items[position - 1]
+      : entry.items.find((candidate) => candidate.key?.toUpperCase() === value.toUpperCase());
+    if (!target) {
+      throw error.notFound(`Checklist item not found in ${entry.id}: ${value}`, {
+        items: entry.items.map((candidate, index) => candidate.key ?? String(index + 1)),
+      });
+    }
+    lineNumber = target.line_number;
+    itemLabel = target.key ?? String(position);
+  }
+  const lines = content.split("\n");
+  const current = lines[lineNumber - 1]!;
+  const next = current.replace(/\[([ xX])\]/u, checked ? "[x]" : "[ ]");
+  lines[lineNumber - 1] = next;
+  const updated = lines.join("\n");
+  const after = parseTasks(updated).find((candidate) => candidate.line_number === entry.line_number)!;
+  return {
+    content: updated,
+    task: entry.id,
+    item: itemLabel,
+    checked,
+    changed: next !== current,
+    line_number: lineNumber,
+    line: next.trim(),
+    task_entry: after,
+  };
 }

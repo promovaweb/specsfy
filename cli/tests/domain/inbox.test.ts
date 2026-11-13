@@ -217,10 +217,10 @@ describe("saída da Inbox para processed", () => {
     await expect(processInboxCapture(project, CAPTURE, [])).rejects.toThrow("spec");
     await expect(
       processInboxCapture(project, "2026-01-01-000000-inexistente.md", ["0007-avisos-de-atraso"]),
-    ).rejects.toThrow("captura não encontrada");
+    ).rejects.toThrow("Capture not found");
     await expect(
       processInboxCapture(project, CAPTURE, ["0099-inexistente"]),
-    ).rejects.toThrow("spec não encontrada");
+    ).rejects.toThrow("Spec not found");
   });
 
   test("nunca sobrescreve uma captura já processada com o mesmo nome", async () => {
@@ -231,7 +231,7 @@ describe("saída da Inbox para processed", () => {
 
     await expect(
       processInboxCapture(project, CAPTURE, ["0007-avisos-de-atraso"]),
-    ).rejects.toThrow("já contém");
+    ).rejects.toThrow("already holds");
     await expect(
       readFile(join(project, "specs/inbox/processed", CAPTURE), "utf8"),
     ).resolves.toBe("# Inbox: já processada\n");

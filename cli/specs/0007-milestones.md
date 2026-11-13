@@ -1,6 +1,6 @@
 # 0007 Milestones
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -24,12 +24,12 @@ definição de script do `importar_mvp`.
 
 ## Tasks
 
-- [ ] Commands `#termfy-cli`
-- [ ] Tools MCP `#termfy-mcp`
-- [ ] Testes `#termfy-test`
+- [x] Commands `#termfy-cli`
+- [x] Tools MCP `#termfy-mcp`
+- [x] Testes `#termfy-test`
 
 ## Tests
 
-- [ ] `milestones sync --json` devolve as milestones atualizadas
+- [x] `milestones sync --json` devolve as milestones atualizadas
 
 ## Notes

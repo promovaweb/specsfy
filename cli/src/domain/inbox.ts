@@ -1,15 +1,22 @@
 /**
- * Saída de uma captura da fila ativa de `specs/inbox/`.
+ * Exit of a capture from the active queue in `specs/inbox/`.
  *
- * Uma captura permanece na fila ativa enquanto houver parte do pedido sem
- * destino. Quando specs com `Definition Gate: Passed` cobrem todo o pedido,
- * ela passa para `specs/inbox/processed/`, com o texto original intacto, o
- * `Status` espelhado e os vínculos atualizados. Julgar a cobertura pertence à
- * pessoa ou ao agente; este módulo só executa a mudança quando o gate permite.
+ * A capture stays in the active queue while part of the request has no
+ * destination. When specs with `Definition Gate: Passed` cover the whole
+ * request, it moves to `specs/inbox/processed/` with the original text
+ * intact, the mirrored `Status` and updated links. Judging coverage belongs
+ * to the person or the agent; this module only performs the move when the
+ * gate allows it. The metadata values written to the file (`Capturada`,
+ * `Processada`, `Spec derivada`) follow the framework templates.
+ *
+ * Failures are `AppError`s: no spec given is USAGE, a missing capture is
+ * NOT_FOUND and a spec without the Definition Gate passed is GATE_FAILED.
  */
 
 import { mkdir, readFile, readdir, rename } from "node:fs/promises";
 import { basename, join, relative } from "node:path";
+import { AppError, error } from "../app/errors.ts";
+import { ExitCode } from "../app/exit-codes.ts";
 import { isFile, pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
 import { resolveSpec, SPEC_FOLDERS, type ResolvedSpec } from "./lifecycle.ts";
 
@@ -25,7 +32,7 @@ const EMPTY_VALUES = new Set(["", "nenhuma", "nenhum", "—", "-"]);
 
 const TABLE_ROW = /^\|\s*([^|]+?)\s*\|\s*([^|]*?)\s*\|\s*$/u;
 
-/** Projeção de um arquivo em `specs/inbox/` ou `specs/inbox/processed/`. */
+/** Projection of a file in `specs/inbox/` or `specs/inbox/processed/`. */
 export interface InboxCapture {
   name: string;
   path: string;
@@ -33,17 +40,17 @@ export interface InboxCapture {
   processed: boolean;
 }
 
-/** Opções da varredura de capturas. */
+/** Options of the capture scan. */
 export interface ScanInboxOptions {
   includeProcessed?: boolean;
 }
 
-/** Opções que tornam o processamento reproduzível em automações. */
+/** Options that make processing reproducible in automations. */
 export interface ProcessInboxOptions {
   processedAt?: string;
 }
 
-/** Resultado da saída de uma captura da fila ativa. */
+/** Result of moving a capture out of the active queue. */
 export interface InboxProcessing {
   name: string;
   from: string;
@@ -54,7 +61,7 @@ export interface InboxProcessing {
   updated_references: string[];
 }
 
-/** Lista as capturas em ordem estável; ativas primeiro, processadas depois. */
+/** Lists captures in a stable order: active first, processed after. */
 export async function scanInboxCaptures(
   project: string,
   options: ScanInboxOptions = {},
@@ -70,9 +77,9 @@ export async function scanInboxCaptures(
 }
 
 /**
- * Move uma captura para `specs/inbox/processed/` quando todas as specs
- * indicadas têm o Definition Gate aprovado. Preserva o texto original,
- * registra as specs derivadas e atualiza as referências em `specs/`.
+ * Moves a capture to `specs/inbox/processed/` when every given spec has the
+ * Definition Gate passed. Keeps the original text, records the derived specs
+ * and updates the references in `specs/`.
  */
 export async function processInboxCapture(
   project: string,
@@ -83,13 +90,13 @@ export async function processInboxCapture(
   const root = resolvePath(project);
   const identifiers = [...new Set(specIdentifiers.map((value) => value.trim()).filter(Boolean))];
   if (!identifiers.length) {
-    throw new Error("informe ao menos uma spec com --spec <id> que cubra a captura");
+    throw error.usage("Provide at least one spec with --spec <id> that covers the capture");
   }
 
   const name = captureName(capture);
   const source = join(root, "specs", INBOX_FOLDER, name);
   if (!(await isFile(source))) {
-    throw new Error(`captura não encontrada na fila ativa: specs/${INBOX_FOLDER}/${name}`);
+    throw error.notFound(`Capture not found in the active queue: specs/${INBOX_FOLDER}/${name}`);
   }
 
   const specs: ResolvedSpec[] = [];
@@ -102,7 +109,7 @@ export async function processInboxCapture(
   const targetDirectory = join(root, "specs", INBOX_FOLDER, INBOX_PROCESSED_FOLDER);
   const target = join(targetDirectory, name);
   if (await pathExists(target)) {
-    throw new Error(`o destino já contém uma captura com esse nome: ${relative(root, target)}`);
+    throw new AppError(ExitCode.GENERIC_ERROR, `The destination already holds a capture with this name: ${relative(root, target)}`);
   }
 
   const specPaths = specs.map((spec) => toPosix(relative(root, spec.path)));
@@ -136,9 +143,9 @@ export async function processInboxCapture(
 }
 
 /**
- * Exige os três sinais da definição aprovada: pasta fora de `draft`, `Status`
- * diferente de Draft e `Definition Gate: Passed` escrito na spec. Nenhum deles
- * é inferido a partir dos outros.
+ * Requires the three signals of an approved definition: folder other than
+ * `draft`, `Status` other than Draft and `Definition Gate: Passed` written in
+ * the spec. None of them is inferred from the others.
  */
 async function assertDefinitionGatePassed(spec: ResolvedSpec): Promise<void> {
   const content = await readFile(spec.path, "utf8");
@@ -146,15 +153,17 @@ async function assertDefinitionGatePassed(spec: ResolvedSpec): Promise<void> {
   const status = readHeaderField(content, "Status");
   const draft = spec.folder === "draft" || !status || status.toLowerCase() === "draft";
   if (draft || gate?.toLowerCase() !== "passed") {
-    throw new Error(
-      `a spec ${spec.identifier} ainda não tem Definition Gate aprovado ` +
-        `(pasta ${spec.folder}, status ${status ?? "ausente"}, gate ${gate ?? "ausente"}); ` +
-        "a captura permanece na fila ativa",
+    throw new AppError(
+      ExitCode.GATE_FAILED,
+      `Spec ${spec.identifier} does not have the Definition Gate passed yet ` +
+        `(folder ${spec.folder}, status ${status ?? "missing"}, gate ${gate ?? "missing"}); ` +
+        "the capture stays in the active queue",
+      { spec: spec.identifier, folder: spec.folder, status: status ?? null, gate: gate ?? null },
     );
   }
 }
 
-/** Lê somente a primeira tabela antes das seções, ignorando exemplos cercados. */
+/** Reads only the first table before the sections, ignoring fenced examples. */
 function readHeaderField(content: string, field: string): string | undefined {
   const matches: string[] = [];
   let inTable = false;
@@ -256,7 +265,7 @@ async function listMarkdown(directory: string): Promise<string[]> {
 function captureName(capture: string): string {
   const name = basename(capture.trim());
   if (!name.endsWith(".md")) {
-    throw new Error(`captura inválida: ${capture}; informe o arquivo .md de specs/${INBOX_FOLDER}/`);
+    throw error.usage(`Invalid capture: ${capture}; give the .md file in specs/${INBOX_FOLDER}/`);
   }
   return name;
 }
@@ -271,8 +280,8 @@ function readTableRow(content: string, field: string): string | undefined {
 }
 
 /**
- * Atualiza uma linha da tabela de metadados ou a insere após `afterField`
- * (ou ao fim da primeira tabela), sem tocar no restante do arquivo.
+ * Updates a row of the metadata table or inserts it after `afterField` (or
+ * at the end of the first table), leaving the rest of the file untouched.
  */
 function upsertTableRow(content: string, field: string, value: string, afterField?: string): string {
   const lines = content.split(/\r?\n/u);
