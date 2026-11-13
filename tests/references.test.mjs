@@ -6,7 +6,9 @@ import {join,relative,resolve,dirname,extname} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {ROOT,read} from './helpers.mjs';
 const ignored=new Set(['.git','.mypy_cache','.pytest_cache','.ruff_cache','.venv','__pycache__','build','dist','node_modules','vendor']);
-function files(suffixes,directory=ROOT){return readdirSync(directory,{withFileTypes:true}).flatMap(entry=>ignored.has(entry.name)?[]:entry.isDirectory()?files(suffixes,join(directory,entry.name)):suffixes.includes(extname(entry.name))?[join(directory,entry.name)]:[]).sort();}
+// Skills do Termfy em cli/.agents/skills/termfy-* são cópias do framework externo, instaladas por npx skills, e não prosa autoral.
+const vendored=path=>relative(ROOT,path).replaceAll("\\","/").startsWith("cli/.agents/skills/termfy");
+function files(suffixes,directory=ROOT){return readdirSync(directory,{withFileTypes:true}).flatMap(entry=>ignored.has(entry.name)||vendored(join(directory,entry.name))?[]:entry.isDirectory()?files(suffixes,join(directory,entry.name)):suffixes.includes(extname(entry.name))?[join(directory,entry.name)]:[]).sort();}
 const htmlTargets=text=>[...text.matchAll(/\b(?:href|src|srcset|poster)=(["'])(.*?)\1/gi)].map(match=>match[2]);
 function targets(text){return [...[...text.matchAll(/!?\[[^\]]*\]\(([^)\s]+)(?:\s+[^)]*)?\)/g)].map(m=>m[1]),...[...text.matchAll(/^\s*\[[^\]]+\]:\s*(\S+)/gm)].map(m=>m[1]),...htmlTargets(text)];}
 function local(source,raw){
@@ -55,7 +57,7 @@ test('imagens do repositório possuem assinatura e dimensões válidas',()=>{
 test('referências de skills e catálogo de especialistas são coerentes',()=>{
  const roots=['.agents/skills','skills','specialists','cli/.agents/skills'];
  const available=new Set(),failures=[];
- for(const root of roots)for(const name of readdirSync(join(ROOT,root))){const path=join(ROOT,root,name),skill=join(path,'SKILL.md');if(!existsSync(skill)||!statSync(path).isDirectory())continue;available.add(name);
+ for(const root of roots)for(const name of readdirSync(join(ROOT,root))){if(root==='cli/.agents/skills'&&name.startsWith('termfy'))continue;const path=join(ROOT,root,name),skill=join(path,'SKILL.md');if(!existsSync(skill)||!statSync(path).isDirectory())continue;available.add(name);
  if(!readFileSync(skill,'utf8').includes('name: '+name))failures.push(name+': frontmatter');
  const agent=join(path,'agents/openai.yaml');if(!existsSync(agent)||!readFileSync(agent,'utf8').includes('$'+name))failures.push(name+': openai.yaml');
  }

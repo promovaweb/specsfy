@@ -7,7 +7,7 @@ import {ROOT,read} from './helpers.mjs';
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 test('catálogo, instalador e documentação publicam o mesmo contexto',()=>{
  const names=['specsfy-setup','specsfy-aux-stack','specsfy-aux-rules','specsfy-aux-database'];
- const installer=read('cli/src/installer.ts'),guide=read('docs/user/project-context.md'),framework=read('skills/Spec.md');
+ const installer=read('cli/src/domain/installer.ts'),guide=read('docs/user/project-context.md'),framework=read('skills/Spec.md');
  for(const name of names){assert.ok(existsSync(join(ROOT,'skills',name,'SKILL.md')));includes(installer,['"'+name+'"']);includes(guide,['$'+name]);}
  for(const path of ['PROJECT.md','DESIGNSYSTEM.MD','.specsfy/USER-PROFILE.md','.specsfy/STACK.md','.specsfy/RULES.md','.specsfy/DATABASE.md','.specify/memory/constitution.md','.specsfy/SPECKIT.md']){includes(framework,[path]);includes(guide,[path]);}
  const setup=read('skills/specsfy-setup/SKILL.md'),script=read('skills/specsfy-setup/scripts/setup_context.mjs');

@@ -14,6 +14,13 @@ __pycache__/
 /cli/dist/
 /cli/node_modules/
 /cli/coverage/
+/cli/tmp/
+/cli/*.tsbuildinfo
+/cli/*.log
+/cli/.env
+/cli/.env.*
+!/cli/.env.example
+/cli/.termfy-home/
 
 # Example application
 /example/.phpunit.cache

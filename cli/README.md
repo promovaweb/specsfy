@@ -17,7 +17,9 @@
 O `specsfy` é a ferramenta do método Specsfy no terminal. O mesmo executável
 instala e atualiza o framework, lê e altera o estado das specs dentro das
 regras do método, roda os gates de definição, plano e entrega e serve tudo
-isso a agentes de IA pelo MCP. Ele tem três modos:
+isso a agentes de IA pelo MCP. Este módulo reúne CLI e TUI no mesmo
+executável, para acompanhar o progresso das specs e agir sobre ele. Ele tem
+três modos:
 
 | Modo | Entrada | Para quem |
 | --- | --- | --- |

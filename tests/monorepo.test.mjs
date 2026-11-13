@@ -26,8 +26,9 @@ test('fontes não referenciam a distribuição antiga em múltiplos repositório
  scan(ROOT);assert.deepEqual(violations,[]);
 });
 test('CLI usa os endpoints de distribuição do monorepo',()=>{
- includes(read('cli/src/installer.ts'),['https://github.com/promovaweb/specsfy.git','BASE_DIRECTORY = "skills"','SPECIALISTS_DIRECTORY = "specialists"']);
- includes(read('cli/src/catalog.ts'),['api.github.com/repos/promovaweb/specsfy/','contents/specialists/catalog.json?ref=main','application/vnd.github.raw+json']);
- includes(read('cli/src/updater.ts'),['api.github.com/repos/promovaweb/specsfy/tags']);
- includes(read('cli/package.json'),['"homepage": "https://promovaweb.com/docs/specsfy/cli/"','"url": "git+https://github.com/promovaweb/specsfy.git"','"email": "contato@promovaweb.com"','"name": "@promovaweb/specsfy"']);
+ includes(read('cli/src/domain/installer.ts'),['https://github.com/promovaweb/specsfy.git','BASE_DIRECTORY = "skills"','SPECIALISTS_DIRECTORY = "specialists"']);
+ includes(read('cli/src/domain/catalog.ts'),['https://api.github.com/repos/','CATALOG_PATH = "specialists/catalog.json"','?ref=main','application/vnd.github.raw+json']);
+ includes(read('cli/src/domain/updater.ts'),['api.github.com/repos/promovaweb/specsfy/releases/latest','https://github.com/promovaweb/specsfy/releases/download']);
+ includes(read('cli/package.json'),['"url": "git+https://github.com/promovaweb/specsfy.git"']);
+ includes(read('cli/npm/package.json'),['"homepage": "https://promovaweb.com/docs/specsfy/cli/"','"url": "git+https://github.com/promovaweb/specsfy.git"','"email": "contato@promovaweb.com"','"name": "@promovaweb/specsfy"']);
 });

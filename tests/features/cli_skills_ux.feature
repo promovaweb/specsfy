@@ -2,14 +2,13 @@
 Feature: Catálogo de skills na TUI
   Para decidir instalações, remoções e atualizações sem interpretar uma lista densa
   Como pessoa usando o CLI
-  Quero comparar skills em uma tabela e inspecionar a decisão antes de aplicá-la
+  Quero ver o estado de cada skill e confirmar cada ação antes de aplicá-la
 
-  Scenario: Planejar skills por tabela e painel de detalhes
+  Scenario: Gerenciar skills com estado nomeado e confirmação
     Given a implementação da aba Skills do CLI
     When o contrato de apresentação é inspecionado
-    Then as skills aparecem em uma tabela com plano, nome, categoria e estado
-    And a skill destacada possui um painel de detalhes e uma ação explícita
-    And a decisão pode ser alternada por teclado ou mouse sem aplicação imediata
+    Then as skills aparecem por categoria com o estado instalado ou disponível em texto
+    And instalar, remover e atualizar pedem confirmação antes de alterar arquivos
 
   Scenario: Atualizar todas as skills Specsfy instaladas
     Given a implementação da aba Skills do CLI

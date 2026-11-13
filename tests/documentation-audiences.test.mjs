@@ -3,6 +3,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {existsSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
+import {execFileSync} from 'node:child_process';
 import {ROOT,read} from './helpers.mjs';
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 const user=path=>read('docs/user/'+path),develop=path=>read('docs/develop/'+path);
@@ -23,9 +24,11 @@ test('guia de documentação explica geração e manutenção',()=>{
  includes(user('system-documentation.md'),['## O que esta documentação explica','## O que é gerado e o que é preservado','## Como ler cada documento','## Procedimento depois de uma mudança','## Situações que impedem a conclusão','docs/architecture.md','docs/database.md','docs/flows.md','docs/testing.md','docs/integrations.md','.specsfy/PACKAGES.md']);
 });
 test('cada comando público do CLI tem rota documental',()=>{
- const cli=read('cli/src/cli.ts');
- const routes={install:'installation.md',skills:'cli.md',transition:'cli.md',migrate:'cli.md',effort:'method-reference.md',progress:'cli.md',milestones:'milestones.md',test:'cli.md',tui:'cli.md',config:'cli.md'};
- for(const [command,route] of Object.entries(routes)){includes(cli,[`.command("${command}")`]);includes(user(route),['specsfy '+command]);}
+ // O registry do binário é a fonte: a descrição OpenCLI lista cada command público.
+ const tree=JSON.parse(execFileSync(process.execPath,[join(ROOT,'cli/bin/specsfy'),'--opencli'],{encoding:'utf8'}));
+ const paths=new Set();const walk=(node,prefix)=>{for(const child of node.commands??[]){const path=[...prefix,child.name].join(' ');paths.add(path);walk(child,[...prefix,child.name]);}};walk(tree.command,[]);
+ const routes={install:'installation.md',skills:'cli.md','specs transition':'cli.md','specs migrate':'cli.md','specs effort':'method-reference.md',progress:'cli.md',milestones:'milestones.md',test:'cli.md',tui:'cli.md',config:'cli.md',gate:'cli.md',verify:'cli.md',mcp:'cli.md'};
+ for(const [command,route] of Object.entries(routes)){assert.ok(paths.has(command),command);includes(user(route),['specsfy '+command]);}
 });
 test('glossário define o vocabulário transversal',()=>{
  includes(develop('context/glossary.md'),['Estado operacional','Status','Transição','Effort','Definition Gate','Plan Gate','Delivery Gate','Rastreabilidade','Projeção de progresso','Contexto persistente','Documentação reconstruída'].map(term=>`| ${term} |`));

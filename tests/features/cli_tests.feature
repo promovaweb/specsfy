@@ -9,5 +9,4 @@ Feature: Executar os testes do projeto consumidor
     When o contrato de execução de testes é inspecionado
     Then o CLI detecta Laravel com Pest sem executar comandos arbitrários
     And o comando specsfy test transmite a saída e preserva o exit code
-    And a TUI separa o resumo e os testes em subabas
-    And a saída detalhada permanece rolável e a execução é explícita
+    And a TUI só executa a suíte quando a pessoa pede e mantém a saída rolável

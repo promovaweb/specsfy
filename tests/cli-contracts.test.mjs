@@ -32,7 +32,7 @@ test('progress projeta a tabela canônica e os três gates', { skip }, t => {
 });
 
 test('test detecta Pest e usa o banco de teste separado', { skip }, t => {
-  const registry = JSON.parse(cli(['--opencli']).stdout).commands ?? [];
+  const registry = JSON.parse(cli(['--opencli']).stdout).command?.commands ?? [];
   if (!registry.some(command => command.name === 'test')) {
     t.skip('command test ainda não integrado (spec 0006)');
     return;

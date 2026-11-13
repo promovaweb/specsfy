@@ -71,7 +71,7 @@ export const documentationSteps = [
     for (const path of [join(ROOT, 'AGENTS.md'), join(ROOT, 'README.md'), ...files(join(ROOT, '.github/workflows'), '.yml'), ...files(join(ROOT, '.github/workflows'), '.yaml')]) assert.ok(!/skills\/specsfy-(?!monorepo-documentator)[^/\s]+\/scripts\//.test(text(path)), path);
   }],
   ['os repositórios integrados do framework Specsfy', ctx => { ctx.root = ROOT; }],
-  ['o contrato do documentador é inspecionado', ctx => { ctx.documentator = read('skills/specsfy-documentator/SKILL.md'); ctx.installer = read('cli/src/installer.ts'); ctx.guide = read('docs/user/system-documentation.md'); }],
+  ['o contrato do documentador é inspecionado', ctx => { ctx.documentator = read('skills/specsfy-documentator/SKILL.md'); ctx.installer = read('cli/src/domain/installer.ts'); ctx.guide = read('docs/user/system-documentation.md'); }],
   ['a instalação inclui a skill de documentação', ctx => includes(ctx.installer, ['"specsfy-documentator"'])],
   ['a skill cobre arquitetura aplicação banco fluxos testes frontend pacotes integrações e decisões', ctx => includes(ctx.documentator, ['arquitetura', 'aplicação', 'banco', 'fluxos', 'testes', 'frontend', 'pacotes', 'integrações', 'decisões'])],
   ['a documentação oficial explica a projeção reconstruível no consumidor', ctx => includes(ctx.guide, ['<projeto>/docs/', 'reconstrói'])],

@@ -1,5 +1,19 @@
 # @promovaweb/specsfy
 
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <picture>
+    <source srcset="https://promovaweb.com/opensource/specsfy/icon.svg"
+    type="image/svg+xml">
+    <img
+      src="https://promovaweb.com/opensource/specsfy/icon.png"
+      alt="Logo do Specsfy"
+      width="128"
+    >
+  </picture>
+</p>
+<!-- markdownlint-enable MD033 -->
+
 Wrapper npm do binário `specsfy`. A instalação não traz o binário: na
 primeira execução, `bin/specsfy.cjs` baixa o executável da plataforma
 (`specsfy-<os>-<arch>[.exe]`) do GitHub Release da mesma versão do pacote,

@@ -20,7 +20,7 @@ test('coletor recusa diretório externo',t=>{
 });
 test('documentador local não substitui documentador do consumidor',()=>{
  includes(read(skill+'/SKILL.md'),['documenta a metodologia','monorepo']);includes(read('skills/specsfy-documentator/SKILL.md'),['Manter em `docs/`']);
- const installer=read('cli/src/installer.ts');assert.ok(!installer.includes('specsfy-monorepo-documentator'));includes(installer,['"specsfy-documentator"']);assert.ok(!existsSync(join(ROOT,'skills/specsfy-monorepo-documentator')));
+ const installer=read('cli/src/domain/installer.ts');assert.ok(!installer.includes('specsfy-monorepo-documentator'));includes(installer,['"specsfy-documentator"']);assert.ok(!existsSync(join(ROOT,'skills/specsfy-monorepo-documentator')));
 });
 test('documentação publica rotas técnicas e de usuário',()=>{
  for(const path of [skill+'/references/documentation-standard.md','docs/develop/documentation.md'])includes(read(path),['docs/user/','docs/develop/']);includes(read('docs/README.md'),['develop/README.md']);

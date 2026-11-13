@@ -56,7 +56,7 @@ test('ebook consome ordem mantida pelo guia de usuário',()=>{
   includes(read('ebook/README.md'),['../docs/user/reading-order.txt']);
 });
 test('documentador está instalado e recebe handoff após implementação',()=>{
-  includes(read('cli/src/installer.ts'),['"specsfy-documentator"']);
+  includes(read('cli/src/domain/installer.ts'),['"specsfy-documentator"']);
   includes(skill('specsfy-07-implement'),['$specsfy-documentator','Depois de cada tarefa']);
   includes(read('skills/Spec.md'),['$specsfy-documentator']);
 });

@@ -10,7 +10,7 @@ const screenshots = [['cli-dash.png', 'Dashboard Home'], ['cli-backlogs.png', 'B
 const base = ['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-update-spec', 'specsfy-progress'];
 export const monorepoDocumentationSteps = [
   ['a skill de documentação do monorepo', ctx => { ctx.skillPath = join(ROOT, local, 'SKILL.md'); ctx.claudePath = join(ROOT, '.claude/skills/specsfy-monorepo-documentator'); }],
-  ['sua identidade e fronteiras são inspecionadas', ctx => { ctx.skill = read(local + '/SKILL.md'); ctx.collector = read(local + '/scripts/collect-monorepo-evidence.mjs'); ctx.installer = read('cli/src/installer.ts'); }],
+  ['sua identidade e fronteiras são inspecionadas', ctx => { ctx.skill = read(local + '/SKILL.md'); ctx.collector = read(local + '/scripts/collect-monorepo-evidence.mjs'); ctx.installer = read('cli/src/domain/installer.ts'); }],
   ['ela é descoberta nas pastas padrão de Codex e Claude', ctx => { assert.ok(existsSync(ctx.skillPath)); assert.ok(lstatSync(ctx.claudePath).isSymbolicLink()); assert.equal(realpathSync(ctx.claudePath), realpathSync(join(ROOT, local))); }],
   ['ela valida a raiz Git única e os módulos', ctx => includes(ctx.collector, ['show-toplevel', 'brand', 'skills', 'docs', 'example', 'specsfy', 'specialists', 'cli'])],
   ['ela publica em docs', ctx => includes(ctx.skill, ['docs/'])],

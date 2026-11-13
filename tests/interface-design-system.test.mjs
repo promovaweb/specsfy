@@ -37,7 +37,7 @@ test('especialista declara defaults e exceções com alcance',()=>{
  includes(specialist,['DESIGNSYSTEM.MD','não informa direção visual','defaults','exceções','alcance','personalidade','hierarquia']);
 });
 test('catálogo, instalador e template de interface estão ligados',()=>{
- includes(read('cli/src/installer.ts'),['"DESIGNSYSTEM.MD"']);includes(read('skills/templates/Interface.md'),['DESIGNSYSTEM.MD','Padrão de dashboard','ReUI']);
+ includes(read('cli/src/domain/installer.ts'),['"DESIGNSYSTEM.MD"']);includes(read('skills/templates/Interface.md'),['DESIGNSYSTEM.MD','Padrão de dashboard','ReUI']);
  const entries=new Map(JSON.parse(read('specialists/catalog.json')).skills.map(entry=>[entry.name,entry]));assert.ok(entries.has('specsfy-specialist-design-system'));
  for(const name of ['specsfy-specialist-interface-experience','specsfy-specialist-ui-design','specsfy-specialist-ux-design','specsfy-specialist-react-ui-components'])assert.ok(entries.get(name)?.requires?.includes('specsfy-specialist-design-system'),name);
 });

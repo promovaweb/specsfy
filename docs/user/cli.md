@@ -98,7 +98,8 @@ specsfy specs transition 0001 completed --project .
 
 O identificador da spec aceita número, nome da pasta, slug ou caminho. A raiz do
 projeto vem de `--project <dir>`; sem a opção, o CLI usa o diretório atual e
-sobe até a raiz mais próxima que contenha `specs/` ou `.specsfy/`.
+sobe até a raiz mais próxima que contenha `specs/` ou `.specsfy/`. Specs no
+layout antigo, `specs/specs/<slug>/`, mudam de pasta com `specsfy specs migrate`.
 
 Para abrir uma spec nova, use:
 

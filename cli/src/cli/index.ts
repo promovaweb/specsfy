@@ -15,14 +15,37 @@ import { renderHelp } from "./help.ts";
 import { root } from "./commands.ts";
 import { color, forceColors } from "./format.ts";
 import { generateOpenCli } from "./opencli.ts";
+import { writeSync } from "node:fs";
 import { parse } from "./parser.ts";
 import type { Context, Result } from "./registry.ts";
 
+/**
+ * Writes the whole text to a file descriptor synchronously. Asynchronous
+ * stream writes are cut at the pipe buffer when the process exits right
+ * after a large output (`--opencli`, `--skill`, big `--json`). EAGAIN on a
+ * non-blocking pipe is retried until every byte is written.
+ */
+function writeAll(fd: number, text: string): void {
+  const buffer = Buffer.from(text.endsWith("\n") ? text : `${text}\n`);
+  let offset = 0;
+  while (offset < buffer.length) {
+    try {
+      offset += writeSync(fd, buffer, offset, buffer.length - offset);
+    } catch (e) {
+      const code = (e as NodeJS.ErrnoException).code;
+      // The reader closed the pipe (`| head`): the rest of the output has no destination.
+      if (code === "EPIPE") return;
+      if (code !== "EAGAIN") throw e;
+      Bun.sleepSync(1);
+    }
+  }
+}
+
 const write = (text: string) => {
-  if (text.length) process.stdout.write(text.endsWith("\n") ? text : `${text}\n`);
+  if (text.length) writeAll(1, text);
 };
 const writeError = (text: string) => {
-  if (text.length) process.stderr.write(text.endsWith("\n") ? text : `${text}\n`);
+  if (text.length) writeAll(2, text);
 };
 
 function prefersJson(): boolean {

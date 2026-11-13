@@ -8,8 +8,9 @@ import {ROOT,read} from './helpers.mjs';
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 const removed=['mark.svg','favicon.svg','logo/logo.md'];
 test('READMEs rastreados adotam logo canônico com fallback PNG',()=>{
- const files=execFileSync('git',['ls-files','-z'],{cwd:ROOT,encoding:'utf8'}).split('\0').filter(path=>path.endsWith('/README.md')||path==='README.md');assert.ok(files.length);
- for(const path of files){const text=read(path);if(path==='cli/README.md'){includes(text,['srcset="https://promovaweb.com/opensource/specsfy/icon.svg"','src="https://promovaweb.com/opensource/specsfy/icon.png"']);continue;}
+// cli/docs/ e cli/template/ são documentação embutida no binário e stubs do Termfy, sem logo; os READMEs publicados do cli usam a URL pública do ícone.
+ const files=execFileSync('git',['ls-files','-z'],{cwd:ROOT,encoding:'utf8'}).split('\0').filter(path=>(path.endsWith('/README.md')||path==='README.md')&&!/^cli\/(\.agents\/skills\/termfy|docs\/|template\/)/.test(path));assert.ok(files.length);
+ for(const path of files){const text=read(path);if(path==='cli/README.md'||path==='cli/npm/README.md'){includes(text,['srcset="https://promovaweb.com/opensource/specsfy/icon.svg"','src="https://promovaweb.com/opensource/specsfy/icon.png"']);continue;}
  const logo=relative(dirname(join(ROOT,path)),join(ROOT,'brand/logo')).replaceAll('\\','/');includes(text,[`<source srcset="${logo}/icon.svg" type="image/svg+xml">`,`<img src="${logo}/icon.png" alt="Logo do Specsfy" width="128">`]);for(const asset of removed)assert.ok(!text.includes(asset),path+': '+asset);
  }
 });

@@ -1,13 +1,13 @@
 @cli @updater
-Feature: Atualizar o CLI instalado como pacote npm
-  Para receber correções pelo gerenciador usado na instalação
-  Como pessoa que abre a aplicação Specsfy
-  Quero ser avisada e decidir antes de instalar uma versão nova
+Feature: Atualizar o binário instalado
+  Para receber correções sem reinstalar à mão
+  Como pessoa que usa o Specsfy
+  Quero saber quando existe versão nova e trocar o binário com segurança
 
-  Scenario: Verificar, oferecer e instalar uma atualização segura
+  Scenario: Verificar e instalar uma atualização segura
     Given a implementação do auto updater do CLI
     When o contrato de atualização é inspecionado
-    Then dados e configurações globais usam ~/.specsfy/cli.json
-    And a versão mais recente deriva de tags semânticas do repositório
-    And a atualização é delegada ao pacote npm oficial
-    And aceitar a oferta atualiza e encerra enquanto recusar abre normalmente
+    Then a checagem diária guarda o estado em ~/.specsfy/update.json
+    And a versão mais recente vem da última GitHub Release do repositório
+    And o binário avulso confere o SHA256SUMS antes de trocar o executável
+    And a instalação pelo npm é atualizada pelo pacote oficial
