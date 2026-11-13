@@ -1,6 +1,6 @@
 # 0008 Documentação do projeto
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -23,11 +23,11 @@ com 10 quando a documentação está desatualizada.
 
 ## Tasks
 
-- [ ] Command e tool `#termfy-cli`
-- [ ] Teste `#termfy-test`
+- [x] Command e tool `#termfy-cli`
+- [x] Teste `#termfy-test`
 
 ## Tests
 
-- [ ] `docs build --check` em projeto atualizado sai com 0
+- [x] `docs build --check` em projeto atualizado sai com 0
 
 ## Notes
