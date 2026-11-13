@@ -53,14 +53,23 @@ específica.
 Na raiz do projeto, os comandos abaixo são independentes e podem rodar em
 paralelo.
 
-| Objetivo | Comando |
-| --- | --- |
-| progresso geral | `node .agents/skills/specsfy-progress/scripts/progress.mjs .` |
-| dados para automação | `node .agents/skills/specsfy-progress/scripts/progress.mjs . --json` |
-| uma única spec | `node .agents/skills/specsfy-progress/scripts/progress.mjs . --slug <slug>` |
-| custo de contexto de uma spec | `node .agents/skills/specsfy-progress/scripts/analyze_context.mjs specs/<estado>/<NNNN>-<slug>/spec.md --json` |
-| contexto persistente | `node .agents/skills/specsfy-setup/scripts/monitor_context.mjs --project . --check` |
-| documentação técnica | `node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs --project . --check` |
+| Objetivo | Comando | Tool MCP |
+| --- | --- | --- |
+| progresso geral | `specsfy progress` | `project_status` |
+| dados para automação | `specsfy progress --json` | `project_status` |
+| uma única spec | `specsfy progress --spec <spec>` | `project_status` |
+| custo de contexto de uma spec | `specsfy context usage <spec> --json` | `context_usage` |
+| contexto persistente | `specsfy context monitor --project . --check` | `context_monitor` |
+| documentação técnica | `specsfy docs build --project . --check` | `docs_build` |
+
+Sem o binário instalado, use os scripts equivalentes:
+
+```bash
+node .agents/skills/specsfy-progress/scripts/progress.mjs . --json
+node .agents/skills/specsfy-progress/scripts/analyze_context.mjs specs/<estado>/<NNNN>-<slug>/spec.md --json
+node .agents/skills/specsfy-setup/scripts/monitor_context.mjs --project . --check
+node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs --project . --check
+```
 
 - `PENDING` no monitor de contexto é blocker da entrega: anuncie o handoff
   indicado pelo monitor e retome depois que a auxiliar atualizar o documento
@@ -80,7 +89,7 @@ paralelo.
 4. Mostre o próximo par `TNNN/ITEM` pronto quando existir.
 5. Classifique como blocker: gate `Failed`, inconsistência de checklist,
    dependência sem caminho pronto, documentação obrigatória apontada por
-   `monitor_context.mjs` (mesmo com todos os checkboxes marcados) e `docs/`
+   `specsfy context monitor` (mesmo com todos os checkboxes marcados) e `docs/`
    ausente ou desatualizado segundo `$specsfy-documentator`. Um gate
    `In Progress` isolado não é falha.
 6. Se uma spec existente exigir mudança de comportamento ou de plano, anuncie a

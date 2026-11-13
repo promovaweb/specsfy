@@ -179,8 +179,14 @@ specsfy-<NN>-<nome>/
   instruções imperativas.
 - `agents/openai.yaml` contém prompt padrão que menciona `$<nome>`.
 - Detalhes extensos ficam em referências de um nível com gatilho de leitura.
+- Toda instrução que citar um script mostra primeiro o command do `specsfy` e a
+  tool MCP, e mantém o script como alternativa quando o binário não estiver
+  instalado. A spec é indicada por número, nome da pasta, slug ou caminho, e a
+  raiz vem de `--project <dir>`, com o diretório atual ou a raiz mais próxima
+  como padrão.
 - Scripts usam Node.js 22 e módulos padrão, retornam códigos úteis e não fazem
-  rede, instalação global ou ação destrutiva por padrão.
+  rede, instalação global ou ação destrutiva por padrão. O binário embute os
+  scripts e os executa com o próprio runtime, sem exigir Node.js na máquina.
 - Assets são templates ou materiais usados na saída, nunca uma segunda fonte.
 
 ## Criar ou alterar uma skill

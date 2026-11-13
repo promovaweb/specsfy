@@ -27,14 +27,15 @@ desta skill é qual spec validar quando houver várias e nenhum slug informado.
 
 ## Pronto quando
 
-- `validate_spec.mjs` roda sem falha estrutural (com `--allow-draft` durante a
-  análise e sem ele quando o gate passa);
+- `specsfy gate spec <spec>` roda sem falha estrutural (com `--allow-draft`
+  durante a análise e sem ele quando o gate passa);
 - o resultado é exatamente `READY` ou `NOT READY`, com contagens, cobertura
   mínima e os três achados mais importantes;
 - `Gate do Ato I — Definição` na seção 13 registra resultado, data e achados, e
   os campos de `Status` e gates refletem esse resultado;
-- em `READY`, a spec foi movida com `specsfy transition <id> defined`, as
-  capturas esgotadas saíram da fila e `$specsfy-05-tasks` foi carregada.
+- em `READY`, a spec foi movida com `specsfy specs transition <id> defined`,
+  equivalente a `specsfy specs transition <id> defined`, as capturas esgotadas
+  saíram da fila e `$specsfy-05-tasks` foi carregada.
 
 ## Orquestrar a conversa
 
@@ -56,14 +57,22 @@ Leia em paralelo a spec, o índice `Artefatos de pesquisa armazenados`, os
 arquivos de `research/` e `references/quality-gates.md`. Os passos abaixo são
 sequenciais.
 
-1. Resolva `specs/<estado>/<NNNN>-<slug>/spec.md` pelo caminho informado; se
-   houver várias specs e nenhum slug, pergunte qual validar.
+1. Resolva a spec pelo identificador informado, que aceita número, nome da
+   pasta, slug ou caminho de `specs/<estado>/<NNNN>-<slug>/spec.md`; se houver
+   várias specs e nenhum identificador, pergunte qual validar.
 2. Confirme `Formato: Specsfy/2.0`, os três atos na ordem, slug igual ao
    diretório e pacote restrito a `spec.md` e ao diretório opcional `research/`.
 3. Para toda API ou documentação externa consultada, confirme uma evidência
    local em `research/` e seu índice em `Artefatos de pesquisa armazenados`.
    Esse material informa a spec; ele não é uma segunda fonte normativa.
 4. Enquanto `Status` ou `Definition Gate` ainda estiverem pendentes, execute:
+
+   ```bash
+   specsfy gate spec <spec> --allow-draft
+   ```
+
+   Pelo MCP, use a tool `gate_spec`. Sem o binário instalado, rode o script
+   equivalente:
 
    ```bash
    node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
@@ -84,7 +93,8 @@ sequenciais.
    para a feature inteira e para cada `US`, `FR` e `NFR`.
 8. Quando produto, arquitetura ou segurança forem materiais, leia
    `references/review-lenses.md`, registre os findings na seção 13 e execute
-   `scripts/review_findings.mjs`. Um finding `P1 Open` mantém o gate pendente.
+   `specsfy gate findings <spec>`. Pelo MCP, use a tool `gate_findings`. Um
+   finding `P1 Open` mantém o gate pendente.
 9. Confira o contexto persistente exigido pela mudança:
 
    | A definição altera | A Definition of Done precisa citar |
@@ -94,9 +104,10 @@ sequenciais.
    | finalidade ou capacidade, de forma material | revisão de `PROJECT.md` |
    | regra nova confirmada | `.specsfy/RULES.md` |
 
-10. No aceite final, execute `verify_evidence.mjs --delivery` para cada tarefa
-    `[MIGRATION]`. Mantenha o Delivery Gate pendente quando a tarefa estiver
-    aberta ou faltar o arquivo, o comando de aplicação ou a consulta de estado.
+10. No aceite final, execute `specsfy gate evidence <spec> --delivery` para
+    cada tarefa `[MIGRATION]`. Pelo MCP, use a tool `gate_evidence`. Mantenha o
+    Delivery Gate pendente quando a tarefa estiver aberta ou faltar o arquivo,
+    o comando de aplicação ou a consulta de estado.
 
 ## Classificar achados
 
@@ -138,11 +149,12 @@ Registre o resultado sem alterar requisitos por conta própria:
 2. em `READY`, defina `Definition Gate: Passed` e `Status: Defined`;
 3. em `NOT READY`, defina `Definition Gate: Failed`, `Plan Gate: Pending`,
    `Delivery Gate: Pending` e mantenha `Status: Draft`;
-4. quando o gate passar, execute novamente
-   `validate_spec.mjs specs/<estado>/<NNNN>-<slug>/spec.md` sem `--allow-draft`;
+4. quando o gate passar, execute novamente `specsfy gate spec <spec>` sem
+   `--allow-draft`;
 5. relate o resultado no chat.
 
-Quando o Definition Gate passar, execute `specsfy transition <id> defined`.
+Quando o Definition Gate passar, execute `specsfy specs transition <id> defined`,
+equivalente a `specsfy specs transition <id> defined`.
 
 ### Retirar da fila as capturas esgotadas
 
@@ -171,7 +183,8 @@ captura e não apague capturas, porque o histórico serve à busca de duplicatas
 Use a mesma análise para o aceite final. Antes de concluir, chame
 `$specsfy-interviewer` quando uma resposta puder mudar a entrega ou o Effort.
 Com Delivery Gate passado, `Status: Complete` e a DoD comprovada, execute
-`specsfy transition <id> completed`.
+`specsfy specs transition <id> completed`, equivalente a
+`specsfy specs transition <id> completed`.
 
 Se o usuário pedir correções, edite as seções de origem, preserve IDs e
 revalide. Mantenha tudo na própria spec, sem criar outro arquivo de
@@ -180,6 +193,13 @@ especificação ou validação.
 ## Enforcement do repositório
 
 Use o mesmo runner localmente e no CI:
+
+```bash
+specsfy verify --boundary local --timeout-seconds 300 --max-output-bytes 65536
+```
+
+Pelo MCP, use a tool `verify`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-04-validate/scripts/verify_repo.mjs . \

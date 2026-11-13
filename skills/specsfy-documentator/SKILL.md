@@ -12,7 +12,7 @@ sustenta.
 
 ## Pronto quando
 
-- `build_documentation.mjs --project <raiz> --check` termina sem falha.
+- `specsfy docs build --project <raiz> --check` termina sem falha.
 - `docs/` cobre toda a lista de `Cobertura obrigatória` e
   `.specsfy/PACKAGES.md` lista todos os pacotes dos manifests e lockfiles.
 - Conteúdo humano fora dos blocos `specsfy:documentator` continua intacto.
@@ -42,6 +42,13 @@ que as fontes executáveis não sustentarem.
    for acionada sem spec ou implementação recente:
 
    ```bash
+   specsfy docs build --project <raiz>
+   ```
+
+   Pelo MCP, use a tool `docs_build`. Sem o binário instalado, rode o script
+   equivalente:
+
+   ```bash
    node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \
      --project <raiz>
    ```
@@ -50,6 +57,13 @@ que as fontes executáveis não sustentarem.
    o código não sustente. Não acrescente escolhas de arquitetura, relações ou
    integrações sem fonte.
 4. Prove que a documentação representa o estado atual:
+
+   ```bash
+   specsfy docs build --project <raiz> --check
+   ```
+
+   Pelo MCP, use a tool `docs_build`. Sem o binário instalado, rode o script
+   equivalente:
 
    ```bash
    node .agents/skills/specsfy-documentator/scripts/build_documentation.mjs \

@@ -31,7 +31,8 @@ Antes de formular qualquer pergunta, leia e aplique o
 - Cada tema desenvolvível tem backlog refinado e spec Draft com
   `Definition Gate: Pending`.
 - Nenhum tema contextual gerou backlog, spec ou Inbox.
-- `specsfy milestones sync --project <raiz>` rodou e
+- `specsfy milestones sync --project <raiz>` rodou, com a tool `milestones_sync`
+  quando o agente usar MCP, e
   `$specsfy-milestone-governor` conferiu os vínculos de `M01`.
 - O relato final lista sessão, backlogs, specs, respostas confirmadas e pontos
   `Pendente`.
@@ -52,6 +53,13 @@ Antes de formular qualquer pergunta, leia e aplique o
    tiver credencial, token, chave privada ou dado pessoal sensível, não gere a
    milestone nem reproduza o valor em mensagens.
 4. **Importar uma única vez,** antes da primeira pergunta:
+
+   ```bash
+   specsfy milestones import-mvp --project <raiz>
+   ```
+
+   Pelo MCP, use a tool `milestones_import_mvp`. Sem o binário instalado, rode
+   o script equivalente:
 
    ```bash
    node \
@@ -141,7 +149,8 @@ Para cada item da fila, em sequência e sem pular responsabilidades. O objetivo
 
 Quando a fila terminar, confirme que cada tema desenvolvível tem backlog e spec
 Draft e que nenhum tema contextual gerou artefato. Execute
-`specsfy milestones sync --project <raiz>` e carregue
+`specsfy milestones sync --project <raiz>`, com a tool `milestones_sync` pelo
+MCP, e carregue
 `$specsfy-milestone-governor` para conferir vínculos e progresso de `M01`. A
 geração automática de Drafts não autoriza implementação nem validação final.
 
@@ -186,6 +195,19 @@ temas contextuais do MVP continuam sem Inbox.
 5. Escreva em Português do Brasil a análise, a síntese, os metadados e qualquer
    milestone gerada. Fonte ou resposta em outro idioma fica só como citação,
    com a interpretação em Português do Brasil.
+
+```bash
+specsfy inbox capture \
+  --input "<texto integral da pessoa>" \
+  --title "<tema da descoberta>" \
+  --session "DESC-AAAAMMDD-<slug>" \
+  --turn "<número sequencial>" \
+  --sources "<situação de MVP.md e BRAND.md>" \
+    [campos de análise da Inbox] [--project <raiz>]
+```
+
+Pelo MCP, use a tool `inbox_capture`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-01-inbox/scripts/capturar_inbox.mjs \

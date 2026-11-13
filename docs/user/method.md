@@ -38,7 +38,7 @@ A pasta também mostra o estado operacional da entrega:
 draft → defined → planned → in-progress → review → completed
 ```
 
-O campo `Status` dentro da spec espelha essa pasta. Use `specsfy transition`
+O campo `Status` dentro da spec espelha essa pasta. Use `specsfy specs transition`
 para mover o pacote inteiro, e não mova arquivos manualmente. `completed/`
 mantém o histórico das entregas finalizadas.
 

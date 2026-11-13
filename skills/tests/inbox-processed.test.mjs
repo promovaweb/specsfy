@@ -18,5 +18,5 @@ test('especificação mantém a captura ativa até a aprovação da definição'
   const source = skill('specsfy-03-specify'); includes(source, ['`specs/inbox/processed/`']); includes(normalized(source), ['definition gate']);
 });
 test('validação só processa a captura integralmente coberta após a transição', () => {
-  const source = skill('specsfy-04-validate'); includes(source, ['`specsfy inbox process <captura> --spec <id>`', '`specsfy transition <id> defined`', 'permanece em `specs/inbox/`']); assert.ok(source.indexOf('`specsfy transition <id> defined`') < source.indexOf('`specsfy inbox process <captura> --spec <id>`')); includes(normalized(source), ['integralmente', 'parte do pedido']);
+  const source = skill('specsfy-04-validate'); includes(source, ['`specsfy inbox process <captura> --spec <id>`', '`specsfy specs transition <id> defined`', 'permanece em `specs/inbox/`']); assert.ok(source.indexOf('`specsfy specs transition <id> defined`') < source.indexOf('`specsfy inbox process <captura> --spec <id>`')); includes(normalized(source), ['integralmente', 'parte do pedido']);
 });

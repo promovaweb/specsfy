@@ -33,13 +33,20 @@ desta skill é qual runner adotar em projeto Node sem PHP.
   `$specsfy-05-tasks`;
 - `cycle`: RED, GREEN e REFACTOR estão registrados na mesma linha de evidência
   e as suítes relacionadas passam;
-- `verify`: `check_traceability.mjs` e `verify_acceptance.mjs` rodaram, e os
-  gaps foram relatados ou resolvidos.
+- `verify`: `specsfy gate trace <spec>` e `specsfy gate acceptance <spec>`
+  rodaram, e os gaps foram relatados ou resolvidos.
 
 ## Proteção obrigatória do banco
 
 Antes de executar qualquer teste focal, suíte ou regressão, confira o comando e
 o ambiente:
+
+```bash
+specsfy gate database --project <raiz> --command "<comando-de-teste>"
+```
+
+Pelo MCP, use a tool `gate_database`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
@@ -105,7 +112,7 @@ a configuração do projeto e `references/test-levels.md`. Depois:
      escolha nem instale dependência silenciosamente;
    - outra stack: preserve o runner existente ou pergunte quando não houver
      decisão reproduzível.
-4. Confira o ambiente e o comando com `check_database_safety.mjs`. Se o estado
+4. Confira o ambiente e o comando com `specsfy gate database`. Se o estado
    não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
 5. Escolha com `references/test-levels.md` o nível mais baixo que ainda prova o
    comportamento.
@@ -195,6 +202,13 @@ spec.
 Execute:
 
 ```bash
+specsfy gate trace <spec>
+```
+
+Pelo MCP, use a tool `gate_trace`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
 node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
@@ -214,6 +228,13 @@ node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/<est
 
 Depois de executar os runners do repositório, registre `Passed` ou a falha na
 coluna Evidência da seção 12 e audite:
+
+```bash
+specsfy gate acceptance <spec>
+```
+
+Pelo MCP, use a tool `gate_acceptance`. Sem o binário instalado, rode o script
+equivalente:
 
 ```bash
 node .agents/skills/specsfy-06-tdd-bdd/scripts/verify_acceptance.mjs \

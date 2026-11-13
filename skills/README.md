@@ -150,7 +150,7 @@ originais. Nenhum arquivo de `.specify/` ou `specs/` é movido, convertido,
 substituído ou removido.
 
 Durante planejamento, implementação e projeção de progresso,
-`specsfy-setup/scripts/monitor_context.mjs` classifica mudanças staged, unstaged
+`specsfy context monitor` classifica mudanças staged, unstaged
 e untracked. Alterações estruturais exigem `STACK.md`. Alterações de
 persistência exigem `DATABASE.md`. Código de aplicação exige revisão de
 `PROJECT.md`. A ausência de impacto material é registrada na evidência da
@@ -226,8 +226,9 @@ specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
 
 - `SKILL.md` possui frontmatter com `name` e `description`.
 - `agents/openai.yaml` menciona `$<nome-da-skill>` no prompt padrão.
-- Scripts usam Python 3 e biblioteca padrão, sem rede ou ação destrutiva por
-  padrão.
+- Scripts usam Node.js 22 e biblioteca padrão, sem rede ou ação destrutiva por
+  padrão. O binário `specsfy` embute os scripts e os executa com o próprio
+  runtime, sem exigir Node.js na máquina.
 - Referências extensas vivem a um nível da skill e possuem gatilho explícito de
   leitura.
 - Uma regra normativa possui uma única fonte. Outros arquivos apontam para ela.
@@ -238,8 +239,10 @@ specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
 
 ## Disponibilizar as skills
 
-O executável versionado pode ser baixado em `get.specsfy.dev`. Para instalar o
-CLI com o npm e então materializar o catálogo base:
+O binário compilado por plataforma pode ser baixado em `get.specsfy.dev`. O
+pacote npm `@promovaweb/specsfy` instala um wrapper que baixa esse binário na
+primeira execução, sem exigir Node.js depois da instalação. Para materializar o
+catálogo base:
 
 ```bash
 npm install --global @promovaweb/specsfy

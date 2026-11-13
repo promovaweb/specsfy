@@ -34,11 +34,18 @@ Use quando outra skill carrega o setup ou quando há handoff automático.
 2. Execute o monitor:
 
    ```bash
+   specsfy context monitor --project <raiz> --check
+   ```
+
+   Pelo MCP, use a tool `context_monitor`. Sem o binário instalado, rode o
+   script equivalente:
+
+   ```bash
    node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
      --project <raiz> --check
    ```
 
-3. Em Laravel, execute também `check_database_safety.mjs --project <raiz>`
+3. Em Laravel, execute também `specsfy gate database --project <raiz>`
    (seção `Proteção do banco durante o setup`).
 4. Se tudo estiver atual, devolva o controle à skill chamadora. Se houver
    `PENDING`, resolva pela tabela de handoffs da seção `Monitorar e resolver
@@ -58,10 +65,13 @@ em paralelo; as etapas dependem do resultado da anterior.
    testes e código ficam dentro dessa raiz, nunca no diretório pai.
 2. **Ler o projeto.** Leia em paralelo `AGENTS.md`, `CLAUDE.md` e as instruções
    locais. Depois execute
-   `node .agents/skills/specsfy-setup/scripts/inspect_project.mjs --project <raiz>`
-   e leia as fontes na ordem retornada: instruções, manifests, configuração,
+   `specsfy context inspect --project <raiz>` e leia as fontes na ordem
+   retornada: instruções, manifests, configuração,
    aplicação, rotas, persistência, integrações, interface, testes e
-   documentação. Em base grande, leia por grupos e diga quais fontes foram
+   documentação. Pelo MCP, use a tool `context_inspect`. Sem o binário
+   instalado, rode
+   `node .agents/skills/specsfy-setup/scripts/inspect_project.mjs --project <raiz>`.
+   Em base grande, leia por grupos e diga quais fontes foram
    lidas. Só proponha stack ou escreva algo depois de entender o sistema atual
    e registrar o que será preservado; não ter lido uma fonte não autoriza
    substituir suas convenções.
@@ -71,9 +81,11 @@ em paralelo; as etapas dependem do resultado da anterior.
    `.specify/memory/constitution.md` existir, leia
    [a compatibilidade com GitHub Spec Kit](references/github-spec-kit.md).
 4. **Diagnosticar o ambiente.** Execute `specsfy doctor --project <raiz>` e
-   corrija cada requisito ausente (Node.js, Git, npm, acesso ao projeto e
-   `npx`) antes de continuar.
+   corrija cada requisito ausente (terminal, acesso ao projeto, `git`, `npx` e
+   token do GitHub) antes de continuar. O binário não exige Node.js.
 5. **Reconciliar o contexto.** Execute
+   `specsfy context setup --project <raiz>`. Pelo MCP, use a tool
+   `context_setup`. Sem o binário instalado, rode
    `node .agents/skills/specsfy-setup/scripts/setup_context.mjs --project <raiz>`.
    Detalhes na seção `Arquivos de contexto`.
 6. **Proteger o banco.** Em Laravel, rode a conferência da seção
@@ -83,9 +95,11 @@ em paralelo; as etapas dependem do resultado da anterior.
    fonte de stack usada pelo script. Com `.specsfy/SPECKIT.md`, abra a
    constituição e cada fonte original listada. Antes de qualquer descoberta de
    interface, execute
-   `node .agents/skills/specsfy-setup/scripts/inspect_interface.mjs --project <raiz>`
-   e abra as rotas, componentes e telas relacionados ao pedido. A saída orienta
-   a leitura; não substitui as fontes.
+   `specsfy context interface --project <raiz>` e abra as rotas, componentes e
+   telas relacionados ao pedido. Pelo MCP, use a tool `context_interface`. Sem o
+   binário instalado, rode
+   `node .agents/skills/specsfy-setup/scripts/inspect_interface.mjs --project <raiz>`.
+   A saída orienta a leitura; não substitui as fontes.
 8. **Conversar sobre lacunas.** Siga as seções `Perfil de conhecimento e
    memória de respostas` e `Roteiro adaptativo do setup`.
 9. **Instalar especialistas.** Siga a seção `Stack e especialistas instalados
@@ -106,8 +120,8 @@ em paralelo; as etapas dependem do resultado da anterior.
 ## Pronto quando
 
 - A raiz está confirmada e todos os comandos usaram essa raiz.
-- `monitor_context.mjs --check` não retorna `PENDING`.
-- Em Laravel, `check_database_safety.mjs` retornou `SAFE`.
+- `specsfy context monitor --check` não retorna `PENDING`.
+- Em Laravel, `specsfy gate database` retornou `SAFE`.
 - Os arquivos de contexto existem, nenhum arquivo existente foi substituído e
   os blocos reservados estão atualizados sem duplicação.
 - O núcleo e os especialistas detectados foram instalados ou a falha foi
@@ -118,7 +132,7 @@ em paralelo; as etapas dependem do resultado da anterior.
 
 ## Arquivos de contexto
 
-O `setup_context.mjs` renderiza `PROJECT.md`, `STACK.md`, `RULES.md`,
+O `specsfy context setup` renderiza `PROJECT.md`, `STACK.md`, `RULES.md`,
 `DATABASE.md`, `INTERFACE.md`, `DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md`
 a partir de `.specsfy/templates/custom/<Nome>.md` quando existir; caso
 contrário, usa os gerenciados `.specsfy/templates/Project.md`, `Stack.md`,
@@ -250,6 +264,13 @@ documentador roda de novo ao fim da implementação.
 Quando o projeto tiver `artisan`, execute:
 
 ```bash
+specsfy gate database --project <raiz>
+```
+
+Pelo MCP, use a tool `gate_database`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
 node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
   --project <raiz>
 ```
@@ -269,7 +290,7 @@ Esta regra é inegociável, porque um teste no banco errado apaga dados reais:
 
 ## Monitorar e resolver pendências
 
-Execute `monitor_context.mjs --project <raiz> --check` no início e no fim de
+Execute `specsfy context monitor --project <raiz> --check` no início e no fim de
 cada mudança. Não contorne um `PENDING`: atualize o documento indicado e rode o
 monitor de novo.
 
