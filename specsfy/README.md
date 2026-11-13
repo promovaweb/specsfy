@@ -1,26 +1,50 @@
-# Specsfy
-
-<!-- markdownlint-disable MD033 -->
 <p align="center">
-  <picture>
-    <source srcset="../brand/logo/icon.svg" type="image/svg+xml">
-    <img src="../brand/logo/icon.png" alt="Logo do Specsfy" width="128">
-  </picture>
+  <a href="https://github.com/promovaweb/specsfy">
+    <picture>
+      <source srcset="../brand/logo/icon.svg" type="image/svg+xml">
+      <img src="../brand/logo/icon.png" alt="Logo do Specsfy" width="128">
+    </picture>
+  </a>
 </p>
-<!-- markdownlint-enable MD033 -->
 
-> Especifique. Prove. Entregue.
+<h1 align="center">Specsfy</h1>
+
+<p align="center">
+  Transforme uma ideia em software testado a partir de uma especificação única, conduzida por agentes de IA.
+</p>
+
+<p align="center">Um projeto da <a href="https://promovaweb.com">Promovaweb</a></p>
+
+<p align="center">
+  <a href="https://github.com/promovaweb/specsfy/releases/latest"><img alt="GitHub Release" src="https://img.shields.io/github/v/release/promovaweb/specsfy"></a>
+  <a href="https://www.npmjs.com/package/@promovaweb/specsfy"><img alt="npm" src="https://img.shields.io/npm/v/@promovaweb/specsfy"></a>
+</p>
+
+<p align="center">
+  <a href="https://promovaweb.com/discord"><img alt="Discord: obter ajuda e conversar com a Comunidade" src="https://img.shields.io/badge/Discord-Obter%20ajuda%20e%20conversar%20com%20a%20Comunidade-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
+</p>
+
+<p align="center">
+  <a href="https://promovaweb.com/docs/specsfy/">Documentação</a> ·
+  <a href="https://promovaweb.com/discord">Discord</a> ·
+  <a href="https://promovaweb.com/planos?utm_source=github&utm_medium=readme&utm_campaign=specsfy">Planos da Promovaweb</a> ·
+  <a href="../cli/CHANGELOG.md">Changelog</a>
+</p>
+
+Esta é a porta de entrada para o usuário final. O texto conduz a instalação e a
+primeira entrega completa. O [README do monorepo](../README.md) apresenta o
+projeto em uma página. A documentação oficial fica em
+[`../docs/`](../docs/README.md).
 
 Specsfy é uma metodologia prática para desenvolver software a partir de uma
-especificação única, executável e rastreável. Esta é a porta de entrada para o
-usuário final: instale o CLI, prepare um projeto e conduza a primeira fatia de
-trabalho pelo passo a passo abaixo.
+especificação única, executável e rastreável. A metodologia vive em
+[`../skills/`](../skills/). O CLI e a TUI vivem em [`../cli/`](../cli/). A
+identidade visual vive em [`../brand/`](../brand/).
 
 ![Dashboard Home do Specsfy](../docs/user/assets/cli/cli-dash.png)
 
 A TUI transforma specs, tarefas, checklists e gates em uma visão operacional.
-Veja as demais telas e comandos no
-[guia do CLI](../docs/user/cli.md).
+Veja as demais telas e comandos no [guia do CLI](../docs/user/cli.md).
 
 ## O que você precisa
 
@@ -28,9 +52,8 @@ Veja as demais telas e comandos no
 - o comando [`skills`](https://github.com/vercel-labs/skills) ou `npx`.
 - um projeto existente ou recém-criado no qual o Specsfy será aplicado.
 
-O monorepo
-[`promovaweb/specsfy`](https://github.com/promovaweb/specsfy) não é um
-projeto consumidor e recusa o bootstrap.
+O monorepo [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy) não é
+um projeto consumidor. O CLI recusa o bootstrap nessa raiz.
 
 ## Instalação passo a passo
 
@@ -68,9 +91,9 @@ O comando instala as skills base, setup, documentação e contexto auxiliar em
 `.agents/skills/`, publica o contrato em `.specsfy/Spec.md` e reconcilia blocos
 gerenciados em `AGENTS.md` e `CLAUDE.md`. Os templates ficam juntos em
 `.specsfy/templates/`, inclusive `DESIGNSYSTEM.MD` para regras macro de
-interface e `UserProfile.md` para o perfil de interação. Personalizações homônimas ficam em
-`.specsfy/templates/custom/`, têm precedência e não são sobrescritas pelo CLI.
-Ele não cria uma spec de produto.
+interface e `UserProfile.md` para o perfil de interação. Personalizações
+homônimas ficam em `.specsfy/templates/custom/`, têm precedência e não são
+sobrescritas pelo CLI. Ele não cria uma spec de produto.
 
 Ao executar `$specsfy-setup`, o agente consulta o perfil, a conversa e os
 arquivos do projeto antes de perguntar. Ele registra o nível de conhecimento e
@@ -93,8 +116,8 @@ consegue ler o projeto. A primeira spec é criada durante o fluxo de uso.
 Vamos criar uma página de boas-vindas em um projeto Laravel que já usa Pest.
 Este exemplo mostra as nove skills que conduzem uma fatia, da captura à
 projeção final. As outras quatro skills base atendem conversas sobre uma spec e
-o planejamento e acompanhamento de milestones, explicados no [guia de
-milestones](../docs/user/milestones.md).
+o planejamento e acompanhamento de milestones, explicados no
+[guia de milestones](../docs/user/milestones.md).
 
 ### 1. Capture uma entrada — `$specsfy-01-inbox`
 
@@ -289,8 +312,7 @@ Quando uma lacuna puder alterar o plano, a execução ou o aceite, o
 entrevistador lê a mesma spec e apresenta pelo menos três perguntas numeradas
 por rodada, com opções numeradas, escrita livre e avanço. Ele registra as
 respostas confirmadas e também recalibra `Effort` de 1 a 10 com uma
-justificativa.
-Não aprova gates nem move a spec sem a skill responsável.
+justificativa. Não aprova gates nem move a spec sem a skill responsável.
 
 Pronto: uma ideia pequena atravessou `Ato I — Definir`,
 `Ato II — Projetar e provar` e `Ato III — Entregar`. Depois que você autoriza a
@@ -312,7 +334,7 @@ specsfy skills update --project .
 ```
 
 Alterações locais em conteúdo gerenciado são preservadas e impedem a
-substituição. Revise o conflito antes de decidir por `--force`, pois essa opção
+substituição. Revise o conflito antes de usar `--force`, porque essa opção
 descarta a customização protegida.
 
 ## Dicas para usar o CLI
@@ -379,7 +401,7 @@ instala automaticamente.
 - [CLI, TUI e atualização](../docs/user/cli.md)
 - [Design system de interface](../docs/user/design-system.md)
 - [Módulos do monorepo](../docs/develop/modules.md)
-- [Documentação completa](../docs/)
+- [Documentação completa](../docs/README.md)
 
 ## O que o Specsfy garante
 
@@ -390,50 +412,41 @@ Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
 Os mesmos IDs conectam histórias, requisitos, condições de aceite, testes,
-tarefas e evidências:
+tarefas e resultados:
 
 ```text
-US → FR/NFR → AC → teste BDD/TDD → tarefa → evidência
+US → FR/NFR → AC → teste BDD/TDD → tarefa → resultado
 ```
 
 O Specsfy não substitui julgamento de produto, pesquisa, segurança ou
 engenharia. Ele também não impõe arquitetura nem gerenciador de projetos. Seu
-contrato é tornar decisões e conclusão rastreáveis.
+contrato é tornar o plano e a conclusão rastreáveis.
 
-## Ecossistema
+## Comunidade e suporte
 
-| Repositório | Responsabilidade |
-| --- | --- |
-| [`specsfy/`](./) | porta de entrada pública |
-| [`docs/`](../docs/) | documentação oficial para usuários |
-| [`skills/`](../skills/) | metodologia executável |
-| [`specialists/`](../specialists/) | conhecimento técnico opcional |
-| [`cli/`](../cli/) | instalação, CLI, TUI e progresso |
-| [`example/`](../example/) | aplicação interna de validação |
-| [`brand/`](../brand/) | identidade visual e verbal |
-| [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy) | orquestração e testes integrados |
+- **Discord:** [obter ajuda e conversar com a Comunidade](https://promovaweb.com/discord).
+- **Bugs e pedidos:** abra uma
+  [issue](https://github.com/promovaweb/specsfy/issues) com a versão, o sistema
+  operacional e o passo a passo para reproduzir.
+- **Novidades:** acompanhe o [CHANGELOG](../cli/CHANGELOG.md) e as
+  [releases](https://github.com/promovaweb/specsfy/releases).
 
-Veja responsabilidades, públicos e limites no
-[guia dos módulos](../docs/develop/modules.md).
+## Promovaweb
 
-## Créditos
+O Specsfy é mantido pela [Promovaweb](https://promovaweb.com), comunidade de
+co-working digital onde profissionais aprendem a construir, automatizar e gerir
+negócios de tecnologia e IA com aulas ao vivo, Co-works e revisão de projetos
+reais.
 
-Specsfy é um projeto da [Promovaweb](https://promovaweb.com), mantido por
-**Luiz Eduardo Oliveira Fonseca** e pela comunidade.
+Quer usar o Specsfy em projetos de verdade, com acompanhamento? Conheça os
+[planos da Promovaweb](https://promovaweb.com/planos?utm_source=github&utm_medium=readme&utm_campaign=specsfy).
 
-### Inspirações e fontes
-
-O projeto reconhece o
+A autoria e os créditos completos ficam em
+[`../docs/user/credits.md`](../docs/user/credits.md). O projeto reconhece o
 [GitHub Spec Kit](https://github.github.com/spec-kit/), o
 [OpenSpec](https://openspec.dev/) e o livro
 [*Categorias*, de Aristóteles](https://classics.mit.edu/Aristotle/categories.html)
-como inspirações. Eles contribuíram, respectivamente, para o estudo de fluxos
-de specification-driven development, acordos leves entre pessoas e agentes e
-classificação explícita de objetos, atributos, relações e estados.
-
-Essas referências não são dependências do Specsfy nem indicam equivalência
-entre os métodos. O contrato executável do projeto permanece nas skills, nos
-templates, nos validadores e nos testes deste repositório.
+como inspirações. Essas referências não são dependências nem indicam
+equivalência entre os métodos.
 
 Contato: [contato@promovaweb.com](mailto:contato@promovaweb.com).
-Consulte os [créditos completos](../docs/user/credits.md).

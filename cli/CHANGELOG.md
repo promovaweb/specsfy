@@ -4,6 +4,22 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.27.2] - 2026-11-13
+
+### Documentação
+
+- O `README.md` da raiz foi reorganizado para quem usa o Specsfy. Ele abre
+  com o logo, a ligação com a Promovaweb, os badges, o banner do Discord e os
+  links de documentação, planos e changelog. Depois traz instalação, primeiros
+  passos, uso, MCP, códigos de saída, os repositórios usados e a licença MIT
+  do CLI.
+- O novo `CONTRIBUTING.md` reúne o que antes ficava no README para quem
+  contribui: ambiente, organização dos módulos, fluxo BDD e TDD, validação,
+  documentação, commits e release.
+- O tutorial em `specsfy/README.md` ganhou o mesmo cabeçalho e as seções de
+  comunidade e da Promovaweb.
+- O `.markdownlint.json` da raiz libera o HTML do cabeçalho.
+
 ## [0.27.1] - 2026-11-13
 
 ### Corrigido
