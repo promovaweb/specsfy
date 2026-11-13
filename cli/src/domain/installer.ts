@@ -1,8 +1,13 @@
 /**
- * Instalação idempotente do framework e das skills do Specsfy.
+ * Idempotent installation of the Specsfy framework and skills.
  *
- * A materialização é delegada ao CLI oficial `skills`; este módulo mantém os
- * fingerprints, protege customizações e gerencia somente blocos identificados.
+ * Materialization is delegated to the official `skills` CLI (see
+ * `prerequisites.ts` for how it runs); this module keeps the fingerprints,
+ * protects local customizations and manages only identified blocks.
+ * The source repository and the agent targets come from the caller
+ * (settings `catalog.repository` and `skills.agents`). Failures are
+ * `AppError`: an unknown name is USAGE, a failed clone is NETWORK_OR_API,
+ * anything else is GENERIC_ERROR.
  */
 
 import { createHash } from "node:crypto";
@@ -32,7 +37,9 @@ import {
   ensureSkillsLock,
   installedSkillNames,
 } from "./skill-lock.ts";
-import { resolveNpxSkillsCommand } from "./prerequisites.ts";
+import { resolveSkillsCommand } from "./prerequisites.ts";
+import { AppError, error as appError } from "../app/errors.ts";
+import { ExitCode } from "../app/exit-codes.ts";
 
 const execFileAsync = promisify(execFile);
 
@@ -118,44 +125,73 @@ interface InternalLock {
   [key: string]: unknown;
 }
 
-/** Instalador de um projeto consumidor explicitamente selecionado. */
+/** True for names the installer manages: framework, renamed, auxiliary, documentation and specialist skills. */
+export function isSpecsfySkillName(name: string): boolean {
+  return (
+    (FRAMEWORK_SKILLS as readonly string[]).includes(name) ||
+    name in RENAMED_BASE_SKILLS ||
+    name.startsWith("specsfy-aux-") ||
+    name.startsWith("specsfy-specialist-")
+  );
+}
+
+/** Options of an installer beyond the project and --force. */
+export interface InstallerOptions {
+  /** Git repository of the framework (setting `catalog.repository`). */
+  repository?: string;
+  /** Agent targets for `skills add` (setting `skills.agents`); `universal` is always included. */
+  agents?: readonly string[] | string;
+}
+
+/** Normalizes the agent list: trimmed, unique, always starting with `universal`. */
+export function normalizeAgents(agents: readonly string[] | string | undefined): string[] {
+  const list = typeof agents === "string" ? agents.split(",") : agents ?? [];
+  const clean = list.map((agent) => agent.trim()).filter(Boolean);
+  return [...new Set(["universal", ...clean])];
+}
+
+/** Installer of an explicitly selected consumer project. */
 export class SkillInstaller {
   readonly project: string;
   readonly force: boolean;
+  readonly repository: string;
+  readonly agents: readonly string[];
 
-  private constructor(project: string, force: boolean) {
+  private constructor(project: string, force: boolean, options: InstallerOptions) {
     this.project = resolvePath(project);
     this.force = force;
+    this.repository = options.repository?.trim() || MONOREPO_REPOSITORY;
+    this.agents = normalizeAgents(options.agents);
   }
 
-  /** Valida o destino e cria o lock oficial antes de liberar o instalador. */
-  static async create(project: string, force = false): Promise<SkillInstaller> {
-    const installer = new SkillInstaller(project, force);
+  /** Validates the target and creates the official lock before returning the installer. */
+  static async create(project: string, force = false, options: InstallerOptions = {}): Promise<SkillInstaller> {
+    const installer = new SkillInstaller(project, force, options);
     await assertConsumerProject(installer.project);
     await ensureSkillsLock(installer.project);
     return installer;
   }
 
-  /** Instala todo o framework base. */
+  /** Installs the whole base framework. */
   async installBase(): Promise<string[]> {
     return this.installBaseSelection([...FRAMEWORK_SKILLS]);
   }
 
-  /** Instala um subconjunto válido do framework base. */
+  /** Installs a valid subset of the base framework. */
   async installBaseSelection(names: string[]): Promise<string[]> {
     const allowed = new Set<string>(FRAMEWORK_SKILLS);
     const invalid = [...new Set(names.filter((name) => !allowed.has(name)))].sort();
     if (invalid.length) {
-      throw new Error(`skill do framework desconhecida: ${invalid.join(", ")}`);
+      throw appError.usage(`unknown framework skill: ${invalid.join(", ")}`);
     }
     return withRepositoryCheckout(
-      MONOREPO_REPOSITORY,
+      this.repository,
       BASE_DIRECTORY,
       (checkout) => this.installBaseFromCheckout(checkout, names),
     );
   }
 
-  /** Instala framework estrutural e skills a partir de uma origem local. */
+  /** Installs the structural framework and skills from a local source. */
   async installBaseFromCheckout(
     checkout: string,
     names: readonly string[] = BASE_SKILLS,
@@ -179,7 +215,7 @@ export class SkillInstaller {
     });
   }
 
-  /** Publica regras, templates, exemplo e blocos gerenciados. */
+  /** Publishes rules, templates, example and managed blocks. */
   async installFrameworkFromCheckout(checkout: string): Promise<string[]> {
     const sourceSpec = join(checkout, "Spec.md");
     const sourceExample = join(checkout, "examples", "Spec.md");
@@ -197,7 +233,7 @@ export class SkillInstaller {
       sourceAgents,
     ]) {
       if (!(await isFile(path))) {
-        throw new Error(`arquivo estrutural ausente na origem: ${path}`);
+        throw fail(`structural file missing in the source: ${path}`);
       }
     }
     const specContent = await readFile(sourceSpec, "utf8");
@@ -302,17 +338,17 @@ export class SkillInstaller {
     return changed;
   }
 
-  /** Instala especialistas do catálogo oficial. */
+  /** Installs specialists from the framework repository. */
   async installSpecialists(names: string[]): Promise<string[]> {
     return this.installFromRepository(
-      MONOREPO_REPOSITORY,
+      this.repository,
       names,
       "specialists",
       SPECIALISTS_DIRECTORY,
     );
   }
 
-  /** Atualiza todas as skills Specsfy já registradas. */
+  /** Updates every Specsfy skill already registered. */
   async updateAll(): Promise<string[]> {
     const installed = await installedSkillNames(this.project);
     const base = [...FRAMEWORK_SKILLS].filter((name) => installed.has(name)).sort();
@@ -327,7 +363,7 @@ export class SkillInstaller {
     return changed;
   }
 
-  /** Clona uma origem temporária e instala as skills solicitadas. */
+  /** Clones a temporary source and installs the requested skills. */
   async installFromRepository(
     repository: string,
     names: readonly string[],
@@ -339,7 +375,7 @@ export class SkillInstaller {
     );
   }
 
-  /** Instala skills locais preservando alterações não autorizadas. */
+  /** Installs local skills, preserving unauthorized changes. */
   async installFromCheckout(
     checkout: string,
     names: readonly string[],
@@ -357,7 +393,7 @@ export class SkillInstaller {
     for (const name of names) {
       const source = join(checkout, name);
       if (!(await isFile(join(source, "SKILL.md")))) {
-        throw new Error(`skill inválida ou ausente na origem: ${name}`);
+        throw fail(`invalid or missing skill in the source: ${name}`);
       }
       const target = join(destination, name);
       const digest = await skillDigest(source);
@@ -372,8 +408,8 @@ export class SkillInstaller {
       }
       const recorded = lock.skills[name]?.content_sha256;
       if (!this.force && recorded !== targetDigest) {
-        throw new Error(
-          `${target} possui alterações locais; preserve-as ou use --force para substituir`,
+        throw fail(
+          `${target} has local changes; keep them or use --force to replace`,
         );
       }
       operations.push({ action: "replace", source, target, digest });
@@ -387,7 +423,7 @@ export class SkillInstaller {
         .filter(({ action }) => action !== "current")
         .map(({ target }) => basename(target));
       if (changedNames.length) {
-        await installWithSkillsCli(checkout, changedNames, this.project);
+        await installWithSkillsCli(checkout, changedNames, this.project, this.agents);
       }
       const installed: string[] = [];
       let lockChanged = false;
@@ -399,8 +435,8 @@ export class SkillInstaller {
             !(await pathExists(operation.target)) ||
             (await skillDigest(operation.target)) !== operation.digest
           ) {
-            throw new Error(
-              `skills CLI não materializou ${name} corretamente em ${operation.target}`,
+            throw fail(
+              `skills CLI did not materialize ${name} correctly at ${operation.target}`,
             );
           }
           installed.push(operation.target);
@@ -429,29 +465,21 @@ export class SkillInstaller {
     });
   }
 
-  /** Remove somente nomes pertencentes ao Specsfy e protege customizações. */
+  /** Removes only Specsfy names and protects customizations. */
   async remove(names: string[]): Promise<string[]> {
     const lock = await this.readLock();
     const official = await installedSkillNames(this.project);
-    const framework = new Set<string>(FRAMEWORK_SKILLS);
     const targets: Array<[string, string]> = [];
     for (const name of names) {
-      if (
-        !framework.has(name) &&
-        !(name in RENAMED_BASE_SKILLS) &&
-        !name.startsWith("specsfy-aux-") &&
-        name !== "specsfy-setup" &&
-        !(DOCUMENTATION_SKILLS as readonly string[]).includes(name) &&
-        !name.startsWith("specsfy-specialist-")
-      ) {
-        throw new Error(`nome de skill Specsfy inválido: ${name}`);
+      if (!isSpecsfySkillName(name)) {
+        throw appError.usage(`not a Specsfy skill name: ${name}`, { name });
       }
       const target = join(this.project, ".agents", "skills", name);
       if ((await pathExists(target)) && !this.force) {
         const recorded = lock.skills[name]?.content_sha256;
         if (recorded !== (await skillDigest(target))) {
-          throw new Error(
-            `${target} possui alterações locais; preserve-as ou use --force para remover`,
+          throw fail(
+            `${target} has local changes; keep them or use --force to remove`,
           );
         }
       }
@@ -474,7 +502,7 @@ export class SkillInstaller {
     let lockChanged = false;
     for (const { name, target, exists } of materialized) {
       if (exists) {
-        await rm(target, { recursive: true });
+        await rm(target, { recursive: true, force: true });
         removed.push(target);
       }
       if (lock.skills[name]) {
@@ -494,7 +522,7 @@ export class SkillInstaller {
     for (const name of names) {
       const source = join(checkout, name);
       if (!(await isFile(join(source, "SKILL.md")))) {
-        throw new Error(`skill inválida ou ausente na origem: ${name}`);
+        throw fail(`invalid or missing skill in the source: ${name}`);
       }
       const target = join(this.project, ".agents", "skills", name);
       if (!(await pathExists(target))) continue;
@@ -502,8 +530,8 @@ export class SkillInstaller {
       const targetDigest = await skillDigest(target);
       if (sourceDigest === targetDigest) continue;
       if (!this.force && lock.skills[name]?.content_sha256 !== targetDigest) {
-        throw new Error(
-          `${target} possui alterações locais; preserve-as ou use --force para substituir`,
+        throw fail(
+          `${target} has local changes; keep them or use --force to replace`,
         );
       }
     }
@@ -519,9 +547,9 @@ export class SkillInstaller {
         !this.force &&
         lock.skills[name]?.content_sha256 !== (await skillDigest(target))
       ) {
-        throw new Error(
-          `${target} foi renomeada e possui alterações locais; preserve-as ` +
-            "ou use --force para removê-la após instalar a substituta",
+        throw fail(
+          `${target} was renamed and has local changes; keep them ` +
+            "or use --force to remove it after installing the replacement",
         );
       }
       targets.push([name, target]);
@@ -542,7 +570,7 @@ export class SkillInstaller {
     const removed: string[] = [];
     for (const [name, target] of targets) {
       if (await pathExists(target)) {
-        await rm(target, { recursive: true });
+        await rm(target, { recursive: true, force: true });
         removed.push(target);
       }
       delete lock.skills[name];
@@ -556,7 +584,7 @@ export class SkillInstaller {
     if (!(await isFile(path))) return { schema_version: 1, skills: {} };
     const payload = await readJson(path);
     if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-      throw new Error(`lock inválido: ${path}`);
+      throw fail(`invalid lock: ${path}`);
     }
     const lock = payload as Partial<InternalLock>;
     if (!lock.skills || typeof lock.skills !== "object" || Array.isArray(lock.skills)) {
@@ -595,11 +623,11 @@ async function withRepositoryCheckout<T>(
         error && typeof error === "object" && "stderr" in error
           ? String((error as { stderr?: unknown }).stderr ?? "").trim()
           : "";
-      throw new Error(detail || "falha ao baixar catálogo");
+      throw appError.network(detail ? `could not clone ${repository}: ${detail}` : `could not clone ${repository}`);
     }
     const source = directory ? join(checkout, directory) : checkout;
     if (!(await pathExists(source))) {
-      throw new Error(`diretório ausente no monorepo: ${directory}`);
+      throw fail(`directory missing in the repository: ${directory}`);
     }
     return await action(source);
   } finally {
@@ -610,10 +638,10 @@ async function withRepositoryCheckout<T>(
 async function extractSourceBlock(path: string): Promise<string> {
   const block = managedBlock(await readFile(path, "utf8"), path);
   if (block === undefined) {
-    throw new Error(`bloco ${FRAMEWORK_START} ausente no arquivo estrutural: ${path}`);
+    throw fail(`block ${FRAMEWORK_START} missing in the structural file: ${path}`);
   }
   if (!block.includes(SPEC_PATH_TOKEN)) {
-    throw new Error(`token ${SPEC_PATH_TOKEN} ausente no bloco de ${path}`);
+    throw fail(`token ${SPEC_PATH_TOKEN} missing in the block of ${path}`);
   }
   return block;
 }
@@ -625,12 +653,12 @@ async function planManagedFile(
   force: boolean,
 ): Promise<string | undefined> {
   if (!(await pathExists(path))) return expected;
-  if (!(await isFile(path))) throw new Error(`${path} existe e não é um arquivo`);
+  if (!(await isFile(path))) throw fail(`${path} exists and is not a file`);
   const current = await readFile(path, "utf8");
   if (current === expected) return undefined;
   if (force || recordedDigest === contentDigest(current)) return expected;
-  throw new Error(
-    `${path} possui alterações locais; preserve-as ou use --force para substituir`,
+  throw fail(
+    `${path} has local changes; keep them or use --force to replace`,
   );
 }
 
@@ -641,16 +669,16 @@ async function planManagedBlock(
   force: boolean,
 ): Promise<string | undefined> {
   if ((await pathExists(path)) && !(await isFile(path))) {
-    throw new Error(`${path} existe e não é um arquivo`);
+    throw fail(`${path} exists and is not a file`);
   }
   const content = (await isFile(path)) ? await readFile(path, "utf8") : "";
   const current = managedBlock(content, path);
   if (current === undefined) return appendBlock(content, expected);
   if (current === expected) return undefined;
   if (!force && recordedDigest !== contentDigest(current)) {
-    throw new Error(
-      `${path} possui alterações locais no bloco Specsfy; ` +
-        "preserve-as ou use --force para substituir somente o bloco",
+    throw fail(
+      `${path} has local changes in the Specsfy block; ` +
+        "keep them or use --force to replace only the block",
     );
   }
   const start = content.indexOf(FRAMEWORK_START);
@@ -663,7 +691,7 @@ function managedBlock(content: string, path: string): string | undefined {
   const ends = content.split(FRAMEWORK_END).length - 1;
   if (!starts && !ends) return undefined;
   if (starts !== 1 || ends !== 1) {
-    throw new Error(`bloco Specsfy malformado em ${path}`);
+    throw fail(`malformed Specsfy block in ${path}`);
   }
   const start = content.indexOf(FRAMEWORK_START);
   const end = content.indexOf(FRAMEWORK_END, start) + FRAMEWORK_END.length;
@@ -684,63 +712,61 @@ async function installWithSkillsCli(
   source: string,
   names: string[],
   project: string,
+  agents: readonly string[],
 ): Promise<void> {
-  const command = await resolveNpxSkillsCommand();
-  if (!command) {
-    throw new Error(
-      "npx não encontrado. Instale o npm e disponibilize `npx` no PATH para " +
-        "executar `npx skills add`.",
-    );
-  }
-  const arguments_ = [...command.slice(1), "add", resolve(source)];
+  const arguments_ = ["add", resolve(source)];
   for (const name of names) arguments_.push("--skill", name);
-  arguments_.push("--agent", "universal", "--copy", "-y", "--full-depth");
-  await runSkillsCommand(command[0]!, arguments_, project, "instalar", names);
+  for (const agent of agents) arguments_.push("--agent", agent);
+  arguments_.push("--copy", "-y", "--full-depth");
+  await runSkillsCommand(arguments_, project, "install", names);
 }
 
+/**
+ * Removes skills from every agent folder and from skills-lock.json. No
+ * `--agent` is passed on purpose: skills 1.5 treats `remove --agent universal`
+ * as a no-op and leaves the lock entry behind.
+ */
 async function removeWithSkillsCli(
   names: string[],
   project: string,
 ): Promise<void> {
-  const command = await resolveNpxSkillsCommand();
-  if (!command) {
-    throw new Error(
-      "npx não encontrado. Instale o npm e disponibilize `npx` no PATH para " +
-        "gerenciar as skills instaladas.",
-    );
-  }
-  await runSkillsCommand(
-    command[0]!,
-    [...command.slice(1), "remove", ...names, "--agent", "universal", "-y"],
-    project,
-    "remover",
-    names,
-  );
+  const arguments_ = ["remove", ...names, "-y"];
+  await runSkillsCommand(arguments_, project, "remove", names);
 }
 
+/** Runs the official skills CLI resolved by `resolveSkillsCommand`. */
 async function runSkillsCommand(
-  executable: string,
   arguments_: string[],
   project: string,
   action: string,
   names: string[],
 ): Promise<void> {
+  const resolved = await resolveSkillsCommand();
+  if (!resolved) {
+    throw fail(
+      "SPECSFY_SKILLS_CLI or SPECSFY_NPX_COMMAND points to a file that is not executable; " +
+        "fix it or unset it to use the skills CLI embedded in the binary.",
+    );
+  }
+  const [executable, ...prefix] = resolved.command;
   try {
-    await execFileAsync(executable, arguments_, {
+    await execFileAsync(executable!, [...prefix, ...arguments_], {
       cwd: project,
       encoding: "utf8",
+      env: { ...process.env, ...resolved.env },
+      maxBuffer: 16 * 1024 * 1024,
     });
   } catch (error) {
     const value = error as { stderr?: unknown; stdout?: unknown; code?: unknown };
-    const detail = String(value.stderr ?? value.stdout ?? "").trim();
-    throw new Error(
-      `skills CLI falhou ao ${action} ${names.join(", ")}: ` +
+    const detail = String(value.stderr || value.stdout || "").trim();
+    throw fail(
+      `skills CLI failed to ${action} ${names.join(", ")}: ` +
         (detail || `exit ${String(value.code ?? 1)}`),
     );
   }
 }
 
-/** Calcula o fingerprint estável de uma skill, ignorando caches gerados. */
+/** Computes the stable fingerprint of a skill, ignoring generated caches. */
 export async function skillDigest(path: string): Promise<string> {
   const digest = createHash("sha256");
   for (const entry of await walkEntries(path)) {
@@ -789,7 +815,7 @@ function stringValue(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
 }
 
-/** Restaura os destinos gerenciados se o processo delegado falhar ou divergir. */
+/** Restores the managed targets when the delegated process fails or diverges. */
 async function withInstallationRollback<T>(paths: string[], operation: () => Promise<T>): Promise<T> {
   const backup = await mkdtemp(join(tmpdir(), "specsfy-install-rollback-"));
   const snapshots: Array<{ target: string; backup: string; existed: boolean }> = [];
@@ -816,11 +842,15 @@ async function withInstallationRollback<T>(paths: string[], operation: () => Pro
         }
       } catch (restoreError) {
         retainBackup = true;
-        throw new AggregateError([error, restoreError], `A restauração falhou. Os arquivos anteriores permanecem em ${backup}`);
+        throw new AggregateError([error, restoreError], `Restore failed. The previous files remain in ${backup}`);
       }
       throw error;
     }
   } finally {
     if (!retainBackup) await rm(backup, { recursive: true, force: true });
   }
+}
+
+function fail(message: string): AppError {
+  return new AppError(ExitCode.GENERIC_ERROR, message);
 }

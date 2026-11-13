@@ -1,6 +1,6 @@
 # 0002 Instalar e atualizar o framework
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -44,16 +44,16 @@ Commands em `src/cli/commands/framework.ts` sobre `src/domain/installer.ts`,
 
 ## Tasks
 
-- [ ] Commands `install`, `update` e `skills ...` `#termfy-cli`
-- [ ] `doctor --project` `#termfy-cli`
-- [ ] Credencial `github.token` no `github.ts` `#termfy-config`
-- [ ] Tools MCP `#termfy-mcp`
-- [ ] Testes de command `#termfy-test`
+- [x] Commands `install`, `update` e `skills ...` `#termfy-cli`
+- [x] `doctor --project` `#termfy-cli`
+- [x] Credencial `github.token` no `github.ts` `#termfy-config`
+- [x] Tools MCP `#termfy-mcp`
+- [x] Testes de command `#termfy-test`
 
 ## Tests
 
-- [ ] `install --json` em projeto vazio cria `.specsfy/` e o lock
-- [ ] Repetir `install` não altera arquivos
-- [ ] `skills remove` de skill externa ao Specsfy sai com 2
+- [x] `install --json` em projeto vazio cria `.specsfy/` e o lock
+- [x] Repetir `install` não altera arquivos
+- [x] `skills remove` de skill externa ao Specsfy sai com 2
 
 ## Notes

@@ -1,4 +1,4 @@
-/** Regressões do catálogo de especialistas. */
+/** Regressions of the specialist catalog. */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
@@ -59,7 +59,7 @@ describe("catálogo", () => {
   });
 
   test("recusa namespace externo e ciclo", () => {
-    expect(() => catalog.require("external")).toThrow("prefixo");
+    expect(() => catalog.require("external")).toThrow("prefix");
     const cyclic = Catalog.fromPayload({
       schema_version: 1,
       skills: [
@@ -78,5 +78,30 @@ describe("catálogo", () => {
       ],
     });
     expect(() => cyclic.resolve(["specsfy-specialist-a"])).toThrow("circular");
+  });
+});
+
+describe("catalog source", () => {
+  test("derives the contents API URL only for GitHub repositories", async () => {
+    const { catalogApiUrl, DEFAULT_CATALOG_URL } = await import("../../src/domain/catalog.ts");
+    expect(catalogApiUrl("https://github.com/acme/fork.git")).toBe(
+      "https://api.github.com/repos/acme/fork/contents/specialists/catalog.json?ref=main",
+    );
+    expect(catalogApiUrl("https://gitlab.com/acme/fork")).toBeUndefined();
+    expect(DEFAULT_CATALOG_URL).toContain("repos/promovaweb/specsfy/");
+  });
+
+  test("reads SPECSFY_SPECIALISTS_CATALOG without network", async () => {
+    const root = await temporaryDirectory();
+    const path = join(root, "catalog.json");
+    await writeFile(path, JSON.stringify({ schema_version: 1, skills: [{ name: "specsfy-specialist-x", description: "X", category: "t" }] }));
+    const previous = process.env.SPECSFY_SPECIALISTS_CATALOG;
+    process.env.SPECSFY_SPECIALISTS_CATALOG = path;
+    try {
+      expect((await Catalog.fetch("https://example.invalid/repo")).entries.map((e) => e.name)).toEqual(["specsfy-specialist-x"]);
+    } finally {
+      if (previous === undefined) delete process.env.SPECSFY_SPECIALISTS_CATALOG;
+      else process.env.SPECSFY_SPECIALISTS_CATALOG = previous;
+    }
   });
 });
