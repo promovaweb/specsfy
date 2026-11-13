@@ -34,8 +34,8 @@ specsfy --version
 ```
 
 O download em `get.specsfy.dev` continua disponível para instalações mantidas
-em `$HOME/.local/bin`. Esse executável inclui as dependências do CLI, mas
-também requer Node.js 22.20 ou superior:
+em `$HOME/.local/bin`. Ele entrega um lançador em Node.js que baixa e confere
+o binário da versão na primeira execução:
 
 ```bash
 mkdir -p "$HOME/.local/bin"
@@ -142,8 +142,8 @@ specsfy upgrade
 specsfy --version
 ```
 
-Na instalação pelo arquivo de `get.specsfy.dev`, repita o download e a
-permissão de execução quando o npm não gerenciar o executável. Para atualizar
+Na instalação pelo arquivo de `get.specsfy.dev`, o `specsfy upgrade` troca
+o próprio lançador pela versão nova. Para atualizar
 as skills já instaladas, execute `specsfy update`. O CLI compara os
 fingerprints e preserva os arquivos customizados:
 

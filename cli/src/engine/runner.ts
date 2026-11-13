@@ -22,7 +22,7 @@ import { copyFileSync, existsSync, linkSync, mkdirSync, readFileSync, renameSync
 import { delimiter, dirname, join } from "node:path";
 import { manifest } from "../app/manifest.ts";
 import { error } from "../app/errors.ts";
-import { baseDir } from "../config/paths.ts";
+import { baseDir, ensureBaseDir } from "../config/paths.ts";
 import { SKILL_FILES } from "./skills.gen.ts";
 
 /** Result of one script execution. */
@@ -59,6 +59,7 @@ export function skillsRuntimeDir(): string {
   const root = join(baseDir(), "runtime", `${manifest.version}-${treeDigest()}`, "skills");
   const marker = join(root, ".complete");
   if (!existsSync(marker)) {
+    ensureBaseDir();
     for (const [path, content] of Object.entries(SKILL_FILES)) {
       const target = join(root, path);
       mkdirSync(dirname(target), { recursive: true });
@@ -137,6 +138,7 @@ const POSIX_SHIM_BODY = [
 export function ensureNodeShim(): string {
   const digest = createHash("sha256").update(process.execPath).digest("hex").slice(0, 12);
   const dir = join(baseDir(), "runtime", "node-shim", digest);
+  ensureBaseDir();
   mkdirSync(dir, { recursive: true });
   if (process.platform === "win32") {
     const target = join(dir, "node.exe");

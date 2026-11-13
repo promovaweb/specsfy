@@ -38,15 +38,16 @@ releases Git.
 
 ## Instalação
 
-Requer Node.js 22.20 ou superior, npm e o comando
-[`skills`](https://github.com/vercel-labs/skills) ou `npx`.
-Enquanto o repositório for privado, autentique uma vez com `gh auth login`.
-o CLI reutiliza essa sessão. Em automações, defina `GH_TOKEN` ou
-`GITHUB_TOKEN` com acesso de leitura ao repositório.
+O CLI é um binário compilado para Linux, macOS e Windows e não depende de
+Node.js. Cada GitHub Release traz os cinco executáveis e o `SHA256SUMS`, e
+`scripts/install-cli.sh` baixa e confere o da sua plataforma. O download curto
+`get.specsfy.dev` entrega um lançador em Node.js que baixa o binário na
+primeira execução. O token do GitHub é opcional: o CLI usa a credencial
+`github.token`, `GH_TOKEN`, `GITHUB_TOKEN` ou a sessão do `gh` quando
+existem.
 
-O executável versionado está disponível pelo download oficial
-`get.specsfy.dev`. Para instalar o pacote publicado e receber atualizações
-gerenciadas pelo npm:
+Para instalar pelo npm, que baixa o binário da plataforma na primeira
+execução e recebe atualizações pelo próprio npm:
 
 ```bash
 npm install --global @promovaweb/specsfy

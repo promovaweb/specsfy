@@ -18,7 +18,8 @@ Os binários não são versionados no Git. O workflow `CLI Release`
 (`.github/workflows/cli-release.yml`) compila os cinco alvos de
 `cli/scripts/build.ts --all` (`specsfy-linux-x64`, `specsfy-linux-arm64`,
 `specsfy-darwin-x64`, `specsfy-darwin-arm64`, `specsfy-windows-x64.exe`),
-gera o `SHA256SUMS`, anexa tudo ao GitHub Release da tag e só depois publica
+gera o `SHA256SUMS` e cria o GitHub Release da tag com a seção do changelog e
+os assets já anexados, depois de o workflow `Specsfy` passar. Só então publica
 o wrapper no npm, que baixa o binário dessa release.
 
 ## 1. Classificar o estado
@@ -53,6 +54,7 @@ bun \
   --notes-file /caminho/notas.md
 cd cli
 bun install --frozen-lockfile
+bun run launcher
 bun run typecheck
 bun test
 bun run build
@@ -86,6 +88,8 @@ Incluir na entrega:
 - `cli/CHANGELOG.md`;
 - `cli/package.json`;
 - `cli/npm/package.json`;
+- `cli/bin/specsfy`, o lançador servido por `get.specsfy.dev`, regenerado por
+  `bun run launcher` com a versão nova;
 - `ebook/build.json` e os artefatos da edição atual;
 - documentação, skills e especialistas alterados pela entrega.
 
@@ -93,7 +97,7 @@ Apresentar notas e diff. Após confirmação:
 
 ```bash
 make verify-version
-git add VERSION cli/CHANGELOG.md cli/package.json cli/npm/package.json
+git add VERSION cli/CHANGELOG.md cli/package.json cli/npm/package.json cli/bin/specsfy
 git commit -m "chore(release): vX.Y.Z"
 git tag -a vX.Y.Z -m "Specsfy CLI vX.Y.Z"
 git rev-parse HEAD
@@ -104,17 +108,15 @@ Os hashes devem ser idênticos. A tag pertence ao monorepo.
 
 ## 4. Publicar e comprovar
 
-Crie o GitHub Release logo depois do push, com a seção exata do changelog. O
-workflow `CLI Release` anexa os binários ao release existente; se ele chegar
-antes, cria o release com a mesma seção, e o passo abaixo vira
-`gh release edit vX.Y.Z --notes-file /caminho/release-notes.md`.
+Não crie o GitHub Release à mão. O workflow `CLI Release` roda o workflow
+`Specsfy`, compila os binários e cria o release com a seção do changelog e os
+seis assets de uma vez (`gh release create vX.Y.Z --verify-tag` com os
+binários), para que o release mais recente nunca fique sem
+binários. Se a tag falhar antes disso, nada é publicado: corrija e publique uma
+versão nova.
 
 ```bash
 git push --atomic origin main vX.Y.Z
-gh release create vX.Y.Z \
-  --repo promovaweb/specsfy --verify-tag \
-  --title "Specsfy CLI vX.Y.Z" \
-  --notes-file /caminho/release-notes.md
 gh run watch --repo promovaweb/specsfy \
   "$(gh run list --repo promovaweb/specsfy --branch vX.Y.Z \
     --workflow "CLI Release" --limit 1 --json databaseId --jq '.[0].databaseId')"
@@ -132,7 +134,9 @@ npm view @promovaweb/specsfy@X.Y.Z version
 ```
 
 Confirmar tag remota, os seis assets (cinco binários e `SHA256SUMS`), CI e
-equivalência exata das notas. Em falha, preservar o estado e reclassificar.
+equivalência exata das notas. Se as notas divergirem, corrija com
+`gh release edit vX.Y.Z --notes-file /caminho/release-notes.md`. Em outra
+falha, preservar o estado e reclassificar.
 O job `npm` do workflow publica `@promovaweb/specsfy` a partir de `cli/npm/`
 depois que os binários estão no release. A proveniência é incluída quando o
 repositório estiver público. Nunca crie uma tag compensatória.

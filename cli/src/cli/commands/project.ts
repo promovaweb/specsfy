@@ -8,6 +8,8 @@
  * the current directory. The MCP tools in `src/mcp/tools/project.ts` call
  * the same functions.
  */
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { manifest } from "../../app/manifest.ts";
 import { ExitCode } from "../../app/exit-codes.ts";
 import { SPEC_FOLDERS } from "../../domain/lifecycle.ts";
@@ -108,10 +110,26 @@ const specsShow: Command = {
 
 export const specsReadCommands = [specsList, specsShow];
 
-/** Seconds between progress refreshes, from `tui.watchInterval`. */
-export function watchInterval(): number {
-  const value = Number(getPath(readSettings(), "tui.watchInterval"));
-  return Number.isFinite(value) && value >= 0.1 ? value : 0.75;
+/**
+ * Seconds between progress refreshes: `--interval` (previous CLI), then
+ * `watch_interval` in the project's `.specsfy/config.json` (previous CLI),
+ * then the `tui.watchInterval` setting.
+ */
+export function watchInterval(option?: string | boolean, project?: string): number {
+  const valid = (value: unknown) => {
+    const number = Number(value);
+    return Number.isFinite(number) && number >= 0.1 ? number : undefined;
+  };
+  if (typeof option === "string" && valid(option)) return valid(option)!;
+  if (project) {
+    try {
+      const payload = JSON.parse(readFileSync(join(project, ".specsfy", "config.json"), "utf8")) as { watch_interval?: unknown };
+      if (valid(payload.watch_interval)) return valid(payload.watch_interval)!;
+    } catch {
+      // No project config: fall back to the setting.
+    }
+  }
+  return valid(getPath(readSettings(), "tui.watchInterval")) ?? 0.75;
 }
 
 async function progressData(project: string, spec?: string) {
@@ -127,6 +145,7 @@ export const progressCommand: Command = {
   options: [
     { name: "--spec", argument: { name: "spec" }, description: "Only this spec (number, folder name, slug or path)." },
     { name: "--watch", description: "Refresh when spec files change, until Ctrl+C. With --json, prints one JSON line per change." },
+    { name: "--interval", argument: { name: "seconds" }, description: "Seconds between checks in --watch (previous CLI option).", hidden: true },
     projectOption,
   ],
   exitCodes: [ExitCode.NOT_FOUND, ExitCode.INTERRUPTED],
@@ -138,17 +157,31 @@ export const progressCommand: Command = {
       const data = await progressData(project, spec);
       return { data, text: () => renderOverview(data) };
     }
+    const interval = watchInterval(ctx.options.interval, project);
     let last = "";
+    let running = false;
+    // One refresh at a time; a spec removed or moved mid-read only skips this round.
     const tick = async () => {
+      if (running) return;
+      running = true;
+      try {
+        await refresh();
+      } catch (e) {
+        ctx.stderr(`progress --watch: ${e instanceof Error ? e.message : String(e)}`);
+      } finally {
+        running = false;
+      }
+    };
+    const refresh = async () => {
       const fingerprint = await specsFingerprint(project);
       if (fingerprint === last) return;
       last = fingerprint;
       const data = await progressData(project, spec);
       if (ctx.json) ctx.stdout(JSON.stringify({ ok: true, command: `${bin} progress`, data }));
-      else ctx.stdout(`\x1b[2J\x1b[H${renderOverview(data)}\n${color.dim(`watching every ${watchInterval()}s · Ctrl+C to stop`)}`);
+      else ctx.stdout(`\x1b[2J\x1b[H${renderOverview(data)}\n${color.dim(`watching every ${interval}s · Ctrl+C to stop`)}`);
     };
     await tick();
-    await new Promise<void>(() => { setInterval(() => { void tick(); }, watchInterval() * 1000); });
+    await new Promise<void>(() => { setInterval(() => { void tick(); }, interval * 1000); });
     return { data: null, text: "" };
   },
 };

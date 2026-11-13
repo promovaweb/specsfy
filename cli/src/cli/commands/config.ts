@@ -26,7 +26,8 @@ const codes = [ExitCode.CONFIG, ExitCode.PERMISSION, ExitCode.NOT_FOUND] as cons
 
 const list: Command = {
   name: "list",
-  aliases: ["ls"],
+  // `show` is the name the previous CLI used.
+  aliases: ["ls", "show"],
   description: "List every key with its effective value (file merged with defaults).",
   exitCodes: codes,
   examples: [`${manifest.bin} config list`, `${manifest.bin} config list --json`],
@@ -64,12 +65,26 @@ const set: Command = {
   name: "set",
   description: "Write a value to settings.json, converting the type according to the schema.",
   arguments: [
-    { name: "key", description: "Key in dot notation.", required: true },
-    { name: "value", description: "Value as text. Booleans accept true/false, yes/no, 1/0, on/off.", required: true },
+    { name: "key", description: "Key in dot notation." },
+    { name: "value", description: "Value as text. Booleans accept true/false, yes/no, 1/0, on/off." },
+  ],
+  options: [
+    // Previous CLI: `config set --project <dir> --watch-interval <seconds>` wrote .specsfy/config.json.
+    { name: "--watch-interval", argument: { name: "seconds" }, description: "Write watch_interval to the project's .specsfy/config.json (previous CLI form).", hidden: true },
+    { name: "--project", argument: { name: "dir" }, description: "Project of --watch-interval.", hidden: true },
   ],
   exitCodes: codes,
   examples: [`${manifest.bin} config set output.format json`, `${manifest.bin} config set output.colors false`],
-  run: (ctx) => {
+  run: async (ctx) => {
+    if (ctx.options["watch-interval"] !== undefined) {
+      const { updateConfig } = await import("../../domain/config.ts");
+      const { resolveProject } = await import("../../core/project.ts");
+      const seconds = Number(ctx.options["watch-interval"]);
+      if (!Number.isFinite(seconds)) throw error.usage("--watch-interval must be a number of seconds.");
+      const data = await updateConfig(resolveProject(ctx.options.project), seconds);
+      return { data, text: () => `${color.ok("✓")} watch_interval = ${data.watch_interval} (${data.project}/.specsfy/config.json)` };
+    }
+    if (ctx.args.length < 2) throw error.usage("Provide a key and a value: config set <key> <value>.");
     const [key, text] = ctx.args as [string, string];
     const value = convertValue(key, text);
     const settings = readSettings();

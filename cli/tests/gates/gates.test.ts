@@ -30,7 +30,9 @@ describe("gate definitions", () => {
   test("list the gates in display order, all as gates", () => {
     expect(gateDefinitions.map((def) => def.name)).toEqual(["spec", "tasks", "interface", "trace", "acceptance", "evidence", "findings", "database"]);
     expect(gateDefinitions.map((def) => def.tool)).toEqual(["gate_spec", "gate_tasks", "gate_interface", "gate_trace", "gate_acceptance", "gate_evidence", "gate_findings", "gate_database"]);
-    expect(gateDefinitions.every((def) => def.gate === true && def.effect === "read")).toBe(true);
+    expect(gateDefinitions.every((def) => def.gate === true)).toBe(true);
+    // tasks, evidence and database run code of the project, so MCP clients must not treat them as reads.
+    expect(gateDefinitions.filter((def) => def.effect === "execute").map((def) => def.name)).toEqual(["tasks", "evidence", "database"]);
     expect(gateCommands.map((command) => command.name)).toEqual(gateDefinitions.map((def) => def.name));
     expect(gateTopLevelCommands.map((command) => command.name)).toEqual(["verify"]);
   });

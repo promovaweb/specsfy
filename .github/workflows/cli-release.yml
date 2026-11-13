@@ -1,9 +1,10 @@
 name: CLI Release
 
-# On a vX.Y.Z tag: compiles the five targets of cli/scripts/build.ts --all,
-# attaches them and SHA256SUMS to the GitHub Release of the tag (creating it
-# with the CHANGELOG section when the release skill has not yet), then
-# publishes the npm wrapper in cli/npm/, which downloads those binaries.
+# On a vX.Y.Z tag: runs the framework workflow (Specsfy) first; only when it
+# passes, compiles the five targets of cli/scripts/build.ts --all, creates the
+# GitHub Release of the tag with the CHANGELOG section and the binaries plus
+# SHA256SUMS already attached (so "latest" never points to a release without
+# assets), then publishes the npm wrapper in cli/npm/, which downloads them.
 
 on:
   push:
@@ -13,7 +14,11 @@ permissions:
   contents: read
 
 jobs:
+  framework:
+    uses: ./.github/workflows/specsfy.yml
+
   binaries:
+    needs: framework
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -57,12 +62,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          if ! gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" dist/specsfy-*-* dist/SHA256SUMS --clobber
+          else
             gh release create "${GITHUB_REF_NAME}" --verify-tag \
               --title "Specsfy CLI ${GITHUB_REF_NAME}" \
-              --notes-file "${RUNNER_TEMP}/release-notes.md"
+              --notes-file "${RUNNER_TEMP}/release-notes.md" \
+              dist/specsfy-*-* dist/SHA256SUMS
           fi
-          gh release upload "${GITHUB_REF_NAME}" dist/specsfy-*-* dist/SHA256SUMS --clobber
 
   npm:
     needs: binaries

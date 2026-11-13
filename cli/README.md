@@ -36,9 +36,11 @@ binário.
 ## Instalação
 
 O executável de cada plataforma (Linux x64 e arm64, macOS x64 e arm64,
-Windows x64) é publicado em `get.specsfy.dev` e anexado a cada GitHub
-Release do repositório. Coloque o arquivo em um diretório do `PATH` e
-preserve a permissão de execução.
+Windows x64) é anexado a cada GitHub Release do repositório, com o
+`SHA256SUMS`. O script `scripts/install-cli.sh` baixa e confere o da sua
+plataforma. O download curto `get.specsfy.dev` entrega um lançador em
+Node.js, gerado de `bin/specsfy`, que baixa o binário na primeira execução e
+se troca no `specsfy upgrade`.
 
 Pelo npm, o pacote `@promovaweb/specsfy` instala um wrapper que baixa o
 binário da plataforma na primeira execução:

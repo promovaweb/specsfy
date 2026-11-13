@@ -125,8 +125,16 @@ interface InternalLock {
   [key: string]: unknown;
 }
 
-/** True for names the installer manages: framework, renamed, auxiliary, documentation and specialist skills. */
+/** Plain skill folder name: lower-case letters, digits and hyphens, never a path. */
+const SKILL_NAME = /^[a-z0-9][a-z0-9-]*$/;
+
+/**
+ * True for names the installer manages: framework, renamed, auxiliary,
+ * documentation and specialist skills. Names with path separators or `..`
+ * are rejected, so a removal can never reach outside `.agents/skills/`.
+ */
 export function isSpecsfySkillName(name: string): boolean {
+  if (!SKILL_NAME.test(name)) return false;
   return (
     (FRAMEWORK_SKILLS as readonly string[]).includes(name) ||
     name in RENAMED_BASE_SKILLS ||

@@ -24,7 +24,7 @@ import { error } from "../../app/errors.ts";
 import { getPath, readSettings } from "../../config/settings.ts";
 import { resolveProject } from "../../core/project.ts";
 import { runScript, skillsRuntimeDir, type ScriptRun } from "../../engine/runner.ts";
-import { projectOption, toCommand, type ScriptCommandDef, type ScriptParam } from "../../engine/script-command.ts";
+import { projectOption, toCommand, type ScriptCommandDef, type ScriptParam, projectFile } from "../../engine/script-command.ts";
 import type { Command } from "../registry.ts";
 
 const bin = manifest.bin;
@@ -33,6 +33,7 @@ const specParam: ScriptParam = { name: "spec", kind: "spec", description: "Spec 
 const allowDraftParam: ScriptParam = { name: "allow-draft", kind: "flag", description: "Accept a spec in Draft and do not require the gate to be Passed." };
 const attestationParam: ScriptParam = {
   name: "attestation",
+  projectPath: true,
   kind: "option",
   placeholder: "file",
   description: "Attestation JSON written by verify --attestation, relative to the project root.",
@@ -62,7 +63,7 @@ export const gateDefinitions: ScriptCommandDef[] = [
     project: "cwd",
     params: [specParam, allowDraftParam],
     json: true,
-    effect: "read",
+    effect: "execute",
     gate: true,
     examples: [`${bin} gate tasks 0001`, `${bin} gate tasks 0001 --allow-draft --json`],
   },
@@ -123,7 +124,7 @@ export const gateDefinitions: ScriptCommandDef[] = [
       attestationParam,
     ],
     json: true,
-    effect: "read",
+    effect: "execute",
     gate: true,
     examples: [`${bin} gate evidence 0001`, `${bin} gate evidence 0001 --delivery --json`, `${bin} gate evidence 0001 --task T003`],
   },
@@ -149,7 +150,7 @@ export const gateDefinitions: ScriptCommandDef[] = [
     project: "project-flag",
     params: [{ name: "command", kind: "option", placeholder: "command", description: "Command line to check before running it, e.g. \"php artisan test\"." }],
     json: true,
-    effect: "read",
+    effect: "execute",
     gate: true,
     examples: [`${bin} gate database`, `${bin} gate database --command "php artisan migrate:fresh" --json`],
   },
@@ -218,7 +219,7 @@ export async function runVerify(options: VerifyOptions): Promise<{ data: VerifyD
   const maxOutputBytes = numberOption("max-output-bytes", options.maxOutputBytes, 0);
   const argv = [project, "--boundary", boundary, "--timeout-seconds", String(timeoutSeconds), "--json"];
   if (maxOutputBytes !== undefined) argv.push("--max-output-bytes", String(maxOutputBytes));
-  if (options.attestation) argv.push("--attestation", resolve(project, options.attestation));
+  if (options.attestation) argv.push("--attestation", projectFile(project, options.attestation, "attestation"));
   if (options.selfTest) argv.push("--self-test");
   const projectSkills = existsSync(join(project, ".agents", "skills"));
   const run = await runScript(VERIFY_SCRIPT, argv, {

@@ -14,6 +14,18 @@
  */
 "use strict";
 
+/**
+ * Where this wrapper was installed: `global` (npm -g), `npx` (npm cache) or
+ * `local` (a project's node_modules). `specsfy upgrade` only runs
+ * `npm install --global` for a global install.
+ */
+function installScope() {
+  const here = __dirname.split("\\").join("/");
+  if (here.includes("/_npx/")) return "npx";
+  if (/\/lib\/node_modules\/@promovaweb\/specsfy\//.test(here) || /\/npm\/node_modules\/@promovaweb\/specsfy\//i.test(here)) return "global";
+  return "local";
+}
+
 const { spawn } = require("node:child_process");
 const crypto = require("node:crypto");
 const fs = require("node:fs");
@@ -100,7 +112,7 @@ async function main() {
   }
   const child = spawn(binary, process.argv.slice(2), {
     stdio: "inherit",
-    env: { ...process.env, SPECSFY_NPM_WRAPPER: "1" },
+    env: { ...process.env, SPECSFY_NPM_WRAPPER: "1", SPECSFY_NPM_SCOPE: installScope() },
     windowsHide: false,
   });
   // Ctrl+C already reaches the child through the terminal's process group;

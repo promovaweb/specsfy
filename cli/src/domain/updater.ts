@@ -49,7 +49,10 @@ const REQUEST_TIMEOUT_MS = 10_000;
 const DOWNLOAD_TIMEOUT_MS = 120_000;
 
 /** How the running binary was installed. */
-export type InstallationKind = "npm" | "binary" | "source";
+export type InstallationKind = "npm" | "launcher" | "binary" | "source";
+
+/** Short URL that serves `cli/bin/specsfy` of the main branch, the Node.js launcher. */
+export const LAUNCHER_URL = "https://get.specsfy.dev";
 
 /** Result of a version check. */
 export interface UpdateCheck {
@@ -98,6 +101,7 @@ export function releaseFileUrl(version: string, file: string, base = downloadBas
 
 /** Detects how the running process was installed. */
 export function installationKind(env: NodeJS.ProcessEnv = process.env, main = Bun.main): InstallationKind {
+  if (env.SPECSFY_LAUNCHER) return "launcher";
   if (env.SPECSFY_NPM_WRAPPER === "1") return "npm";
   return isCompiledBinary(main) ? "binary" : "source";
 }
@@ -112,6 +116,14 @@ export async function fetchLatestVersion(currentVersion: string, fetcher: FetchL
     });
   } catch (e) {
     throw appError.network(`could not reach GitHub Releases: ${e instanceof Error ? e.message : String(e)}`);
+  }
+  // The repository is public: a stale or revoked token must not block the check.
+  if (response.status === 401) {
+    try {
+      response = await fetcher(RELEASES_API_URL, { headers: { "User-Agent": `specsfy-cli/${currentVersion}`, Accept: "application/vnd.github+json" }, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+    } catch (e) {
+      throw appError.network(`could not reach GitHub Releases: ${e instanceof Error ? e.message : String(e)}`);
+    }
   }
   if (!response.ok) throw appError.network(`GitHub Releases answered HTTP ${response.status}`, { status: response.status });
   let payload: unknown;
@@ -182,8 +194,16 @@ export function npmUpgradeArguments(): string[] {
   return ["install", "--global", `${NPM_PACKAGE_NAME}@latest`];
 }
 
-/** Updates the npm wrapper with the npm found in PATH. */
-export async function upgradeWithNpm(): Promise<void> {
+/**
+ * Updates the npm wrapper with the npm found in PATH. Only a global install
+ * is updated in place; a project install or npx gets the command to run, so
+ * the upgrade never adds a global package the person did not have.
+ */
+export async function upgradeWithNpm(scope = process.env.SPECSFY_NPM_SCOPE ?? "global"): Promise<void> {
+  if (scope === "npx") return;
+  if (scope === "local") {
+    throw new AppError(ExitCode.USAGE, `specsfy is installed in this project: run npm install ${NPM_PACKAGE_NAME}@latest there.`);
+  }
   try {
     await execFileAsync(process.platform === "win32" ? "npm.cmd" : "npm", npmUpgradeArguments(), { encoding: "utf8", shell: process.platform === "win32" });
   } catch (e) {
@@ -263,6 +283,34 @@ export async function upgradeBinary(
   }
 }
 
+/**
+ * Replaces the Node.js launcher installed from `get.specsfy.dev` with the
+ * current one. The new launcher must declare the expected version; it
+ * downloads its own binary on the next run.
+ */
+export async function upgradeLauncher(launcherPath: string, version: string, fetcher: FetchLike = fetch, url = LAUNCHER_URL): Promise<string> {
+  const text = await (await download(url, version, fetcher)).text();
+  if (!text.includes(`const version = "${version}";`)) {
+    throw appError.network(`${url} does not serve the launcher of v${version} yet; try again after the release finishes`);
+  }
+  const target = await replacementPath(launcherPath);
+  const temporary = join(dirname(target), `.${basename(target)}.${process.pid}.tmp`);
+  try {
+    try {
+      await writeFile(temporary, text, { mode: 0o755 });
+      await chmod(temporary, 0o755);
+    } catch (e) {
+      const code = (e as NodeJS.ErrnoException).code;
+      if (code === "EACCES" || code === "EPERM") throw appError.permission(`cannot write next to ${target}; rerun with permission to replace it`);
+      throw e;
+    }
+    await rename(temporary, target);
+    return target;
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
 /** Result of `upgrade`. */
 export interface UpgradeResult {
   current: string;
@@ -292,6 +340,10 @@ export async function upgrade(
   if (kind === "npm") {
     await upgradeWithNpm();
     return { ...base, upgraded: true, method: "npm" };
+  }
+  if (kind === "launcher") {
+    const path = await upgradeLauncher(process.env.SPECSFY_LAUNCHER!, update.latest, options.fetcher);
+    return { ...base, upgraded: true, method: "launcher", path };
   }
   const path = await upgradeBinary(options.executablePath ?? process.execPath, update.latest, {
     ...(options.fetcher ? { fetcher: options.fetcher } : {}),

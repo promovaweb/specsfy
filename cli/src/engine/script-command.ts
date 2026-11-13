@@ -19,7 +19,9 @@ import { z } from "zod";
 import { ExitCode } from "../app/exit-codes.ts";
 import type { Command, Context, OptionDefinition, ArgumentDefinition, Result } from "../cli/registry.ts";
 import type { Registrar } from "../mcp/server.ts";
-import { resolveProject, resolveSpecPath } from "../core/project.ts";
+import { isInside, resolveProject, resolveSpecPath } from "../core/project.ts";
+import { resolve } from "node:path";
+import { error } from "../app/errors.ts";
 import { runScript, type ScriptRun } from "./runner.ts";
 
 /** How a parameter is passed to the script. */
@@ -40,6 +42,8 @@ export interface ScriptParam {
   join?: boolean;
   /** Placeholder shown in help for options. */
   placeholder?: string;
+  /** The value is a file path that must stay inside the project; it reaches the script resolved. */
+  projectPath?: boolean;
 }
 
 /** How the project root is handed to the script. */
@@ -69,8 +73,12 @@ export interface ScriptCommandDef {
   params: readonly ScriptParam[];
   /** The script accepts `--json`; the binary passes it to get structured data. */
   json?: boolean;
-  /** `read` never changes files; `write` changes files in the project. */
-  effect: "read" | "write";
+  /**
+   * `read` never changes files; `write` changes files in the project;
+   * `execute` runs code of the project (its own scripts, `php artisan`), so
+   * MCP clients must not auto-approve it as a read.
+   */
+  effect: "read" | "write" | "execute";
   /** A gate maps any failure to GATE_FAILED. */
   gate?: boolean;
   examples?: readonly string[];
@@ -84,6 +92,16 @@ const PROJECT_OPTION: OptionDefinition = {
 
 /** Shared `--project` option for project commands. */
 export const projectOption = PROJECT_OPTION;
+
+/**
+ * Resolves a file option against the project and refuses paths outside it,
+ * so a tool call can never make a script read or write elsewhere.
+ */
+export function projectFile(project: string, value: string, name: string): string {
+  const path = resolve(project, value);
+  if (!isInside(project, path)) throw error.usage(`--${name} must point inside the project: ${value}`);
+  return path;
+}
 
 /** Builds the argument vector of the script from resolved values. */
 async function buildArgv(def: ScriptCommandDef, project: string, values: Record<string, unknown>): Promise<string[]> {
@@ -107,7 +125,7 @@ async function buildArgv(def: ScriptCommandDef, project: string, values: Record<
         if (value === true || value === "true") flags.push(flag);
         break;
       case "option":
-        flags.push(flag, String(value));
+        flags.push(flag, param.projectPath ? projectFile(project, String(value), param.name) : String(value));
         break;
       case "list": {
         const items = Array.isArray(value) ? value.map(String) : String(value).split(",").map((x) => x.trim()).filter(Boolean);

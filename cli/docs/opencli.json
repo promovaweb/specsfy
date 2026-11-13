@@ -3,7 +3,7 @@
   "opencli": "0.1",
   "info": {
     "title": "Specsfy",
-    "version": "0.26.2",
+    "version": "0.27.0",
     "summary": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
     "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP. Without arguments it opens the TUI; \"specsfy mcp\" starts the MCP server over stdio; any other command runs as a CLI with text or --json output.",
     "contact": {
@@ -3592,7 +3592,8 @@
             "name": "list",
             "description": "List every key with its effective value (file merged with defaults).",
             "aliases": [
-              "ls"
+              "ls",
+              "show"
             ],
             "examples": [
               "specsfy config list",
@@ -3672,12 +3673,12 @@
               {
                 "name": "key",
                 "description": "Key in dot notation.",
-                "required": true
+                "required": false
               },
               {
                 "name": "value",
                 "description": "Value as text. Booleans accept true/false, yes/no, 1/0, on/off.",
-                "required": true
+                "required": false
               }
             ],
             "examples": [
