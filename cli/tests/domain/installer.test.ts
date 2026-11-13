@@ -91,7 +91,7 @@ describe("instalador", () => {
     await writeFile(command, await readFile(command, "utf8") + "\nprocess.exit(17);\n");
 
     await expect(installer.installBaseFromCheckout(source, ["specsfy-02-backlog"]))
-      .rejects.toThrow("skills CLI falhou");
+      .rejects.toThrow("skills CLI failed");
     expect(await readFile(join(project, "AGENTS.md"), "utf8")).toBe("# Regras próprias\n");
     expect(await readFile(join(project, ".specsfy/templates/custom/Spec.md"), "utf8")).toBe("customizado");
     expect(await readFile(join(project, "skills-lock.json"), "utf8")).toBe(lock);
@@ -163,7 +163,7 @@ describe("instalador", () => {
         ["specsfy-02-backlog"],
         "base",
       ),
-    ).rejects.toThrow("alterações locais");
+    ).rejects.toThrow("local changes");
     await (await SkillInstaller.create(project, true)).installFromCheckout(
       source,
       ["specsfy-02-backlog"],
@@ -236,7 +236,7 @@ describe("instalador", () => {
       await pathExists(join(project, ".agents/skills/specsfy-specialist-react")),
     ).toBe(false);
     await expect(installer.remove(["external-skill"])).rejects.toThrow(
-      "nome de skill Specsfy inválido",
+      "not a Specsfy skill name",
     );
   });
 

@@ -17,9 +17,15 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '22.20.0'
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: '1.4.4'
       - run: npm ci --ignore-scripts
       - run: npm ci --ignore-scripts
         working-directory: .ebook
+      - name: Instalar dependências do CLI para os contratos executados pelas fontes
+        run: bun install --frozen-lockfile
+        working-directory: cli
       - name: Instalar dependências de inspeção do ebook
         run: sudo apt-get install -y libxml2-utils poppler-utils
       - run: npm run validate:skills
@@ -42,48 +48,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y shellcheck
       - run: npm run test:${{ matrix.module }}
-
-  cli:
-    needs: [integrated, skills, example]
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      id-token: write
-    defaults:
-      run:
-        working-directory: cli
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: '22.20.0'
-          cache: npm
-          cache-dependency-path: cli/package-lock.json
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run check
-      - name: Validar artefato versionado
-        run: git diff --exit-code -- bin/specsfy bin/specsfy.build.json
-      - name: Validar instalação local
-        run: |
-          npm install --global --prefix "${RUNNER_TEMP}/specsfy-tools" .
-          "${RUNNER_TEMP}/specsfy-tools/bin/specsfy" --version
-      - name: Validar versão da tag
-        if: github.ref_type == 'tag'
-        run: |
-          version="$(node --print 'require("./package.json").version')"
-          test "v${version}" = "${GITHUB_REF_NAME}"
-      - name: Publicar pacote npm
-        if: github.ref_type == 'tag'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
-        run: |
-          if [ "${REPOSITORY_PRIVATE}" = "true" ]; then
-            npm publish --access public
-          else
-            npm publish --access public --provenance
-          fi
 
   example:
     runs-on: ubuntu-24.04

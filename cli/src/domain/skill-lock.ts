@@ -1,5 +1,8 @@
 /**
- * Contrato do `skills-lock.json` gerado pelo gerenciador oficial de skills.
+ * Contract of the `skills-lock.json` written by the official skills manager.
+ *
+ * Failures are `AppError`: an invalid lock is GENERIC_ERROR and running in
+ * the official Specsfy monorepo is USAGE.
  */
 
 import { stat } from "node:fs/promises";
@@ -10,22 +13,24 @@ import {
   resolvePath,
   writeTextAtomic,
 } from "./filesystem.ts";
+import { AppError, error as appError } from "../app/errors.ts";
+import { ExitCode } from "../app/exit-codes.ts";
 
 export const LOCK_FILENAME = "skills-lock.json";
 
-/** Estrutura mínima compatível com o CLI `skills`. */
+/** Minimal structure compatible with the `skills` CLI. */
 export interface SkillsLock {
   version: 1;
   skills: Record<string, unknown>;
   [key: string]: unknown;
 }
 
-/** Cria um lock vazio em memória. */
+/** Creates an empty lock in memory. */
 export function emptySkillsLock(): SkillsLock {
   return { version: 1, skills: {} };
 }
 
-/** Lê o lock ou materializa a estrutura mínima quando ele não existe. */
+/** Reads the lock or writes the minimal structure when it does not exist. */
 export async function ensureSkillsLock(project: string): Promise<SkillsLock> {
   const root = resolvePath(project);
   await assertConsumerProject(root);
@@ -36,7 +41,7 @@ export async function ensureSkillsLock(project: string): Promise<SkillsLock> {
   return readSkillsLock(root);
 }
 
-/** Lê e valida o lock oficial sem criá-lo. */
+/** Reads and validates the official lock without creating it. */
 export async function readSkillsLock(project: string): Promise<SkillsLock> {
   const root = resolvePath(project);
   const path = join(root, LOCK_FILENAME);
@@ -46,22 +51,22 @@ export async function readSkillsLock(project: string): Promise<SkillsLock> {
     payload = await readJson(path);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`lock inválido: ${path}: ${message}`);
+    throw invalidLock(`invalid lock: ${path}: ${message}`);
   }
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error(`lock inválido: ${path}`);
+    throw invalidLock(`invalid lock: ${path}`);
   }
   const lock = payload as Partial<SkillsLock>;
   if (lock.version !== 1) {
-    throw new Error(`versão de lock não suportada em ${path}`);
+    throw invalidLock(`unsupported lock version in ${path}`);
   }
   if (!lock.skills || typeof lock.skills !== "object" || Array.isArray(lock.skills)) {
-    throw new Error(`campo skills inválido em ${path}`);
+    throw invalidLock(`invalid skills field in ${path}`);
   }
   return lock as SkillsLock;
 }
 
-/** Retorna os nomes registrados no lock. */
+/** Returns the names registered in the lock. */
 export async function installedSkillNames(
   project: string,
   create = true,
@@ -72,7 +77,7 @@ export async function installedSkillNames(
   return new Set(Object.keys(payload.skills));
 }
 
-/** Retorna um fingerprint barato do lock para polling da TUI. */
+/** Returns a cheap fingerprint of the lock for TUI polling. */
 export async function skillsLockFingerprint(project: string): Promise<string> {
   const path = join(resolvePath(project), LOCK_FILENAME);
   if (!(await isFile(path))) return "missing";
@@ -84,7 +89,7 @@ export async function skillsLockFingerprint(project: string): Promise<string> {
   }
 }
 
-/** Impede instalação na raiz oficial do monorepo Specsfy. */
+/** Refuses to install in the root of the official Specsfy monorepo. */
 export async function assertConsumerProject(project: string): Promise<void> {
   const path = join(resolvePath(project), "AGENTS.md");
   if (!(await isFile(path))) return;
@@ -94,6 +99,10 @@ export async function assertConsumerProject(project: string): Promise<void> {
     content.includes("monorepo oficial do specsfy") ||
     content.includes("workspace specsfy dev")
   ) {
-    throw new Error("operação recusada no monorepo oficial do Specsfy");
+    throw appError.usage("operation refused in the official Specsfy monorepo");
   }
+}
+
+function invalidLock(message: string): AppError {
+  return new AppError(ExitCode.GENERIC_ERROR, message);
 }

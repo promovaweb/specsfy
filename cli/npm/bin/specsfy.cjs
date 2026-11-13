@@ -1,0 +1,123 @@
+#!/usr/bin/env node
+/**
+ * npm wrapper of the specsfy binary.
+ *
+ * Finds the executable of this platform for the package version in the
+ * cache, downloading it on first use from `<base>/v<version>/<asset>`
+ * (base: SPECSFY_DOWNLOAD_URL or the GitHub Releases download URL) after
+ * checking its SHA-256 against the release `SHA256SUMS`. Then it runs the
+ * binary with the same argv and stdio, sets SPECSFY_NPM_WRAPPER=1 so
+ * `specsfy upgrade` delegates to npm, forwards termination signals and exits
+ * with the child's exit code. SPECSFY_BINARY skips the download entirely.
+ *
+ * Plain Node.js CommonJS with no dependencies: it runs on any Node >= 18.
+ */
+"use strict";
+
+const { spawn } = require("node:child_process");
+const crypto = require("node:crypto");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+
+const { version } = require("../package.json");
+const DEFAULT_BASE = "https://github.com/promovaweb/specsfy/releases/download";
+const SUPPORTED = ["linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64", "windows-x64"];
+
+/** Release asset name of this platform, as built by scripts/build.ts --all. */
+function assetName(platform = process.platform, arch = process.arch) {
+  const system = platform === "win32" ? "windows" : platform;
+  const target = `${system}-${arch}`;
+  if (!SUPPORTED.includes(target)) {
+    throw new Error(`no prebuilt specsfy binary for ${target}; supported: ${SUPPORTED.join(", ")}`);
+  }
+  return `specsfy-${target}${system === "windows" ? ".exe" : ""}`;
+}
+
+/** Cache directory of the binaries, one folder per version. */
+function cacheDirectory(env = process.env) {
+  if (env.SPECSFY_CACHE_DIR) return env.SPECSFY_CACHE_DIR;
+  if (process.platform === "win32") return path.join(env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Local"), "specsfy", "cache");
+  return path.join(env.XDG_CACHE_HOME || path.join(os.homedir(), ".cache"), "specsfy");
+}
+
+/** GET with redirects, resolving to a Buffer; http and https only. */
+function get(url, redirects = 5) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith("http:") ? require("node:http") : require("node:https");
+    const request = client.get(url, { headers: { "User-Agent": `specsfy-npm/${version}` } }, (response) => {
+      const status = response.statusCode || 0;
+      if (status >= 300 && status < 400 && response.headers.location) {
+        response.resume();
+        if (redirects <= 0) return reject(new Error(`too many redirects: ${url}`));
+        return resolve(get(new URL(response.headers.location, url).toString(), redirects - 1));
+      }
+      if (status !== 200) {
+        response.resume();
+        return reject(new Error(`download failed: ${url}: HTTP ${status}`));
+      }
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("end", () => resolve(Buffer.concat(chunks)));
+      response.on("error", reject);
+    });
+    request.setTimeout(120000, () => request.destroy(new Error(`download timed out: ${url}`)));
+    request.on("error", reject);
+  });
+}
+
+/** Downloads, verifies and stores the binary; returns its path. */
+async function ensureBinary(env = process.env) {
+  if (env.SPECSFY_BINARY) return env.SPECSFY_BINARY;
+  const asset = assetName();
+  const directory = path.join(cacheDirectory(env), `v${version}`);
+  const target = path.join(directory, asset);
+  if (fs.existsSync(target)) return target;
+  const base = (env.SPECSFY_DOWNLOAD_URL || DEFAULT_BASE).replace(/\/+$/, "");
+  process.stderr.write(`specsfy: downloading ${asset} v${version}...\n`);
+  const sums = (await get(`${base}/v${version}/SHA256SUMS`)).toString("utf8");
+  const line = sums.split(/\r?\n/).map((item) => /^([0-9a-f]{64})\s+\*?(.+)$/i.exec(item.trim())).find((match) => match && match[2].trim() === asset);
+  if (!line) throw new Error(`SHA256SUMS of v${version} does not list ${asset}`);
+  const bytes = await get(`${base}/v${version}/${asset}`);
+  const digest = crypto.createHash("sha256").update(bytes).digest("hex");
+  if (digest !== line[1].toLowerCase()) throw new Error(`checksum mismatch for ${asset}: expected ${line[1]}, got ${digest}`);
+  fs.mkdirSync(directory, { recursive: true });
+  const temporary = path.join(directory, `.${asset}.${process.pid}.tmp`);
+  fs.writeFileSync(temporary, bytes, { mode: 0o755 });
+  fs.chmodSync(temporary, 0o755);
+  fs.renameSync(temporary, target);
+  return target;
+}
+
+/** Runs the binary with this process' argv and stdio and mirrors its exit. */
+async function main() {
+  let binary;
+  try {
+    binary = await ensureBinary();
+  } catch (error) {
+    process.stderr.write(`specsfy: ${error.message}\n`);
+    process.exit(5);
+  }
+  const child = spawn(binary, process.argv.slice(2), {
+    stdio: "inherit",
+    env: { ...process.env, SPECSFY_NPM_WRAPPER: "1" },
+    windowsHide: false,
+  });
+  // Ctrl+C already reaches the child through the terminal's process group;
+  // the wrapper only stays alive until the child decides how to exit.
+  process.on("SIGINT", () => {});
+  const forward = (signal) => () => { if (!child.killed) child.kill(signal); };
+  for (const signal of ["SIGTERM", "SIGHUP"]) process.on(signal, forward(signal));
+  child.on("error", (error) => {
+    process.stderr.write(`specsfy: cannot run ${binary}: ${error.message}\n`);
+    process.exit(1);
+  });
+  child.on("exit", (code, signal) => {
+    if (signal) process.exit(signal === "SIGINT" ? 130 : 1);
+    process.exit(code === null ? 1 : code);
+  });
+}
+
+if (require.main === module) void main();
+
+module.exports = { assetName, cacheDirectory, ensureBinary };

@@ -1,5 +1,11 @@
 #!/usr/bin/env node
-/** Confere VERSION e todas as projeções publicáveis sem executar os artefatos. */
+/**
+ * Confere VERSION e todas as projeções publicáveis sem executar os artefatos.
+ *
+ * O CLI compilado em Bun lê a versão de cli/package.json (embutida no binário
+ * no build) e o wrapper npm publica cli/npm/package.json; os dois precisam
+ * repetir VERSION, assim como o ebook.
+ */
 import { readFileSync, statSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,16 +18,10 @@ export function checkVersionAlignment(root) {
   if (!/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(expected)) {
     throw new Error('VERSION não contém uma versão SemVer estável');
   }
-  const match = read('cli/src/version.ts').match(/export const VERSION = "([^"]+)";/);
-  if (!match) throw new Error('cli/src/version.ts não declara VERSION');
-  const lock = json('cli/package-lock.json');
   const ebook = json('ebook/build.json');
   const versions = {
     'cli/package.json': json('cli/package.json').version,
-    'cli/package-lock.json': lock.version,
-    'cli/package-lock.json#packages[empty]': lock.packages?.['']?.version,
-    'cli/src/version.ts': match[1],
-    'cli/bin/specsfy.build.json': json('cli/bin/specsfy.build.json').version,
+    'cli/npm/package.json': json('cli/npm/package.json').version,
     'ebook/build.json': ebook.version,
     'ebook/build.json#edition': ebook.edition,
   };

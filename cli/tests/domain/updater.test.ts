@@ -1,330 +1,125 @@
-/** Regressões da consulta, do cache e da atualização pelo npm. */
-import {
-  lstat,
-  mkdir,
-  readFile,
-  stat,
-  symlink,
-  writeFile,
-} from "node:fs/promises";
+/** Regressions of the release check, the daily cache and the binary swap. */
+import { createHash } from "node:crypto";
+import { chmod, readFile, stat, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { describe, expect, test, mock } from "bun:test";
+import { describe, expect, test } from "bun:test";
+import { AppError } from "../../src/app/errors.ts";
+import { ExitCode } from "../../src/app/exit-codes.ts";
 import {
+  assetName,
   checkForUpdate,
-  clearStartupUpdateDeferral,
-  deferStartupUpdate,
-  ensureGlobalConfig,
-  EXECUTABLE_DOWNLOAD_URL,
-  NPM_REGISTRY_URL,
+  compareVersions,
+  dailyUpdateCheck,
+  DEFAULT_DOWNLOAD_BASE_URL,
+  downloadBaseUrl,
+  installationKind,
   npmUpgradeArguments,
-  offerStartupUpdate,
-  standaloneExecutablePath,
-  upgradeWithExecutable,
+  parseChecksums,
+  RELEASES_API_URL,
+  releaseFileUrl,
+  upgrade,
+  upgradeBinary,
+  type FetchLike,
 } from "../../src/domain/updater.ts";
 import { temporaryDirectory } from "./helpers.ts";
 
-describe("atualizador", () => {
-  test("cria cache privado e mantém as configurações padrão", async () => {
-    const root = await temporaryDirectory();
-    const path = join(root, ".specsfy/cli.json");
+const latestRelease = (tag: string): FetchLike => async (url) => {
+  expect(String(url)).toBe(RELEASES_API_URL);
+  return Response.json({ tag_name: tag });
+};
 
-    const payload = await ensureGlobalConfig(path);
-
-    expect(payload.schema_version).toBe(1);
-    expect(payload.settings).toMatchObject({
-      check_updates_on_startup: true,
-      check_interval_seconds: 86400,
-    });
-    expect((await stat(path)).mode & 0o777).toBe(0o600);
+describe("updater", () => {
+  test("compares versions and names the asset of each platform", () => {
+    expect(compareVersions("0.27.0", "0.26.9")).toBeGreaterThan(0);
+    expect(compareVersions("v1.0.0", "1.0.0")).toBe(0);
+    expect(assetName("linux", "x64")).toBe("specsfy-linux-x64");
+    expect(assetName("darwin", "arm64")).toBe("specsfy-darwin-arm64");
+    expect(assetName("win32", "x64")).toBe("specsfy-windows-x64.exe");
+    expect(() => assetName("freebsd", "x64")).toThrow(AppError);
   });
 
-  test("seleciona a maior tag estável e armazena ETag e commit", async () => {
+  test("builds release URLs from GitHub or SPECSFY_DOWNLOAD_URL", () => {
+    expect(downloadBaseUrl({})).toBe(DEFAULT_DOWNLOAD_BASE_URL);
+    expect(downloadBaseUrl({ SPECSFY_DOWNLOAD_URL: "https://get.specsfy.dev/" })).toBe("https://get.specsfy.dev");
+    expect(releaseFileUrl("1.2.3", "SHA256SUMS", "https://get.specsfy.dev")).toBe("https://get.specsfy.dev/v1.2.3/SHA256SUMS");
+  });
+
+  test("detects npm wrapper, compiled binary and source runs", () => {
+    expect(installationKind({ SPECSFY_NPM_WRAPPER: "1" }, "/$bunfs/root/specsfy")).toBe("npm");
+    expect(installationKind({}, "/$bunfs/root/specsfy")).toBe("binary");
+    expect(installationKind({}, "/repo/cli/src/main.ts")).toBe("source");
+    expect(npmUpgradeArguments()).toEqual(["install", "--global", "@promovaweb/specsfy@latest"]);
+  });
+
+  test("upgrade --check returns latest without changing anything", async () => {
+    expect(await upgrade("0.26.2", { check: true, fetcher: latestRelease("v0.27.0") })).toEqual({ current: "0.26.2", latest: "0.27.0", upgraded: false });
+    expect(await checkForUpdate("0.27.0", latestRelease("v0.27.0"))).toEqual({ current: "0.27.0", latest: "0.27.0", available: false });
+  });
+
+  test("network failures are NETWORK_OR_API", async () => {
+    const offline: FetchLike = async () => { throw new TypeError("fetch failed"); };
+    await expect(upgrade("0.26.2", { check: true, fetcher: offline })).rejects.toMatchObject({ code: ExitCode.NETWORK_OR_API });
+    const missing: FetchLike = async () => new Response("{}", { status: 404 });
+    await expect(checkForUpdate("0.26.2", missing)).rejects.toMatchObject({ code: ExitCode.NETWORK_OR_API });
+  });
+
+  test("an up-to-date installation is not upgraded; source runs refuse", async () => {
+    expect(await upgrade("0.27.0", { fetcher: latestRelease("v0.27.0"), kind: "binary" })).toMatchObject({ upgraded: false });
+    await expect(upgrade("0.26.0", { fetcher: latestRelease("v0.27.0"), kind: "source" })).rejects.toMatchObject({ code: ExitCode.USAGE });
+  });
+
+  test("the daily check is cached, disabled by the setting and never throws", async () => {
     const root = await temporaryDirectory();
-    const path = join(root, ".specsfy/cli.json");
-    const fetcher = mock(async (url: string | URL | Request | URL) =>
-      url === NPM_REGISTRY_URL
-        ? new Response(JSON.stringify({ version: "0.8.0" }), {
-            status: 200,
-          })
-        : new Response(
-            JSON.stringify([
-              { name: "v0.7.0", commit: { sha: "7".repeat(40) } },
-              { name: "v0.8.0", commit: { sha: "8".repeat(40) } },
-              { name: "v0.9.0-beta.1", commit: { sha: "9".repeat(40) } },
-            ]),
-            { status: 200, headers: { etag: '"tags-v1"' } },
-          ),
-    );
+    const cachePath = join(root, "update.json");
+    let calls = 0;
+    const fetcher: FetchLike = async () => { calls += 1; return Response.json({ tag_name: "v0.30.0" }); };
+    expect(await dailyUpdateCheck("0.26.2", { enabled: false, fetcher, cachePath })).toBeUndefined();
+    expect(await dailyUpdateCheck("0.26.2", { enabled: true, fetcher, cachePath, now: 1000 })).toEqual({ current: "0.26.2", latest: "0.30.0", available: true });
+    expect(await dailyUpdateCheck("0.26.2", { enabled: true, fetcher, cachePath, now: 2000 })).toMatchObject({ latest: "0.30.0" });
+    expect(calls).toBe(1);
+    expect((await stat(cachePath)).mode & 0o777).toBe(0o600);
+    const offline: FetchLike = async () => { throw new Error("offline"); };
+    expect(await dailyUpdateCheck("0.26.2", { enabled: true, fetcher: offline, cachePath, now: 1000 + 90_000 })).toMatchObject({ latest: "0.30.0" });
+    expect(await dailyUpdateCheck("0.26.2", { enabled: true, fetcher: offline, cachePath: join(root, "none.json") })).toBeUndefined();
+  });
 
-    const update = await checkForUpdate("0.6.0", {
-      cachePath: path,
-      now: 1000,
-      fetcher,
-    });
-
-    expect(update).toEqual({
-      current_version: "0.6.0",
-      latest_version: "0.8.0",
-      tag: "v0.8.0",
-      commit_sha: "8".repeat(40),
-    });
-    const payload = JSON.parse(await readFile(path, "utf8")) as {
-      cache: Record<string, unknown>;
+  test("swaps the binary after checking SHA256SUMS and --version, through a symlink", async () => {
+    const root = await temporaryDirectory();
+    const real = join(root, "specsfy-real");
+    const link = join(root, "specsfy");
+    await writeFile(real, "#!/bin/sh\necho 'specsfy 0.26.2'\n");
+    await chmod(real, 0o755);
+    await symlink(real, link);
+    const binary = Buffer.from("#!/bin/sh\necho 'specsfy 0.27.0'\n");
+    const asset = assetName("linux", "x64");
+    const sums = `${createHash("sha256").update(binary).digest("hex")}  ${asset}\n`;
+    const fetcher: FetchLike = async (url) => {
+      const text = String(url);
+      if (text.endsWith("/v0.27.0/SHA256SUMS")) return new Response(sums);
+      if (text.endsWith(`/v0.27.0/${asset}`)) return new Response(binary);
+      return new Response("", { status: 404 });
     };
-    expect(payload.cache.etag).toBe('"tags-v1"');
+    const target = await upgradeBinary(link, "0.27.0", { fetcher, base: "https://mirror.test", platform: "linux", arch: "x64" });
+    expect(target).toBe(real);
+    expect(await readFile(real, "utf8")).toContain("0.27.0");
+    expect((await stat(real)).mode & 0o111).not.toBe(0);
   });
 
-  test("reutiliza cache recente e preserva chaves desconhecidas", async () => {
+  test("refuses a binary whose checksum does not match", async () => {
     const root = await temporaryDirectory();
-    const path = join(root, "cli.json");
-    await writeFile(
-      path,
-      JSON.stringify({
-        schema_version: 1,
-        settings: {
-          check_updates_on_startup: true,
-          check_interval_seconds: 86400,
-          custom: "preservar",
-        },
-        cache: {
-          last_checked_at: 900,
-          latest_version: "0.7.0",
-          latest_distribution_version: "0.7.0",
-          latest_tag: "v0.7.0",
-          latest_commit: "7".repeat(40),
-        },
-      }),
-    );
-    const fetcher = mock();
-
-    expect(
-      await checkForUpdate("0.6.0", {
-        cachePath: path,
-        now: 1000,
-        fetcher,
-      }),
-    ).toMatchObject({ latest_version: "0.7.0" });
-    expect(fetcher).not.toHaveBeenCalled();
-    expect(await readFile(path, "utf8")).toContain("preservar");
+    const path = join(root, "specsfy");
+    await writeFile(path, "old");
+    const asset = assetName("linux", "x64");
+    const fetcher: FetchLike = async (url) =>
+      String(url).endsWith("SHA256SUMS") ? new Response(`${"0".repeat(64)}  ${asset}\n`) : new Response("tampered");
+    await expect(upgradeBinary(path, "0.27.0", { fetcher, base: "https://mirror.test", platform: "linux", arch: "x64" })).rejects.toMatchObject({ code: ExitCode.NETWORK_OR_API });
+    expect(await readFile(path, "utf8")).toBe("old");
   });
 
-  test("não repete o aviso depois de adiar a mesma versão", async () => {
-    const root = await temporaryDirectory();
-    const path = join(root, "cli.json");
-    const fetcher = mock(async (url: string | URL | Request | URL) =>
-      url === NPM_REGISTRY_URL
-        ? new Response(JSON.stringify({ version: "0.9.0" }), { status: 200 })
-        : new Response(
-            JSON.stringify([
-              { name: "v0.9.0", commit: { sha: "9".repeat(40) } },
-            ]),
-            { status: 200 },
-          ),
-    );
-
-    const update = await checkForUpdate("0.8.0", {
-      cachePath: path,
-      now: 1_000,
-      fetcher,
+  test("parses sha256sum output, including binary mode markers", () => {
+    expect(parseChecksums(`${"a".repeat(64)}  specsfy-linux-x64\n${"b".repeat(64)} *specsfy-windows-x64.exe\n`)).toEqual({
+      "specsfy-linux-x64": "a".repeat(64),
+      "specsfy-windows-x64.exe": "b".repeat(64),
     });
-    expect(update?.latest_version).toBe("0.9.0");
-
-    await deferStartupUpdate("0.9.0", { cachePath: path, now: 1_001 });
-    expect(
-      await checkForUpdate("0.8.0", {
-        cachePath: path,
-        now: 1_002,
-        fetcher,
-      }),
-    ).toBeUndefined();
-    expect(
-      await checkForUpdate("0.8.0", {
-        cachePath: path,
-        now: 1_002,
-        force: true,
-        fetcher,
-      }),
-    ).toMatchObject({ latest_version: "0.9.0" });
-    expect(
-      await checkForUpdate("0.8.0", {
-        cachePath: path,
-        now: 87_402,
-        fetcher,
-      }),
-    ).toMatchObject({ latest_version: "0.9.0" });
-
-    await clearStartupUpdateDeferral(path);
-    const cache = JSON.parse(await readFile(path, "utf8")) as {
-      cache: Record<string, unknown>;
-    };
-    expect(cache.cache).not.toHaveProperty("startup_snoozed_version");
-  });
-
-  test("a oferta de inicialização pergunta uma vez e depois abre normalmente", async () => {
-    const root = await temporaryDirectory();
-    const path = join(root, "cli.json");
-    const fetcher = mock(async (url: string | URL | Request | URL) =>
-      url === NPM_REGISTRY_URL
-        ? new Response(JSON.stringify({ version: "0.9.0" }), { status: 200 })
-        : new Response(
-            JSON.stringify([
-              { name: "v0.9.0", commit: { sha: "9".repeat(40) } },
-            ]),
-            { status: 200 },
-          ),
-    );
-    const inputDescriptor = Object.getOwnPropertyDescriptor(
-      process.stdin,
-      "isTTY",
-    );
-    const outputDescriptor = Object.getOwnPropertyDescriptor(
-      process.stdout,
-      "isTTY",
-    );
-    Object.defineProperty(process.stdin, "isTTY", {
-      configurable: true,
-      value: true,
-    });
-    Object.defineProperty(process.stdout, "isTTY", {
-      configurable: true,
-      value: true,
-    });
-    try {
-      const ask = mock(async () => "n");
-      const output = mock();
-      expect(
-        await offerStartupUpdate("0.8.0", ask, output, {
-          cachePath: path,
-          now: 1_000,
-          fetcher,
-        }),
-      ).toBe(false);
-      expect(
-        await offerStartupUpdate("0.8.0", ask, output, {
-          cachePath: path,
-          now: 1_001,
-          fetcher,
-        }),
-      ).toBe(false);
-      expect(ask).toHaveBeenCalledOnce();
-      expect(output).toHaveBeenCalledWith(
-        "Atualização adiada. Abrindo a aplicação normalmente.",
-      );
-    } finally {
-      if (inputDescriptor) {
-        Object.defineProperty(process.stdin, "isTTY", inputDescriptor);
-      } else {
-        delete (process.stdin as { isTTY?: boolean }).isTTY;
-      }
-      if (outputDescriptor) {
-        Object.defineProperty(process.stdout, "isTTY", outputDescriptor);
-      } else {
-        delete (process.stdout as { isTTY?: boolean }).isTTY;
-      }
-    }
-  });
-
-  test("usa o pacote npm oficial no upgrade", () => {
-    expect(npmUpgradeArguments()).toEqual([
-      "install",
-      "--global",
-      "@promovaweb/specsfy@latest",
-    ]);
-  });
-
-  test("reconhece executável avulso pela entrada sem extensão", () => {
-    expect(standaloneExecutablePath(["node", "/usr/local/bin/specsfy"])).toBe(
-      "/usr/local/bin/specsfy",
-    );
-    expect(standaloneExecutablePath(["node", "/usr/local/bin/specsfy.cjs"])).toBe(
-      undefined,
-    );
-  });
-
-  test("substitui o executável avulso somente após validar a versão baixada", async () => {
-    const root = await temporaryDirectory();
-    const executable = join(root, "specsfy");
-    const downloaded = Buffer.from(
-      "#!/usr/bin/env node\n" +
-        'if (process.argv[2] === "--version") console.log("0.9.0");\n',
-    );
-    const fetcher = mock(async (url: string | URL | Request | URL) => {
-      expect(url).toBe(EXECUTABLE_DOWNLOAD_URL);
-      return new Response(downloaded, { status: 200 });
-    });
-
-    await upgradeWithExecutable(executable, "0.9.0", fetcher);
-
-    expect(await readFile(executable)).toEqual(downloaded);
-    expect(fetcher).toHaveBeenCalledOnce();
-  });
-
-  test("atualiza o arquivo apontado sem remover o symlink do executável", async () => {
-    const root = await temporaryDirectory();
-    const target = join(root, "releases/specsfy");
-    const link = join(root, "bin/specsfy");
-    await mkdir(join(root, "releases"), { recursive: true });
-    await mkdir(join(root, "bin"), { recursive: true });
-    await writeFile(target, "#!/usr/bin/env node\nconsole.log(\"0.8.0\")\n", {
-      mode: 0o755,
-    });
-    await symlink(target, link);
-    const downloaded = Buffer.from(
-      "#!/usr/bin/env node\n" +
-        'if (process.argv[2] === "--version") console.log("0.9.0");\n',
-    );
-
-    await upgradeWithExecutable(
-      link,
-      "0.9.0",
-      async () => new Response(downloaded, { status: 200 }),
-    );
-
-    expect((await lstat(link)).isSymbolicLink()).toBe(true);
-    expect(await readFile(target)).toEqual(downloaded);
-  });
-
-  test("não oferece downgrade quando a versão local é mais recente", async () => {
-    const root = await temporaryDirectory();
-    const fetcher = mock(async (url: string | URL | Request | URL) =>
-      url === NPM_REGISTRY_URL
-        ? new Response(JSON.stringify({ version: "0.8.0" }), { status: 200 })
-        : new Response(
-            JSON.stringify([
-              { name: "v0.8.0", commit: { sha: "8".repeat(40) } },
-            ]),
-            { status: 200 },
-          ),
-    );
-
-    expect(
-      await checkForUpdate("0.8.1", {
-        cachePath: join(root, "cli.json"),
-        force: true,
-        fetcher,
-      }),
-    ).toBeUndefined();
-  });
-
-  test("ignora tag não publicada para não repetir o aviso de atualização", async () => {
-    const root = await temporaryDirectory();
-    const fetcher = mock(async (url: string | URL | Request | URL) =>
-      url === NPM_REGISTRY_URL
-        ? new Response(JSON.stringify({ version: "0.8.1" }), { status: 200 })
-        : new Response(
-            JSON.stringify([
-              { name: "v0.9.0", commit: { sha: "9".repeat(40) } },
-            ]),
-            { status: 200 },
-          ),
-    );
-
-    expect(
-      await checkForUpdate("0.8.1", {
-        cachePath: join(root, "cli.json"),
-        force: true,
-        fetcher,
-      }),
-    ).toBeUndefined();
   });
 });

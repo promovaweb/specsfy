@@ -1,6 +1,6 @@
 # 0011 Distribuição
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -31,13 +31,13 @@ adaptado ao binário.
 
 ## Tasks
 
-- [ ] `upgrade` para o binário `#termfy-release`
-- [ ] Workflow de release com os cinco alvos `#termfy-release`
-- [ ] Wrapper npm `#termfy-release`
-- [ ] `install-cli.sh` `#termfy-release`
+- [x] `upgrade` para o binário `#termfy-release`
+- [x] Workflow de release com os cinco alvos `#termfy-release`
+- [x] Wrapper npm `#termfy-release`
+- [x] `install-cli.sh` `#termfy-release`
 
 ## Tests
 
-- [ ] `upgrade --check --json` com fetch simulado devolve `latest`
+- [x] `upgrade --check --json` com fetch simulado devolve `latest`
 
 ## Notes

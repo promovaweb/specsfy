@@ -1,4 +1,4 @@
-/** Regressões do lock e da proteção de conteúdo gerenciado. */
+/** Regressions of the lock and of the managed-content protection. */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
@@ -9,8 +9,8 @@ import {
 } from "../../src/domain/skill-lock.ts";
 import { temporaryDirectory } from "./helpers.ts";
 
-describe("lock de skills", () => {
-  test("cria o lock oficial mínimo e lista nomes", async () => {
+describe("skills lock", () => {
+  test("creates the minimal official lock and lists names", async () => {
     const project = await temporaryDirectory();
     await ensureSkillsLock(project);
     const payload = JSON.parse(
@@ -26,16 +26,16 @@ describe("lock de skills", () => {
     );
   });
 
-  test("recusa lock inválido", async () => {
+  test("refuses an invalid lock", async () => {
     const project = await temporaryDirectory();
     await writeFile(
       join(project, "skills-lock.json"),
       JSON.stringify({ version: 2, skills: {} }),
     );
-    await expect(readSkillsLock(project)).rejects.toThrow("não suportada");
+    await expect(readSkillsLock(project)).rejects.toThrow("unsupported");
   });
 
-  test("recusa a raiz oficial", async () => {
+  test("refuses the official root", async () => {
     const project = await temporaryDirectory();
     await mkdir(project, { recursive: true });
     await writeFile(
@@ -43,7 +43,7 @@ describe("lock de skills", () => {
       "Este é o monorepo oficial do Specsfy.",
     );
     await expect(ensureSkillsLock(project)).rejects.toThrow(
-      "operação recusada",
+      "operation refused",
     );
   });
 });

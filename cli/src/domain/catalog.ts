@@ -1,17 +1,35 @@
 /**
- * Catálogo de especialistas e detecção de tecnologias do projeto.
+ * Specialist catalog and detection of the project's technologies.
+ *
+ * The catalog is `specialists/catalog.json` of the framework repository
+ * (setting `catalog.repository`). For GitHub repositories it is read through
+ * the contents API with the token of `github.ts`; for any other Git URL it
+ * comes from a shallow clone. `SPECSFY_SPECIALISTS_CATALOG` points to a local
+ * file and skips the network. Failures are `AppError` with the exit code of
+ * their family (USAGE, NOT_FOUND, CREDENTIALS, NETWORK_OR_API).
  */
 
-import { spawnSync } from "node:child_process";
-import { readdir, readFile } from "node:fs/promises";
+import { execFile, spawnSync } from "node:child_process";
+import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { promisify } from "node:util";
+import { AppError, error as appError } from "../app/errors.ts";
+import { ExitCode } from "../app/exit-codes.ts";
 import { apiHeaders } from "./github.ts";
 import { isFile, pathExists, resolvePath } from "./filesystem.ts";
 
-export const DEFAULT_CATALOG_URL =
-  "https://api.github.com/repos/promovaweb/specsfy/contents/specialists/catalog.json?ref=main";
+const execFileAsync = promisify(execFile);
 
-/** Entrada normalizada do catálogo de especialistas. */
+/** Default framework repository, same as the `catalog.repository` setting default. */
+export const DEFAULT_REPOSITORY = "https://github.com/promovaweb/specsfy";
+
+/** Path of the catalog inside the framework repository. */
+export const CATALOG_PATH = "specialists/catalog.json";
+
+export const DEFAULT_CATALOG_URL = catalogApiUrl(DEFAULT_REPOSITORY)!;
+
+/** Normalized entry of the specialist catalog. */
 export interface CatalogEntryValue {
   name: string;
   description: string;
@@ -34,7 +52,17 @@ interface CatalogPayload {
   }>;
 }
 
-/** Catálogo validado com resolução de dependências entre especialistas. */
+/**
+ * GitHub contents API URL of the catalog for a GitHub repository URL
+ * (`https://github.com/<owner>/<repo>[.git]`), or undefined for other hosts.
+ */
+export function catalogApiUrl(repository: string): string | undefined {
+  const match = /^https:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/.exec(repository.trim());
+  if (!match) return undefined;
+  return `https://api.github.com/repos/${match[1]}/${match[2]}/contents/${CATALOG_PATH}?ref=main`;
+}
+
+/** Validated catalog with dependency resolution between specialists. */
 export class Catalog {
   readonly entries: CatalogEntryValue[];
   readonly #byName: Map<string, CatalogEntryValue>;
@@ -46,7 +74,7 @@ export class Catalog {
     this.#byName = new Map(entries.map((entry) => [entry.name, entry]));
   }
 
-  /** Constrói o catálogo a partir do schema JSON público. */
+  /** Builds the catalog from the public JSON schema. */
   static fromPayload(payload: unknown): Catalog {
     if (
       !payload ||
@@ -54,7 +82,7 @@ export class Catalog {
       (payload as Partial<CatalogPayload>).schema_version !== 1 ||
       !Array.isArray((payload as Partial<CatalogPayload>).skills)
     ) {
-      throw new Error("versão de catálogo não suportada");
+      throw new AppError(ExitCode.NETWORK_OR_API, "unsupported catalog version");
     }
     const source = payload as CatalogPayload;
     return new Catalog(
@@ -70,47 +98,78 @@ export class Catalog {
     );
   }
 
-  /** Lê o catálogo de um arquivo local. */
+  /** Reads the catalog from a local file. */
   static async fromPath(path: string): Promise<Catalog> {
-    return Catalog.fromPayload(JSON.parse(await readFile(resolvePath(path), "utf8")));
+    let text: string;
+    try {
+      text = await readFile(resolvePath(path), "utf8");
+    } catch {
+      throw appError.notFound(`catalog file not found: ${path}`);
+    }
+    return Catalog.fromPayload(JSON.parse(text));
   }
 
-  /** Obtém o catálogo remoto ou usa o override de ambiente. */
-  static async fetch(url = DEFAULT_CATALOG_URL): Promise<Catalog> {
+  /**
+   * Fetches the catalog of a framework repository, or reads the file named
+   * by SPECSFY_SPECIALISTS_CATALOG.
+   */
+  static async fetch(repository = DEFAULT_REPOSITORY): Promise<Catalog> {
     const override = process.env.SPECSFY_SPECIALISTS_CATALOG;
     if (override) return Catalog.fromPath(override);
-    const response = await fetch(url, {
-      headers: await apiHeaders(
-        "specsfy-cli",
-        "application/vnd.github.raw+json",
-      ),
-      signal: AbortSignal.timeout(20_000),
-    });
+    const url = catalogApiUrl(repository);
+    if (!url) return Catalog.fromClone(repository);
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        headers: await apiHeaders("specsfy-cli", "application/vnd.github.raw+json"),
+        signal: AbortSignal.timeout(20_000),
+      });
+    } catch (e) {
+      throw appError.network(`could not reach the specialist catalog: ${e instanceof Error ? e.message : String(e)}`);
+    }
     if (!response.ok) {
       if ([401, 403, 404].includes(response.status)) {
-        throw new Error(
-          "catálogo de especialistas indisponível; autentique o GitHub " +
-            "com `gh auth login` ou defina GH_TOKEN",
+        throw appError.credentials(
+          "specialist catalog unavailable; save a GitHub token with " +
+            "`specsfy credentials set github.token`, set GH_TOKEN or run `gh auth login`",
+          { status: response.status },
         );
       }
-      throw new Error(`falha ao consultar catálogo: HTTP ${response.status}`);
+      throw appError.network(`catalog request failed: HTTP ${response.status}`, { status: response.status });
     }
     return Catalog.fromPayload((await response.json()) as unknown);
   }
 
-  /** Exige uma skill existente com o namespace de especialistas. */
+  /** Reads the catalog from a shallow clone of a non-GitHub repository. */
+  static async fromClone(repository: string): Promise<Catalog> {
+    const temporary = await mkdtemp(join(tmpdir(), "specsfy-catalog-"));
+    try {
+      try {
+        await execFileAsync("git", ["clone", "--depth", "1", repository, join(temporary, "checkout")]);
+      } catch (e) {
+        const detail = String((e as { stderr?: unknown }).stderr ?? "").trim();
+        throw appError.network(`could not clone ${repository}${detail ? `: ${detail}` : ""}`);
+      }
+      return await Catalog.fromPath(join(temporary, "checkout", CATALOG_PATH));
+    } finally {
+      await rm(temporary, { recursive: true, force: true });
+    }
+  }
+
+  /** Requires an existing skill in the specialist namespace. */
   require(name: string): CatalogEntryValue {
     if (!name.startsWith("specsfy-specialist-")) {
-      throw new Error(
-        "a skill especialista deve usar o prefixo specsfy-specialist-",
+      throw appError.usage(
+        `specialist skills must use the specsfy-specialist- prefix: ${name}`,
+        { name },
       );
     }
     const entry = this.#byName.get(name);
-    if (!entry) throw new Error(`skill não encontrada no catálogo: ${name}`);
+    if (!entry) throw appError.notFound(`skill not found in the catalog: ${name}`, { name });
     return entry;
   }
 
-  /** Resolve requisitos em ordem topológica e rejeita ciclos. */
+  /** Resolves requirements in topological order and rejects cycles. */
   resolve(names: string[]): CatalogEntryValue[] {
     const resolved: CatalogEntryValue[] = [];
     const completed = new Set<string>();
@@ -118,7 +177,7 @@ export class Catalog {
     const visit = (name: string): void => {
       if (completed.has(name)) return;
       if (active.has(name)) {
-        throw new Error(`dependência circular entre especialistas: ${name}`);
+        throw new AppError(ExitCode.GENERIC_ERROR, `circular dependency between specialists: ${name}`);
       }
       const entry = this.require(name);
       active.add(name);
@@ -131,7 +190,7 @@ export class Catalog {
     return resolved;
   }
 
-  /** Detecta tecnologias na raiz e nos subprojetos, respeitando exclusões Git. */
+  /** Detects technologies at the root and in subprojects, honoring Git ignores. */
   async detect(project: string): Promise<CatalogEntryValue[]> {
     const root = resolvePath(project);
     const roots = await detectionRoots(root);
@@ -179,7 +238,7 @@ async function readDependencies(project: string): Promise<Set<string>> {
   return dependencies;
 }
 
-/** Visita subprojetos sem seguir symlinks, instalações de skills ou dependências. */
+/** Visits subprojects without following symlinks, skill installs or dependencies. */
 async function detectionRoots(project: string): Promise<string[]> {
   const roots: string[] = [project];
   const ignored = new Set([".git", ".agents", ".claude", ".specify", ".venv", "venv", "node_modules", "vendor", "dist", "build", "coverage", "__pycache__"]);

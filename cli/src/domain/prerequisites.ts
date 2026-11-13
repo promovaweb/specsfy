@@ -1,125 +1,151 @@
-/** Diagnóstico compartilhado pelos fluxos de setup, update e upgrade. */
+/**
+ * Prerequisites shared by install, update, skills and doctor --project.
+ *
+ * The binary runs without Node.js. Node only mattered to the old CLI because
+ * skills were materialized with `npx skills`. Now the skills CLI runs on the
+ * Bun runtime embedded in the binary itself: the binary re-executes itself
+ * with `BUN_BE_BUN=1` (`<binary> x --bun skills@<version> ...`), which works
+ * with no Node.js or npx on the machine. `SPECSFY_SKILLS_CLI` (an executable
+ * that behaves as `skills`) and `SPECSFY_NPX_COMMAND` (an `npx`-like
+ * executable, called as `<npx> skills ...`) override that runtime.
+ */
 
 import { constants } from "node:fs";
 import { access, readdir, stat } from "node:fs/promises";
-import { delimiter, dirname, extname, join, resolve } from "node:path";
+import { delimiter, join, resolve } from "node:path";
+import pkg from "../../package.json" with { type: "json" };
+import { AppError } from "../app/errors.ts";
+import { ExitCode } from "../app/exit-codes.ts";
 
-const MINIMUM_NODE_VERSION = [22, 20, 0] as const;
+/** Pinned version of the official skills CLI, from package.json. */
+export const SKILLS_VERSION: string = (pkg as { devDependencies?: Record<string, string> }).devDependencies?.skills ?? "latest";
 
+/** Package spec handed to `bun x`. */
+export const SKILLS_PACKAGE = `skills@${SKILLS_VERSION}`;
+
+/** One prerequisite and whether it is satisfied. */
 export interface PrerequisiteCheck {
-  name: "node" | "git" | "skills" | "npm" | "project";
+  name: "git" | "skills" | "project";
   ok: boolean;
   detail: string;
   command?: string[] | undefined;
+  /** For `project`: why it failed. */
+  reason?: "missing" | "permission";
+}
+
+/** How to run the official skills CLI. */
+export interface SkillsCommand {
+  /** Executable followed by the arguments that precede `add`/`remove`. */
+  command: string[];
+  /** Extra environment for the child process. */
+  env?: Record<string, string>;
+  /** `override` (SPECSFY_SKILLS_CLI), `npx` (SPECSFY_NPX_COMMAND) or `self` (embedded Bun). */
+  source: "override" | "npx" | "self";
 }
 
 interface CheckOptions {
   path?: string;
-  nodeVersion?: string;
-  npxOverride?: string;
-  skillsLauncher?: string;
   platform?: NodeJS.Platform;
   pathext?: string;
 }
 
-/** Informa se a versão do runtime satisfaz o contrato do pacote. */
-export function nodeVersionSupported(version: string): boolean {
-  const parts = version.split(".").map(Number);
-  if (parts.length < 2 || parts.some((part) => !Number.isInteger(part))) return false;
-  for (let index = 0; index < MINIMUM_NODE_VERSION.length; index += 1) {
-    const difference = (parts[index] ?? 0) - MINIMUM_NODE_VERSION[index]!;
-    if (difference) return difference > 0;
-  }
-  return true;
+/** True when running as a `bun build --compile` executable. */
+export function isCompiledBinary(main = Bun.main): boolean {
+  return main.startsWith("/$bunfs/") || /^[A-Za-z]:\\~BUN\\/.test(main);
+}
+
+/** The binary itself (or the bun running the sources) as the skills runtime. */
+export function selfSkillsCommand(): SkillsCommand {
+  return {
+    command: [process.execPath, "x", "--bun", SKILLS_PACKAGE],
+    env: { BUN_BE_BUN: "1" },
+    source: "self",
+  };
 }
 
 /**
- * Resolve o `npx` que chama a CLI oficial `skills` sob demanda.
- *
- * Toda materialização do Specsfy passa por `npx skills add`, para usar a
- * versão publicada e tornar o comando apresentado à pessoa explícito.
+ * Resolves how to call the skills CLI: SPECSFY_SKILLS_CLI, then
+ * SPECSFY_NPX_COMMAND, then the embedded Bun runtime. Returns undefined
+ * when an override is set but is not an executable file.
  */
-export async function resolveNpxSkillsCommand(
-  path = process.env.PATH ?? "",
-  override = process.env.SPECSFY_NPX_COMMAND,
-  _launcher = process.argv[1],
+export async function resolveSkillsCommand(
+  env: NodeJS.ProcessEnv = process.env,
   platform: NodeJS.Platform = process.platform,
-  pathext = process.env.PATHEXT,
-): Promise<string[] | undefined> {
-  if (override) {
-    const executable = resolve(override);
-    return (await isExecutable(executable, platform))
-      ? npxCommand(executable, platform)
-      : undefined;
+): Promise<SkillsCommand | undefined> {
+  const direct = env.SPECSFY_SKILLS_CLI?.trim();
+  if (direct) {
+    const executable = resolve(direct);
+    return (await isExecutable(executable, platform)) ? { command: [executable], source: "override" } : undefined;
   }
-  const npx = await findExecutable("npx", path, platform, pathext);
-  return npx ? npxCommand(npx, platform) : undefined;
+  const npx = env.SPECSFY_NPX_COMMAND?.trim();
+  if (npx) {
+    const executable = resolve(npx);
+    return (await isExecutable(executable, platform)) ? { command: [executable, "skills"], source: "npx" } : undefined;
+  }
+  return selfSkillsCommand();
 }
 
-/** Verifica todos os recursos usados pelos comandos de instalação e atualização. */
+/** Human description of a skills command, without environment values. */
+export function describeSkillsCommand(command: SkillsCommand): string {
+  if (command.source === "self") return `${SKILLS_PACKAGE} on the embedded Bun runtime (${command.command[0]} x --bun)`;
+  return command.command.join(" ");
+}
+
+/** Checks every resource used by the install and update commands. */
 export async function checkPrerequisites(
   project: string,
   options: CheckOptions = {},
 ): Promise<PrerequisiteCheck[]> {
   const path = options.path ?? process.env.PATH ?? "";
-  const nodeVersion = options.nodeVersion ?? process.versions.node;
   const platform = options.platform ?? process.platform;
   const pathext = options.pathext ?? process.env.PATHEXT;
   const git = await findExecutable("git", path, platform, pathext);
-  const npm = await findExecutable("npm", path, platform, pathext);
-  const skills = await resolveNpxSkillsCommand(
-    path,
-    options.npxOverride ?? process.env.SPECSFY_NPX_COMMAND,
-    options.skillsLauncher ?? process.argv[1],
-    platform,
-    pathext,
-  );
+  const skills = await resolveSkillsCommand(process.env, platform);
   const target = resolve(project);
-  let projectOk = false;
+  let reason: PrerequisiteCheck["reason"];
   try {
-    projectOk = (await stat(target)).isDirectory();
-    if (projectOk) await access(target, constants.R_OK | constants.W_OK);
+    if (!(await stat(target)).isDirectory()) reason = "missing";
+    else {
+      try { await access(target, constants.R_OK | constants.W_OK); }
+      catch { reason = "permission"; }
+    }
   } catch {
-    projectOk = false;
+    reason = "missing";
   }
 
   return [
     {
-      name: "node",
-      ok: nodeVersionSupported(nodeVersion),
-      detail: `Node.js 22.20 ou mais recente; versão atual: ${nodeVersion}`,
-    },
-    {
       name: "git",
       ok: Boolean(git),
-      detail: git ? `Git encontrado em ${git}` : "Git não encontrado no PATH",
+      detail: git ? `Git found at ${git}` : "Git not found in PATH; install Git to download the framework",
       command: git ? [git] : undefined,
     },
     {
       name: "skills",
       ok: Boolean(skills),
       detail: skills
-        ? `instalação de skills disponível por ${skills.join(" ")}`
-        : "npx não encontrado; instale o npm e disponibilize `npx` no PATH",
-      command: skills,
-    },
-    {
-      name: "npm",
-      ok: Boolean(npm),
-      detail: npm ? `npm encontrado em ${npm}` : "npm não encontrado no PATH",
-      command: npm ? [npm] : undefined,
+        ? `skills CLI available through ${describeSkillsCommand(skills)}`
+        : "SPECSFY_SKILLS_CLI or SPECSFY_NPX_COMMAND points to a file that is not executable",
+      command: skills?.command,
     },
     {
       name: "project",
-      ok: projectOk,
-      detail: projectOk
-        ? `projeto legível e gravável em ${target}`
-        : `projeto ausente, inválido ou sem permissão de escrita: ${target}`,
+      ok: !reason,
+      detail: !reason
+        ? `project readable and writable at ${target}`
+        : reason === "missing"
+          ? `project directory not found: ${target}`
+          : `project is not readable and writable: ${target}`,
+      ...(reason ? { reason } : {}),
     },
   ];
 }
 
-/** Interrompe o fluxo com todas as correções necessárias em uma única mensagem. */
+/**
+ * Stops the flow with every needed fix in a single message. A missing
+ * project is NOT_FOUND, a read-only project is PERMISSION, anything else
+ * is GENERIC_ERROR.
+ */
 export function assertPrerequisites(
   checks: PrerequisiteCheck[],
   required: PrerequisiteCheck["name"][] = checks.map(({ name }) => name),
@@ -127,14 +153,21 @@ export function assertPrerequisites(
   const selected = new Set(required);
   const failures = checks.filter(({ name, ok }) => selected.has(name) && !ok);
   if (!failures.length) return;
-  throw new Error(
-    "pré-requisitos ausentes:\n" +
-      failures.map(({ detail }) => `- ${detail}`).join("\n"),
+  const project = failures.find(({ name }) => name === "project");
+  const code = project?.reason === "permission"
+    ? ExitCode.PERMISSION
+    : project?.reason === "missing"
+      ? ExitCode.NOT_FOUND
+      : ExitCode.GENERIC_ERROR;
+  throw new AppError(
+    code,
+    "missing prerequisites:\n" + failures.map(({ detail }) => `- ${detail}`).join("\n"),
+    { failed: failures.map(({ name }) => name) },
   );
 }
 
-/** Localiza arquivos de comandos, incluindo PATHEXT e caixa Windows. */
-async function findExecutable(
+/** Finds executables in PATH, honoring PATHEXT and Windows case. */
+export async function findExecutable(
   name: string,
   path: string,
   platform: NodeJS.Platform = process.platform,
@@ -147,7 +180,7 @@ async function findExecutable(
   for (const item of path.split(windows ? ";" : delimiter)) {
     const directory = windows ? item.replace(/^"(.*)"$/, "$1") : item;
     if (!directory) continue;
-    // A listagem preserva a caixa real mesmo nos testes Windows executados em Linux.
+    // Listing keeps the real case, even in Windows tests run on Linux.
     let entries: string[] = [];
     if (windows) {
       try { entries = await readdir(directory); } catch { continue; }
@@ -161,21 +194,6 @@ async function findExecutable(
       const executable = join(directory, actual);
       if (await isExecutable(executable, platform)) return executable;
     }
-  }
-  return undefined;
-}
-
-/** Executa o entrypoint do npm pelo Node para evitar shims batch e shell. */
-async function npxCommand(executable: string, platform: NodeJS.Platform): Promise<string[] | undefined> {
-  if (platform !== "win32" || /\.(exe|com)$/i.test(extname(executable))) {
-    return [executable, "skills"];
-  }
-  const entrypoint = join(dirname(executable), "node_modules", "npm", "bin", "npx-cli.js");
-  try {
-    await access(entrypoint, constants.R_OK);
-    if ((await stat(entrypoint)).isFile()) return [process.execPath, entrypoint, "skills"];
-  } catch {
-    // Sem o entrypoint, o diagnóstico não pode aprovar um shim que execFile rejeita.
   }
   return undefined;
 }

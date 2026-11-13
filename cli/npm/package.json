@@ -1,0 +1,38 @@
+{
+  "name": "@promovaweb/specsfy",
+  "version": "0.26.2",
+  "description": "Specsfy CLI, TUI and MCP server: installs the specsfy binary of your platform from the GitHub Release of this version.",
+  "license": "MIT",
+  "homepage": "https://promovaweb.com/docs/specsfy/cli/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/promovaweb/specsfy.git",
+    "directory": "cli/npm"
+  },
+  "bugs": {
+    "email": "contato@promovaweb.com"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "specsfy": "bin/specsfy.cjs"
+  },
+  "files": [
+    "bin/specsfy.cjs",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "linux",
+    "darwin",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}
