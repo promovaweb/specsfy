@@ -1,6 +1,6 @@
 # 0004 Gates e verificação
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -38,15 +38,15 @@ chama os scripts com `node` dentro do projeto; o binário passa
 
 ## Tasks
 
-- [ ] Definições dos gates `#termfy-cli`
-- [ ] `verify` sem dependência de Node.js `#termfy-cli`
-- [ ] Tools MCP `#termfy-mcp`
-- [ ] Testes com o projeto `example/` `#termfy-test`
+- [x] Definições dos gates `#termfy-cli`
+- [x] `verify` sem dependência de Node.js `#termfy-cli`
+- [x] Tools MCP `#termfy-mcp`
+- [x] Testes com o projeto `example/` `#termfy-test`
 
 ## Tests
 
-- [ ] `gate spec` em spec válida sai com 0
-- [ ] `gate spec` em spec inválida sai com 10 e lista os problemas no `--json`
-- [ ] `verify --json` devolve `result`
+- [x] `gate spec` em spec válida sai com 0
+- [x] `gate spec` em spec inválida sai com 10 e lista os problemas no `--json`
+- [x] `verify --json` devolve `result`
 
 ## Notes

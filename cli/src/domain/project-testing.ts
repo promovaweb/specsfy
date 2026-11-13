@@ -1,5 +1,11 @@
 /**
- * Detecção e execução segura dos testes do projeto consumidor.
+ * Detection and safe execution of the consumer project's test suite.
+ *
+ * Only Laravel with Pest is detected today. Before the runner starts, the
+ * project must prove a separate test database (`.env.testing`); otherwise
+ * the run stops with GATE_FAILED and PHP never starts. A project without a
+ * known runner raises NOT_FOUND. Errors are `AppError`s so the CLI and the
+ * MCP tool map them to exit codes directly.
  */
 
 import { spawn } from "node:child_process";
@@ -7,10 +13,12 @@ import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createInterface } from "node:readline";
 import { performance } from "node:perf_hooks";
+import { AppError, error } from "../app/errors.ts";
+import { ExitCode } from "../app/exit-codes.ts";
 import { isFile, pathExists, resolvePath } from "./filesystem.ts";
 import { assertConsumerProject } from "./skill-lock.ts";
 
-/** Comando de teste detectado sem interpretação por shell. */
+/** Detected test command, run without a shell. */
 export interface TestCommand {
   label: string;
   argv: readonly string[];
@@ -18,21 +26,23 @@ export interface TestCommand {
   display: string;
 }
 
-/** Resultado de uma execução do runner do consumidor. */
+/** Result of one run of the consumer's runner. */
 export interface TestRun {
   command: TestCommand;
   exit_code: number;
   duration_seconds: number;
   summary_lines: string[];
+  /** Every presented output line, in order. */
+  output: string[];
 }
 
-/** Detecta Laravel com Pest sem executar código do projeto. */
+/** Detects Laravel with Pest without running project code. Raises NOT_FOUND without a known runner. */
 export async function detectProjectTestCommand(
   project: string,
 ): Promise<TestCommand> {
   const root = resolvePath(project);
   if (!(await pathExists(root))) {
-    throw new Error(`projeto não encontrado: ${root}`);
+    throw error.notFound(`Project not found: ${root}`);
   }
   await assertConsumerProject(root);
   if ((await isFile(join(root, "artisan"))) && (await usesPest(root))) {
@@ -44,13 +54,13 @@ export async function detectProjectTestCommand(
       display: argv.join(" "),
     };
   }
-  throw new Error(
-    "Pest não foi detectado no projeto. " +
-      "É esperado um projeto Laravel com artisan e pestphp/pest.",
+  throw error.notFound(
+    "No known test runner found in the project. " +
+      "Expected a Laravel project with artisan and pestphp/pest.",
   );
 }
 
-/** Executa o runner detectado, transmite linhas e preserva o exit code. */
+/** Runs the detected runner, streams the lines and keeps the exit code. */
 export async function runProjectTests(
   project: string,
   emit: (line: string) => void = console.log,
@@ -62,14 +72,14 @@ export async function runProjectTests(
   const lines: string[] = [];
   let structuredSummary: string[] = [];
   const [executable, ...arguments_] = command.argv;
-  if (!executable) throw new Error("comando de teste vazio");
+  if (!executable) throw new Error("empty test command");
   const child = spawn(executable, arguments_, {
     cwd: command.cwd,
     env: { ...process.env, NO_COLOR: process.env.NO_COLOR ?? "1" },
     stdio: ["ignore", "pipe", "pipe"],
     signal,
   });
-  if (!child.stdout) throw new Error("não foi possível capturar a saída do Pest");
+  if (!child.stdout) throw new Error("could not capture the Pest output");
   const consume = (line: string): void => {
     const presented = presentOutputLine(line);
     lines.push(...presented.lines);
@@ -94,19 +104,21 @@ export async function runProjectTests(
     summary_lines: structuredSummary.length
       ? structuredSummary
       : summaryLines(lines),
+    output: lines,
   };
 }
 
 /**
- * Interrompe o runner antes do spawn quando Laravel não possui um banco de
- * testes explícito e separado ou quando a suíte tenta recriar migrations.
+ * Stops before the runner is spawned when Laravel has no explicit, separate
+ * test database or when the suite may recreate migrations. Raises
+ * GATE_FAILED.
  */
 export async function assertSafeLaravelTestDatabase(root: string): Promise<void> {
   const developmentPath = join(root, ".env");
   const testingPath = join(root, ".env.testing");
   if (!(await isFile(testingPath))) {
-    throw new Error(
-      "testes suspensos: crie .env.testing com um banco separado do .env",
+    throw gateFailed(
+      "tests suspended: create .env.testing with a database separate from .env",
     );
   }
 
@@ -115,18 +127,18 @@ export async function assertSafeLaravelTestDatabase(root: string): Promise<void>
     : new Map<string, string>();
   const testing = parseEnvironment(await readFile(testingPath, "utf8"));
   if (testing.get("APP_ENV") !== "testing") {
-    throw new Error("testes suspensos: .env.testing exige APP_ENV=testing");
+    throw gateFailed("tests suspended: .env.testing requires APP_ENV=testing");
   }
   if (!testing.get("DB_DATABASE") && !testing.get("DB_URL")) {
-    throw new Error(
-      "testes suspensos: .env.testing deve declarar DB_DATABASE ou DB_URL",
+    throw gateFailed(
+      "tests suspended: .env.testing must declare DB_DATABASE or DB_URL",
     );
   }
   const testingTarget = databaseTarget(testing, development);
   const developmentTarget = databaseTarget(development);
   if (developmentTarget && testingTarget === developmentTarget) {
-    throw new Error(
-      "testes suspensos: .env.testing aponta para o banco de desenvolvimento",
+    throw gateFailed(
+      "tests suspended: .env.testing points to the development database",
     );
   }
 
@@ -135,14 +147,19 @@ export async function assertSafeLaravelTestDatabase(root: string): Promise<void>
   for (const path of await phpFiles(testsPath)) {
     const source = await readFile(path, "utf8");
     if (/\b(?:RefreshDatabase|DatabaseMigrations)\b/u.test(source)) {
-      throw new Error(
-        "testes suspensos: a suíte usa trait que pode recriar migrations",
+      throw gateFailed(
+        "tests suspended: the suite uses a trait that may recreate migrations",
       );
     }
   }
 }
 
-/** Formata uma linha JSON estruturada do Pest ou preserva texto comum. */
+/** GATE_FAILED error raised by the database guard. */
+function gateFailed(message: string): AppError {
+  return new AppError(ExitCode.GATE_FAILED, message);
+}
+
+/** Formats a structured Pest JSON line or keeps plain text. */
 export function presentOutputLine(line: string): {
   lines: string[];
   summary: string[];
@@ -178,9 +195,9 @@ export function presentOutputLine(line: string): {
       if (!detail || typeof detail !== "object") continue;
       const error = detail as Record<string, unknown>;
       lines.push(
-        `FAIL  ${String(error.test ?? "Teste desconhecido")}`,
-        `      ${String(error.file ?? "arquivo desconhecido")}:${String(error.line ?? "?")}`,
-        `      ${String(error.message ?? "Erro sem mensagem")}`,
+        `FAIL  ${String(error.test ?? "Unknown test")}`,
+        `      ${String(error.file ?? "unknown file")}:${String(error.line ?? "?")}`,
+        `      ${String(error.message ?? "Error without message")}`,
         "",
       );
     }
@@ -203,7 +220,7 @@ async function usesPest(root: string): Promise<boolean> {
     payload = JSON.parse(await readFile(path, "utf8")) as unknown;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    throw new Error(`composer.json inválido em ${root}: ${message}`);
+    throw new Error(`Invalid composer.json in ${root}: ${message}`);
   }
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) return false;
   const dependencies = new Set<string>();
