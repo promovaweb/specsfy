@@ -1,4 +1,4 @@
-/** Contratos da detecção e execução de testes do projeto consumidor. */
+/** Contracts of the detection and execution of the consumer project tests. */
 import { chmod, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
@@ -8,9 +8,10 @@ import {
   presentOutputLine,
   runProjectTests,
 } from "../../src/domain/project-testing.ts";
+import { ExitCode } from "../../src/app/exit-codes.ts";
 import { temporaryDirectory } from "./helpers.ts";
 
-describe("runner do projeto consumidor", () => {
+describe("consumer project runner", () => {
   async function configureSafeDatabase(project: string): Promise<void> {
     await writeFile(
       join(project, ".env"),
@@ -22,7 +23,7 @@ describe("runner do projeto consumidor", () => {
     );
   }
 
-  test("detecta Laravel Pest sem executar código", async () => {
+  test("detects Laravel Pest without running code", async () => {
     const project = await temporaryDirectory();
     await writeFile(join(project, "artisan"), "#!/usr/bin/env php\n");
     await writeFile(
@@ -38,9 +39,9 @@ describe("runner do projeto consumidor", () => {
     });
   });
 
-  test("aceita a fixture Pest e recusa projetos sem runner", async () => {
+  test("accepts the Pest fixture and refuses projects without a runner", async () => {
     const project = await temporaryDirectory();
-    await expect(detectProjectTestCommand(project)).rejects.toThrow("Pest");
+    await expect(detectProjectTestCommand(project)).rejects.toMatchObject({ code: ExitCode.NOT_FOUND, message: expect.stringContaining("test runner") });
     await writeFile(join(project, "artisan"), "");
     await mkdir(join(project, "tests"));
     await writeFile(join(project, "tests/Pest.php"), "<?php\n");
@@ -49,7 +50,7 @@ describe("runner do projeto consumidor", () => {
     });
   });
 
-  test("apresenta relatório estruturado sem expor JSON bruto", () => {
+  test("presents the structured report without raw JSON", () => {
     const result = presentOutputLine(
       JSON.stringify({
         tool: "pest",
@@ -78,7 +79,7 @@ describe("runner do projeto consumidor", () => {
     expect(result.lines.join("\n")).not.toContain("error_details");
   });
 
-  test("transmite a saída e preserva o exit code do Pest", async () => {
+  test("streams the output and keeps the Pest exit code", async () => {
     const project = await temporaryDirectory();
     const commands = await temporaryDirectory();
     await writeFile(join(project, "artisan"), "");
@@ -98,6 +99,7 @@ describe("runner do projeto consumidor", () => {
       const result = await runProjectTests(project, (line) => output.push(line));
       expect(result.exit_code).toBe(1);
       expect(result.summary_lines).toEqual(["1 failed"]);
+      expect(result.output).toEqual(["PASS  Tests/Unit/ExampleTest.php", "1 failed"]);
       expect(output).toEqual([
         "PASS  Tests/Unit/ExampleTest.php",
         "1 failed",
@@ -108,16 +110,16 @@ describe("runner do projeto consumidor", () => {
     }
   });
 
-  test("suspende testes sem .env.testing antes de iniciar o runner", async () => {
+  test("suspends tests without .env.testing before starting the runner", async () => {
     const project = await temporaryDirectory();
     await writeFile(join(project, "artisan"), "");
     await mkdir(join(project, "tests"));
     await writeFile(join(project, "tests/Pest.php"), "<?php\n");
 
-    await expect(runProjectTests(project)).rejects.toThrow(".env.testing");
+    await expect(runProjectTests(project)).rejects.toMatchObject({ code: ExitCode.GATE_FAILED, message: expect.stringContaining(".env.testing") });
   });
 
-  test("recusa o banco de desenvolvimento e traits destrutivas", async () => {
+  test("refuses the development database and destructive traits", async () => {
     const project = await temporaryDirectory();
     await writeFile(join(project, "artisan"), "");
     await mkdir(join(project, "tests"));
@@ -132,7 +134,7 @@ describe("runner do projeto consumidor", () => {
     await writeFile(join(project, "tests/Pest.php"), "<?php\n");
 
     await expect(assertSafeLaravelTestDatabase(project)).rejects.toThrow(
-      "banco de desenvolvimento",
+      "development database",
     );
 
     await writeFile(
@@ -144,7 +146,7 @@ describe("runner do projeto consumidor", () => {
       "<?php\nuse Illuminate\\Foundation\\Testing\\RefreshDatabase;\n",
     );
     await expect(assertSafeLaravelTestDatabase(project)).rejects.toThrow(
-      "recriar migrations",
+      "recreate migrations",
     );
   });
 });

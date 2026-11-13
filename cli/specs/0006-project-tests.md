@@ -1,6 +1,6 @@
 # 0006 Testes do projeto
 
-Status: draft
+Status: in_progress
 
 ## Goal
 
@@ -26,12 +26,12 @@ comprovação do banco, sai com 10 antes de iniciar o PHP.
 
 ## Tasks
 
-- [ ] Command `test` `#termfy-cli`
-- [ ] Tool `project_test` `#termfy-mcp`
-- [ ] Testes `#termfy-test`
+- [x] Command `test` `#termfy-cli`
+- [x] Tool `project_test` `#termfy-mcp`
+- [x] Testes `#termfy-test`
 
 ## Tests
 
-- [ ] Projeto sem runner conhecido sai com 6
+- [x] Projeto sem runner conhecido sai com 6
 
 ## Notes
