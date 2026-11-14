@@ -228,7 +228,9 @@ especialistas, o ebook, a tag e a GitHub Release usam o mesmo SemVer.
    `cli/npm/package.json`.
 2. Registre a mudança em [`cli/CHANGELOG.md`](cli/CHANGELOG.md), no formato
    Keep a Changelog.
-3. Regenere o lançador `cli/bin/specsfy` com `bun run launcher` em `cli/`.
+3. Em `cli/`, regenere o lançador `cli/bin/specsfy` com `bun run launcher` e
+   a descrição `cli/docs/opencli.json` com `bun run opencli`. Os dois guardam a
+   versão; rode `bun run validate`, o mesmo gate do workflow de release.
 4. Reconstrua o ebook com `make ebook`.
 5. Rode `make verify-version`.
 6. Crie a tag `vX.Y.Z` e envie a branch e a tag.

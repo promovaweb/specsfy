@@ -58,9 +58,9 @@ bun \
 cd cli
 bun install --frozen-lockfile
 bun run launcher
-bun run typecheck
+bun run opencli
 bun test
-bun run build
+bun run validate
 ./dist/specsfy --version
 bun install --frozen-lockfile --os="*" --cpu="*" --libc="*"
 bun run build:all
@@ -79,7 +79,10 @@ bun \
 ```
 
 Exigir `X.Y.Z` em `VERSION`, `cli/package.json`, `cli/npm/package.json`,
-`./dist/specsfy --version`, ebook e `ebook/build.json`. O changelog promove as
+`./dist/specsfy --version`, `cli/docs/opencli.json`, ebook e
+`ebook/build.json`. `bun run validate` é o mesmo gate do job `binaries` do
+workflow de release: inclui typecheck, testes, `opencli:check`, `docs:check` e
+build. Um arquivo gerado com a versão antiga reprova a tag depois do push. O changelog promove as
 notas sob `## [X.Y.Z] - YYYY-MM-DD`. Os executáveis de `cli/dist/` servem só
 para conferência local e não entram no commit.
 
@@ -93,6 +96,7 @@ Incluir na entrega:
 - `cli/npm/package.json`;
 - `cli/bin/specsfy`, o lançador servido por `get.specsfy.dev`, regenerado por
   `bun run launcher` com a versão nova;
+- `cli/docs/opencli.json`, regenerado por `bun run opencli` com a versão nova;
 - `ebook/build.json` e os artefatos da edição atual;
 - documentação, skills e especialistas alterados pela entrega.
 
@@ -100,7 +104,8 @@ Apresentar notas e diff. Após confirmação:
 
 ```bash
 make verify-version
-git add VERSION cli/CHANGELOG.md cli/package.json cli/npm/package.json cli/bin/specsfy
+git add VERSION cli/CHANGELOG.md cli/package.json cli/npm/package.json \
+  cli/bin/specsfy cli/docs/opencli.json
 git commit -m "chore(release): vX.Y.Z"
 git tag -a vX.Y.Z -m "Specsfy CLI vX.Y.Z"
 git rev-parse HEAD
