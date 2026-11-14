@@ -4,6 +4,23 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.29.1] - 2026-11-13
+
+### Corrigido
+
+- A tag `v0.29.0` não gerou GitHub Release: o job `binaries` reprovou porque
+  `cli/docs/opencli.json` ainda declarava a versão 0.28.1. Esta versão publica
+  o mesmo conteúdo da 0.29.0 com a descrição OpenCLI regenerada.
+- A skill `specsfy-release-cli` e o `CONTRIBUTING.md` passam a regenerar
+  `cli/docs/opencli.json` com `bun run opencli` e a rodar `bun run validate`,
+  o mesmo gate do workflow de release, antes do commit da versão.
+
+### Adicionado
+
+- Os três capítulos novos do guia do usuário e do ebook, anunciados na 0.29.0,
+  chegam ao público nesta versão: casos de uso, exemplos completos e
+  referência rápida.
+
 ## [0.29.0] - 2026-11-13
 
 ### Adicionado

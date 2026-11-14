@@ -36,7 +36,7 @@ const fs = require("node:fs");
 const os = require("node:os");
 const path = require("node:path");
 
-const version = "0.29.0";
+const version = "0.29.1";
 const DEFAULT_BASE = "https://github.com/promovaweb/specsfy/releases/download";
 const SUPPORTED = ["linux-x64", "linux-arm64", "darwin-x64", "darwin-arm64", "windows-x64"];
 
