@@ -4,6 +4,8 @@
   "docs/user/method-reference.md",
   "docs/user/installation.md",
   "docs/user/getting-started.md",
+  "docs/user/use-cases.md",
+  "docs/user/examples.md",
   "docs/user/inbox.md",
   "docs/user/backlog.md",
   "docs/user/milestones.md",
@@ -36,5 +38,6 @@
   "docs/user/laravel.md",
   "docs/user/astro.md",
   "docs/user/nextjs.md",
+  "docs/user/reference.md",
   "docs/user/credits.md"
 ]

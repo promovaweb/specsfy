@@ -41,7 +41,16 @@ A separação de públicos e as regras de atualização são normativas no
 ## Guias para usuários
 
 Jornadas públicas ficam em `docs/user/`: método, instalação, primeiro projeto,
-uma página por skill base, CLI, contexto persistente e especialistas.
+casos de uso, exemplos completos, uma página por skill base, CLI, contexto
+persistente, especialistas e a referência rápida.
+
+`use-cases.md` organiza receitas por situação e `examples.md` mostra os
+artefatos de uma entrega com trechos da aplicação interna de `example/`,
+ajustados ao contrato vigente: o Gherkin fica só na spec, os testes usam o
+marcador `SPECSFY:` e os validadores são `.mjs`. `reference.md` resume
+arquivos, estados, gates, IDs, skills, comandos e glossário e lista as fontes
+externas como texto, para o ebook continuar autocontido. Ao mudar um desses
+contratos, atualize também essas três páginas.
 
 ## Ebook do percurso do usuário
 

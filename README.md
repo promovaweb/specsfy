@@ -225,6 +225,11 @@ percurso de desenvolvimento.
   com o CLI.
 - [Referência dos comandos](docs/user/cli-reference.md): argumentos, opções e
   códigos de saída.
+- [Casos de uso](docs/user/use-cases.md): receitas por situação, do bug ao MVP.
+- [Exemplos completos](docs/user/examples.md): os arquivos de uma entrega real e
+  mensagens prontas para cada etapa.
+- [Referência rápida](docs/user/reference.md): arquivos, estados, gates, IDs,
+  skills, comandos e glossário em uma página.
 - [Deploy](docs/user/deploy.md): release, servidores e produção em Docker Swarm
   com o especialista `specsfy-specialist-deploy`.
 - [Edição em PDF e EPUB](ebook/): o mesmo guia do usuário em formato portátil.

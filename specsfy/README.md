@@ -396,6 +396,9 @@ instala automaticamente.
 
 - [Instalação completa](../docs/user/installation.md)
 - [Uso básico](../docs/user/getting-started.md)
+- [Casos de uso](../docs/user/use-cases.md)
+- [Exemplos completos](../docs/user/examples.md)
+- [Referência rápida](../docs/user/reference.md)
 - [Atualizar uma especificação](../docs/user/update-spec.md)
 - [Uso avançado](../docs/user/advanced-usage.md)
 - [CLI, TUI e atualização](../docs/user/cli.md)

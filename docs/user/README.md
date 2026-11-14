@@ -24,13 +24,14 @@ implementação do framework para seguir esse percurso.
 
 ## Leia online ou como ebook
 
-Este mesmo percurso compõe a edição portátil **v1.8.0**. Use o PDF para leitura
-e impressão ou o EPUB em leitores que permitem ajustar fonte e tamanho:
+Este mesmo percurso compõe a edição portátil vigente, com a mesma versão do
+framework. Use o PDF para leitura e impressão ou o EPUB em leitores que
+permitem ajustar fonte e tamanho:
 
-- [PDF](../../ebook/Specsfy-Guia-do-Usuario-v1.8.0.pdf), para leitura,
-  compartilhamento e impressão.
-- [EPUB](../../ebook/Specsfy-Guia-do-Usuario-v1.8.0.epub), para leitores
-  digitais com fonte e tamanho ajustáveis.
+- [PDF](../../ebook/ebook-specsfy.pdf), para leitura, compartilhamento e
+  impressão.
+- [EPUB](../../ebook/ebook-specsfy.epub), para leitores digitais com fonte e
+  tamanho ajustáveis.
 
 Os dois formatos são reconstruídos a partir destas páginas. O
 [manifesto da edição](../../ebook/build.json) informa a versão vigente e os
@@ -74,6 +75,14 @@ consegue ler o projeto, mesmo que ainda não exista uma spec.
 Use [Primeiro projeto](getting-started.md) como tutorial guiado. Você começa
 com uma mudança pequena, acompanha a criação da `spec.md` e termina conferindo
 os testes e as evidências registradas, sem precisar decorar cada skill.
+
+Depois do tutorial, veja o mesmo método aplicado a outras situações:
+
+- [Casos de uso](use-cases.md): receitas para bug, CRUD com interface, MVP,
+  mudança tardia, banco de dados, projeto existente e retomada de trabalho.
+- [Exemplos completos](examples.md): cada arquivo produzido por uma entrega
+  real, do texto original à evidência dos testes, com mensagens prontas para
+  cada etapa.
 
 Para preservar uma ideia sem iniciar a especificação, escolha uma destas
 entradas:
@@ -150,6 +159,8 @@ integração ou tecnologia específica:
 - aplicação em projetos [Laravel](laravel.md), [Astro](astro.md) ou
   [Next.js](nextjs.md).
 - [Quadro técnico](../develop/modules.md), para conhecer os módulos do monorepo.
+- [Referência rápida](reference.md), para consultar arquivos, estados, gates,
+  IDs, skills, comandos, glossário e fontes externas em uma página.
 - [Créditos](credits.md), para autoria e identidade do projeto.
 
 Se você pretende contribuir ou modificar o próprio framework, continue no
