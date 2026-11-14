@@ -1,6 +1,6 @@
 {
   "name": "@promovaweb/specsfy",
-  "version": "0.28.1",
+  "version": "0.29.0",
   "description": "Specsfy CLI, TUI and MCP server: installs the specsfy binary of your platform from the GitHub Release of this version.",
   "license": "AGPL-3.0-only",
   "homepage": "https://promovaweb.com/docs/specsfy/cli/",

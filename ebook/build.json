@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "version": "0.28.1",
-  "edition": "v0.28.1",
-  "generated_at": "2026-11-13T21:57:38Z",
-  "source_sha256": "7de51f3c751b638e155b2d87904aeb9efabf5e24755c066f0b2f58998e40568a",
+  "version": "0.29.0",
+  "edition": "v0.29.0",
+  "generated_at": "2026-11-14T01:27:04Z",
+  "source_sha256": "d641d4daa1502e9ee6d1497a4d8c1d1bae1502590d0b1aec0dbeac4416e46961",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -37,6 +37,7 @@
     "docs/user/deploy-vault.md",
     "docs/user/deploy.md",
     "docs/user/design-system.md",
+    "docs/user/examples.md",
     "docs/user/getting-started.md",
     "docs/user/inbox.md",
     "docs/user/installation.md",
@@ -47,6 +48,7 @@
     "docs/user/nextjs.md",
     "docs/user/project-context.md",
     "docs/user/reading-order.txt",
+    "docs/user/reference.md",
     "docs/user/skills/README.md",
     "docs/user/skills/specsfy-01-inbox.md",
     "docs/user/skills/specsfy-02-backlog.md",
@@ -64,9 +66,15 @@
     "docs/user/skills/specsfy-update-spec.md",
     "docs/user/specialists.md",
     "docs/user/system-documentation.md",
-    "docs/user/update-spec.md"
+    "docs/user/update-spec.md",
+    "docs/user/use-cases.md"
   ],
   "document_metadata": {
+    "docs/user/examples.md": {
+      "autoridade": "templates de `skills/templates/` e aplicação interna de validação",
+      "escopo": "artefatos produzidos por uma entrega e mensagens prontas para cada etapa",
+      "natureza": "guia de uso"
+    },
     "docs/user/getting-started.md": {
       "autoridade": "metodologia executável de `skills/`",
       "escopo": "primeira fatia de trabalho em um projeto consumidor",
@@ -81,16 +89,26 @@
       "autoridade": "uso público da capacidade de milestones",
       "escopo": "MVP, roadmap, specs e backlog de projetos consumidores",
       "natureza": "guia de uso"
+    },
+    "docs/user/reference.md": {
+      "autoridade": "contrato central de `skills/Spec.md` e interface pública de `cli/`",
+      "escopo": "consulta rápida de arquivos, estados, gates, skills, comandos e termos",
+      "natureza": "referência"
+    },
+    "docs/user/use-cases.md": {
+      "autoridade": "metodologia executável de `skills/` e interface pública de `cli/`",
+      "escopo": "situações recorrentes em projetos consumidores",
+      "natureza": "guia de uso"
     }
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.28.1.pdf",
-      "sha256": "0df4552dd32a2dd933c3017744cbd61a3f4d1ebed65ffa4c67b6132b8927d19b"
+      "file": "Specsfy-Guia-do-Usuario-v0.29.0.pdf",
+      "sha256": "d9ec4b1b0cd7e5d57ce977c764d4ed4c0ae710b4b32215cd8913e8ce55ff00d8"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.28.1.epub",
-      "sha256": "e8b835bee89e7927e8fe362a6c9209389e11b386cf89370e0b214762ab3488bb"
+      "file": "Specsfy-Guia-do-Usuario-v0.29.0.epub",
+      "sha256": "8e5cc545ace034442620722efcc35f6a19823c5ca72ff6c699193fce889a547d"
     }
   }
 }

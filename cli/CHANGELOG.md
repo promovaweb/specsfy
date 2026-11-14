@@ -4,6 +4,28 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-11-13
+
+### Adicionado
+
+- O guia do usuário ganhou três capítulos, também no ebook:
+  `docs/user/use-cases.md`, com nove receitas por situação (ideia na Inbox,
+  bug com teste de regressão, CRUD com interface, MVP, mudança depois da
+  definição, banco de dados, projeto existente, acompanhamento e retomada);
+  `docs/user/examples.md`, com os arquivos de uma entrega real da aplicação de
+  `example/`, do texto original à evidência dos testes, e mensagens prontas
+  para cada etapa; e `docs/user/reference.md`, com arquivos, estados, gates,
+  Effort, identificadores, checklist, skills, comandos do CLI, proteções,
+  glossário e referências externas.
+
+### Corrigido
+
+- O portal do guia do usuário apontava para a edição v1.8.0 do ebook e agora
+  usa os aliases permanentes `ebook-specsfy.pdf` e `ebook-specsfy.epub`.
+- As edições v1.7.20 a v1.9.0 do ebook, anteriores ao reinício da numeração em
+  0.x, foram removidas. A retenção mantinha esses arquivos porque o SemVer
+  deles é maior que o da edição vigente.
+
 ## [0.28.1] - 2026-11-13
 
 ### Alterado
