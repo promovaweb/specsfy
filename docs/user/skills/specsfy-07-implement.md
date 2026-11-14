@@ -35,13 +35,13 @@ Implemente T003 da spec 0004 e valide a regressão.
    de escrever JSX ou TSX.
 4. Verifica a tarefa predecessora e o RED atual.
 5. Em Laravel, confirma `.env.testing` separado do `.env` e passa o comando
-   pelo `check_database_safety.mjs`. Sem `SAFE`, interrompe antes do teste.
+   pelo `check_database_safety.mjs`, interrompendo o teste sem a saída `SAFE`.
 6. Faz a menor mudança de produção, incluindo a tela e a interação previstas.
 7. Executa o teste focal até obter GREEN.
 8. Em uma tarefa `[MIGRATION]`, aplica o arquivo no banco de teste e consulta o
    estado das migrations.
 9. Faz a revisão visual obrigatória quando a tarefa puder alterar a interface,
-   mesmo sem pedido específico. Confere bordas, espaçamentos, margens, padding,
+   mesmo sem uma solicitação específica. Confere bordas, espaçamentos, margens, padding,
    tipografia, alinhamento, largura, overflow, foco, zoom e conteúdo curto ou
    longo nos viewports e estados aplicáveis.
 10. Refatora sem alterar o comportamento.
@@ -50,7 +50,7 @@ Implemente T003 da spec 0004 e valide a regressão.
 ```text
 T003 [x] Implementar solicitação sem revelar existência do cadastro
 Teste focal: passou
-Revisão visual: Não aplicável; a tarefa altera somente a regra de serviço.
+Revisão visual: Não aplicável; a tarefa altera somente a camada de serviço.
 Regressão: passou
 ```
 
@@ -121,5 +121,5 @@ em `.specsfy/STACK.md` e preserva o conteúdo de `migrations.json`.
 ## Próximo passo
 
 Continue com a próxima tarefa ou consulte
-[`specsfy-progress`](specsfy-progress.md). Se surgir uma necessidade
-nova, use [`specsfy-update-spec`](specsfy-update-spec.md).
+[`specsfy-progress`](specsfy-progress.md). Uma necessidade nova segue pelo
+[`specsfy-update-spec`](specsfy-update-spec.md), que atualiza a mesma spec.

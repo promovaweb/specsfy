@@ -8,7 +8,7 @@ verificáveis. As tarefas ficam na seção 14 da própria `spec.md`.
 Use depois do Definition Gate ou quando uma alteração exigir replanejamento.
 Não use para escrever código nem para marcar uma tarefa como concluída.
 
-Se houver mais de um recorte, ordem ou próximo passo possível, a skill reúne a
+Quando houver mais de um escopo, ordem ou próximo passo possível, a skill reúne a
 consulta em uma pergunta numerada. Ela oferece três ou mais sugestões,
 `Escrever outra resposta`, `Gere outras opções` e `Avançar` desde a primeira
 rodada.
@@ -48,7 +48,7 @@ Uma tarefa de API ou persistência não substitui essas tarefas.
 Quando qualquer tarefa cria ou altera schema, tabela, coluna, índice, relação
 ou model persistente, o plano inclui uma tarefa separada com as tags
 `[CODE] [MIGRATION]`. Ela aponta para o arquivo versionado e fica entre os
-testes TDD e o código que passa a usar a nova estrutura.
+testes TDD e o código que usa a nova estrutura.
 
 ```text
 T004 [CODE] [MIGRATION] Criar tabela em

@@ -13,7 +13,7 @@ description: Investigar, estruturar e validar experiências com pesquisa, arquit
   capacidade de uma pessoa concluir uma tarefa.
 - Não acionar para acabamento visual isolado; usar
   `$specsfy-specialist-ui-design` quando intenção e fluxo já estão validados.
-- Combinar com `$specsfy-specialist-prototyping` quando uma hipótese precisar
+- Combinar com `$specsfy-specialist-prototyping` quando uma suposição precisar
   de artefato descartável antes de implementação.
 
 ## Fluxo
@@ -32,16 +32,16 @@ description: Investigar, estruturar e validar experiências com pesquisa, arquit
    camada de interface não estiver clara, encaminhar a pergunta para a pessoa.
    Examinar o sistema atual para identificar o que a pessoa já vê, faz e espera
    em cada tela afetada antes de propor uma alteração.
-3. Formular a hipótese de comportamento antes de escolher método; definir
+3. Formular a suposição de comportamento antes de escolher método; definir
    público, contexto, frequência e consequência de falha.
 4. Mapear material existente e marcar separadamente fato observado,
-   inferência, hipótese e preferência interna.
+   inferência, suposição e preferência interna.
 5. Selecionar método proporcional à pergunta e ao impacto de falha usando
    [references/standards.md](references/standards.md); definir recrutamento,
    consentimento, roteiro e regra de parada.
 6. Mapear jornada atual com entradas, escolhas, esperas, erros, canais,
    dependências e handoffs; não apagar exceções críticas.
-7. Prototipar na fidelidade mínima que torne a hipótese testável sem simular
+7. Prototipar na fidelidade mínima que torne a suposição testável sem simular
    comportamento que altere o resultado.
 8. Conduzir sessões com tarefas e prompts neutros, registrando sucesso, erro,
    tempo, hesitação, compreensão e citações relevantes.
@@ -106,7 +106,7 @@ campo, ausência de permissão e falha de carregamento.
 - `$specsfy-specialist-design-system` define defaults, exceções por alcance e
   cenários CRUD antes da arquitetura de informação.
 - `$specsfy-specialist-prototyping` cria o artefato mínimo para testar uma
-  hipótese de interação.
+  suposição de interação.
 - `$specsfy-specialist-web-accessibility` avalia conformidade e uso com
   tecnologias assistivas além do recorte de pesquisa.
 - `$specsfy-specialist-domain-modeling` alinha vocabulário e invariantes quando

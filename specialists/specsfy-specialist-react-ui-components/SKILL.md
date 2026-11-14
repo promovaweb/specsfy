@@ -128,5 +128,5 @@ uma escolha incremental, ler
   fronteira server/client e o roteamento do framework hospedeiro.
 
 Leia [references/standards.md](references/standards.md) para regras de
-seleção, adaptação, estado, dependências e comprovação, e carregue os demais
+seleção, adaptação, estado, dependências e comprovação. Carregue os demais
 arquivos de `references/` somente no passo do Fluxo que os solicita.

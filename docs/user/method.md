@@ -1,8 +1,8 @@
 # Como a metodologia funciona
 
-O Specsfy ajuda você a transformar uma necessidade em uma entrega comprovada.
-Você explica o que precisa, e o agente organiza a definição, o plano, os testes
-e a implementação na mesma especificação.
+Com o Specsfy, você transforma uma necessidade em uma entrega comprovada. Você
+descreve o que precisa e o agente reúne a definição, o plano, os testes e a
+implementação na mesma especificação.
 
 A metodologia existe para responder, durante todo o trabalho, a três perguntas:
 
@@ -14,8 +14,9 @@ Você não precisa decorar comandos nem escolher cada skill. O agente identifica
 etapa atual, anuncia as transições e mantém o trabalho na mesma conversa.
 
 Antes de iniciar uma descoberta, o setup lê o sistema que já existe. Ele reúne
-instruções do projeto, manifests, configuração, código, rotas, dados,
-integrações, interfaces, testes e documentação. Essa leitura evita sugestões
+as instruções do projeto, os manifests e a configuração, além do código, das
+rotas, do modelo de dados, das integrações, das interfaces, dos testes e da
+documentação. Essa leitura evita sugestões
 desconectadas da aplicação e registra o que precisa continuar igual antes de
 propor uma mudança.
 
@@ -28,8 +29,8 @@ você reconheça a sequência e o assunto ao listar o diretório de specs:
 specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
-`NNNN` é o número da spec, como `0001`. O `slug` identifica o assunto, como
-`recuperar-senha`. Assim, o caminho `0001-recuperar-senha` pode ser localizado
+`NNNN` é o número da spec (por exemplo, `0001`), enquanto o `slug` identifica
+o assunto da entrega, como `recuperar-senha`. Assim, o caminho `0001-recuperar-senha` pode ser localizado
 sem abrir o arquivo.
 
 A pasta também mostra o estado operacional da entrega:
@@ -38,15 +39,16 @@ A pasta também mostra o estado operacional da entrega:
 draft → defined → planned → in-progress → review → completed
 ```
 
-O campo `Status` dentro da spec espelha essa pasta. Use `specsfy specs transition`
-para mover o pacote inteiro, e não mova arquivos manualmente. `completed/`
-mantém o histórico das entregas finalizadas.
+O campo `Status` dentro da spec espelha essa pasta. Use
+`specsfy specs transition` para mover a pasta inteira da spec, em vez de mover
+arquivos à mão. A pasta `completed/` mantém o histórico das entregas
+finalizadas.
 
 Ao abrir a `spec.md`, você encontra o comportamento esperado, o plano e as
 provas que permitem conferir o estado atual:
 
 - o problema e o resultado esperado.
-- as pessoas afetadas e as regras que precisam ser respeitadas.
+- os atores afetados e as regras de negócio que precisam ser respeitadas.
 - histórias, requisitos e limites.
 - exemplos de comportamento escritos em BDD.
 - as escolhas registradas, as possíveis falhas e o plano técnico.
@@ -73,12 +75,12 @@ perfis exibidos pelo progresso, os estados e os gates apresentados neste guia.
 
 ## Interfaces fazem parte da definição
 
-Quando a entrega cria ou muda uma tela usada por pessoas, o Specsfy pergunta
-antes do código como a experiência deve funcionar. A conversa cobre as telas,
+Quando a entrega cria ou muda uma tela do produto, o Specsfy pergunta como a
+experiência deve funcionar ainda na definição. A conversa cobre as telas,
 o fluxo de informação, os menus e a navegação principal, os campos e validações do formulário, a composição e o
 formato de cada ação, como página, painel lateral, modal ou outra alternativa.
-As opções usam texto completo, e você sempre pode escolher `Escrever outra
-resposta`, `Gere outras opções` ou `Avançar`.
+As opções usam texto completo. Em todas as perguntas, você pode escolher
+`Escrever outra resposta`, `Gere outras opções` ou `Avançar`.
 
 Antes das perguntas, o Specsfy analisa a stack e o sistema atual quando ele
 existe. Ele observa rotas, telas, componentes, conteúdo, permissões, estados e
@@ -88,7 +90,7 @@ agente não troca React, Tailwind, shadcn/ui ou outra tecnologia por suposição
 Um CRUD com interface não é considerado pronto apenas por ter banco, serviço
 ou API. A spec registra telas, menus, formulário, navegação, estados de carregamento,
 vazio, erro e sucesso, além do uso por teclado. O plano gera tarefas e testes
-para essa interface antes da implementação.
+para essa interface já na fase de planejamento.
 
 Essas tarefas aparecem em uma `Fase de interface` própria na seção 14 da spec.
 Cada tela tem uma tarefa com caminho, comportamento e teste de interação.
@@ -101,11 +103,12 @@ de acordo com o quanto já definiu:
 - Uma **ideia** preserva seu texto em
   `specs/inbox/` sem perguntas e sem autorizar implementação.
 - O **backlog** guarda uma proposta que merece organização e refinamento, mas
-  ainda não foi escolhida para entrega. Ela vive em `specs/backlog/`.
+  ainda não foi escolhida para entrega e fica registrada em `specs/backlog/`.
 - A **spec** representa uma entrega escolhida. A partir dela, definição, plano,
-  testes, código e evidências passam a seguir o mesmo contrato.
+  testes, código e evidências seguem o mesmo contrato.
 
-O percurso mais completo preserva a ideia, aprofunda as definições e só chega
+O percurso mais completo preserva a ideia original, aprofunda as definições da
+entrega e só chega
 ao código depois do plano e do RED:
 
 ```text
@@ -129,8 +132,8 @@ de controle baseado em evidência. Um **gate** aprovado não significa apenas
 **Sua participação:** você informa a ideia e escolhe quando vale refiná-la ou
 promovê-la. Se solicitar apenas a captura, o agente não inicia o refinamento.
 
-**Prova técnica:** a captura recebe um arquivo próprio em `specs/inbox/`. Se
-você escolher o refinamento, ela segue para o backlog. A `spec.md` normativa
+**Prova técnica:** a captura recebe um arquivo próprio em `specs/inbox/` e
+segue para o backlog quando você escolhe o refinamento. A `spec.md` normativa
 só aparece depois de uma promoção explícita.
 
 Essa separação mantém a caixa de entrada leve e impede que toda observação se
@@ -151,7 +154,7 @@ uma confirmação para você encerrar a área, responder depois ou retomar agora
 O encerramento é respeitado até uma reabertura explícita. O adiamento mantém os
 pontos registrados e o Definition Gate pendente até serem resolvidos.
 
-**Prova técnica:** a spec registra a finalidade, as pessoas afetadas, os
+**Prova técnica:** a spec registra a finalidade, os atores afetados, os
 requisitos, os limites e os cenários BDD. A validação procura contradições,
 definições em aberto e dúvidas que impedem o planejamento.
 
@@ -161,9 +164,9 @@ O Ato I termina quando a validação registra este gate na `spec.md`:
 Definition Gate: Passed
 ```
 
-Esse estado permite que o agente organize o plano a partir dos requisitos e
-cenários já conferidos. O código ainda não foi alterado, e o Plan Gate continua
-pendente.
+Esse estado permite que o agente monte o plano a partir dos requisitos e
+cenários já conferidos, sem nenhuma alteração no código e com o Plan Gate
+ainda pendente.
 
 ### Ato II — Planejar e preparar o RED
 
@@ -172,7 +175,7 @@ conseguem detectar a ausência do novo comportamento.
 
 **Sua participação:** você confirma escolhas de produto ou estratégia que
 alteram o resultado. Os detalhes técnicos que o repositório consegue comprovar
-podem ser derivados do código, da stack e das regras do projeto.
+podem ser derivados do código, da stack e das convenções do projeto.
 
 **Prova técnica:** o agente registra as tarefas, os contratos, as informações
 afetadas, as possíveis falhas e a reversibilidade na spec. Depois, transforma
@@ -242,14 +245,15 @@ Cenário: cliente solicita recuperação de senha
   Então o sistema confirma a solicitação sem revelar informações privadas
 ```
 
-Esse cenário mostra a regra e o resultado esperado, mas o texto Gherkin
+Esse cenário mostra a regra de negócio e o resultado esperado, mas o texto
+Gherkin
 não é executado como uma suíte separada pelo Specsfy.
 
 O **TDD** transforma o comportamento em testes executáveis na ferramenta já
-usada pelo projeto. Primeiro o teste falha pelo motivo correto. Depois, a
-implementação faz o teste passar. Em resumo:
+usada pelo projeto. Primeiro o teste falha pelo motivo correto, para que em
+seguida a implementação faça esse teste passar. Em resumo:
 
-- BDD ajuda a definir **o comportamento que importa**.
+- BDD define **o comportamento que importa**.
 - TDD comprova **que o código apresenta esse comportamento**.
 
 Essa ligação evita uma descrição clara sem prova automática e também impede
@@ -293,7 +297,7 @@ sistema inteiro:
 
 - `PROJECT.md`: finalidade, capacidades e limites do projeto.
 - `.specsfy/STACK.md`: tecnologias estruturais e suas evidências.
-- `.specsfy/RULES.md`: regras confirmadas para o trabalho.
+- `.specsfy/RULES.md`: convenções confirmadas para o trabalho.
 - `.specsfy/DATABASE.md`: visão da persistência e das relações.
 
 O agente consulta esses arquivos antes de planejar e os revisa durante a

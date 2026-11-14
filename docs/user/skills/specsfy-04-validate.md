@@ -1,8 +1,8 @@
 # Validar a definição com `specsfy-04-validate`
 
 Esta skill revisa a spec como código em linguagem natural. Primeiro verifica o
-formato. Depois avalia clareza, completude, consistência e possibilidade de
-teste.
+formato da spec e, em seguida, avalia clareza, completude, consistência e
+possibilidade de teste.
 
 ## Quando usar
 
@@ -36,8 +36,8 @@ Status: Defined
 ```
 
 1. Move a spec para `defined` e confere as capturas de `specs/inbox/` que a
-   originaram. Se a spec, sozinha ou com outras já aprovadas, cobre o pedido
-   inteiro, executa `specsfy inbox process <captura> --spec <id>` e a captura
+   originaram. Se a spec, sozinha ou com outras já aprovadas, cobre a
+   solicitação inteira, executa `specsfy inbox process <captura> --spec <id>` e a captura
    passa para `specs/inbox/processed/`. Se ficou alguma parte sem spec
    aprovada, a captura permanece na fila ativa e a skill informa o que resta.
 
@@ -58,8 +58,8 @@ ausente.
 - conferência da aplicação das migrations previstas no plano.
 - retorno automático à etapa que pode resolver a lacuna.
 - gate aprovado somente após nova validação.
-- captura da Inbox retirada da fila ativa somente quando o pedido inteiro
-  estiver coberto por specs aprovadas.
+- captura da Inbox retirada da fila ativa somente quando a solicitação inteira
+  estiver coberta por specs aprovadas.
 
 ## Erros comuns
 
@@ -71,5 +71,5 @@ ausente.
 ## Próximo passo
 
 Com o Definition Gate aprovado, use
-[`specsfy-05-tasks`](specsfy-05-tasks.md). Se a validação encontrar uma
-escolha aberta, use [`specsfy-02-backlog`](specsfy-02-backlog.md).
+[`specsfy-05-tasks`](specsfy-05-tasks.md). Quando a validação encontra uma
+escolha aberta, a próxima etapa é o [`specsfy-02-backlog`](specsfy-02-backlog.md).

@@ -20,7 +20,7 @@ estado. Use `specsfy specs transition` para alterar os dois juntos, pois mover a
 pasta manualmente deixa o registro inconsistente.
 
 A spec não é um relatório preenchido no final. Ela recebe a definição no Ato
-I, o plano e o RED no Ato II, e as tarefas com seus resultados no Ato III.
+I, o plano e o RED no Ato II e as tarefas com seus resultados no Ato III.
 Código, testes, pesquisa e documentação derivada podem ficar em outros
 arquivos, mas a ligação entre eles permanece na spec.
 
@@ -44,18 +44,19 @@ avançar; uma sugestão não substitui a análise do código existente.
 
 ## Effort
 
-`Effort` é uma escala inteira de 1 a 10 para a capacidade de raciocínio,
-investigação, coordenação e execução pedida pela entrega no estado atual. Não
-representa horas, dias, preço, quantidade de pessoas ou prazo prometido. Uma
+`Effort` é uma escala inteira de 1 a 10 para a capacidade de raciocínio e de
+investigação que a entrega exige no estado atual, somada à coordenação e à
+execução. O número não representa horas, preço, quantidade de desenvolvedores
+nem prazo prometido. Uma
 tarefa curta pode ter Effort alto quando envolve autorização delicada, migração
 difícil de reverter ou integração pouco conhecida. Uma tarefa longa pode ficar
 em faixa menor quando segue uma convenção já comprovada e tem testes diretos.
 
-O valor inicial é uma hipótese de trabalho. Ele pode mudar depois de uma
+O valor inicial é uma suposição de trabalho. Ele pode mudar depois de uma
 resposta confirmada, da leitura do repositório, de uma dependência descoberta ou
 de um resultado de teste. O CLI guarda valor anterior, data e justificativa no
-histórico da própria spec. Assim, a pessoa que retoma a entrega consegue ver o
-motivo de cada recalibração.
+histórico da própria spec. Assim, você consegue ver o motivo de cada
+recalibração ao retomar a entrega.
 
 ### Faixas e perfis
 
@@ -74,11 +75,12 @@ quando seus comportamentos forem independentes.
 
 ### Quando atualizar
 
-Atualize Effort quando um fato mudar a capacidade necessária: mais módulos,
-dados existentes, integração externa, autorização, compatibilidade ou revisão
-humana recorrente podem elevar a faixa. Escopo menor, padrão já comprovado ou
-dependência removida podem reduzi-la. Não altere o número para comunicar
-urgência, pressão comercial ou preferência por modelo.
+Atualize Effort quando um fato mudar a capacidade necessária. Mais módulos,
+registros existentes a migrar ou uma integração externa podem elevar a faixa,
+assim como autorização, compatibilidade e revisão humana recorrente. Escopo
+menor, padrão já comprovado ou dependência removida podem reduzi-la. Não altere
+o número para comunicar urgência, interesse comercial ou preferência por
+modelo.
 
 Registre o fato que mudou a estimativa. Uma justificativa como “passou de 4
 para 7 porque inclui migração de dados existentes e compatibilidade com uma API
@@ -93,9 +95,9 @@ nem transforma Effort em autorização para implementar.
 
 ### Effort não é prioridade
 
-Prioridade responde o que deve receber atenção antes. Effort responde quanta
-capacidade a entrega exige. Um ajuste urgente pode ter Effort 2. Um estudo que
-ficará para depois pode ter Effort 8. O backlog ordena itens por valor,
+Prioridade responde o que deve receber atenção antes, enquanto Effort responde
+quanta capacidade a entrega exige. Um ajuste urgente pode ter Effort 2, ao
+passo que um estudo deixado para depois pode ter Effort 8. O backlog ordena itens por valor,
 urgência, dependências, exposição operacional, esforço e informações ausentes.
 A spec usa Effort para tornar a execução transparente.
 
@@ -118,9 +120,10 @@ draft → defined → planned → in-progress → review → completed
 
 ### O significado de cada estado
 
-Em `draft`, o agente esclarece problema, resultado, atores, escopo, regras,
-casos-limite e comportamento observável. Uma dúvida que muda produto, dados,
-segurança, aceite ou plano impede o gate da definição. Pesquisa pode apoiar a
+Em `draft`, o agente esclarece o problema e o resultado, os atores e o escopo,
+as regras de negócio, os casos-limite e o comportamento observável. Uma dúvida
+que muda o produto, o modelo de dados, a segurança, o aceite ou o plano impede
+o gate da definição. Pesquisa pode apoiar a
 conversa, mas precisa ter conclusão e impacto registrados na spec.
 
 Em `defined`, problema, limites, histórias, requisitos e cenários BDD permitem
@@ -154,9 +157,9 @@ alterar diretamente a spec concluída.
 | `review` | `in-progress`, `review`, `completed` | aceite final encontrou trabalho pendente |
 | `completed` | `completed` | entrega fechada não recebe edição direta |
 
-Mudança apenas de estratégia técnica retorna a `planned`. Mudança de
-comportamento retorna a `draft`. Uma comprovação vencida, como regressão
-executada antes da última alteração, pede nova verificação. O método não repete
+Mudança apenas de estratégia técnica retorna a `planned`, enquanto mudança de
+comportamento retorna a `draft`. Uma comprovação vencida, como uma regressão
+executada antes da última alteração, exige nova verificação. O método não repete
 etapas por ritual: ele evita aprovar um resultado novo com uma prova antiga.
 
 ## Gates
@@ -168,9 +171,10 @@ estimativa de qualidade nem um botão de aprovação manual.
 ### Definition Gate
 
 O gate do Ato I exige problema e resultado observável, escopo incluído e fora
-de escopo, atores, regras, histórias, requisitos funcionais e não funcionais,
+de escopo, atores, regras de negócio, histórias, requisitos funcionais e não
+funcionais,
 três cenários BDD distintos para cada item principal e nenhuma lacuna P1 que
-impeça o planejamento. Quando a entrega tem interface para pessoas, ele exige
+impeça o planejamento. Quando a entrega tem interface de usuário, ele exige
 também telas, fluxo de informação, menus e navegação principal, formulário,
 composição, estados e acessibilidade descritos na seção 10. Um CRUD sem telas e formulário mantém o
 gate pendente. Termo ambíguo, requisito sem forma de teste, história
@@ -178,7 +182,8 @@ sem aceite ou conflito entre seções mantêm o gate pendente.
 
 ### Plan Gate
 
-O gate do Ato II exige plano técnico proporcional, contratos e dados aplicáveis,
+O gate do Ato II exige plano técnico proporcional, contratos e modelo de dados
+aplicáveis,
 tarefas com IDs e dependências, estratégia TDD derivada do BDD, RED válido,
 plano de testes e ordem de execução. Uma lista de tarefas vaga, sem referências,
 ou um teste sem cenário correspondente não torna o plano pronto.
@@ -211,28 +216,29 @@ apenas torna o estado geral legível.
 | 6. Cenários BDD de aceite | tornar o comportamento observável | condição inicial, ação, resultado e IDs cobertos |
 | 7. Requisitos | declarar obrigações do sistema | funções, qualidades mensuráveis, erros e casos-limite |
 
-A seção 1 não deve antecipar a solução. “Criar uma tela” descreve uma possível
-implementação, enquanto “permitir que uma pessoa recupere acesso sem revelar se
+A seção 1 não deve adiantar a solução. “Criar uma tela” descreve uma possível
+implementação, enquanto “permitir que o usuário recupere acesso sem revelar se
 um e-mail existe” descreve o resultado e seu limite. A métrica de sucesso
 precisa ter um alvo ou uma observação verificável, não uma impressão genérica.
 
 A seção 2 diferencia pesquisa de escolha. Um R-001 pode registrar uma
 documentação de API consultada e concluir que determinado endpoint exige
-idempotência. A regra que a entrega adotará aparece depois na seção de
+idempotência. A definição que a entrega adotará aparece depois na seção de
 restrições, requisitos, plano ou escolhas. Se a fonte externa foi realmente
 consultada, seu registro local em research/ preserva origem, versão ou data e o
 ponto usado na conclusão.
 
-Na seção 3, “fora de escopo” protege tanto o projeto quanto a expectativa de
-quem acompanha a entrega. Por exemplo, uma entrega que permite solicitar troca
+Na seção 3, “fora de escopo” protege tanto o projeto quanto a expectativa dos
+envolvidos na entrega. Por exemplo, uma entrega que permite solicitar troca
 de senha pode deixar explícito que não inclui autenticação social, gestão de
-perfis ou alteração do visual de todas as telas. Atores não são apenas pessoas:
+perfis ou alteração do visual de todas as telas. Atores também podem ser
+sistemas:
 um serviço externo, um job ou um administrador pode ter objetivo, permissão e
 limite próprios.
 
 Nas seções 5, 6 e 7, a mesma necessidade aparece em três níveis. A história
-explica para quem a capacidade gera valor. O requisito declara a obrigação. O
-cenário mostra um exemplo que pode ser aceito ou recusado. Essa diferença evita
+explica qual ator recebe a capacidade, o requisito declara a obrigação do
+sistema e o cenário mostra um exemplo que pode ser aceito ou recusado. Essa diferença evita
 história vaga, requisito sem teste e cenário que não representa valor.
 
 ### Ato II: seções 8 a 15
@@ -248,14 +254,14 @@ história vaga, requisito sem teste e cenário que não representa valor.
 | 14. Tarefas | dividir a entrega em ações verificáveis | o que fazer, em qual ordem, com quais referências e dependências? |
 | 15. Ordem de execução | expor dependências reais | qual é o caminho crítico, o paralelismo e o menor conjunto entregável? |
 
-O plano técnico é proporcional ao alcance. Uma alteração local pode registrar
-um componente, teste e arquivo. Uma migração precisa explicar compatibilidade,
-ordem, reversão e retenção. Quando uma categoria não se aplica, escreva “Não
+O plano técnico é proporcional ao alcance da mudança. Uma alteração local pode
+registrar um componente, um teste e um arquivo, enquanto uma migração precisa
+explicar compatibilidade, ordem, reversão e retenção. Quando uma categoria não se aplica, escreva “Não
 aplicável” com a razão, em vez de deixar uma lacuna que pareça esquecimento.
 
 Quando o cabeçalho declara `Interface para pessoas: Sim`, a seção 10 também
 registra a stack e o sistema atual observados, a responsabilidade de cada tela,
-os menus, seus itens e destinos, como a pessoa avança e retorna no fluxo, os
+os menus, seus itens e destinos, como o usuário avança e retorna no fluxo, os
 campos e validações dos formulários, o padrão de abertura de ações, a
 disposição dos elementos e os estados de interface. O Specsfy analisa rotas,
 telas, componentes, conteúdo, permissões e
@@ -278,7 +284,7 @@ A estratégia TDD e o plano de testes são complementares. A seção 11 explica 
 sequência RED, GREEN e REFACTOR para o caso. A seção 12 permite localizar a
 relação entre requisito, cenário BDD, nível de teste, arquivo e comando. O
 marcador SPECSFY: no teste deve usar os IDs da spec. O resultado é uma cadeia
-que uma pessoa consegue seguir nos dois sentidos.
+que você consegue seguir nos dois sentidos.
 
 A seção 13 registra o resultado de cada gate e os achados de revisão. Um achado
 especializado usa identificador, severidade, estado, referências e
@@ -296,10 +302,10 @@ essa informação em caminho crítico, tarefas paralelas e estratégia de MVP.
 | --- | --- | --- |
 | 16. Dependências, riscos e suposições | expor condições externas e hipóteses | dependência, consequência, mitigação e condição que ainda precisa de confirmação |
 | 17. Decisões | preservar escolhas confirmadas | escolha, motivo, referências atingidas e ato que precisa ser revisto se ela mudar |
-| 18. Definition of Done | fechar o contrato de entrega | critérios de conclusão, aceite, documentação e comprovações finais |
+| 18. Definition of Done | fechar o contrato de entrega | condições de conclusão, aceite, documentação e comprovações finais |
 
 Dependências são itens fora do controle imediato da tarefa, como uma API,
-aprovação, credencial fornecida por outra equipe ou migração prévia. Suposições
+aprovação, credencial fornecida por outro setor ou migração prévia. Suposições
 são premissas ainda não confirmadas. Registre ambas de forma explícita para que
 um teste verde não esconda uma condição externa não atendida.
 
@@ -307,12 +313,12 @@ A seção 17 não substitui um ADR para uma escolha arquitetural transversal nem
 substitui as seções de requisito e plano. Ela conserva a escolha da entrega e
 mostra o que precisa ser reavaliado quando a escolha for revista. O histórico é
 mais útil quando registra alternativas descartadas e seu motivo, sem reescrever
-o passado como se a escolha atual sempre tivesse sido conhecida.
+o passado como se a escolha atual já fosse conhecida desde o início.
 
-A Definition of Done é o fechamento da entrega concreta. Ela reúne gates,
-testes, aceite, regressão, rastreabilidade, documentação e pendências tratadas.
-Não use uma lista genérica copiada de outra spec. Cada item precisa corresponder
-ao comportamento, aos dados e às integrações daquela entrega.
+A Definition of Done fecha a entrega e reúne os gates, os testes de aceite e de
+regressão, a rastreabilidade, a documentação e as pendências tratadas. Não use
+uma lista genérica copiada de outra spec, porque cada item precisa corresponder
+ao comportamento, ao modelo de dados e às integrações daquela entrega.
 
 ## Identificadores e rastreabilidade
 
@@ -327,7 +333,8 @@ ao comportamento, aos dados e às integrações daquela entrega.
 | `FIND-*` | achado de revisão | tipo, severidade, estado e referência |
 
 Cada história principal possui três cenários distintos. Em geral, um cobre o
-caminho principal, outro uma regra crítica e outro uma falha ou limite. O
+caminho principal, outro uma regra de negócio crítica e outro uma falha ou
+limite. O
 cenário declara os IDs cobertos. O teste TDD usa o marcador `SPECSFY:` com os
 mesmos IDs. Essa cadeia mostra requisito sem teste e teste sem comportamento
 definido.
@@ -346,17 +353,17 @@ e dependências. O checklist abaixo dela deixa seis movimentos auditáveis:
 | `EVIDENCE` | qual comando, resultado e IDs permitem conferir o trabalho? |
 | `IMPROVE` | houve melhoria de processo ou há motivo registrado para não aplicá-la? |
 
-Pesquisa responde uma pergunta, mas não aprova sozinha uma regra de produto.
+Pesquisa responde uma pergunta, mas não aprova sozinha uma regra de negócio.
 Registre pergunta, conclusão, fonte, localizador e impacto. Fonte externa
 consultada requer registro local em `research/`, enquanto a conclusão
 normativa fica na spec, ligada ao escopo, requisito ou plano.
 
-`specsfy progress` lê as specs sem alterá-las. Ele mostra estado, Effort,
-perfil, gates e contagens. Sua porcentagem é uma projeção, não uma aprovação:
-com checklists, ela usa itens concluídos sobre itens totais, e sem checklists,
-gates aprovados sobre gates totais. Use a porcentagem para localizar trabalho
-pendente. Use gates, resultados de teste e leitura da spec para confirmar um
-avanço.
+`specsfy progress` lê as specs sem alterá-las e mostra estado, Effort, perfil,
+gates e totais de itens. Sua porcentagem é uma projeção, não uma aprovação:
+com checklists, ela divide os itens concluídos pelo total de itens. Sem
+checklists, ela divide os gates aprovados pelo total de gates. A porcentagem serve
+para localizar trabalho pendente, enquanto os gates, os resultados de teste e a
+leitura da spec confirmam um avanço.
 
 ## Dúvidas frequentes
 

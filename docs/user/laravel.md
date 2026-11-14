@@ -1,8 +1,8 @@
 # Usar Specsfy com Laravel
 
 `$specsfy-specialist-laravel` acrescenta verificações próprias do Laravel ao
-fluxo do Specsfy. A spec continua governando a mudança, e o especialista segue
-as convenções e a versão comprovadas pelo projeto.
+fluxo do Specsfy, enquanto a spec continua governando a mudança. O especialista
+segue as convenções e a versão comprovadas pelo projeto.
 
 ## Confirmar a detecção
 
@@ -72,7 +72,8 @@ são reaproveitados; dependências transitivas continuam relacionadas em
 5. Derive testes para caminho feliz, autorização, validação, efeitos e falhas.
 6. Antes de qualquer teste, crie `.env.testing` com `APP_ENV=testing` e um
    `DB_DATABASE` ou `DB_URL` explícito, diferente do destino usado pelo `.env`.
-7. Implemente controllers finos e mantenha as regras na camada já adotada pelo
+7. Implemente controllers finos e mantenha as regras de negócio na camada já
+   adotada pelo
    projeto. Inspecione as consultas e o N+1 quando a quantidade de relações
    puder aumentar o tempo da resposta.
 8. Confira o ambiente e o comando antes de executar os checks:
@@ -82,8 +83,9 @@ node .agents/skills/specsfy-setup/scripts/check_database_safety.mjs \
   --project . --command "php artisan test"
 ```
 
-Somente a saída `SAFE` permite continuar. `PENDING` encerra a etapa até a
-configuração ser corrigida. `IGNORED` descarta o comando, sem pedir autorização
+Somente a saída `SAFE` permite continuar, porque `PENDING` encerra a etapa até
+a configuração ser corrigida. Já `IGNORED` descarta o comando sem solicitar
+autorização
 para forçá-lo.
 
 Quando houver uma migration planejada, aplique-a no banco de teste protegido e
@@ -105,7 +107,7 @@ specsfy test --project .
 ```
 
 O CLI detecta `artisan` e `pestphp/pest`, chama `php artisan test` e preserva o
-exit code. Ele não recebe uma string arbitrária de shell. A verificação anterior
+exit code, sem receber uma string arbitrária de shell. A verificação anterior
 continua obrigatória antes desse comando.
 
 ## O que o especialista acrescenta

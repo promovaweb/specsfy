@@ -14,21 +14,21 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
 - Acionar também para nomear, sequenciar ou fechar uma branch
   `feature/`, `release/` ou `hotfix/` dentro de um projeto que já declarou
   Gitflow como estratégia de branch.
-- Não acionar para propor Gitflow a um projeto que não pediu isso — a escolha
-  do modelo de branch é decisão explícita de quem conduz o projeto, nunca
+- Não acionar para propor Gitflow a um projeto que não pediu isso: a escolha
+  do modelo de branch é escolha explícita de quem conduz o projeto, nunca
   inferida pela presença de uma branch chamada `develop` ou pelo volume de
   branches abertas.
 - Não acionar para resolver um conflito já em andamento
   (`$specsfy-specialist-merge-conflict-resolution`) nem para desenhar o
   pipeline ou a promoção de artefato entre ambientes
-  (`$specsfy-specialist-delivery-engineering`) — aqui o foco é a topologia e a
+  (`$specsfy-specialist-delivery-engineering`): aqui o foco é a topologia e a
   política das branches, não a resolução textual nem a entrega.
 
 ## Fluxo
 
 1. Confirmar que a pessoa pediu Gitflow explicitamente, ou apontar a
    configuração/instrução existente que já declara essa escolha, antes de
-   aplicar qualquer convenção — nunca presumir Gitflow a partir da estrutura
+   aplicar qualquer convenção, nunca presumir Gitflow a partir da estrutura
    do repositório.
 2. Verificar o estado real das branches (`git branch -a`,
    `git config --get-regexp '^gitflow\.'`) para saber se `main`/`master` e
@@ -37,9 +37,9 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
 3. Definir com a pessoa os nomes das branches permanentes (`main` de
    produção, `develop` de integração) e os prefixos das branches de vida
    curta (`feature/`, `release/`, `hotfix/`, `support/` quando aplicável).
-4. Registrar a decisão como regra confirmada do projeto (`$specsfy-aux-rules`
+4. Registrar a escolha como regra confirmada do projeto (`$specsfy-aux-rules`
    grava em `.specsfy/RULES.md`), incluindo prefixos, branch-alvo de cada
-   tipo e política de merge — não deixar a convenção apenas verbal.
+   tipo e política de merge, não deixar a convenção apenas verbal.
 5. Orientar a abertura, a integração e o fechamento de cada tipo de branch:
    `feature/*` parte de e volta para `develop`; `release/*` parte de
    `develop` e vai para `main` e `develop`; `hotfix/*` parte de `main` e vai
@@ -48,13 +48,13 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
    `main`, alinhando com a estratégia de versionamento já adotada pelo
    projeto (semver ou outra).
 7. Verificar que `develop` recebeu de volta toda correção aplicada em
-   `release/*` ou `hotfix/*` antes de considerar o ciclo fechado —
+   `release/*` ou `hotfix/*` antes de considerar o ciclo fechado:
    divergência aqui reaparece como regressão no próximo release.
 
 ## Padrões
 
 - Usar `git merge --no-ff` para toda integração de `feature/*`, `release/*`
-  e `hotfix/*` — merge fast-forward apaga o registro de que aquela branch
+  e `hotfix/*`: merge fast-forward apaga o registro de que aquela branch
   existiu, do qual a auditoria de release do Gitflow depende.
 - Nomear com prefixo consistente e o mesmo separador em todo o projeto
   (`feature/<slug>`, `release/<versao>`, `hotfix/<versao-ou-slug>`); não
@@ -63,13 +63,13 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
   ou `main` correspondente, sem cherry-pick seletivo de commits ainda não
   integrados.
 - Aplicar em `release/*` somente correção de bug, texto, documentação e
-  preparação de release (changelog, versão) — funcionalidade nova não entra
+  preparação de release (changelog, versão): funcionalidade nova não entra
   numa branch de release já aberta; volta para a próxima `feature/*`.
 - Fechar todo `hotfix/*` mesclando em `main` (com tag) e em `develop` (ou na
-  `release/*` aberta, se houver uma) na mesma operação — hotfix que só chega
+  `release/*` aberta, se houver uma) na mesma operação: hotfix que só chega
   em `main` desaparece do próximo release.
 - Apagar a branch de vida curta (`feature/*`, `release/*`, `hotfix/*`) depois
-  do merge confirmado nos dois destinos — branch finalizada e não apagada
+  do merge confirmado nos dois destinos: branch finalizada e não apagada
   convida retrabalho sobre código já integrado.
 
 ## Antipadrões
@@ -99,25 +99,25 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
   conferidos antes de apagar uma branch de vida curta, garantindo que o
   merge realmente aconteceu nos dois destinos esperados.
 - Tag de versão presente em `main` para cada `release/*` ou `hotfix/*`
-  fechado (`git tag --contains <commit-do-merge>`), e a mesma correção
+  fechado (`git tag --contains <commit-do-merge>`), com a mesma correção
   presente em `develop` (`git log develop --oneline | grep <commit>` ou
   equivalente).
 - `.specsfy/RULES.md` (ou instrução equivalente do projeto) registrando a
   convenção de nomes e a política de merge, revisitada por
   `$specsfy-aux-rules` quando alguém a violar.
 - Não declarar "o projeto segue Gitflow" apenas porque existe uma branch
-  `develop`; a evidência exige prefixos consistentes, merges `--no-ff`
+  `develop`; a comprovação exige prefixos consistentes, merges `--no-ff`
   rastreáveis e o ciclo de `release`/`hotfix` fechado nos dois destinos.
 
 ## Skills relacionadas
 
 - `$specsfy-specialist-merge-conflict-resolution` quando uma integração de
-  `feature/`, `release/` ou `hotfix/` já em andamento gerar conflito — esta
+  `feature/`, `release/` ou `hotfix/` já em andamento gerar conflito: esta
   skill decide a topologia e a política de branch, a outra resolve o
   conflito textual ou semântico já aberto.
 - `$specsfy-specialist-delivery-engineering` quando o merge em `main` ou a
   tag de release precisar disparar pipeline, build de artefato ou promoção
-  entre ambientes — esta skill entrega a branch e a tag corretas, a outra
+  entre ambientes: esta skill entrega a branch e a tag corretas, a outra
   decide como o pipeline reage a elas.
 
 Leia [references/standards.md](references/standards.md) para o mapa completo

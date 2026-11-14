@@ -16,7 +16,7 @@ description: "Gera relatórios de servidor com Ansible, logs Docker, serviços S
   `$specsfy-specialist-ansible` para automação com escrita e
   `$specsfy-specialist-docker-swarm` para topologia e rollout do Swarm.
 - Combinar com `$specsfy-specialist-observability` quando o relatório vai
-  definir SLO, alerta ou dashboard, e com `$specsfy-specialist-debugging`
+  definir SLO, alerta ou dashboard e com `$specsfy-specialist-debugging`
   quando um erro encontrado no relatório precisa de causa raiz.
 
 ## Fluxo
@@ -74,7 +74,7 @@ Editorial Compartilhado aplicável ao projeto consumidor.
 - Tratar container parado com erro com `docker ps -a --filter status=exited`,
   inspeção do código de saída e trecho final do log. Código `0` não é erro;
   `137` indica OOM ou kill externo e pede correlação com `dmesg` e limites.
-- Inventariar imagens com repositório, tag, digest quando disponível, tamanho
+- Listar imagens com repositório, tag, digest quando disponível, tamanho
   e tempo de criação. Marcar `dangling` e candidatas a `prune` sem executar
   a limpeza no mesmo play.
 - Medir disco com `df -h` e `df -i` por filesystem mais `docker system df`.

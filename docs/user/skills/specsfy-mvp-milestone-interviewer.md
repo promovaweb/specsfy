@@ -7,7 +7,7 @@ submódulo Git e esses arquivos não estão nele, ela os procura na raiz do Hub
 que contém o submódulo. A importação preserva o contexto comercial e de produto
 no próprio `MVP.md`; somente requisitos de desenvolvimento entram no Specsfy.
 Quando você escolher uma opção pelo número, a captura registra o texto da opção
-escolhida, e não somente `1`, `2` ou `3`.
+escolhida, não somente `1`, `2` ou `3`.
 
 ## Quando usar
 
@@ -29,7 +29,8 @@ desde a primeira rodada.
 Quando a jornada indicar que o sistema precisa guardar informações, a skill
 pergunta, uma por vez, sobre cada informação ausente ou ambígua durante a
 entrevista do backlog correspondente. São no máximo oito perguntas por área;
-para continuar, você precisa pedir mais e indicar quantas deseja responder. As
+para continuar, você precisa solicitar mais e indicar quantas deseja
+responder. As
 respostas confirmadas ficam em `.specsfy/DATABASE.md`.
 
 ## Como descrever a tarefa
@@ -56,7 +57,8 @@ a base usada e a lacuna que ficou aberta. Cada backlog também recebe o trecho
 que o originou como registro confirmado. A própria skill carrega
 `$specsfy-02-backlog`, que reaproveita os defaults e só pergunta por lacunas,
 ambiguidades, contradições ou escolhas reais. Ela chama
-`$specsfy-data-discovery` quando houver dados ambíguos e retorna à fila até
+`$specsfy-data-discovery` quando houver informações ambíguas e retorna à fila
+até
 entrevistar todos. Depois sincroniza os milestones e só chama
 `$specsfy-03-specify` para gerar uma spec Draft para cada backlog. Os campos
 sem resposta confiável ficam marcados como `Pendente`. A seção 10 de cada spec
@@ -66,8 +68,8 @@ não executa tarefas e não passa os gates durante a conversa.
 
 ## Erros comuns
 
-- pedir tarefas técnicas antes de entrevistar todos os backlogs gerados;
-- misturar uma hipótese da conversa com o texto que foi registrado;
+- solicitar tarefas técnicas antes de entrevistar todos os backlogs gerados;
+- misturar uma suposição da conversa com o texto que foi registrado;
 - esperar que a importação implemente código ou aprove uma spec com lacunas.
 
 ## Próximo passo

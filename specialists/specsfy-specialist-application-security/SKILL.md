@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-application-security
-description: "Modelar ameaças e revisar segurança de aplicações, APIs, autenticação, autorização, dados, dependências, secrets e infraestrutura. Use para mudanças com trust boundaries, identidade, entrada externa, dados sensíveis ou revisão de segurança; use também para threat modeling antes de uma feature com nova superfície de ataque; não declare segurança sem evidência, e para hardening de pipeline/credenciais de deploy use `$specsfy-specialist-delivery-engineering`."
+description: "Modelar ameaças e revisar segurança de aplicações, APIs, autenticação, autorização, dados, dependências, secrets e infraestrutura. Use para mudanças com trust boundaries, identidade, entrada externa, dados sensíveis ou revisão de segurança; use também para threat modeling antes de uma feature com nova superfície de ataque; não declare segurança sem comprovação, e para hardening de pipeline/credenciais de deploy use `$specsfy-specialist-delivery-engineering`."
 ---
 
 # Segurança de aplicações
@@ -12,18 +12,18 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - Acionar também antes de desenhar uma feature com superfície de ataque nova
   (novo endpoint público, nova integração, novo tipo de usuário) para fazer
   threat modeling preventivo.
-- Não acionar como substituto de revisão de credenciais de pipeline/deploy —
+- Não acionar como substituto de revisão de credenciais de pipeline/deploy:
   usar `$specsfy-specialist-delivery-engineering` para isso; aqui o foco é a
   aplicação e seus dados, não a esteira de entrega.
 - Combinar com `$specsfy-specialist-postgres`/`$specsfy-specialist-supabase`
-  quando o risco envolve modelagem de acesso a dado por linha ou tenant.
+  quando a exposição envolve modelagem de acesso a dado por linha ou tenant.
 
 ## Fluxo
 
 1. Mapear ativos, atores, trust boundaries, entradas externas e efeitos
    (o que muda de estado) antes de pensar em controle.
 2. Definir ameaças plausíveis e seu impacto real antes de escolher
-   controles — não implementar defesa para uma ameaça que não existe no
+   controles, não implementar defesa para uma ameaça que não existe no
    contexto do sistema.
 3. Verificar autenticação, autorização por objeto (não só por rota) e
    separação de tenants em toda operação que lê ou muta dado.
@@ -35,15 +35,15 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
    produção.
 6. Materializar testes positivos (fluxo autorizado funciona) e negativos
    (fluxo não autorizado falha) nos boundaries críticos identificados.
-7. Registrar risco residual, owner, sinal de observabilidade associado e
-   plano de resposta — nenhum sistema fica "100% seguro", apenas com risco
-   conhecido e monitorado.
+7. Registrar a exposição que permanece, owner, sinal de observabilidade
+   associado e plano de resposta: nenhum sistema fica "100% seguro", apenas
+   com falhas possíveis conhecidas e monitoradas.
 
 ## Padrões
 
 - Negar por padrão e conceder o menor privilégio necessário para cada
   identidade e operação.
-- Autorizar no servidor em toda operação e em todo objeto acessado — nunca
+- Autorizar no servidor em toda operação e em todo objeto acessado, nunca
   confiar em uma verificação apenas client-side ou em um ID de objeto vindo
   do cliente sem revalidar propriedade/tenant.
 - Tratar upload de arquivo, URL fornecida pelo usuário, template
@@ -55,7 +55,7 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - Rotacionar credenciais periodicamente e preferir identidade temporária
   (tokens de curta duração, STS/OIDC) a segredo estático de longa duração.
 - Mitigar abuso com limites por ator e por recurso (rate limit por usuário/
-  API key/tenant), não apenas por IP — um IP compartilhado (NAT, proxy)
+  API key/tenant), não apenas por IP: um IP compartilhado (NAT, proxy)
   penaliza usuários legítimos e um atacante distribuído contorna limite
   só por IP.
 - Ao corrigir uma vulnerabilidade, corrigir a causa raiz e adicionar teste
@@ -67,7 +67,7 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - Verificar autorização apenas pela rota (`/admin/*` protegido) sem verificar
   o objeto específico acessado dentro da rota: um usuário autenticado como
   tenant A consegue acessar `/api/orders/123` de um tenant B só trocando o
-  ID na URL (IDOR — Insecure Direct Object Reference).
+  ID na URL (IDOR, Insecure Direct Object Reference).
 - Validar entrada só no client (JavaScript no navegador) sem revalidar no
   servidor: qualquer requisição direta à API contorna completamente a
   validação client-side.
@@ -76,7 +76,7 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
   malicioso como um tipo inofensivo.
 - Guardar segredo de aplicação (chave de API, senha de banco) em variável de
   ambiente sem controle de acesso ao processo/log, ou logar o payload
-  completo de uma requisição que contém token de autenticação — o segredo
+  completo de uma requisição que contém token de autenticação: o segredo
   vaza por um canal indireto mesmo com o "cofre" correto na origem.
 - Anunciar "sistema seguro" ou "vulnerabilidade corrigida" sem teste
   negativo específico comprovando que o vetor original não funciona mais.
@@ -84,17 +84,17 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 ## Validação
 
 - Casos de teste negativos: acesso sem autenticação, com identidade errada,
-  com tenant errado e replay de uma requisição já processada — todos devem
+  com tenant errado e replay de uma requisição já processada, todos devem
   falhar de forma controlada.
 - Análise de dependências vulneráveis e varredura de secrets vazados com as
-  ferramentas já adotadas pelo projeto, rodada como parte do fluxo normal,
+  ferramentas já adotadas pelo projeto, executada como parte do fluxo normal,
   não apenas manualmente antes de um release grande.
 - Configuração segura de produção: headers de segurança (ex.:
   `Content-Security-Policy`, `Strict-Transport-Security`), atributos de
   cookie (`HttpOnly`, `Secure`, `SameSite`) e política de CORS restrita à
   origem realmente necessária.
-- Evidência concreta de cada controle reivindicado e do risco residual que
-  permanece — nunca declarar algo "seguro" em linguagem absoluta sem o teste
+- Comprovação concreta de cada controle reivindicado e da exposição que
+  permanece, nunca declarar algo "seguro" em linguagem absoluta sem o teste
   que comprova.
 
 ## Skills relacionadas
@@ -113,7 +113,7 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
   constraints).
 - `$specsfy-specialist-delivery-engineering` para hardening de credenciais
   de pipeline, assinatura de artefato e supply chain.
-- `$specsfy-specialist-web-api-design` quando o risco nasce do desenho do
+- `$specsfy-specialist-web-api-design` quando a exposição vem do desenho do
   contrato de API (verbos, versionamento, exposição de campo sensível).
 
 Leia [references/standards.md](references/standards.md) para checklist de

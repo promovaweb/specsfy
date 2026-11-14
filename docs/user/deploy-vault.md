@@ -9,7 +9,7 @@ muda somente a maneira de fornecer a senha que abre esse arquivo.
 
 ### Comando configure-vault
 
-Execute `./deploy configure-vault` no seu terminal. O comando pede a senha
+Execute `./deploy configure-vault` no seu terminal. O comando solicita a senha
 atual do Vault duas vezes e grava um arquivo fora do repositório. A senha não
 aparece na tela, nos argumentos do processo ou nas mensagens do configurador.
 Ela fica em texto simples no arquivo local, com permissão `600`, dentro de uma
@@ -31,11 +31,11 @@ fonte explicitamente.
 <!-- markdownlint-enable MD013 -->
 
 O configurador recusa caminhos dentro do worktree e links simbólicos. Antes
-de substituir um arquivo, pede confirmação; responder `n` ou usar Enter
-preserva o conteúdo. Senhas diferentes na confirmação também preservam o
-arquivo. O comando exige terminal para cadastrar e não aceita a senha como
-argumento. Sucesso retorna código `0`; falha retorna `1`, opção inválida `2` e
-cancelamento por Ctrl+C `130`.
+de substituir um arquivo, ele solicita uma confirmação que preserva o conteúdo
+quando você responde `n` ou usa Enter. Senhas diferentes na confirmação também
+preservam o arquivo. O comando exige terminal para cadastrar e não aceita a
+senha como argumento. Sucesso retorna código `0`, falha retorna `1`, opção
+inválida retorna `2` e cancelamento por Ctrl+C retorna `130`.
 
 Estes cinco usos cobrem o cadastro, a consulta e a separação de configurações:
 
@@ -69,14 +69,14 @@ XDG_CONFIG_HOME="$HOME/.config-automacao" ./deploy configure-vault
 Um destino personalizado precisa ser informado nas execuções seguintes por
 `--vault-password-file`, `ANSIBLE_VAULT_PASSWORD_FILE` ou `ansible.cfg`. O
 cadastro padrão é descoberto automaticamente pelo modo sem interação do mesmo
-checkout e usuário. A consulta `--show-path` ajuda a conferir permissões com
-`stat`, sem revelar o conteúdo.
+checkout e usuário. A consulta `--show-path` mostra o caminho do arquivo para
+você conferir as permissões com `stat`, sem revelar o conteúdo.
 
 ### Trocar, remover ou configurar outra máquina
 
 Para substituir a cópia local da senha, execute o mesmo comando de cadastro,
 confirme com `s` e informe a senha atual. Isso não altera a criptografia do
-Vault. Quando a intenção for mudar a senha que criptografa os dados, faça a
+Vault. Quando a intenção for mudar a senha que criptografa o arquivo, faça a
 rotação pelo Ansible e atualize depois todas as fontes que fornecem essa senha.
 
 Para remover o cadastro padrão, confira primeiro o caminho e remova somente
@@ -92,21 +92,22 @@ quando outra fonte estiver configurada. Para um arquivo personalizado, remova
 o caminho que você cadastrou e retire a referência correspondente do ambiente
 ou de `ansible.cfg`. Essa remoção não apaga o Vault criptografado do projeto.
 
-Em outra máquina, execute o cadastro novamente no checkout correspondente.
-Não envie o arquivo da senha pelo Git. A configuração é local ao usuário que
-executa o Ansible; um agente executado em container ou por outro usuário precisa
+Em outra máquina, execute o cadastro novamente no checkout correspondente, sem
+enviar o arquivo da senha pelo Git. A configuração é local ao usuário que
+executa o Ansible. Um agente executado em container ou por outro usuário precisa
 receber sua própria fonte de senha e acesso SSH ao ambiente autorizado.
 
 ## Deploy manual e deploy pela IA
 
 ### Comando run
 
-`./deploy run` mantém a entrada manual: pede a senha no terminal, mesmo quando
+`./deploy run` mantém a entrada manual e solicita a senha no terminal, mesmo
+quando
 existe uma fonte externa. A senha digitada fica em um arquivo temporário com
 permissão `600` durante a execução, removido ao concluir ou cancelar normalmente.
 Um encerramento forçado por `SIGKILL` pode deixar esse temporário na máquina.
 
-`./deploy run --non-interactive` usa uma fonte configurada e não pede dados.
+`./deploy run --non-interactive` usa uma fonte configurada e não faz perguntas.
 Antes de conectar aos servidores, valida localmente a descriptografia de
 `ansible/group_vars/all/vault.yml`. Depois, testa os hosts e aplica o playbook.
 Senha incorreta, fonte ausente ou falha do cofre encerram a execução, sem
@@ -128,11 +129,11 @@ a precedência do próprio Ansible. Os IDs permitem usar mais de uma senha no
 mesmo Vault. Fontes com `@prompt` são recusadas nesse modo.
 
 O comando exige Node.js 22 ou superior e os executáveis `ansible-config`,
-`ansible-inventory`, `ansible` e `ansible-playbook`. O ambiente também precisa
-de acesso SSH por chave e das permissões de elevação usadas pelo playbook.
-O modo sem interação desativa as perguntas de SSH, sudo e Vault; não concede
-permissões adicionais. Uma configuração de cofre deve estar autenticada antes
-da execução. Scripts que fornecem senha não podem depender de perguntas.
+`ansible-inventory`, `ansible` e `ansible-playbook`, além de acesso SSH por
+chave e das permissões de elevação usadas pelo playbook.
+O modo sem interação desativa as perguntas de SSH, sudo e Vault, sem conceder
+permissões adicionais. Uma configuração de cofre precisa estar autenticada no
+início da execução. Scripts que fornecem senha não podem fazer perguntas.
 
 Nos cinco exemplos abaixo, confirme os hosts declarados no arquivo selecionado
 antes de publicar. O alvo padrão continua sendo `ansible/inventory.yml`:
@@ -177,16 +178,16 @@ A execução mostra a tabela de conexões e o resultado do playbook. Código `0`
 confirma o sucesso dos comandos; a IA ainda deve conferir os serviços e a
 versão publicada. Falhas de configuração ou execução retornam `1`, argumentos
 inválidos retornam `2` e Ctrl+C retorna `130`. Sem fonte pronta, a IA informa a
-pendência e orienta o cadastro humano, sem pedir a senha na conversa.
+pendência e orienta o cadastro humano, sem solicitar a senha na conversa.
 
 ## Cadastro de segredos com a mesma configuração
 
 ### Comando secrets
 
-`./deploy secrets` continua solicitando os valores ausentes da aplicação no
-terminal. Para a senha do Vault, reaproveita as mesmas fontes explícitas,
-nativas ou locais do modo automatizado. Sem nenhuma fonte configurada, pede
-também a senha. O comando não recebe valores secretos como argumentos.
+`./deploy secrets` continua solicitando no terminal os valores ausentes da
+aplicação. Para a senha do Vault, reaproveita as fontes explícitas, nativas ou
+locais do modo automatizado e, sem nenhuma fonte configurada, solicita também a
+senha. O comando não recebe valores secretos como argumentos.
 
 As opções `--vault-password-file <fonte>` e `--vault-id <id>@<fonte>` são
 opcionais, com os mesmos tipos e ordem de escolha de `run`. Não há
@@ -198,7 +199,8 @@ O arquivo `ansible/vault-fields.txt` contém os nomes desejados, um por linha,
 no formato `vault_` seguido de letras minúsculas, números ou sublinhados. O
 utilitário preserva campos existentes e publica o YAML atualizado somente
 depois de criptografar todos os novos valores. Uma falha intermediária mantém
-o arquivo original. É necessário ter `ansible-vault` instalado.
+o arquivo original. Para tudo isso, o `ansible-vault` precisa estar instalado
+na máquina que executa o comando.
 
 ```bash
 # Cadastrar os campos faltantes usando a fonte já configurada

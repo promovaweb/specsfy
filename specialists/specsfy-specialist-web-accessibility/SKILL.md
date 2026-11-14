@@ -20,7 +20,7 @@ description: Implementar e auditar acessibilidade web com WCAG, HTML semântico,
 
 1. Descobrir política, nível WCAG, navegadores, tecnologias assistivas, público
    e fluxos críticos; separar auditoria de conformidade de teste de usabilidade.
-2. Inventariar barreiras por estrutura, percepção, teclado, foco, formulário,
+2. Listar barreiras por estrutura, percepção, teclado, foco, formulário,
    atualização dinâmica, mídia e autenticação usando
    [references/standards.md](references/standards.md).
 3. Corrigir HTML e comportamento nativos antes de adicionar ARIA ou widget
@@ -32,7 +32,7 @@ description: Implementar e auditar acessibilidade web com WCAG, HTML semântico,
 6. Executar análise automática e inspeção manual; classificar cada achado por
    critério, impacto, caminho de reprodução e correção verificável.
 7. Exercitar tarefas críticas com tecnologia assistiva representativa e
-   documentar cobertura, limitações, exceções e risco residual.
+   documentar cobertura, limitações, exceções e barreiras que permanecem.
 
 ## Padrões
 
@@ -66,8 +66,8 @@ description: Implementar e auditar acessibilidade web com WCAG, HTML semântico,
 - Medir contraste de texto, componentes e indicadores de foco e testar forced
   colors e reduced motion quando aplicáveis.
 - Combinar axe/linter com inspeção do accessibility tree e leitor de tela nos
-  fluxos de maior risco.
-- Não declarar conformidade WCAG sem mapear critérios, escopo, evidência,
+  fluxos de maior impacto.
+- Não declarar conformidade WCAG sem mapear critérios, escopo, comprovação,
   limitações e exceções; “acessível” não é sinônimo de teste automatizado verde.
 
 ## Skills relacionadas
@@ -83,7 +83,7 @@ description: Implementar e auditar acessibilidade web com WCAG, HTML semântico,
   inclusive com pessoas que usam tecnologias assistivas.
 - `$specsfy-specialist-react` e `$specsfy-specialist-astro` ou
   `$specsfy-specialist-nextjs` implementam a correção no framework observado.
-- `$specsfy-specialist-code-review` amplia a revisão para riscos além do recorte
+- `$specsfy-specialist-code-review` amplia a revisão para falhas além do recorte
   de acessibilidade.
 
 Leia [references/standards.md](references/standards.md) para critérios WCAG 2.2,

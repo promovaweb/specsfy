@@ -26,12 +26,12 @@ quro desenvolver uma listagem de usuarios para gerenciar os usuarios do sistema
 ```
 
 O Specsfy preserva o texto exatamente como foi escrito. O erro de digitação
-fica no registro porque ele é a prova do pedido original. A interpretação
+fica no registro porque ele é a prova da solicitação original. A interpretação
 aparece em seções separadas, marcadas como inferência.
 
 ## 2. A captura na Inbox
 
-Quando você pede para guardar a ideia, `specsfy-01-inbox` cria um arquivo em
+Quando você solicita que a ideia seja guardada, `specsfy-01-inbox` cria um arquivo em
 `specs/inbox/` com este cabeçalho:
 
 ```text
@@ -50,7 +50,7 @@ Quando você pede para guardar a ideia, `specsfy-01-inbox` cria um arquivo em
 ```
 
 Logo abaixo ficam o texto original, as fontes consultadas e a análise inicial:
-problema, pessoas afetadas e valor esperado. Nenhuma pergunta é feita nessa
+problema, usuários afetados e valor esperado. Nenhuma pergunta é feita nessa
 etapa.
 
 ## 3. O item de backlog
@@ -103,7 +103,7 @@ Pergunta 1. Quais informações de cada usuário a listagem deve mostrar?
 
 Você pode responder `1`, combinar com texto, como `4: nome e cargo`, ou
 escolher `Avançar` para encerrar, adiar ou retomar a área. A resposta é
-registrada pelo texto completo da opção, nunca só pelo número.
+registrada pelo texto completo da opção, além do número.
 
 ## 5. O cabeçalho da spec
 
@@ -221,7 +221,7 @@ it("ordena por nome e desempata por ID", () => {
 });
 ```
 
-Antes da implementação, esses testes precisam falhar pelo motivo certo. No
+Na preparação, esses testes precisam falhar pelo motivo certo. No
 exemplo, o RED registrado foi: rota `directory.users.index` ausente. Um teste
 que falha por erro de sintaxe ou banco indisponível não vale como RED.
 
@@ -243,7 +243,7 @@ itens obrigatórios, nesta ordem:
 ```
 
 Uma tarefa sem interface marca `VISUAL` como `Não aplicável` e explica o
-motivo. O percentual de progresso conta somente as tarefas e esses itens.
+motivo. O percentual de progresso considera somente as tarefas e esses itens.
 
 ## 9. A evidência RED, GREEN e REFACTOR
 
@@ -327,5 +327,5 @@ Para consultar rapidamente estados, gates, arquivos e comandos, siga para a
 ## Justificativa de tamanho
 
 O capítulo acompanha uma única entrega, arquivo por arquivo. Manter todos os
-trechos na mesma página mostra como cada artefato nasce do anterior e como os
+trechos na mesma página mostra como cada artefato deriva do anterior e como os
 identificadores ligam requisito, teste, tarefa e evidência.

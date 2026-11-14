@@ -8,7 +8,8 @@ gates manualmente.
 ## Descreva o que mudou
 
 Durante ou depois da implementação, identifique a `spec.md` e diga diretamente
-o que deve mudar. Você pode adicionar, remover, corrigir ou mudar uma regra. A
+o que deve mudar. Você pode adicionar, remover, corrigir ou mudar
+uma regra de negócio. A
 skill usará esse arquivo para encontrar os requisitos, testes e tarefas
 afetados:
 
@@ -52,8 +53,8 @@ mudança posterior → update-spec → validate ou tasks → TDD/BDD → impleme
                                ↘ backlog, se faltar uma definição
 ```
 
-Testes e tarefas que continuam válidos são preservados. Provas dependentes do
-comportamento anterior voltam a ficar pendentes. A implementação só é retomada
+Testes e tarefas que continuam válidos são preservados, enquanto as provas
+dependentes do comportamento anterior voltam a ficar pendentes. A implementação só é retomada
 depois de existir novo RED válido e os gates necessários voltarem a `Passed`.
 
 ## Resultado esperado
@@ -62,7 +63,7 @@ depois de existir novo RED válido e os gates necessários voltarem a `Passed`.
 - IDs e definições ainda válidos foram preservados.
 - os gates afetados foram reabertos.
 - validação, tarefas e testes foram reconciliados.
-- a etapa que recebeu o pedido foi retomada automaticamente.
+- a etapa que recebeu a solicitação foi retomada automaticamente.
 
 ## Limites
 
@@ -80,5 +81,5 @@ depois de existir novo RED válido e os gates necessários voltarem a `Passed`.
 
 Depois da atualização, consulte
 [`specsfy-progress`](skills/specsfy-progress.md) para conferir o
-estado geral. A spec atualizada permanece como única fonte normativa do
+estado geral, com a spec atualizada como única fonte normativa do
 projeto.

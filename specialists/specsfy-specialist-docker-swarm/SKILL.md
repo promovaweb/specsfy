@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-docker-swarm
-description: "Projetar, implantar e operar stacks Docker Swarm com serviços, overlay networks, secrets, configs, placement, rollout, rollback e recuperação do quorum. Use para swarm init, docker stack, services, managers, workers ou arquivos de stack; use também para decidir topologia de managers/workers e estratégia de rollout; não use Compose local como evidência de comportamento do Swarm, e para build/imagem de uma única máquina use `$specsfy-specialist-docker`."
+description: "Projetar, implantar e operar stacks Docker Swarm com serviços, overlay networks, secrets, configs, placement, rollout, rollback e recuperação do quorum. Use para swarm init, docker stack, services, managers, workers ou arquivos de stack; use também para decidir topologia de managers/workers e estratégia de rollout; não use Compose local como comprovação de comportamento do Swarm, e para build/imagem de uma única máquina use `$specsfy-specialist-docker`."
 ---
 
 # Docker Swarm
@@ -12,11 +12,11 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 - Acionar também para decidir topologia de managers/workers, rollout,
   rollback ou recuperação de quorum.
 - Não acionar para desenvolvimento local com `docker compose up` em uma única
-  máquina, nem para build de imagem — usar `$specsfy-specialist-docker` nesse
+  máquina, nem para build de imagem: usar `$specsfy-specialist-docker` nesse
   caso; muitas chaves do Compose (`profiles`, `depends_on.condition`, `build`
   em runtime) não têm efeito em `docker stack deploy`.
 - Combinar com `$specsfy-specialist-delivery-engineering` quando o rollout faz
-  parte de um pipeline de release, e com `$specsfy-specialist-observability`
+  parte de um pipeline de release e com `$specsfy-specialist-observability`
   para decidir os sinais que autorizam ou revertem o rollout.
 
 ## Fluxo
@@ -76,13 +76,13 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 - Aplicar `placement.constraints` apenas com labels administradas
   (`node.labels.*`), nunca com hostname hardcoded.
 - Não assumir que uma opção do Compose (`profiles`, `build`, `develop`,
-  `depends_on` com `condition`) é respeitada por `stack deploy` — validar
+  `depends_on` com `condition`) é respeitada por `stack deploy`: validar
   contra a lista de campos suportados antes de depender dela.
 
 ## Antipadrões
 
 - Rolling update sem `update_config.order: start-first` em serviço com
-  poucas réplicas: a réplica antiga cai antes da nova ficar saudável, e o
+  poucas réplicas: a réplica antiga cai antes da nova ficar saudável. O
   serviço fica momentaneamente sem capacidade.
 - Volume local (`bind` ou volume nomeado sem driver distribuído) em serviço
   com múltiplas réplicas ou reagendamento: o dado "desaparece" quando o
@@ -107,9 +107,9 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
   restantes.
 - Provar rollback de aplicação (`docker service update --rollback` ou
   `rollback_config`) e a compatibilidade de migrations de dados durante a
-  janela em que as duas versões coexistem.
+  janela durante a qual as duas versões coexistem.
 - Não declarar a stack "pronta para produção" sem esses quatro pontos
-  verificados; "funcionou no meu node" não é evidência de convergência do
+  verificados; "funcionou no meu node" não é comprovação de convergência do
   cluster.
 
 ## Skills relacionadas
@@ -126,7 +126,7 @@ description: "Projetar, implantar e operar stacks Docker Swarm com serviços, ov
 - `$specsfy-specialist-laravel` define os contratos da aplicação e
   `$specsfy-specialist-redis` a persistência/cache usados pelos services.
 - `$specsfy-specialist-docker` para build de imagem, Dockerfile e
-  desenvolvimento local com Compose — fronteira: Swarm começa onde a
+  desenvolvimento local com Compose: fronteira: Swarm começa onde a
   aplicação passa a rodar em múltiplos nós com estado de cluster.
 - `$specsfy-specialist-delivery-engineering` quando o rollout do serviço faz
   parte de um pipeline de release com promoção entre ambientes.

@@ -48,12 +48,12 @@ specs/<estado>/0004-recuperar-senha/
 Em seguida, ela preenche o Ato I com requisitos e cenários, mantém as escolhas
 ainda abertas claramente marcadas e executa os validadores. Um resultado
 incompleto permanece pendente em vez de receber uma aprovação sem evidência.
-Quando falta uma decisão material, a skill entrega a conversa ao ciclo de
-refinamento do backlog e retoma depois. Se você escolher `avançar`, a spec pode registrar o
+Quando falta uma escolha material, a skill entrega a conversa ao ciclo de
+refinamento do backlog e retoma depois. Ao escolher `avançar`, a spec pode registrar o
 brief parcial, mas permanece Draft com o Definition Gate pendente. A mesma
 o refinamento não é reaberto imediatamente nessa retomada.
 
-Os arquivos em `research/` apoiam as escolhas registradas, mas nunca substituem
+Os arquivos em `research/` apoiam as escolhas registradas, mas não substituem
 o texto normativo de `spec.md`. Quando houver divergência, a entrega e seus
 validadores devem seguir a spec.
 
@@ -80,5 +80,5 @@ validadores devem seguir a spec.
 ## Próximo passo
 
 Use [`specsfy-04-validate`](specsfy-04-validate.md) para provar que a
-definição está pronta. Se uma escolha importante faltar, a transição volta para
-[`specsfy-02-backlog`](specsfy-02-backlog.md).
+definição está pronta. Quando falta uma escolha importante, a transição volta
+para o [`specsfy-02-backlog`](specsfy-02-backlog.md).

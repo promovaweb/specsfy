@@ -12,8 +12,8 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
   ou dimensionar backup/restore em Postgres.
 - Acionar também quando um ORM (Eloquent, Prisma, Drizzle) gerar SQL
   ineficiente e a causa raiz for modelagem ou índice, não a API do ORM.
-- Não acionar para decisões específicas de Supabase (RLS, Auth, Realtime,
-  Edge Functions) — usar `$specsfy-specialist-supabase`, que aplica Postgres
+- Não acionar para escolhas específicas de Supabase (RLS, Auth, Realtime,
+  Edge Functions): usar `$specsfy-specialist-supabase`, que aplica Postgres
   por baixo com essas camadas adicionais.
 - Combinar com `$specsfy-specialist-laravel` quando o ponto de entrada for
   Eloquent e com `$specsfy-specialist-performance-engineering` quando o
@@ -30,11 +30,11 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
    real com `EXPLAIN (ANALYZE, BUFFERS)` sobre dados representativos, nunca
    sobre uma tabela vazia ou de desenvolvimento.
 4. Selecionar índice pelo workload observado (predicados do `WHERE`,
-   `ORDER BY`, `JOIN`) — nunca por "essa coluna é consultada" isoladamente.
+   `ORDER BY`, `JOIN`), nunca por "essa coluna é consultada" isoladamente.
 5. Analisar isolation level, duração de transação, ordem de aquisição de
    locks e concorrência esperada sob a carga real.
 6. Planejar a migration com compatibilidade entre a versão antiga e nova da
-   aplicação durante o deploy, e um caminho de rollback testável.
+   aplicação durante o deploy, com um caminho de rollback testável.
 7. Marcar a execução como `[MIGRATION]`, apontar o arquivo versionado, aplicar
    em uma base de teste e consultar o histórico do migrador antes de concluir.
 8. Validar backup, restore, monitoramento e capacidade no ambiente alvo antes
@@ -43,13 +43,13 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 ## Padrões
 
 - Preferir constraint do banco (`NOT NULL`, `CHECK`, `UNIQUE`, FK, `EXCLUDE`)
-  para toda invariante que sempre deve valer — validação só na aplicação
+  para toda invariante que sempre deve valer: validação só na aplicação
   permite dado inconsistente por qualquer segundo caminho de escrita.
 - Evitar `SELECT *` em código de produção, tipos imprecisos (`text` para
   enum fechado, `float` para dinheiro) e índice redundante que duplica outro
   já existente com prefixo igual.
 - Nunca adicionar índice sem ler padrão de escrita, tamanho da tabela,
-  seletividade do predicado e o plano antes/depois — índice mal escolhido
+  seletividade do predicado e o plano antes/depois: índice mal escolhido
   piora escrita sem acelerar leitura.
 - Manter transação curta (evitar I/O externo, espera de usuário ou chamada de
   rede dentro dela) e ordem de aquisição de locks consistente entre todos os
@@ -60,25 +60,25 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
   alto volume: nunca renomear/remover coluna lida em produção no mesmo passo
   que a adiciona.
 - Conceder o menor privilégio necessário e separar papéis de migration
-  (DDL), aplicação (DML) e leitura (`SELECT` apenas) — a aplicação nunca
+  (DDL), aplicação (DML) e leitura (`SELECT` apenas): a aplicação nunca
   conecta com um role que pode `DROP TABLE`.
 
 ## Antipadrões
 
-- Índice criado por "essa coluna aparece no WHERE", ignorando seletividade —
+- Índice criado por "essa coluna aparece no WHERE", ignorando seletividade:
   em coluna de baixa cardinalidade (booleano, status com poucos valores) o
   planner frequentemente prefere seq scan e o índice só custa em escrita.
 - `ALTER TABLE ... ADD COLUMN ... NOT NULL DEFAULT` em versão antiga do
-  Postgres (< 11) reescrevendo a tabela inteira sob lock — em versões atuais
+  Postgres (< 11) reescrevendo a tabela inteira sob lock. Em versões atuais
   isso é otimizado para `DEFAULT` constante, mas `DEFAULT` com função
   volátil ainda reescreve.
 - Transação longa mantendo lock enquanto espera resposta de rede ou
-  confirmação do usuário — bloqueia autovacuum de limpar tuplas mortas e
+  confirmação do usuário: impede o autovacuum de limpar tuplas mortas e
   aumenta bloat.
-- Paginação por `OFFSET` grande em tabela que cresce — custo cresce
+- Paginação por `OFFSET` grande em tabela que cresce: o custo cresce
   linearmente com o offset; preferir paginação por keyset (`WHERE id >
   :cursor ORDER BY id LIMIT :n`).
-- Backup automatizado nunca restaurado — "temos backup" sem um restore
+- Backup automatizado nunca restaurado: "temos backup" sem um restore
   completo testado é uma suposição não verificada, não uma garantia.
 
 ## Validação
@@ -93,7 +93,7 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 - Conferir cada tarefa `[MIGRATION]` pelo arquivo, pelo comando de aplicação e
   pela consulta do histórico do migrador, todos registrados com saída zero.
 - Provar restore periodicamente a partir do backup real, incluindo o tempo
-  que o processo leva (RTO) — backup sem restore testado não é uma garantia
+  que o processo leva (RTO): backup sem restore testado não é uma garantia
   de recuperação.
 - Não declarar uma mudança "sem impacto de performance" sem o plano
   comparado; não declarar um schema "íntegro" sem os testes de constraint e
@@ -114,10 +114,10 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 - `$specsfy-specialist-observability` para métricas e alertas de banco em
   produção (conexões, locks, replicação, lag).
 - `$specsfy-specialist-redis` quando parte do estado consultado estiver em
-  cache fora do banco — o Postgres continua sendo a fonte de verdade que o
+  cache fora do banco: o Postgres continua sendo a fonte de verdade que o
   Redis nunca substitui.
 - `$specsfy-specialist-docker` para empacotar e operar o servidor Postgres
-  em container (imagem oficial, volume de dados, healthcheck) — decisão de
+  em container (imagem oficial, volume de dados, healthcheck): escolha de
   schema, índice e plano continuam aqui.
 
 Leia [references/standards.md](references/standards.md) para tipos, índices,

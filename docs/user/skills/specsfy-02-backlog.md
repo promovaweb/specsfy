@@ -7,9 +7,9 @@ pergunta prioritária por vez até produzir um brief pronto para especificar.
 ## Quando usar
 
 Use quando quiser organizar uma captura em `specs/inbox/`, avaliar uma
-oportunidade ou fechar lacunas sobre público, finalidade, regras, limites,
-privacidade, falhas e resultado esperado. Para apenas salvar sem perguntas,
-use `specsfy-01-inbox`.
+oportunidade ou fechar lacunas sobre público, finalidade, regras de negócio,
+limites, privacidade, falhas e resultado esperado. Para apenas guardar o texto
+sem perguntas, use `specsfy-01-inbox`.
 
 Não use para planejar tarefas, escrever testes ou iniciar código, pois um item
 de backlog ainda não passou pelos gates que autorizam essas etapas.
@@ -26,7 +26,7 @@ permitir que a pessoa escolha o idioma da interface.
 ```
 
 Quando houver itens parecidos em `specs/backlog/`, inclua a situação que
-diferencia esta entrada das demais. Isso ajuda a skill a atualizar o item correto
+diferencia esta entrada das demais. Com isso, a skill atualiza o item correto
 e a manter visíveis as definições que continuam abertas:
 
 ```text
@@ -48,13 +48,13 @@ Ainda não decidimos quais idiomas serão oferecidos.
 specs/backlog/0003-idioma-da-interface.md
 ```
 
-O item registra problema, público, resultado esperado e dúvidas abertas. Ele
+O item registra problema, público, resultado esperado e dúvidas abertas,
 continua sendo backlog e não autoriza implementação.
 
 Quando a entrega incluir interface, o refinamento também pergunta somente o
 que ainda não foi dito sobre telas, fluxo de informação, menus e navegação
 principal, formulário, padrão de abertura da ação e disposição dos elementos.
-Você pode pedir alternativas para
+Você pode solicitar alternativas para
 uma página, painel lateral ou modal. As respostas ficam registradas em texto
 para orientar a spec.
 
@@ -64,14 +64,15 @@ e evitam sugestões incompatíveis com o projeto.
 
 ## Como o ciclo termina
 
-O refinamento faz no máximo oito perguntas por área. Cada rodada traz
-exatamente uma pergunta numerada. Ela oferece três ou mais opções numeradas, `Escrever
+O refinamento faz no máximo oito perguntas por área, com exatamente uma
+pergunta numerada em cada rodada. Ela oferece três ou mais opções numeradas, `Escrever
 outra resposta`, `Gere outras opções` e `Avançar`. Ao escolher outras opções,
 o agente mantém a pergunta e apresenta sugestões diferentes. O agente
-reconsidera o pedido e as respostas antes de montar a próxima rodada.
+reconsidera a solicitação e as respostas antes de montar a próxima rodada.
 
 Ao chegar a oito perguntas, o agente resume o que foi confirmado e o que ficou
-aberto. Ele só continua se você pedir explicitamente mais perguntas e informar
+aberto. Ele só continua quando você solicita explicitamente mais perguntas e
+informa
 quantas quer responder.
 
 `Avançar` existe desde a primeira rodada. Na rodada seguinte, você escolhe se
@@ -86,7 +87,7 @@ houver lacunas aplicáveis, a spec permanece `Status: Draft` e o
 - perguntas adaptadas ao caso, agrupadas em rodadas numeradas.
 - preservação das suas palavras.
 - indicação de duplicatas ou relações.
-- distinção entre fato, hipótese e escolha confirmada.
+- distinção entre fato, suposição e escolha confirmada.
 - um brief pronto para especificar.
 - um caminho claro para retomar depois.
 - nenhuma `spec.md` criada automaticamente sem promoção.
@@ -103,5 +104,5 @@ houver lacunas aplicáveis, a spec permanece `Status: Draft` e o
 ## Próximo passo
 
 Quando o backlog estiver claro, use
-[`specsfy-03-specify`](specsfy-03-specify.md). Se ainda houver uma decisão
+[`specsfy-03-specify`](specsfy-03-specify.md). Se ainda houver uma escolha
 material aberta, continue o ciclo nesta mesma skill.

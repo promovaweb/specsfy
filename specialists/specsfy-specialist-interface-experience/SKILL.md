@@ -30,7 +30,7 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
    de testes usados pelo projeto. Seguir essas fontes e não trocar tecnologia
    ou biblioteca sem confirmação da pessoa.
 4. Aplicar o contrato central de perguntas somente para lacunas reais:
-   perguntar uma lacuna por rodada sobre telas, fluxo de informação, formulário,
+   perguntar uma lacuna por vez sobre telas, fluxo de informação, formulário,
    formato de ação e composição. Quando a pessoa não informa direção visual,
    aplicar os defaults de `DESIGNSYSTEM.MD` e registrar a direção padrão. Só
    perguntar sobre composição quando o pedido contrariar uma regra existente.
@@ -40,7 +40,7 @@ description: Analisar o sistema atual e orientar a descoberta, o plano e a entre
    formulários, a composição, os estados e a acessibilidade. Um CRUD não pode
    ficar restrito a API, banco ou serviço. Para CRUD, mapear sempre lista com
    `PageHeader` e `DataGrid` com detalhe clicável por linha, detalhe com
-   `PageHeader` e `DetailLists`, e criar ou editar com `PageHeader` e seções de
+   `PageHeader` e `DetailLists` e criar ou editar com `PageHeader` e seções de
    formulário em duas colunas responsivas. Toda tela também deve mapear
    `Breadcrumb` com equipe, módulo e tela atual; em Laravel, reaproveitar o
    componente já usado pelo layout. O `PageHeader` é um único componente
@@ -77,7 +77,7 @@ preserva tudo fora do alcance registrado.
 - Reutilizar o mesmo `PageHeader` componentizado em todas as telas CRUD; manter
   `DataGrid` em largura total com `ID`, editar e apagar visíveis na linha.
 - Conferir bordas, espaçamentos, margens, padding e tipografia durante o
-  desenvolvimento, mesmo sem pedido da pessoa, e registrar o resultado no
+  desenvolvimento, mesmo sem pedido da pessoa. Registrar o resultado no
   item `VISUAL` da tarefa.
 - Organizar criar e editar em seções com coluna de contexto, painel em duas
   colunas nos breakpoints largos e uma coluna no mobile.

@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-laravel
-description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloquent, autorização, filas, eventos, cache e testes. Use quando o projeto contém `artisan` ou `laravel/framework` e a tarefa toca rotas, controllers, models, policies, jobs, commands, migrations, Pest ou PHPUnit; não use para PHP sem Laravel nem para modelagem de Postgres em si — combine com `specsfy-specialist-postgres` quando a decisão for de schema ou índice.
+description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloquent, autorização, filas, eventos, cache e testes. Use quando o projeto contém `artisan` ou `laravel/framework` e a tarefa toca rotas, controllers, models, policies, jobs, commands, migrations, Pest ou PHPUnit; não use para PHP sem Laravel nem para modelagem de Postgres em si — combine com `specsfy-specialist-postgres` quando a escolha for de schema ou índice.
 ---
 
 # Laravel
@@ -8,14 +8,14 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 ## Quando usar
 
 - Acionar quando o repositório tem `artisan`, `composer.json` com
-  `laravel/framework`, e a tarefa envolve rotas, controllers, models,
+  `laravel/framework` e a tarefa envolve rotas, controllers, models,
   policies, form requests, jobs, eventos, cache, config ou testes Laravel.
 - Acionar também para revisão de PR Laravel, diagnóstico de N+1, fila
   travada, autorização quebrada ou migration arriscada.
-- Não acionar para decisão pura de schema, índice ou plano de query — usar
+- Não acionar para escolha pura de schema, índice ou plano de query: usar
   `$specsfy-specialist-postgres` e trazer o resultado para o Eloquent.
 - Combinar com `$specsfy-specialist-application-security` quando a mudança
-  tocar autenticação, mass assignment, upload ou dado sensível, e com
+  tocar autenticação, mass assignment, upload ou dado sensível e com
   `$specsfy-specialist-supabase` quando o Postgres for gerenciado por
   Supabase em vez de instância própria.
 
@@ -31,8 +31,8 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 3. Mapear a requisição do ponto de entrada até domínio, persistência,
    efeitos assíncronos e resposta, identificando o boundary onde a regra de
    negócio já vive no projeto (Action, Service, Model rico).
-4. Localizar convenções irmãs — como o projeto organiza Form Requests,
-   Policies, Resources e Jobs — e seguir o padrão existente em vez de
+4. Localizar convenções irmãs (como o projeto organiza Form Requests,
+   Policies, Resources e Jobs) e seguir o padrão existente em vez de
    introduzir um novo.
 5. Definir autorização, validação, transação, idempotência e modo de falha
    antes de escrever código, especialmente para jobs e webhooks.
@@ -47,8 +47,8 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
    latência importarem.
 9. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
    disponíveis no projeto antes de considerar a tarefa concluída.
-10. Verificar impacto operacional — migration em produção, workers, scheduler,
-   cache de config — e registrar risco quando a ação exigir autorização
+10. Verificar impacto operacional (migration em produção, workers, scheduler,
+   cache de config) e registrar a consequência quando a ação exigir autorização
    externa.
 
 ## Padrões
@@ -70,13 +70,13 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 - Migrations compatíveis com o volume real: `expand → migrar dado → contract`
   para mudança incompatível em tabela grande; nunca um único `ALTER` bloqueante
   sem medir o lock esperado.
-- Nunca confiar em validação do cliente nem autorizar somente na UI —
+- Nunca confiar em validação do cliente nem autorizar somente na UI:
   Policy/Gate roda no servidor em toda ação e em todo objeto, não só na rota
   de criação.
 - Proteger mass assignment com `$fillable` (ou `$guarded` deliberado) e nunca
   passar `$request->all()` direto para `create`/`update` sem validação prévia.
 - Não criar abstração, evento, pacote ou camada extra sem um segundo
-  consumidor real e benefício verificável — três controllers parecidos não
+  consumidor real e benefício verificável: três controllers parecidos não
   justificam um framework interno.
 - Exigir `.env.testing` com `APP_ENV=testing` e banco diferente do `.env` antes
   de executar Pest ou PHPUnit. Se essa separação não estiver comprovada, não
@@ -88,15 +88,15 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 ## Antipadrões
 
 - Model "gordo" que mistura regra de negócio, efeito colateral externo e
-  apresentação no mesmo método — sintoma de que o boundary do projeto não foi
+  apresentação no mesmo método: sintoma de que o boundary do projeto não foi
   seguido.
 - Policy que autoriza pela presença do usuário autenticado, sem checar
-  ownership do objeto — abre acesso cross-tenant mesmo com `auth` middleware
+  ownership do objeto: abre acesso cross-tenant mesmo com `auth` middleware
   presente.
 - Job que reprocessa efeito não idempotente (enviar e-mail, cobrar cartão) sem
-  chave de deduplicação — reentrega do worker duplica o efeito.
+  chave de deduplicação: reentrega do worker duplica o efeito.
 - Migration com `Schema::table` renomeando ou removendo coluna usada em
-  produção no mesmo deploy que o código que a lê — quebra a janela de deploy
+  produção no mesmo deploy que o código que a lê: quebra a janela de deploy
   misto.
 - Teste que depende de limpeza global do banco e pode alcançar a configuração
   de desenvolvimento.
@@ -114,7 +114,7 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
 - Antes de concluir `[MIGRATION]`, confirmar o arquivo em
   `database/migrations/`, executar `php artisan migrate --env=testing` e
   registrar `php artisan migrate:status --env=testing` com saída zero.
-- Inspecionar queries geradas quando a tela lista uma coleção com relação —
+- Inspecionar queries geradas quando a tela lista uma coleção com relação:
   contar queries antes/depois (`assertQueryCountLessThan`, Debugbar, log de
   queries) para provar ausência de N+1.
 - Verificar queues, scheduler, cache de config/rotas e variáveis de ambiente

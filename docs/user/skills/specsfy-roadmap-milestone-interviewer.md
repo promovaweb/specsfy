@@ -25,7 +25,7 @@ MVP aceito → entrevista de evolução → milestones pós-MVP → specs candid
 
 ## O que esperar
 
-Você recebe uma sequência recomendada, dependências e hipóteses que ainda
+Você recebe uma sequência recomendada, dependências e suposições que ainda
 dependem de uso real.
 
 ## Erros comuns
@@ -35,5 +35,5 @@ dependem de uso real.
 
 ## Próximo passo
 
-Mudanças no núcleo seguem por `$specsfy-update-spec`. Consulte
-[Milestones](../milestones.md) para revisar a estrutura resultante.
+Mudanças no núcleo do MVP seguem por `$specsfy-update-spec`, enquanto o guia
+[Milestones](../milestones.md) mostra como revisar a estrutura resultante.

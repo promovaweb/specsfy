@@ -11,13 +11,13 @@ description: Projetar, implementar e revisar interfaces React com composição, 
   lista, efeito ou estado em React puro (CRA, Vite, RSC-agnóstico).
 - Acionar também para revisar por que um componente rerenderiza demais, por
   que um efeito roda em loop, ou como decidir onde um estado deve viver.
-- Não acionar para decisão de Server vs Client Component, cache de dados ou
+- Não acionar para escolha de Server vs Client Component, cache de dados ou
   roteamento de framework; usar `$specsfy-specialist-nextjs` nesse caso.
 - Não acionar para escolher ou adaptar uma biblioteca de componentes visuais
   prontos; usar `$specsfy-specialist-react-ui-components` com
   `$specsfy-specialist-ui-design` para isso.
 - Combinar com `$specsfy-specialist-typescript` quando o componente expõe
-  props públicas ou modela estado com union discriminada, e com
+  props públicas ou modela estado com union discriminada e com
   `$specsfy-specialist-web-accessibility` para auditoria aprofundada de
   teclado e leitor de tela.
 
@@ -44,7 +44,7 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 5. Manter cada estado no dono mais próximo capaz de resolvê-lo; derivar
    valores durante o render em vez de sincronizar com `useEffect`.
 6. Usar effects apenas para sincronizar com um sistema externo (DOM,
-   subscription, rede, storage) — nunca para computar algo a partir de props
+   subscription, rede, storage), nunca para computar algo a partir de props
    e state já disponíveis.
 7. Implementar semântica HTML e navegação por teclado antes do acabamento
    visual; então cobrir com teste de comportamento observável.
@@ -58,21 +58,21 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 ## Padrões
 
 - Preferir composição a um componente genérico com muitas props de
-  configuração; dividir quando a árvore de decisão interna cresce.
+  configuração; dividir quando a árvore de escolha interna cresce.
 - Em Laravel com React, usar shadcn/ui para primitives e ReUI para composições
   gratuitas. Página e rota compõem blocos React; grade, formulário, filtros,
   overlays e cartões reutilizáveis são componentes próprios e documentados em
   `INTERFACE.md`.
 - Nunca copiar uma prop para `state` só para "guardar o valor inicial"; isso
-  cria dessincronia — leia a prop diretamente ou derive durante o render.
+  cria dessincronia: leia a prop diretamente ou derive durante o render.
 - Não usar `useEffect` para computar um valor derivável de props/state
   existentes; use uma variável comum ou `useMemo` quando o cálculo for caro.
 - Tornar loading, empty, error, stale e success estados explícitos da UI, não
   branches implícitos de um único booleano `loading`.
 - Usar `key` estável e vinda dos dados (id) em listas; nunca o índice do
   array quando a ordem pode mudar, item pode ser removido ou reordenado.
-- Isolar cada `Context.Provider` pela frequência de mudança e responsabilidade
-  — um context que muda a cada tecla não deve envolver a árvore inteira.
+- Isolar cada `Context.Provider` pela frequência de mudança e responsabilidade:
+  um context que muda a cada tecla não deve envolver a árvore inteira.
 - Não memoizar (`memo`/`useMemo`/`useCallback`) sem medição prévia; memoização
   tem custo de comparação e só compensa com renders caros ou comprovadamente
   frequentes.
@@ -82,15 +82,15 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 ## Antipadrões
 
 - Efeito que sincroniza estado local com uma prop
-  (`useEffect(() => setX(prop), [prop])`) — sintoma de estado duplicado; a
+  (`useEffect(() => setX(prop), [prop])`): sintoma de estado duplicado; a
   fonte da verdade já é a prop.
 - Cadeia de effects que dispara outro effect via mudança de state
-  ("effect chain") — geralmente colapsa em um único handler de evento ou em
+  ("effect chain"): geralmente colapsa em um único handler de evento ou em
   cálculo direto durante o render.
 - `useEffect` sem array de dependências completo, "silenciado" com
-  `// eslint-disable` — esconde bug de closure obsoleta em vez de resolvê-lo.
-- Context único guardando todo o estado global da aplicação ("god context")
-  — qualquer mudança rerenderiza toda a árvore; prefira contexts menores ou
+  `// eslint-disable`: esconde bug de closure obsoleta em vez de resolvê-lo.
+- Context único guardando todo o estado global da aplicação ("god context"):
+  qualquer mudança rerenderiza toda a árvore; prefira contexts menores ou
   uma biblioteca de estado dedicada quando o grafo de dependências crescer.
 - Confundir este escopo com o de `$specsfy-specialist-nextjs`: adicionar
   `"use client"` em cascata para "resolver" um erro de hook, em vez de mover a
@@ -105,7 +105,7 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 - Checar o console por warnings do React (chaves, hooks fora de ordem,
   atualização de estado após unmount) e por avisos de hydration quando houver
   SSR.
-- Rodar profiling ou bundle analysis somente quando uma hipótese concreta de
+- Rodar profiling ou bundle analysis somente quando uma suposição concreta de
   performance existir; anexar a medição antes/depois.
 - Não declarar um componente "acessível" ou "performático" sem a comprovação
   acima; linguagem absoluta sem prova é proibida.
@@ -120,7 +120,7 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 - `$specsfy-specialist-tailwind-css` estiliza o componente sem assumir
   ownership de estado, effect ou concorrência.
 - `$specsfy-specialist-nextjs` para fronteira server/client, cache de dados e
-  roteamento — este especialista trata React independente de framework.
+  roteamento: este especialista trata React independente de framework.
 - `$specsfy-specialist-react-ui-components` e `$specsfy-specialist-ui-design`
   para escolher e compor uma biblioteca visual pronta; este especialista
   entra depois, para ownership de estado, efeitos e testes.

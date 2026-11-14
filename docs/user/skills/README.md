@@ -15,10 +15,10 @@ seleciona a etapa responsável e anuncia cada transição necessária.
 
 ## Nomes exibidos
 
-Os comandos técnicos continuam, por exemplo, como `$specsfy-02-backlog`. Na
-interface, as sete etapas centrais aparecem como `Specsfy - 01 - Inbox` até
-`Specsfy - 07 - Implementar`. As skills adicionais usam `Specsfy - Nome`, e
-as técnicas usam `Specsfy - Especialista - Nome`.
+Os comandos técnicos continuam com o nome técnico, como `$specsfy-02-backlog`.
+Na interface, as sete etapas centrais aparecem como `Specsfy - 01 - Inbox` até
+`Specsfy - 07 - Implementar`. As skills adicionais usam `Specsfy - Nome`,
+enquanto as técnicas usam `Specsfy - Especialista - Nome`.
 
 ## Como responder às perguntas
 
@@ -72,7 +72,7 @@ entrega um brief na conversa.
 
 Com a intenção de criar uma entrega confirmada,
 `specsfy-03-specify` monta a `spec.md` e `specsfy-04-validate` comprova o
-Ato I. A skill `specsfy-05-tasks` organiza o plano, chama
+Ato I. A skill `specsfy-05-tasks` monta o plano, chama
 `specsfy-06-tdd-bdd` para materializar os testes e só aprova o Plan Gate
 depois de um RED válido. `specsfy-07-implement` executa as tarefas com
 evidência e documentação atualizada.
@@ -85,13 +85,13 @@ Quando uma lacuna puder alterar a próxima etapa, chame
 `specsfy-interviewer`. Ele conversa com a spec sem substituir a skill que
 valida, planeja, implementa ou conclui.
 
-Para organizar um produto inteiro, comece pelo
-`specsfy-mvp-milestone-interviewer`. Depois do aceite do MVP, use o
+Para planejar um produto inteiro, comece pelo
+`specsfy-mvp-milestone-interviewer` e, depois do aceite do MVP, use o
 `specsfy-roadmap-milestone-interviewer`. O `specsfy-milestone-governor` mantém
-o mapa derivado de specs e backlog. O guia [Milestones](../milestones.md)
-explica arquivos, relações e sincronização.
+o painel derivado de specs e backlog, detalhado no guia
+[Milestones](../milestones.md) com arquivos, relações e sincronização.
 
-Quando uma conversa revelar informações que o sistema precisa lembrar, use
+Quando uma conversa revelar informações que o sistema precisa guardar, use
 `specsfy-data-discovery`. A skill pergunta em linguagem simples e mantém o
 registro em `.specsfy/DATABASE.md` antes de o backlog ou a spec avançar.
 

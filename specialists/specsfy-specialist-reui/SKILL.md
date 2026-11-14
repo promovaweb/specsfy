@@ -109,4 +109,4 @@ hidratação definidos pelo framework hospedeiro.
   experiência antes da escolha de componentes.
 
 Leia [references/standards.md](references/standards.md) para fontes oficiais,
-tokens e comandos, e as referências de setup e catálogo quando aplicar ReUI.
+tokens e comandos. Use as referências de setup e catálogo quando aplicar ReUI.

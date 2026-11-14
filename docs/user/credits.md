@@ -19,7 +19,8 @@ desatualizada.
 
 ## Identidade
 
-Logos, cores, tipografia, voz, acessibilidade e regras de aplicação pertencem
+Logos, cores, tipografia, voz, acessibilidade e orientações de aplicação
+pertencem
 ao diretório [`brand/`](../../brand/). Use os
 ativos e orientações desse diretório ao apresentar o projeto.
 
@@ -57,4 +58,5 @@ implementa cada recurso.
 
 O histórico e os arquivos de licença de cada repositório comprovam autoria e
 licenciamento. Quando uma licença não estiver declarada, não presuma seus
-termos. A identidade oficial do Specsfy permanece em `brand/`.
+termos. A identidade oficial do Specsfy permanece no diretório `brand/` do
+repositório.

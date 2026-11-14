@@ -6,7 +6,7 @@ efeito esperado sem definir arquitetura, tarefas ou código nessa etapa.
 
 Para apenas guardar um texto sem responder perguntas, use a
 [Inbox](inbox.md). Depois que uma entrada for promovida, a
-`spec.md` passa a governar o comportamento, os gates, as tarefas e as
+`spec.md` governa a partir daí o comportamento, os gates, as tarefas e as
 evidências da entrega.
 
 ## Estrutura
@@ -26,8 +26,8 @@ specs/
 ```
 
 O item começa leve e amadurece até produto, desenvolvimento e testes
-compreenderem o comportamento esperado. Ele não contém tarefas ou gates e nunca
-autoriza implementação diretamente.
+compreenderem o comportamento esperado. Ele não contém tarefas ou gates e não
+autoriza a implementação de forma direta.
 
 ## Organização do backlog
 
@@ -41,13 +41,13 @@ Produto
         └── Melhoria
 ```
 
-O épico representa um objetivo amplo. A funcionalidade delimita uma capacidade.
-Histórias e requisitos representam entregas menores e verificáveis. Regras,
-itens técnicos e melhorias também pertencem ao backlog quando tornam o
-comportamento ou sua operação possível.
+O épico representa um objetivo amplo, enquanto a funcionalidade delimita uma
+capacidade do produto. Histórias e requisitos representam entregas menores e
+verificáveis. Regras de negócio, itens técnicos e melhorias também pertencem ao
+backlog quando tornam o comportamento viável ou o funcionamento possível.
 
-Nem toda ideia precisa começar com a hierarquia completa. Use `A esclarecer`
-no lugar de inventar uma relação.
+Uma ideia pode começar sem a hierarquia completa, com `A esclarecer` no lugar
+de uma relação inventada.
 
 ## Anatomia de um item
 
@@ -98,10 +98,12 @@ confirma:
 Se algo estiver ausente, vago, contraditório ou ambíguo, a skill pergunta uma
 lacuna relevante por vez e reavalia após cada resposta. Ela não usa questionário
 fixo, não repete o que já foi explicado e não persiste placeholders nesses
-campos. Se a pessoa não souber responder, explicita a lacuna sem inventar.
+campos. Quando você não souber responder, a skill registra a lacuna sem
+inventar.
 
 Esse é o mínimo de captura, não um refinamento profundo. Hierarquia, prioridade,
-regras detalhadas, aceite e solução técnica podem ser refinados depois.
+regras de negócio detalhadas, aceite e solução técnica podem ser refinados
+depois.
 
 ### Duplicatas e referências
 
@@ -139,14 +141,14 @@ Mantenha o backlog realmente ordenado para que a próxima oportunidade fique
 visível no arquivo para todos os responsáveis. Compare os itens pelos fatores
 abaixo:
 
-1. valor para a pessoa e para o negócio.
+1. valor para o usuário e para o negócio.
 2. exposição de segurança, privacidade e operação.
 3. dependências e entregas desbloqueadas.
 4. urgência.
 5. esforço.
 6. pontos ainda desconhecidos.
 
-Prioridade é relativa. Classificar tudo como alta não cria uma ordem.
+Prioridade é relativa, porque classificar tudo como alta não cria uma ordem.
 Autenticação e autorização podem preceder melhorias visuais, assim como uma
 infraestrutura de notificações pode preceder os eventos que dependem dela.
 
@@ -179,15 +181,15 @@ input → inbox → backlog → spec
 2. A mesma skill apresenta uma pergunta numerada por rodada e
    produz um brief enquanto houver escolhas materiais abertas.
 3. Use `$specsfy-03-specify` somente quando houver intenção explícita de
-   promover o material. A fonte normativa é criada em
+   promover o material, com a fonte normativa criada em
    `specs/<estado>/<NNNN>-<slug>/spec.md`.
 4. Depois da promoção, mantenha o backlog como proveniência, marque-o
    `Promoted` e registre o caminho da spec.
 
 Ao concluir, a skill informa qual etapa assumirá o trabalho e executa
-automaticamente o avanço ou o retorno. A conversa mostra o nome da skill, o
-motivo da troca e o resultado esperado. Você acompanha essa transição sem
-repetir comandos, e nenhuma troca autoriza implementação.
+automaticamente o avanço ou o retorno, com o nome da skill, o motivo da troca
+e o resultado esperado exibidos na conversa. Você acompanha essa transição sem
+repetir comandos, mas nenhuma troca de skill autoriza a implementação.
 
 Backlog e spec possuem sequências independentes. `BACKLOG-0004` pode originar
 `SPEC-0002`, mas os números não precisam coincidir e não indicam prioridade.
@@ -203,13 +205,14 @@ Backlog e spec possuem sequências independentes. `BACKLOG-0004` pode originar
 
 ## Quando está refinado
 
-O item está pronto para especificação quando a equipe consegue responder às
+O item está pronto para especificação quando os envolvidos conseguem responder
+às
 perguntas abaixo sem consultar suposições fora do arquivo:
 
 - Qual problema será resolvido e qual público será beneficiado?
 - Qual evento inicia o comportamento e qual resultado será produzido?
-- Qual papel pode executar a operação?
-- Quais regras, erros e exceções precisam ser respeitados?
+- Qual papel pode executar a ação?
+- Quais regras de negócio, erros e exceções precisam ser respeitados?
 - Como verificar objetivamente o resultado?
 - Há implicações de segurança, privacidade, desempenho ou volume?
 - O que ficou fora da entrega?

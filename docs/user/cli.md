@@ -32,7 +32,7 @@ specsfy --version
 
 O pacote npm é um wrapper: na primeira execução ele baixa o binário correto para
 o sistema operacional. O download direto em `get.specsfy.dev` entrega o mesmo
-executável, sem depender de Node.js.
+executável, que dispensa o Node.js.
 
 Depois de instalar o programa, prepare o projeto consumidor:
 
@@ -78,7 +78,7 @@ specsfy skills update --project .
 ```
 
 `skills list` e `skills detect` apenas leem. `skills install`, `skills remove` e
-`skills update` alteram o projeto, sempre limitados aos nomes informados. Uma
+`skills update` alteram o projeto, limitados aos nomes informados. Uma
 skill externa ou com alteração local não é removida sem `--force`.
 
 ## Ciclo da spec
@@ -108,7 +108,7 @@ specsfy specs new --title "Recuperar senha" --project .
 ```
 
 O comando aloca o próximo identificador e cria
-`specs/draft/<NNNN>-<slug>/spec.md`. Para incorporar um pedido tardio, consulte a
+`specs/draft/<NNNN>-<slug>/spec.md`. Para incorporar uma mudança tardia, consulte a
 projeção de impacto sem editar a spec:
 
 ```bash
@@ -141,14 +141,14 @@ specsfy gate database --project .
 specsfy verify --boundary local
 ```
 
-`specsfy verify` executa a política completa e é a entrada do CI. As fronteiras
-`local`, `git` e `ci` aplicam a mesma política. A atestação opcional registra o
+`specsfy verify` executa a política completa e é a entrada do CI. Os modos
+`local`, `git` e `ci` de `--boundary` aplicam a mesma política. A atestação opcional registra o
 commit, os comandos aprovados e os arquivos cobertos.
 
 ## Inbox e backlog
 
 Uma captura entra na fila ativa com `inbox capture` e só sai depois que specs
-aprovadas cobrem o pedido:
+aprovadas cobrem toda a solicitação:
 
 ```bash
 specsfy inbox list
@@ -197,8 +197,8 @@ specsfy progress --spec 0001 --json
 specsfy status
 ```
 
-`tasks delivery` escreve somente em `stdout`; publicar o texto exige pedido
-explícito. `progress --watch` atualiza a cada mudança das specs e `--json`
+`tasks delivery` escreve somente em `stdout`, enquanto a publicação do texto depende
+de uma solicitação explícita. `progress --watch` atualiza a cada mudança das specs e `--json`
 entrega `summary` e `specs` para automação.
 
 ## Contexto do projeto
@@ -231,8 +231,8 @@ specsfy milestones import-mvp --project .
 ```
 
 `milestones sync` projeta os vínculos das specs para `specs.md` e
-`specs/milestones/MNN.md`. `milestones import-mvp` converte `MVP.md` em `M01`,
-backlog e specs Draft.
+`specs/milestones/MNN.md`, enquanto `milestones import-mvp` converte o `MVP.md`
+em `M01`, itens de backlog e specs em Draft.
 
 ## Testes do projeto
 
@@ -338,8 +338,8 @@ algum.
 
 ## Documentação embutida
 
-`specsfy --skill` imprime a documentação do framework embutida no binário. Um
-tema específico pode ser consultado com `specsfy skill <tema>`. A mesma
+`specsfy --skill` imprime a documentação do framework embutida no binário, enquanto
+`specsfy skill <tema>` mostra um tema específico. A mesma
 documentação fica disponível pelo MCP no recurso `specsfy://skill`.
 
 ## Configuração e credenciais
@@ -383,7 +383,7 @@ duplicar explicações sobre progresso e proteção de alterações locais.
 ## Segurança e reversibilidade
 
 - O destino padrão das skills é `<projeto>/.agents/skills`.
-- As regras centrais ficam em `<projeto>/.specsfy/Spec.md`.
+- O contrato central fica em `<projeto>/.specsfy/Spec.md`.
 - Template e exemplo ficam em `<projeto>/.specsfy/templates/Spec.md` e
   `<projeto>/.specsfy/examples/Spec.md`.
 - Templates personalizados ficam em `<projeto>/.specsfy/templates/custom/`, fora

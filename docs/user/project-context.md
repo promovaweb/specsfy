@@ -7,8 +7,8 @@ mudança. O arquivo `PROJECT.md` explica a finalidade da aplicação, enquanto
 cinco documentos em `.specsfy/` registram a stack, as instruções confirmadas,
 a persistência observada no código, os pacotes instalados e o perfil de
 interação do setup.
-As regras macro de interface ficam em `DESIGNSYSTEM.MD`, na raiz do projeto, e
-seguem um ciclo próprio com a skill especialista de design system.
+As orientações gerais de interface ficam em `DESIGNSYSTEM.MD`, na raiz do
+projeto. Elas seguem um ciclo próprio com a skill especialista de design system.
 
 Execute `$specsfy-setup` depois de instalar o framework. Depois disso, o
 framework a executa obrigatoriamente antes de iniciar cada skill, inclusive em
@@ -37,15 +37,15 @@ mantêm esta estrutura:
 ```
 
 O setup também reserva blocos delimitados para as diretrizes do Specsfy em
-`AGENTS.md` e `CLAUDE.md`. Conteúdo fora desses blocos pertence ao usuário e é
-preservado. A referência publicável das diretrizes vive em
+`AGENTS.md` e `CLAUDE.md`. O conteúdo fora desses blocos pertence a você e é
+preservado em todas as execuções. A referência publicável das diretrizes vive em
 [`specsfy-setup`](../../skills/specsfy-setup/).
 
 | Arquivo | Conteúdo | Skill mantenedora |
 | --- | --- | --- |
 | `PROJECT.md` | finalidade e capacidades | `$specsfy-setup` cria o modelo |
 | `.specsfy/STACK.md` | stack e evidências | `$specsfy-aux-stack` |
-| `.specsfy/RULES.md` | regras explícitas confirmadas | `$specsfy-aux-rules` |
+| `.specsfy/RULES.md` | diretrizes explícitas confirmadas | `$specsfy-aux-rules` |
 | `.specsfy/DATABASE.md` | persistência e relações | `$specsfy-aux-database` |
 | `.specsfy/PACKAGES.md` | pacotes npm e Composer com finalidade | `$specsfy-documentator` |
 | `docs/packages/README.md` | índice dos pacotes Composer diretos e links para fichas de uso | `$specsfy-specialist-laravel-package-manager` |
@@ -65,7 +65,7 @@ confirmado e as respostas já fornecidas. O agente consulta esse arquivo, a
 conversa e as fontes do projeto antes de perguntar. Assuntos já respondidos
 ficam fora da próxima rodada; perguntas técnicas recebem mais contexto para
 iniciantes e podem usar versões, arquitetura e integrações diretamente para
-pessoas experientes.
+usuários experientes.
 
 O setup também verifica como você administra cada informação principal do
 produto. Quando a jornada precisa de cadastro e manutenção, ele confirma as
@@ -85,9 +85,9 @@ Ao terminar a preparação dos contextos e especialistas, o setup executa
 sistema existente em `docs/` e atualiza `.specsfy/PACKAGES.md`, mesmo quando a
 execução não começou por uma alteração recente no código.
 
-Use `$specsfy-data-discovery` antes de implementar quando ainda faltar explicar
-o que o produto precisa guardar, quem consulta cada informação e quando ela
-deixa de ser necessária. A skill registra as respostas confirmadas em uma
+Use `$specsfy-data-discovery` no planejamento quando ainda faltar explicar o
+que o produto precisa guardar, quais papéis consultam cada informação e quando
+ela perde a utilidade. A skill registra as respostas confirmadas em uma
 seção própria de `DATABASE.md`, separada do que o código detectar depois.
 
 ## Projeto existente com GitHub Spec Kit
@@ -109,10 +109,12 @@ o bloco delimitado. Se a constituição divergir de `.specsfy/RULES.md`, preserv
 os dois textos e resolva a divergência antes de alterar a feature.
 
 Execute `$specsfy-aux-stack` após alterar frameworks, runtimes, ferramentas
-estruturais ou persistência. Execute `$specsfy-aux-database` sempre que criar ou
+estruturais ou persistência. Execute `$specsfy-aux-database` toda vez que criar
+ou
 alterar banco, schema, tabela, coleção, model persistente, campo, relação,
 índice ou migration. Use `$specsfy-aux-rules` para formular e acrescentar uma
-regra confirmada sem duplicar ou apagar regras anteriores.
+diretriz confirmada em `.specsfy/RULES.md` sem duplicar ou apagar as
+anteriores.
 
 ## Monitoramento durante mudanças
 
@@ -137,7 +139,8 @@ node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
 `PENDING` impede a conclusão da tarefa e do Delivery Gate. Quando uma mudança
 de aplicação não altera história, finalidade, capacidades ou limites, registre
 essa avaliação na evidência da tarefa e execute novamente com
-`--acknowledge-project-no-change`. Para uma revisão de regras sem regra nova,
+`--acknowledge-project-no-change`. Para uma revisão do `RULES.md` sem diretriz
+nova,
 use `--acknowledge-rules-no-change` somente depois de registrar a justificativa.
 Veja a topologia e o `--check` no guia de
 [documentação técnica do sistema](system-documentation.md).
@@ -151,7 +154,7 @@ Veja a topologia e o `--check` no guia de
   preservado.
 - As auxiliares atualizam apenas blocos detectados delimitados e preservam
   seções humanas.
-- Uma nova varredura nunca autoriza remover silenciosamente uma definição
+- Uma nova varredura não autoriza remover silenciosamente uma definição
   humana.
 - `DATABASE.md` usa tabelas Markdown para facilitar mapeamento e comparação.
 - `PACKAGES.md` deriva de manifests, lockfiles e metadados locais, preservando
@@ -163,5 +166,5 @@ O estado implementado é comprovado pelas fontes do próprio projeto. Os
 manifests e lockfiles mostram a stack, enquanto schemas e migrations mostram a
 persistência. Os documentos resumem essas evidências e as definições
 humanas que precisam permanecer entre mudanças. Eles não substituem a
-`spec.md`, não registram gates e nunca devem copiar segredos, valores de `.env`
+`spec.md`, não registram gates e não devem copiar segredos, valores de `.env`
 ou registros de produção.

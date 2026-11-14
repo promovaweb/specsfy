@@ -1,14 +1,14 @@
 # Incorporar mudanças com `specsfy-update-spec`
 
 Esta skill atualiza uma spec que já foi definida, planejada, iniciada ou
-concluída. A nova necessidade entra na mesma fonte, e somente os atos cujas
-provas perderam validade são reabertos.
+concluída. A nova necessidade entra na mesma fonte, onde somente os atos com
+provas que perderam validade são reabertos.
 
 ## Quando usar
 
 Use quando uma entrega existente precisar incorporar algo esquecido, adicionar
-ou remover comportamento, corrigir uma definição ou mudar uma regra já
-registrada.
+ou remover comportamento, corrigir uma definição ou mudar uma regra de negócio
+já registrada.
 
 Para criar a primeira versão da spec, use specify. A update-spec depende de uma
 fonte existente para comparar a nova instrução com requisitos, testes, tarefas
@@ -73,5 +73,6 @@ iniciar outra vez o mesmo ciclo nessa retomada.
 
 ## Próximo passo
 
-A própria skill encaminha para a etapa reaberta. Depois da atualização, use
-[`specsfy-progress`](specsfy-progress.md) para revisar o estado geral.
+A própria skill encaminha para a etapa reaberta. Depois da atualização, use o
+[`specsfy-progress`](specsfy-progress.md) para revisar o estado geral de todas
+as specs do projeto.

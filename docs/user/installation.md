@@ -47,7 +47,7 @@ chmod +x "$HOME/.local/bin/specsfy"
 
 Abra a raiz do repositório que receberá a metodologia. Não execute a instalação
 dentro do monorepo oficial do Specsfy, porque o CLI reconhece essa raiz como
-ambiente de desenvolvimento e recusa a operação:
+ambiente de desenvolvimento e recusa o comando:
 
 ```bash
 cd caminho/do/projeto
@@ -68,8 +68,8 @@ mesmo caminho e mantém nele os contextos, as specs e o trabalho de código.
 O instalador publica as etapas numeradas a partir de
 `.agents/skills/specsfy-01-inbox`, grava o contrato central em
 `.specsfy/Spec.md` e adiciona templates, exemplos e registros técnicos em
-`.specsfy/`, inclusive `.specsfy/templates/DESIGNSYSTEM.MD` para as regras
-macro de interface. Ele também insere blocos gerenciados em `AGENTS.md` e
+`.specsfy/`, inclusive `.specsfy/templates/DESIGNSYSTEM.MD` para as
+orientações gerais de interface. Ele também insere blocos gerenciados em `AGENTS.md` e
 `CLAUDE.md`, preservando o conteúdo que já existe fora desses blocos.
 
 Ao executar `$specsfy-setup`, o template também gera `DESIGNSYSTEM.MD` na raiz
@@ -84,7 +84,7 @@ as respostas confirmadas são preservados entre execuções.
 
 Para personalizar um template sem impedir atualizações, copie-o para
 `.specsfy/templates/custom/` com o mesmo nome. Essa versão tem precedência e
-nunca é sobrescrita pelo instalador, inclusive com `--force`.
+não é sobrescrita pelo instalador, inclusive com `--force`.
 
 A instalação inclui as quatorze skills base, entre elas as quatro de conversa e
 milestones, além do setup, do documentador do sistema e das três skills
@@ -98,7 +98,7 @@ como git.exe. A instalação chama o entrypoint JavaScript do npx pelo Node,
 para preservar caminhos com espaços sem passar os argumentos por um shell.
 Se o npm estiver incompleto, repare sua instalação antes de tentar novamente.
 
-Quando o instalador delegado falha, o Specsfy tenta restaurar as regras,
+Quando o instalador delegado falha, o Specsfy tenta restaurar o contrato,
 os templates, as skills e os locks gerenciados que existiam antes da operação.
 Se a restauração também falhar, a mensagem informa onde encontrar a cópia dos
 arquivos anteriores. Preserve essa pasta e o log antes de repetir o comando.
@@ -108,9 +108,9 @@ Windows nativo depende do teste no computador que apresentou a falha.
 
 ## Confira os arquivos instalados
 
-Na mesma raiz, liste o catálogo e consulte o progresso. O primeiro comando deve
-mostrar as skills instaladas, e o segundo deve conseguir ler o diretório de
-specs:
+Na mesma raiz, liste o catálogo e consulte o progresso. O primeiro comando
+mostra as skills instaladas, enquanto o segundo confirma que consegue ler o
+diretório de specs:
 
 ```bash
 specsfy skills list
@@ -153,7 +153,7 @@ specsfy update --project .
 
 `specsfy skills update --project .` continua aceito para automações anteriores.
 
-O Specsfy registra fingerprints dos arquivos gerenciados. Uma atualização
+O Specsfy registra fingerprints dos arquivos gerenciados. Assim, uma atualização
 normal substitui versões intactas e preserva arquivos customizados. Se o CLI
 informar que encontrou alterações locais, revise a diferença. `--force`
 descarta a customização protegida no arquivo indicado.

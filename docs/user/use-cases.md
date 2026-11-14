@@ -10,14 +10,14 @@
 
 Este capítulo parte de situações reais do dia a dia e mostra qual caminho o
 Specsfy segue em cada uma. Você não precisa decorar a ordem das skills: basta
-descrever a situação ao agente, e ele anuncia cada transição. Use as receitas
-abaixo para saber o que esperar, o que pedir e onde conferir o resultado.
+descrever a situação ao agente. Ele anuncia cada transição. Use as receitas
+abaixo para saber o que esperar, o que solicitar e onde conferir o resultado.
 
 Cada caso traz quatro partes:
 
 - **Situação:** quando o caso se aplica.
 - **Caminho:** a sequência de skills e comandos que o agente percorre.
-- **Como pedir:** um exemplo de mensagem em linguagem natural.
+- **Como solicitar:** um exemplo de mensagem em linguagem natural.
 - **O que fica registrado:** os arquivos que comprovam o trabalho.
 
 ## Escolha o caso pela situação
@@ -28,7 +28,7 @@ Cada caso traz quatro partes:
 | corrigir um defeito com prova de que ele não volta | [Corrigir um bug com teste de regressão](#corrigir-um-bug-com-teste-de-regressão) |
 | criar uma funcionalidade com telas e formulários | [Criar um CRUD com interface](#criar-um-crud-com-interface) |
 | começar um produto do zero | [Planejar um produto novo pelo MVP](#planejar-um-produto-novo-pelo-mvp) |
-| mudar algo que já foi definido | [Incluir um pedido depois da definição](#incluir-um-pedido-depois-da-definição) |
+| mudar algo que já foi definido | [Incluir uma mudança depois da definição](#incluir-uma-mudança-depois-da-definição) |
 | guardar informações novas no banco | [Mudar o banco de dados com segurança](#mudar-o-banco-de-dados-com-segurança) |
 | adotar o método em um sistema que já existe | [Adotar o Specsfy em um projeto existente](#adotar-o-specsfy-em-um-projeto-existente) |
 | acompanhar várias entregas ao mesmo tempo | [Acompanhar o andamento do projeto](#acompanhar-o-andamento-do-projeto) |
@@ -36,14 +36,14 @@ Cada caso traz quatro partes:
 
 ## Anotar uma ideia durante uma reunião
 
-**Situação:** surgiu uma ideia, um pedido de cliente ou uma observação, mas
+**Situação:** surgiu uma ideia, uma solicitação de cliente ou uma observação, mas
 você não quer discutir detalhes agora.
 
-**Caminho:** `specsfy-01-inbox`. A skill não faz perguntas. Ela grava o texto
-original com data, hora e hash de integridade, consulta o contexto do projeto
-e registra uma análise inicial marcada como inferência.
+**Caminho:** `specsfy-01-inbox`, uma skill que não faz perguntas. Ela grava o
+texto original com data, hora e hash de integridade, consulta o contexto do
+projeto e registra uma análise inicial marcada como inferência.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Guarde na Inbox: o financeiro pediu para exportar o relatório mensal de
@@ -55,7 +55,7 @@ vendas em CSV, com filtro por vendedor.
 fica intacto, mesmo que tenha erros de digitação.
 
 **Quando a ideia avança:** peça para refinar a entrada no backlog. Depois que
-uma spec cobrir todo o pedido e passar no Definition Gate, a captura sai da
+uma spec cobrir toda a solicitação e passar no Definition Gate, a captura sai da
 fila ativa e vai para `specs/inbox/processed/`. Nada é apagado.
 
 ## Corrigir um bug com teste de regressão
@@ -63,7 +63,8 @@ fila ativa e vai para `specs/inbox/processed/`. Nada é apagado.
 **Situação:** um comportamento está errado e você quer garantir que a correção
 tenha um teste que falharia sem ela.
 
-**Caminho:**
+**Caminho:** o agente percorre as etapas abaixo, anuncia cada transição na
+conversa e registra o resultado de cada uma na spec da entrega:
 
 1. `specsfy-02-backlog` compara o relato com itens existentes e pergunta
    somente o que muda o comportamento, como o resultado correto esperado.
@@ -72,10 +73,10 @@ tenha um teste que falharia sem ela.
 3. `specsfy-04-validate` aprova o Definition Gate.
 4. `specsfy-05-tasks` planeja a correção e chama `specsfy-06-tdd-bdd`.
 5. `specsfy-06-tdd-bdd` cria o teste e observa o **RED**: o teste precisa
-   falhar porque o defeito existe, e não por erro de sintaxe ou ambiente.
+   falhar porque o defeito existe, não por erro de sintaxe ou ambiente.
 6. `specsfy-07-implement` corrige, obtém o **GREEN** e roda a regressão.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 O desconto de 10% está sendo aplicado duas vezes quando o cupom é usado no
@@ -101,7 +102,7 @@ aprovar a definição, o agente lê o design system do projeto
 somente as lacunas: telas, navegação, campos, validações, estados de
 carregamento, vazio, erro e permissão.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Quero um cadastro de clientes com listagem, detalhe, criação e edição.
@@ -112,8 +113,7 @@ Somente administradores podem apagar.
 
 - um único `PageHeader` reutilizado na lista, no detalhe, na criação e na
   edição;
-- a listagem em um `DataGrid` de largura total, com a coluna `ID` sempre
-  visível;
+- a listagem em um `DataGrid` de largura total, com a coluna `ID` visível;
 - a linha inteira funcionando como link para o detalhe, por mouse e teclado;
 - ações independentes de editar e apagar em cada linha, com confirmação antes
   de apagar e respeito à permissão.
@@ -123,28 +123,28 @@ formulários, composição e estados. Cada tarefa com interface traz o item
 `VISUAL` preenchido com viewport, estados percorridos e ajustes. Componentes
 novos ou reaproveitados entram em `INTERFACE.md`.
 
-Leia [Design system de interface](design-system.md) para entender as regras
-macro e as exceções com alcance.
+Leia [Design system de interface](design-system.md) para entender as
+orientações gerais e as exceções com alcance.
 
 ## Planejar um produto novo pelo MVP
 
 **Situação:** você tem a visão de um produto e quer quebrá-la em entregas
 demonstráveis antes de escrever código.
 
-**Caminho:**
+**Caminho:** o agente percorre as etapas abaixo, anuncia cada transição na
+conversa e registra o resultado de cada uma na spec da entrega:
 
 1. `specsfy-mvp-milestone-interviewer` conduz a conversa sobre o MVP e
-   organiza marcos que podem ser demonstrados.
+   define marcos que podem ser demonstrados.
 2. `specsfy-data-discovery` entra quando a conversa revela informações que o
    sistema precisa guardar.
 3. A importação do `MVP.md` gera e refina um backlog por item e pode criar
-   specs em `Draft`, sempre com `Definition Gate: Pending`.
+   specs em `Draft`, todas com `Definition Gate: Pending`.
 4. `specsfy-milestone-governor` mantém `specs.md` e os arquivos
    `specs/milestones/MNN.md` alinhados com specs e backlog.
-5. Depois do aceite do MVP, `specsfy-roadmap-milestone-interviewer` planeja a
-   evolução.
+5. Após o MVP, `specsfy-roadmap-milestone-interviewer` planeja a evolução.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Quero criar um sistema de agendamento para clínicas pequenas. Me ajude a
@@ -158,12 +158,13 @@ avançar.
 
 Leia [Milestones](milestones.md) para ver arquivos e sincronização.
 
-## Incluir um pedido depois da definição
+## Incluir uma mudança depois da definição
 
-**Situação:** a spec já passou no Definition Gate, ou até já foi implementada,
-e alguém pede uma mudança: um campo novo, uma regra diferente, uma remoção.
+**Situação:** a spec já passou no Definition Gate, ou até já foi implementada.
+Agora surge uma mudança, como um campo novo, uma regra de negócio diferente ou
+uma remoção.
 
-**Caminho:** `specsfy-update-spec`. A mudança volta para a mesma `spec.md`. A
+**Caminho:** `specsfy-update-spec` leva a mudança para a mesma `spec.md`. A
 skill classifica o impacto e reabre somente o que perdeu validade:
 
 | Tipo de mudança | Atos reabertos | Próxima etapa |
@@ -172,7 +173,7 @@ skill classifica o impacto e reabre somente o que perdeu validade:
 | muda apenas o plano técnico | II e III | `specsfy-05-tasks` |
 | falta uma escolha que só você pode fazer | permanece em definição | `specsfy-02-backlog` |
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Na spec 0003, além do e-mail, o usuário também precisa poder entrar com o
@@ -180,7 +181,7 @@ número do celular.
 ```
 
 **O que fica registrado:** a spec atualizada, os gates afetados de volta para
-`Pending` e uma nova rodada de testes para o comportamento incluído. Nenhum
+`Pending` e uma nova sequência de testes para o comportamento incluído. Nenhum
 `plan.md`, `tasks.md` ou arquivo paralelo é criado.
 
 Leia [Mudanças posteriores](update-spec.md) para os detalhes.
@@ -189,37 +190,38 @@ Leia [Mudanças posteriores](update-spec.md) para os detalhes.
 
 **Situação:** a entrega cria tabela, campo, relação ou migration.
 
-**Caminho:**
+**Caminho:** o agente percorre as etapas abaixo, anuncia cada transição na
+conversa e registra o resultado de cada uma na spec da entrega:
 
 1. `specsfy-data-discovery` pergunta em linguagem simples o que o sistema
-   precisa lembrar e registra as respostas confirmadas em
+   precisa guardar e registra as respostas confirmadas em
    `.specsfy/DATABASE.md`.
 2. `specsfy-05-tasks` inclui uma tarefa `[MIGRATION]` com arquivo versionado.
 3. `specsfy-07-implement` aplica a migration no **banco de teste** e registra
    uma consulta de estado.
 4. `specsfy-aux-database` atualiza o quadro de persistência.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Os pedidos precisam guardar o código de rastreio e a transportadora.
 ```
 
-**Proteções que nunca são desligadas:**
+**Proteções permanentes:**
 
 - nenhum teste roda no banco de desenvolvimento; em Laravel, o projeto precisa
   de `.env.testing` com `APP_ENV=testing` e um banco diferente do `.env`;
-- comandos que apagam ou recriam banco são sempre recusados, como
+- comandos que apagam ou recriam banco são recusados em qualquer situação, como
   `migrate:fresh`, `db:wipe`, `DROP TABLE` e `TRUNCATE`, mesmo com autorização;
-- testes Laravel usam `DatabaseTransactions`, nunca `RefreshDatabase`.
+- testes Laravel usam `DatabaseTransactions` no lugar de `RefreshDatabase`.
 
 **O que fica registrado:** a migration versionada, `DATABASE.md` atualizado e
 a evidência da migration aplicada no banco de teste.
 
 ## Adotar o Specsfy em um projeto existente
 
-**Situação:** o sistema já existe, tem código e talvez nenhuma documentação, e
-você quer começar a trabalhar com specs a partir de agora.
+**Situação:** o sistema já existe, tem código e talvez nenhuma documentação.
+Você quer começar a trabalhar com specs a partir de agora.
 
 **Caminho:**
 
@@ -231,10 +233,9 @@ você quer começar a trabalhar com specs a partir de agora.
 3. `specsfy-documentator` lê o projeto inteiro e reconstrói `docs/` com
    arquitetura, banco, fluxos, testes e integrações, além de
    `.specsfy/PACKAGES.md`.
-4. Daqui em diante, cada mudança nova segue o fluxo base. O código antigo não
-   precisa ganhar spec retroativa.
+4. Cada mudança nova segue o fluxo base, sem spec retroativa do código antigo.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Acabei de instalar o Specsfy neste projeto. Prepare o contexto e gere a
@@ -252,12 +253,13 @@ Leia [Informações permanentes do projeto](project-context.md) e
 ## Acompanhar o andamento do projeto
 
 **Situação:** há várias specs em estados diferentes e você quer saber o que
-está pronto, o que está bloqueado e qual é o próximo trabalho.
+está pronto, o que está parado por dependência e qual é o próximo trabalho.
 
-**Caminho:** `specsfy-progress` na conversa, ou o CLI no terminal. Os dois
-somente leem os arquivos; nada é alterado.
+**Caminho:** `specsfy-progress` na conversa ou o CLI no terminal. Os dois
+apenas leem as specs, os milestones e o backlog, sem alterar nenhum arquivo do
+projeto.
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Qual é o estado das specs e o que falta para fechar o milestone M01?
@@ -275,7 +277,7 @@ specsfy
 ```
 
 O último comando abre a TUI, com as abas Overview, Specs, Backlog, Gates,
-Tests, Skills e About. O formato `--json` serve para scripts e dashboards, e
+Tests, Skills e About. O formato `--json` serve para scripts e dashboards.
 `specsfy verify` roda todos os gates como etapa da integração contínua. Quando houver
 skills `clickupfy-*` instaladas, a transição de estado e o Effort também podem
 ser sincronizados com uma tarefa do ClickUp; o estado local continua sendo a
@@ -283,15 +285,15 @@ referência.
 
 ## Retomar uma entrega interrompida
 
-**Situação:** você parou no meio de uma entrega e não lembra em que ponto
-estava.
+**Situação:** você parou no meio de uma entrega e não sabe mais onde
+parou.
 
-**Caminho:** basta pedir para continuar. O agente relê a spec, os gates, as
+**Caminho:** basta solicitar a continuação. O agente relê a spec, os gates, as
 tarefas e as evidências e escolhe a skill responsável pelo estado encontrado.
 Se uma tarefa está pela metade, ela é retomada no item do checklist que falta
 (`PREP`, `EXECUTE`, `VERIFY`, `VISUAL`, `EVIDENCE` ou `IMPROVE`).
 
-**Como pedir:**
+**Como solicitar:**
 
 ```text
 Continue a spec 0005 de onde parou.
@@ -306,8 +308,9 @@ em vez de girar em círculo.
 ## Combine os casos
 
 Os casos acima se encaixam. Um produto novo começa pelo MVP, gera specs em
-rascunho, cada spec segue o fluxo base, uma mudança de banco ativa as
-proteções de dados, e um pedido tardio volta pela atualização da spec. Para
+rascunho e cada spec segue o fluxo base. Uma mudança de banco ativa as
+proteções do banco de dados. Uma solicitação tardia volta pela atualização da
+spec. Para
 ver todos os arquivos produzidos por uma entrega completa, siga para os
 [Exemplos completos](examples.md).
 

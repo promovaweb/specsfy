@@ -14,7 +14,7 @@ pergunta numerada. Ela contém três ou mais sugestões, `Escrever outra respost
 
 ## Como descrever a tarefa
 
-Peça: “revise os milestones do projeto e sincronize o mapa”.
+Solicite: “revise os milestones do projeto e sincronize o painel”.
 
 ## Exemplo passo a passo
 
@@ -33,5 +33,6 @@ A skill mostra relações ausentes e atualiza somente blocos gerados.
 
 ## Próximo passo
 
-A condição de saída continua dependendo de validação confirmada. Veja
-[Milestones](../milestones.md) para o comando e o modelo de arquivos.
+A condição de saída continua dependendo de validação confirmada. O guia
+[Milestones](../milestones.md) mostra o comando e o modelo de arquivos usados
+na sincronização.

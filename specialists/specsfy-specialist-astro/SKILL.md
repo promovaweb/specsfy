@@ -16,9 +16,9 @@ description: Construir e revisar sites Astro com renderização, content collect
 - Não acionar para a lógica interna de um componente React/Vue/Svelte
   hidratado dentro de uma ilha; usar `$specsfy-specialist-react` (ou
   equivalente) para o comportamento do componente em si, mantendo este
-  especialista para a decisão de quando e como hidratá-lo.
+  especialista para a escolha de quando e como hidratá-lo.
 - Combinar com `$specsfy-specialist-web-accessibility` para landmarks,
-  headings e navegação por teclado do site, e com
+  headings e navegação por teclado do site e com
   `$specsfy-specialist-performance-engineering` quando o sintoma for Core Web
   Vitals fora do SLO.
 
@@ -48,16 +48,16 @@ description: Construir e revisar sites Astro com renderização, content collect
   `client:visible` para algo abaixo da dobra, `client:idle` para algo de
   baixa prioridade, `client:load` só quando a interação precisa estar pronta
   imediatamente; nunca `client:load` por padrão em tudo.
-- Não transportar para uma ilha mais dado do que ela usa para renderizar —
+- Não transportar para uma ilha mais dado do que ela usa para renderizar:
   cada prop de uma ilha vira JSON serializado no HTML e conta no payload.
 - Manter layouts e componentes `.astro` server-first; um componente `.astro`
-  nunca precisa de diretiva `client:*` porque ele não hidrata — apenas os
+  nunca precisa de diretiva `client:*` porque ele não hidrata: apenas os
   componentes de framework (React/Vue/Svelte) embutidos hidratam.
 - Validar todo conteúdo (frontmatter, parâmetros de rota, body de endpoint)
   na fronteira com schema explícito; tratar slug duplicado ou rota colidente
   como erro de build, não como comportamento silencioso.
 - Escolher `server` output (SSR) apenas quando personalização por
-  requisição, sessão ou frescor de dado realmente justificar — do contrário,
+  requisição, sessão ou frescor de dado realmente justificar: do contrário,
   `static` é mais rápido, mais barato e mais simples de cachear.
 - Preservar `canonical`, sitemap e dados estruturados (JSON-LD) coerentes com
   a URL final de cada página, inclusive em conteúdo gerado dinamicamente.
@@ -67,15 +67,15 @@ description: Construir e revisar sites Astro com renderização, content collect
 
 ## Antipadrões
 
-- `client:load` aplicado "por garantia" em toda ilha da página — infla o JS
+- `client:load` aplicado "por garantia" em toda ilha da página: infla o JS
   enviado mesmo quando `client:visible` ou `client:idle` bastariam.
 - Passar o objeto de dado completo (ex.: registro inteiro do banco) como prop
-  para uma ilha que só exibe dois campos — cada byte extra é serializado e
+  para uma ilha que só exibe dois campos, cada byte extra é serializado e
   enviado ao navegador.
 - Content collection sem schema Zod, "confiando" que o frontmatter está
-  correto — um campo ausente só aparece como bug em produção, não em build.
+  correto: um campo ausente só aparece como bug em produção, não em build.
 - Usar `server` output para o site inteiro quando só uma rota (ex.: um
-  dashboard autenticado) precisa de SSR — perde cache estático nas páginas
+  dashboard autenticado) precisa de SSR, perde cache estático nas páginas
   que não precisavam disso.
 - Confundir a responsabilidade desta skill com a do framework hidratado: um
   bug de estado dentro de uma ilha React é problema de
@@ -93,7 +93,7 @@ description: Construir e revisar sites Astro com renderização, content collect
 - Fazer preview no runtime real do adapter (não só `astro dev`), medindo
   payload de JS por rota e Core Web Vitals antes/depois da mudança.
 - Não declarar uma página "estática" ou "zero-JS" sem inspecionar o HTML
-  gerado; linguagem absoluta sem essa evidência é proibida.
+  gerado; linguagem absoluta sem essa comprovação é proibida.
 
 ## Skills relacionadas
 
@@ -111,7 +111,7 @@ description: Construir e revisar sites Astro com renderização, content collect
   props de componente e tipos de endpoint.
 - `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-shadcn-ui` para a
   camada de estilo e os componentes visuais usados em layouts e ilhas.
-- Não use `$specsfy-specialist-nextjs` para decisões deste projeto: são
+- Não use `$specsfy-specialist-nextjs` para escolhas deste projeto: são
   frameworks distintos com fronteiras server/client e cache diferentes; migrar
   um padrão de um para o outro sem checar a skill correspondente costuma
   quebrar a semântica de cache.

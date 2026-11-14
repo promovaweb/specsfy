@@ -15,7 +15,8 @@ ao Docker Swarm com um caminho conhecido de rollback.
 ## O arquivo SEMVER
 
 `SEMVER` contém uma única linha com a versão preparada. Você pode abrir o
-arquivo antes do deploy e comparar esse valor com a imagem que será publicada:
+arquivo a qualquer momento e comparar esse valor com a imagem que será
+publicada:
 
 ```text
 1.4.0
@@ -27,7 +28,7 @@ mudança e impede que uma correção pareça uma quebra de compatibilidade:
 - aumente `PATCH` para uma correção compatível, como `1.4.0` para `1.4.1`.
 - aumente `MINOR` para uma capacidade nova e compatível, como `1.4.1` para
   `1.5.0`.
-- aumente `MAJOR` quando a interface pública deixa de ser compatível, como
+- aumente `MAJOR` quando a interface pública perde a compatibilidade, como
   `1.5.0` para `2.0.0`.
 
 A skill `$specsfy-specialist-versioning` analisa o alcance da entrega, propõe o
@@ -72,13 +73,13 @@ A versão preparada precisa aparecer nos artefatos que representam a entrega:
 
 O commit também pode gerar uma tag de imagem, como `git-a1b2c3d`. Depois da
 publicação, o digest `sha256:...` identifica o conteúdo exato promovido. O
-número explica a evolução para pessoas. O digest garante que todos os nodes
+número explica a evolução de forma legível, enquanto o digest garante que todos os nodes
 baixem os mesmos bytes.
 
 ```mermaid
 flowchart TD
-  P[Pedido em linguagem natural] --> D[specsfy-specialist-deploy]
-  D --> I[Inventário dos servidores]
+  P[Solicitação em linguagem natural] --> D[specsfy-specialist-deploy]
+  D --> I[Lista dos servidores]
   I --> C[Teste das conexões]
   C --> K[Chaves públicas para deploy]
   D --> S[SEMVER]
@@ -105,7 +106,7 @@ completo. Ela gera a base operacional com:
 ```bash
 node .agents/skills/specsfy-specialist-deploy/scripts/scaffold.mjs \
   --project . \
-  --image registry.example/equipe/aplicacao
+  --image registry.example/org/aplicacao
 ```
 
 O comando lê `SEMVER` na raiz e cria o `Dockerfile` com Open Swoole, o
@@ -133,9 +134,9 @@ externo `cloudflare_tunnel_token`, montado em arquivo no container. A stack
 usa `--token-file`; o valor não aparece no YAML, nos argumentos do processo ou
 no repositório.
 
-Se você escolher Nginx, Traefik, HAProxy ou outro ingresso, diga isso ao pedir
-o deploy. A geração usa `--proxy external`, não cria `cloudflared` e deixa a
-configuração pública para a alternativa escolhida. O Cloudflare Tunnel só é
+Para usar Nginx, Traefik, HAProxy ou outro ingresso, informe essa escolha ao
+solicitar o deploy. A geração usa `--proxy external`, não cria `cloudflared` e
+deixa a configuração pública para a alternativa escolhida. O Cloudflare Tunnel só é
 omitido depois dessa escolha explícita.
 
 ### Opções do scaffold
@@ -154,7 +155,7 @@ uso da interface:
 ```bash
 node scripts/scaffold.mjs --project . --image registry.example/app
 
-node scripts/scaffold.mjs --project /srv/minha-app --image ghcr.io/equipe/app
+node scripts/scaffold.mjs --project /srv/minha-app --image ghcr.io/org/app
 
 node scripts/scaffold.mjs --project . --image registry.example/app \
   --proxy cloudflare-tunnel
@@ -162,7 +163,7 @@ node scripts/scaffold.mjs --project . --image registry.example/app \
 node scripts/scaffold.mjs --project . --image registry.example/app \
   --proxy external
 
-node scripts/scaffold.mjs --project ../api --image ghcr.io/equipe/api \
+node scripts/scaffold.mjs --project ../api --image ghcr.io/org/api \
   --proxy external
 ```
 
@@ -177,13 +178,13 @@ externa ou do terminal, conforme o modo escolhido:
 
 Cada resposta é adicionada automaticamente ao `vault.yml` como variável
 criptografada. O playbook transforma essas variáveis em Docker Secrets. A
-stack mantém somente os nomes externos e nunca recebe os valores protegidos.
-Se você repetir o comando, ele preserva os campos existentes e pergunta apenas
-pelos que ainda faltam.
+stack mantém somente os nomes externos e não recebe os valores protegidos.
+Quando você repete o comando, ele preserva os campos existentes e pergunta
+apenas pelos que ainda faltam.
 
 O próximo capítulo, [Servidores, conexões e comandos de
 deploy](deploy-operations.md), mostra a árvore criada no projeto, o cadastro de
-máquinas, a conta `deploy`, a sincronização das chaves públicas e os comandos
+máquinas, o usuário `deploy`, a sincronização das chaves públicas e os comandos
 curtos para outro painel do Herdr.
 
 ### Versionamento prepara a entrega
@@ -199,8 +200,8 @@ apenas ao desenvolvimento local. O build recebe a tag SemVer, a tag do commit
 e as anotações OCI. A mesma imagem serve HTTP, filas, scheduler ou outros
 processos, com comandos próprios.
 
-A imagem é compilada uma vez. Staging e produção recebem o mesmo digest. Não
-há um novo build por ambiente.
+A imagem é compilada uma única vez. Staging e produção recebem o mesmo digest,
+sem um novo build por ambiente.
 
 ### Ansible prepara os hosts
 
@@ -208,9 +209,9 @@ há um novo build por ambiente.
 preflight. Depois, prepara o Debian, autentica no registry, instala os arquivos
 versionados e valida a stack antes da escrita no cluster.
 
-Use `--check --diff` primeiro. Limite os hosts com `--limit` e aplique lotes
-com `serial` quando a alteração alcançar várias máquinas. Segredos ficam no
-Ansible Vault ou em um cofre externo, nunca no repositório.
+Comece pelo check mode com a opção `--check`. Limite os hosts com `--limit` e
+aplique lotes com `serial` quando a alteração alcançar várias máquinas. Os
+segredos ficam no Ansible Vault ou em um cofre externo, fora do repositório.
 
 ### Docker Swarm aplica a versão
 
@@ -239,7 +240,7 @@ versão ainda não foi usada no repositório local.
 
 ### 2. Teste e compile uma vez
 
-Rode a suíte do projeto antes do build. Passe a versão e o commit como
+Rode a suíte do projeto antes do build e informe a versão e o commit como
 metadados da imagem:
 
 ```bash
@@ -254,8 +255,8 @@ docker build \
   .
 ```
 
-Antes do push, confirme que a tag SemVer ainda não existe no registry. Uma tag
-publicada é imutável. Se for preciso corrigir o conteúdo, prepare um novo
+Antes do push, confirme que a tag SemVer ainda não existe no registry, porque
+uma tag publicada é imutável. Para corrigir o conteúdo, prepare um novo
 `PATCH`.
 
 ### 3. Publique o artefato antes da tag Git
@@ -275,7 +276,7 @@ escrita no cluster. A leitura deve confirmar:
 - versão do Docker Engine e papel de cada node.
 - presença das redes externas necessárias.
 - existência dos Docker Secrets esperados.
-- serviço `cloudflared` na rede overlay, salvo quando outro proxy foi pedido.
+- serviço `cloudflared` na rede overlay, salvo quando outro proxy foi escolhido.
 - token do túnel entregue por Docker Secret, sem valor literal na stack.
 - versão do manifesto igual ao conteúdo de `SEMVER`.
 - acesso ao digest publicado.
@@ -309,7 +310,7 @@ formato anterior:
 
 1. adicione coluna, tabela ou índice sem remover o contrato antigo.
 2. publique código que entende os dois formatos.
-3. migre ou preencha os dados necessários.
+3. migre ou preencha os registros necessários.
 4. confirme que nenhum processo antigo depende do formato anterior.
 5. remova o contrato antigo em outra versão.
 
@@ -319,9 +320,10 @@ Os serviços HTTP e os workers não devem disputar a mesma migration.
 
 ## Rollback faz parte da preparação
 
-Antes do deploy, registre a versão anterior e seu digest. O rollback de código
-volta a stack para essa imagem. O rollback de dados é outro procedimento:
-algumas migrations não podem ser desfeitas sem perda.
+Registre a versão anterior e seu digest no início do deploy. O rollback de
+código volta a stack para essa imagem, enquanto o rollback do banco de dados é
+outro procedimento, porque algumas migrations não podem ser desfeitas sem
+perda.
 
 Um plano mínimo deixa registrada a imagem que voltará ao ar, a relação com o
 banco e os sinais usados para interromper o rollout. Ele informa:
@@ -338,8 +340,8 @@ execução em produção.
 
 ## Exemplo completo
 
-Considere uma aplicação na versão `1.3.2`. A entrega adiciona um endpoint sem
-quebrar clientes existentes. A skill propõe `minor`, então `SEMVER` passa para
+Considere uma aplicação na versão `1.3.2` cuja entrega adiciona um endpoint
+sem quebrar clientes existentes. A skill propõe `minor` e o `SEMVER` vai para
 `1.4.0`.
 
 O pipeline testa o commit, cria `app:1.4.0` e `app:git-a1b2c3d`, publica ambas
@@ -348,8 +350,8 @@ Ansible valida os nodes e instala o manifesto. O Swarm promove o digest com
 `start-first`, observa a convergência e mantém `1.3.2` disponível para
 rollback.
 
-Ao final, `SEMVER`, changelog, imagem, manifesto, tag Git e GitHub Release
-contam a mesma história.
+Ao final, o `SEMVER` e o changelog registram a mesma versão da imagem, do
+manifesto, da tag Git e da GitHub Release.
 
 ## Antes de considerar o deploy concluído
 
@@ -365,11 +367,12 @@ contam a mesma história.
 - O resultado foi registrado na especificação e no changelog.
 
 Para conhecer cada especialista, continue em [Skills
-especialistas](specialists.md). Para pipelines e automações adicionais,
-consulte [Uso avançado](advanced-usage.md).
+especialistas](specialists.md). O capítulo [Uso avançado](advanced-usage.md)
+reúne pipelines e automações adicionais para levar o Specsfy à integração
+contínua.
 
 ## Justificativa de tamanho
 
 Este capítulo mantém no mesmo percurso a versão, o artefato, a preparação dos
-hosts e a operação do cluster. A leitura conjunta permite conferir a passagem
+hosts e o funcionamento do cluster. A leitura conjunta permite conferir a passagem
 do `SEMVER` ao runtime sem separar etapas que dependem umas das outras.

@@ -13,7 +13,7 @@ description: "Projetar e revisar logs, métricas, traces, correlação, SLOs, al
 - Acionar também para definir o sinal objetivo que autoriza continuar, pausar
   ou reverter um rollout.
 - Não acionar para diagnosticar a causa raiz de uma latência específica já
-  detectada — usar `$specsfy-specialist-performance-engineering` para
+  detectada: usar `$specsfy-specialist-performance-engineering` para
   profiling e otimização; observability aqui é sobre desenhar o sistema de
   sinais, não sobre investigar um caso pontual já instrumentado.
 - Combinar com `$specsfy-specialist-delivery-engineering` quando o sinal
@@ -33,40 +33,40 @@ description: "Projetar e revisar logs, métricas, traces, correlação, SLOs, al
    o desenho, não como correção posterior.
 5. Proteger dados sensíveis na telemetry (redaction, mascaramento) e definir
    política de retenção por tipo de sinal.
-6. Construir dashboards organizados por decisão (o que essa tela me ajuda a
+6. Construir dashboards organizados por escolha (o que essa tela me ajuda a
    decidir?) e alertas organizados por ação (o que eu faço quando esse
    alerta dispara?).
-7. Validar a telemetry nos três estados — sucesso, falha e degradação
-   parcial — antes de confiar nela durante um incidente real.
+7. Validar a telemetry nos três estados (sucesso, falha e degradação
+   parcial) antes de confiar nela durante um incidente real.
 
 ## Padrões
 
 - Logs estruturados (chave-valor ou JSON) com evento nomeado, severidade,
-  identificador de correlação e contexto mínimo necessário — nunca uma
+  identificador de correlação e contexto mínimo necessário, nunca uma
   string livre concatenada que exige regex para extrair dado.
 - Métricas usam apenas labels de cardinalidade limitada e conhecida
   (endpoint normalizado, código de status, tenant se o volume de tenants for
   baixo); nunca user id, URL crua com query string ou mensagem de erro bruta
-  como label — cada valor único de label multiplica as séries armazenadas.
+  como label: cada valor único de label multiplica as séries armazenadas.
 - Traces preservam o mesmo contexto de correlação atravessando HTTP, fila e
-  job assíncrono — um trace que "quebra" na borda de uma fila não serve para
+  job assíncrono: um trace que "quebra" na borda de uma fila não serve para
   depurar o problema mais comum (latência distribuída entre serviços).
-- Alertas refletem impacto real ao usuário ou risco iminente de violar o
-  SLO, e todo alerta tem owner e runbook alcançável — alerta sem ação
+- Alertas refletem impacto real ao usuário ou ameaça iminente de violar o
+  SLO. Todo alerta tem owner e runbook alcançável: alerta sem ação
   associada é ruído que treina a equipe a ignorar alertas.
 - Dashboards começam pela visão de saúde agregada (RED/USE) e permitem
   drill-down até o sinal granular, não o inverso.
 - Sampling de traces preserva 100% dos erros e das transações de negócio
   crítico, mesmo reduzindo a amostragem do caminho feliz de alto volume.
-- A própria telemetry falha de modo seguro (degrada, não derruba o produto)
-  — um exportador de métricas fora do ar nunca pode derrubar a aplicação que
+- A própria telemetry falha de modo seguro (degrada, não derruba o produto):
+  um exportador de métricas fora do ar nunca pode derrubar a aplicação que
   instrumenta.
 
 ## Antipadrões
 
 - "Logar tudo" sem estrutura nem nível de severidade consistente: aumenta
   custo de armazenamento e reduz a capacidade real de encontrar o evento
-  relevante durante um incidente — volume de log não é observabilidade.
+  relevante durante um incidente, volume de log não é observabilidade.
 - Métrica com label de alta cardinalidade (ex.: `user_id` ou `order_id` como
   label): explode o número de séries temporais armazenadas e pode derrubar
   ou encarecer drasticamente o backend de métricas.
@@ -100,9 +100,9 @@ description: "Projetar e revisar logs, métricas, traces, correlação, SLOs, al
   em relatórios por host, com coleta somente leitura via Ansible.
 
 - `$specsfy-specialist-debugging` consome os sinais para isolar causa e pede
-  instrumentação adicional quando a evidência é insuficiente.
+  instrumentação adicional quando a comprovação é insuficiente.
 - `$specsfy-specialist-docker` e `$specsfy-specialist-docker-swarm` expõem
-  runtime, service e node signals; esta skill define correlação e decisão.
+  runtime, service e node signals; esta skill define correlação e escolha.
 - `$specsfy-specialist-postgres` e `$specsfy-specialist-redis` produzem sinais
   de dados/cache com cardinalidade e retenção controladas aqui.
 - `$specsfy-specialist-web-api-design` define correlação e erro no contrato;
@@ -110,7 +110,7 @@ description: "Projetar e revisar logs, métricas, traces, correlação, SLOs, al
 - `$specsfy-specialist-performance-engineering` para diagnóstico de causa
   raiz de uma latência ou gargalo já detectado pelos sinais aqui definidos.
 - `$specsfy-specialist-delivery-engineering` quando o sinal de saúde definido
-  aqui alimenta a decisão de continuar ou reverter um rollout.
+  aqui alimenta a escolha de continuar ou reverter um rollout.
 - `$specsfy-specialist-application-security` quando a telemetry precisa
   registrar (ou deliberadamente não registrar) eventos de segurança.
 

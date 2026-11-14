@@ -11,8 +11,8 @@
 ## O que você vai construir
 
 Este tutorial acompanha uma página de boas-vindas em um projeto Laravel que já
-usa Pest. A rota recebe um nome e mostra uma saudação. Quando o nome não for
-informado, a página usa `visitante`.
+usa Pest. A rota recebe um nome e mostra uma saudação, com `visitante` no lugar
+do nome quando ele não é informado.
 
 Você verá como uma ideia chega à implementação sem dividir a fonte normativa
 entre `plan.md`, `tasks.md` e outros arquivos. O exemplo mostra cada skill
@@ -60,8 +60,8 @@ deve apontar um caminho semelhante a este:
 specs/inbox/2026-07-28-143205-pagina-boas-vindas.md
 ```
 
-Essa captura preserva o texto recebido e registra inferências separadamente.
-Ela ainda não cria backlog, spec, tarefas ou código.
+Essa captura preserva o texto recebido e registra inferências separadamente,
+sem criar backlog, spec, tarefas ou código.
 
 ## Refine a proposta no backlog
 
@@ -82,7 +82,7 @@ numerado:
 specs/backlog/0001-pagina-boas-vindas.md
 ```
 
-O backlog organiza uma possibilidade de entrega, mas não autoriza alteração no
+O backlog registra uma possibilidade de entrega, mas não autoriza alteração no
 código. Essa separação permite comparar e priorizar ideias antes de criar uma
 especificação normativa.
 
@@ -121,10 +121,9 @@ A skill cria o diretório numerado e mantém a fonte normativa neste caminho:
 specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
-Abra esse arquivo e confira se o problema, as pessoas afetadas, os requisitos,
+Abra esse arquivo e confira se o problema, os usuários afetados, os requisitos,
 os limites e os cenários BDD representam a conversa. O Gherkin permanece na
-spec como referência legível. O Specsfy não cria uma suíte `.feature`
-separada.
+spec como referência legível, sem uma suíte `.feature` separada.
 
 ## Comprove a definição
 
@@ -226,7 +225,7 @@ o nome deve ter no máximo 80 caracteres.
 
 Essa skill preserva a nova instrução, atualiza a `spec.md` e invalida somente
 as provas afetadas. Como o limite muda comportamento, o fluxo reabre desde o
-Ato I, percorre validação, tarefas e TDD/BDD, e só então retoma
+Ato I e percorre validação, tarefas e TDD/BDD antes de retomar o
 `$specsfy-07-implement`. A skill de atualização não altera código de
 produção automaticamente.
 

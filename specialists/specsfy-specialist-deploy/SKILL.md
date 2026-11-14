@@ -40,7 +40,7 @@ Editorial Compartilhado aplicável ao projeto consumidor.
    solicitada em etapa própria.
 
 4. Acionar `$specsfy-specialist-debian-server` para levantar as máquinas uma
-   por rodada. Registrar hostname, endereço, porta SSH, usuário de conexão e
+   por pergunta. Registrar hostname, endereço, porta SSH, usuário de conexão e
    papel `manager` ou `worker` em `ansible/inventory.yml`, preservando os hosts
    já cadastrados. Quando chegar uma máquina nova, adicionar somente esse host.
 5. Testar todos os hosts declarados antes de qualquer alteração remota. A skill
@@ -139,7 +139,7 @@ Editorial Compartilhado aplicável ao projeto consumidor.
 ## Antipadrões
 
 - Usar `latest` ou outra tag que não reproduza `SEMVER`.
-- Executar `docker swarm init` em toda rodada do playbook.
+- Executar `docker swarm init` em toda execução do playbook.
 - Expor token de join em log, variável aberta ou arquivo commitado.
 - Guardar senha, token ou chave no `stack.yaml`, em variável aberta ou na
   imagem.
@@ -162,7 +162,7 @@ Editorial Compartilhado aplicável ao projeto consumidor.
 - Confirmar que `deploy` existe, pertence ao grupo `docker`, acessa o daemon e é
   owner dos diretórios da aplicação.
 - Confirmar Docker Engine ativo, manager alcançável e swarm em estado `active`.
-- Executar o playbook duas vezes; a segunda rodada deve terminar sem mudanças.
+- Executar o playbook duas vezes; a segunda execução deve terminar sem mudanças.
 - Comparar a imagem de cada serviço com `SEMVER` e com o digest publicado.
 - Observar a convergência e ensaiar rollback em ambiente compatível.
 

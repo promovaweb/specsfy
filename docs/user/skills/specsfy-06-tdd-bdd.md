@@ -57,7 +57,7 @@ suíte normal do projeto, não em um arquivo `.feature` nem em uma segunda suít
 - caso de teste ligado a uma condição de aceite da spec.
 - comando e resultado registrados.
 - distinção entre falha esperada e problema de ambiente.
-- cobertura de sucesso, regra e limite.
+- cobertura de sucesso, regra de negócio e limite.
 - regressão depois do GREEN.
 
 ## Erros comuns
@@ -74,4 +74,5 @@ suíte normal do projeto, não em um arquivo `.feature` nem em uma segunda suít
 
 Com RED válido e tarefa pronta, use
 [`specsfy-07-implement`](specsfy-07-implement.md). Para apenas reorganizar
-as tarefas, volte a [`specsfy-05-tasks`](specsfy-05-tasks.md).
+as tarefas da spec, volte ao [`specsfy-05-tasks`](specsfy-05-tasks.md) sem
+alterar o código.

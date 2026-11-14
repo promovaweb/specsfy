@@ -97,7 +97,7 @@ chmod +x "$HOME/.local/bin/specsfy"
 
 ## Incorpore uma mudança na spec
 
-Quando lembrar de algo depois da definição, use a entrada explícita:
+Quando surgir algo novo depois da definição, use a entrada explícita:
 
 ```text
 Use $specsfy-update-spec em

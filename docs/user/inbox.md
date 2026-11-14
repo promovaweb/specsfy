@@ -22,14 +22,14 @@ Data e hora evitam uma fila numerada artificial e preservam a ordem real de
 chegada. Se duas capturas tiverem o mesmo nome no mesmo segundo, o Specsfy
 adiciona um sufixo sem sobrescrever a anterior.
 
-## O que o arquivo organiza
+## O que o arquivo registra
 
 - metadados e integridade do texto original.
 - texto original completo.
 - resumo processado.
 - problema ou oportunidade.
-- pessoas e valor percebidos.
-- sinais de escopo, regras ou solução.
+- usuários e valor percebidos.
+- sinais de escopo, regras de negócio ou solução.
 - dependências, falhas possíveis e direções futuras.
 - pontos a revisar no futuro.
 - rastreabilidade para backlog ou spec derivados.
@@ -43,8 +43,8 @@ ou apagar informações, a Inbox registra o sinal sem perguntar. No backlog,
 `$specsfy-data-discovery` conversa sobre essas informações antes de o item ser
 considerado pronto.
 
-O texto será versionado no Git. Não inclua senhas, tokens, chaves privadas ou
-dados pessoais sensíveis. Se o agente detectar um segredo evidente, ele não
+O texto será versionado no Git, por isso a captura não deve incluir senhas,
+tokens, chaves privadas ou dados pessoais sensíveis. Se o agente detectar um segredo evidente, ele não
 grava a captura e orienta você a remover o conteúdo sensível antes de reenviar.
 
 ## Inbox, backlog e spec
@@ -55,7 +55,7 @@ captura sem perguntas → backlog refinável → spec normativa
 
 - `specs/inbox/` preserva o input e funciona como fila ativa.
 - `specs/inbox/processed/` guarda as capturas já cobertas por specs aprovadas.
-- `specs/backlog/` organiza algo escolhido para refinamento.
+- `specs/backlog/` guarda algo escolhido para refinamento.
 - `specs/<estado>/<NNNN>-<slug>/spec.md` governa comportamento e entrega.
 
 Uma captura pode permanecer na Inbox pelo tempo que for preciso. Quando quiser
@@ -64,12 +64,12 @@ avançar, use `$specsfy-02-backlog` com o caminho do arquivo.
 ## Quando a captura sai da Inbox
 
 Virar backlog ou spec em Draft não retira a captura da fila ativa: enquanto
-qualquer parte do pedido estiver sem definição aprovada, ela continua em
-`specs/inbox/`, e a leitura da pasta mostra o que ainda precisa de tratamento.
+qualquer parte da solicitação estiver sem definição aprovada, ela continua em
+`specs/inbox/`. A leitura da pasta mostra o que ainda precisa de tratamento.
 
 A saída acontece em um único momento: quando `$specsfy-04-validate` aprova o
 Definition Gate de uma spec e confirma que essa spec, sozinha ou com outras já
-aprovadas, cobre o pedido inteiro. A validação então executa:
+aprovadas, cobre a solicitação inteira. A validação então executa:
 
 ```bash
 specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de-atraso
@@ -78,15 +78,15 @@ specsfy inbox process 2026-07-28-143205-avisar-clientes.md --spec 0007-avisos-de
 O comando move o arquivo para `specs/inbox/processed/`, com o mesmo nome, e:
 
 - troca `Status: Capturada` por `Status: Processada`;
-- registra as specs que absorveram o pedido em `Spec derivada` e a data em
+- registra as specs que absorveram a solicitação em `Spec derivada` e a data em
   `Processada em`;
 - atualiza os links para a captura no backlog e nas specs;
 - preserva o texto original e a análise inicial sem alteração.
 
-Antes de mover, o comando confere cada spec indicada. Ela precisa estar fora
+Antes de mover, o comando confere se cada spec indicada está fora
 da pasta `draft`, ter `Status` diferente de `Draft` e mostrar
-`Definition Gate: Passed` na tabela do topo. O `Status` também precisa estar
-escrito nessa tabela. Tabelas do corpo e exemplos não comprovam aprovação.
+`Definition Gate: Passed` na tabela do topo, onde o `Status` também precisa
+estar escrito. Tabelas do corpo e exemplos não comprovam aprovação.
 Se o gate não estiver escrito, a
 spec é recusada mesmo que já esteja em outra pasta. Basta uma spec recusada
 para a captura continuar em `specs/inbox/`.
@@ -97,7 +97,8 @@ specs/inbox/processed/             ← capturas integralmente cobertas por specs
 ```
 
 Nada é apagado. Capturas processadas continuam valendo como histórico e
-entram na busca por duplicatas do backlog. Se uma parte do pedido ficou de
+entram na busca por duplicatas do backlog. Quando uma parte da solicitação fica
+de
 fora, a captura permanece na fila ativa e a validação informa o que resta
 encaminhar.
 
@@ -134,4 +135,4 @@ Para personalizar um modelo, copie somente o arquivo desejado para
 `.specsfy/templates/custom/` e preserve o mesmo nome. A versão em `custom/`
 tem precedência sobre a cópia padrão. O instalador protege alterações locais nos
 templates gerenciados, mas `--force` pode substituí-los. O conteúdo de
-`custom/` nunca é gerenciado nem sobrescrito.
+`custom/` não é gerenciado nem sobrescrito pelo Specsfy.

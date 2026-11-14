@@ -45,7 +45,7 @@ instala primeiro componentes gratuitos ReUI sobre esta base.
    exigidos (diálogo modal vs popover vs sheet lateral), não pela aparência
    mais próxima do design.
 5. Adicionar o menor conjunto de componentes necessário e revisar o código
-   gerado linha a linha — ele é copiado para o projeto e passa a ser mantido
+   gerado linha a linha: ele é copiado para o projeto e passa a ser mantido
    por quem o adicionou.
 6. Adaptar tokens, variantes (`cva`) e composição ao design do projeto sem
    remover roles, `aria-*`, gestão de foco ou atalhos de teclado oferecidos
@@ -86,7 +86,7 @@ instala primeiro componentes gratuitos ReUI sobre esta base.
   não segurança) e associar cada mensagem de erro ao campo correspondente
   via `aria-describedby`/label.
 - Atualizar um componente já customizado apenas depois de comparar o diff
-  entre a versão nova do registry e as customizações locais — um `add`
+  entre a versão nova do registry e as customizações locais: um `add`
   ingênuo pode sobrescrever uma correção de acessibilidade feita
   anteriormente.
 
@@ -96,16 +96,16 @@ instala primeiro componentes gratuitos ReUI sobre esta base.
   pública. Isso introduz imports e props incompatíveis com Base UI ou React
   Aria.
 - Importar um Dialog do shadcn/ui e remover o `aria-describedby`/título por
-  achar "redundante visualmente" — quebra o anúncio do leitor de tela sobre o
+  achar "redundante visualmente": quebra o anúncio do leitor de tela sobre o
   que o diálogo faz.
 - Editar o arquivo gerado do componente para "consertar" um estilo em vez de
-  ajustar o token/variant central — a próxima pessoa que atualizar o
+  ajustar o token/variant central: a próxima pessoa que atualizar o
   componente perde a correção sem saber que ela existia.
 - Tratar o Data Table como componente único e genérico para toda tabela do
-  sistema, acumulando props condicionais até virar impossível de entender —
+  sistema, acumulando props condicionais até virar impossível de entender:
   compor uma tabela por caso de uso a partir dos blocos do registry.
 - Validar formulário só no cliente (schema no front) e nunca repetir a
-  validação no servidor — qualquer requisição direta ao endpoint ignora a
+  validação no servidor: qualquer requisição direta ao endpoint ignora a
   validação do formulário.
 - Rodar `shadcn add` sobre um componente já customizado sem diff prévio,
   perdendo silenciosamente ajustes de acessibilidade ou de negócio feitos
@@ -116,7 +116,7 @@ instala primeiro componentes gratuitos ReUI sobre esta base.
 - Rodar typecheck, lint, testes e build do projeto após adicionar ou
   modificar um componente.
 - Percorrer a navegação completa por teclado: abrir/fechar overlay, focus
-  trap dentro do Dialog/Sheet, e retorno do foco ao elemento que o abriu.
+  trap dentro do Dialog/Sheet e retorno do foco ao elemento que o abriu.
 - Testar em mobile e desktop, tema claro e escuro, zoom alto e conteúdo
   longo/truncado nas células de tabela e nos rótulos.
 - Exercitar os estados de tabela (vazio, carregando, erro, com dados),
@@ -137,7 +137,7 @@ instala primeiro componentes gratuitos ReUI sobre esta base.
 - `$specsfy-specialist-typescript` para tipar variantes `cva` e schemas de
   formulário (`zod` + `react-hook-form`).
 - `$specsfy-specialist-nextjs` quando o formulário submete para uma Server
-  Action — validação e autorização server-side pertencem a essa skill.
+  Action: validação e autorização server-side pertencem a essa skill.
 - `$specsfy-specialist-react-ui-components` e `$specsfy-specialist-ui-design`
   quando o projeto precisa de uma galeria de referências visuais mais ampla
   ou de definições de composição de página.

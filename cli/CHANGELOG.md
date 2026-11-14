@@ -4,6 +4,13 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.29.2] - 2026-11-14
+
+### Corrigido
+
+- Revisada a redação do guia do usuário em `docs/user/`, com explicações mais precisas e correções de linguagem.
+- Atualizados os formatos portáteis da documentação a partir das fontes revisadas.
+
 ## [0.29.1] - 2026-11-13
 
 ### Corrigido

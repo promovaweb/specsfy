@@ -9,9 +9,9 @@
 </p>
 <!-- markdownlint-enable MD033 -->
 
-O Specsfy ajuda você a transformar uma ideia em software testado sem espalhar
+Com o Specsfy, você transforma uma ideia em software testado sem espalhar
 requisitos, planos e tarefas por vários arquivos. Você conversa normalmente
-com o agente, e as skills organizam o trabalho em uma única especificação.
+com o agente, enquanto as skills reúnem o trabalho em uma única especificação.
 Nesse arquivo, você consegue conferir o que será entregue, quais testes
 comprovam o comportamento e o que já foi concluído.
 
@@ -53,10 +53,10 @@ arquivo muda ao longo do trabalho e o que comprova a passagem entre os atos.
 
 Os três atos ligam cada fase a uma evidência verificável na `spec.md`:
 
-1. **Ato I — Definir:** entender e validar o que deve ser entregue.
-2. **Ato II — Projetar e provar:** preparar tarefas e obter o RED, a falha
-   esperada antes da implementação.
-3. **Ato III — Entregar e validar:** implementar, obter testes verdes e
+1. **Ato I (Definir):** entender e validar o que deve ser entregue.
+2. **Ato II (Projetar e provar):** preparar tarefas e obter o RED, a falha
+   esperada enquanto o comportamento ainda não existe.
+3. **Ato III (Entregar e validar):** implementar, obter testes verdes e
    registrar evidências.
 
 Para interpretar cada campo da spec, consulte a [Referência do
@@ -81,11 +81,12 @@ Depois do tutorial, veja o mesmo método aplicado a outras situações:
 - [Casos de uso](use-cases.md): receitas para bug, CRUD com interface, MVP,
   mudança tardia, banco de dados, projeto existente e retomada de trabalho.
 - [Exemplos completos](examples.md): cada arquivo produzido por uma entrega
-  real, do texto original à evidência dos testes, com mensagens prontas para
-  cada etapa.
+  completa, do texto original aos testes, com mensagens prontas para cada
+  etapa.
 
-Para preservar uma ideia sem iniciar a especificação, escolha uma destas
-entradas:
+Para preservar uma ideia sem iniciar a especificação, escolha uma das entradas
+abaixo de acordo com o que você quer fazer com ela agora, sem perder o texto
+original:
 
 - preserve um texto sem perguntas na [Inbox](inbox.md).
 - refine e priorize uma proposta no [Backlog](backlog.md).
@@ -116,8 +117,8 @@ linguagem natural, o resultado esperado, os erros comuns e o próximo passo.
 Quando uma delas precisar perguntar, você recebe uma pergunta numerada por
 rodada. Ela traz três ou mais opções numeradas,
 `Escrever outra resposta`, `Gere outras opções` e `Avançar` desde o início da
-conversa. Cada área aceita no máximo oito perguntas, salvo se você pedir mais e
-informar quantas deseja responder.
+conversa. Cada área aceita no máximo oito perguntas, salvo quando você solicita
+mais e informa quantas deseja responder.
 Depois de avançar, você informa se quer encerrar definitivamente as perguntas
 daquela área, responder depois ou retomar agora. O encerramento é respeitado
 até você reabrir a área; o adiamento preserva os pontos para retomada.
@@ -133,9 +134,10 @@ Depois da primeira entrega, escolha os guias ligados à sua rotina:
 - [CLI e TUI](cli.md): interface visual e acompanhamento.
 - [Referência dos comandos](cli-reference.md): parâmetros, efeitos, saídas e
   exemplos do CLI.
-- [Informações permanentes do projeto](project-context.md): stack, regras,
-  banco e convenções.
-- [Design system de interface](design-system.md): regras macro, padrões CRUD,
+- [Informações permanentes do projeto](project-context.md): stack, banco e
+  convenções confirmadas.
+- [Design system de interface](design-system.md): orientações gerais, padrões
+  CRUD,
   estados e exceções com alcance.
 - [Documentação do sistema](system-documentation.md): documentação técnica
   derivada da aplicação.
@@ -147,7 +149,47 @@ Depois da primeira entrega, escolha os guias ligados à sua rotina:
 Os próximos guias são opcionais. Consulte-os quando a entrega exigir uma
 integração ou tecnologia específica:
 
-- [Especialistas](specialists.md), para conhecimento técnico adicional.
+- [Especialistas](specialists.md), para conhecimento técnico adicional, com
+  um guia para cada especialista do catálogo:
+  - [Acessibilidade Web](specialists/web-accessibility.md)
+  - [Ansible](specialists/ansible.md)
+  - [APIs Web](specialists/web-api-design.md)
+  - [Arquitetura de Software](specialists/software-architecture.md)
+  - [Astro](specialists/astro.md)
+  - [Code Review](specialists/code-review.md)
+  - [Componentes React](specialists/react-ui-components.md)
+  - [Debian Server](specialists/debian-server.md)
+  - [Debugging](specialists/debugging.md)
+  - [Deploy](specialists/deploy.md)
+  - [Design System](specialists/design-system.md)
+  - [Docker](specialists/docker.md)
+  - [Docker Swarm](specialists/docker-swarm.md)
+  - [Engenharia de Entrega](specialists/delivery-engineering.md)
+  - [Experiência de Interface](specialists/interface-experience.md)
+  - [Gestor de pacotes Laravel](specialists/laravel-package-manager.md)
+  - [Gitflow](specialists/gitflow.md)
+  - [Laravel](specialists/laravel.md)
+  - [Modelagem de Dados](specialists/data-modeling.md)
+  - [Modelagem de Domínio](specialists/domain-modeling.md)
+  - [Next.js](specialists/nextjs.md)
+  - [Observabilidade](specialists/observability.md)
+  - [Performance](specialists/performance-engineering.md)
+  - [Pesquisa Técnica](specialists/technical-research.md)
+  - [PostgreSQL](specialists/postgres.md)
+  - [Prototipação](specialists/prototyping.md)
+  - [React](specialists/react.md)
+  - [Redis](specialists/redis.md)
+  - [Relatório de servidor](specialists/server-report.md)
+  - [Resolução de Conflitos Git](specialists/merge-conflict-resolution.md)
+  - [ReUI](specialists/reui.md)
+  - [Segurança de Aplicações](specialists/application-security.md)
+  - [shadcn/ui](specialists/shadcn-ui.md)
+  - [Supabase](specialists/supabase.md)
+  - [Tailwind CSS](specialists/tailwind-css.md)
+  - [TypeScript](specialists/typescript.md)
+  - [UI Design](specialists/ui-design.md)
+  - [UX Design](specialists/ux-design.md)
+  - [Versionamento](specialists/versioning.md)
 - [Como funciona o Deploy da aplicação](deploy.md), para ligar `SEMVER`, imagem, Ansible e
   Docker Swarm em um deploy verificável.
 - [Servidores e comandos de deploy](deploy-operations.md), para cadastrar
@@ -163,9 +205,9 @@ integração ou tecnologia específica:
   IDs, skills, comandos, glossário e fontes externas em uma página.
 - [Créditos](credits.md), para autoria e identidade do projeto.
 
-Se você pretende contribuir ou modificar o próprio framework, continue no
-[guia técnico](../develop/README.md). Ele é um percurso separado do uso em
-projetos consumidores.
+Para contribuir ou modificar o próprio framework, continue no
+[guia técnico](../develop/README.md), um percurso separado do uso em projetos
+consumidores.
 
 ## Conversa contínua entre etapas
 
@@ -182,7 +224,7 @@ backlog e promovê-la até chegar a:
 specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
-Em seguida, o agente valida a definição, organiza tarefas, prepara testes,
+Em seguida, o agente valida a definição, monta as tarefas, prepara testes,
 implementa e registra evidências nesse mesmo arquivo. Se depois você solicitar
 um botão novo, a alteração retorna à mesma `spec.md`. O agente reabre somente
 os atos cujas provas perderam validade, sem criar `plan.md`, `tasks.md` ou

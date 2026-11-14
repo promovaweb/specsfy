@@ -22,7 +22,7 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 
 1. Confirmar a versão do Tailwind, a integração (Vite, PostCSS, framework) e
    onde os tokens são declarados (`tailwind.config.js` ou `@theme` em CSS na
-   v4) — a sintaxe de configuração muda entre gerações.
+   v4): a sintaxe de configuração muda entre gerações.
 2. Traduzir o layout e os estados da interface em constraints responsivas
    (breakpoints ou `@container`) antes de escrever a primeira classe.
 3. Reutilizar tokens semânticos já existentes (cor, espaçamento, radius,
@@ -33,7 +33,7 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
    `aria-*`) e preferências do usuário (`dark`, `motion-reduce`,
    `forced-colors`) desde a primeira versão do componente, não como retrofit.
 6. Extrair um componente (não `@apply`) quando o padrão repetido representa
-   uma unidade semântica reconhecível (um "Card", um "Badge"), e não apenas
+   uma unidade semântica reconhecível (um "Card", um "Badge"), não apenas
    uma coincidência visual entre dois lugares.
 7. Validar o CSS gerado no build de produção: nenhuma classe usada
    dinamicamente deve estar ausente por não ser detectável estaticamente
@@ -43,18 +43,18 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 
 - Manter cor, espaçamento, radius e tipografia como tokens com nome de
   intenção (`bg-surface`, `text-muted`) sempre que o projeto já tiver um
-  sistema de design — não introduzir valor solto que dribla o token
+  sistema de design, não introduzir valor solto que dribla o token
   existente.
 - Expressar estado (hover, foco, seleção, erro) com variantes do próprio
   Tailwind (`hover:`, `aria-selected:`, `data-[state=open]:`), nunca
   escondendo a lógica de estado em concatenação de string opaca fora da
   vista do build.
-- Não usar `@apply` como substituto geral de componente — ele recria uma
+- Não usar `@apply` como substituto geral de componente: ele recria uma
   folha de estilo tradicional dentro do utility-first e perde a
   colocação (a classe deixa de estar ao lado do elemento que ela estiliza).
 - Garantir que toda classe construída dinamicamente (template string,
   concatenação condicional) seja detectável estaticamente pelo scanner de
-  conteúdo — usar mapas completos de classes literais em vez de montar a
+  conteúdo: usar mapas completos de classes literais em vez de montar a
   classe por concatenação de partes (`text-${color}-500` não funciona: o
   scanner não executa o template).
 - Tratar dark mode, `prefers-reduced-motion`, `prefers-contrast` e
@@ -65,25 +65,25 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
   (ex.: um card que muda de layout dentro de uma sidebar estreita), não ao
   viewport inteiro.
 - Não multiplicar valores arbitrários (`p-[13px]`, `text-[15px]`) sem antes
-  perguntar se um novo token de escala deveria existir — um valor arbitrário
+  perguntar se um novo token de escala deveria existir: um valor arbitrário
   isolado é aceitável; vários próximos e repetidos indicam token ausente.
 
 ## Antipadrões
 
-- Classe montada por concatenação de variável (`` `bg-${color}-500` ``) — o
+- Classe montada por concatenação de variável (`` `bg-${color}-500` ``): o
   scanner de conteúdo do Tailwind não executa JS, então essa classe nunca é
   gerada no CSS final; use um mapa literal de classes completas.
-- `@apply` usado para recriar dezenas de componentes CSS tradicionais —
+- `@apply` usado para recriar dezenas de componentes CSS tradicionais:
   perde a vantagem de colocation do utility-first e cria uma folha de
   estilo paralela difícil de rastrear.
 - Cor, espaçamento ou radius hardcoded (`#3b82f6`, `17px`) ao lado de um
-  sistema de tokens já existente — quebra o tema (claro/escuro, marca) na
+  sistema de tokens já existente: quebra o tema (claro/escuro, marca) na
   primeira mudança centralizada.
 - Adicionar dark mode, foco visível ou movimento reduzido só depois de uma
   reclamação de acessibilidade, em vez de tratá-los como parte do componente
   desde a primeira versão.
 - Confundir a responsabilidade desta skill com a escolha de biblioteca de
-  componentes prontos — Tailwind é a camada de utilitários/tema; a escolha
+  componentes prontos: Tailwind é a camada de utilitários/tema; a escolha
   de "qual Data Table usar" pertence a
   `$specsfy-specialist-shadcn-ui`/`$specsfy-specialist-react-ui-components`.
 
@@ -97,10 +97,10 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
   indesejado.
 - Percorrer `hover`, `focus-visible`, `disabled`, `loading`, `error` e
   `selected` visualmente e por teclado.
-- Checar contraste nos temas claro e escuro, e o comportamento com
+- Checar contraste nos temas claro e escuro. Checar também o comportamento com
   `prefers-reduced-motion`/`forced-colors` ativados no sistema operacional.
 - Não declarar um componente "responsivo" ou "acessível" apenas por ter
-  classes `sm:`/`dark:` presentes; a evidência acima é obrigatória antes da
+  classes `sm:`/`dark:` presentes; a comprovação acima é obrigatória antes da
   afirmação.
 
 ## Skills relacionadas

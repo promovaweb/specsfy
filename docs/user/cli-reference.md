@@ -13,8 +13,8 @@ Para aprender o percurso pela interface visual, consulte o
 
 ## `specsfy`
 
-Abre a TUI no diretório atual. Não recebe argumentos. A TUI reúne as abas
-Overview, Specs, Backlog, Gates, Tests, Skills e About.
+Abre a TUI no diretório atual, sem argumentos. A TUI reúne as abas Overview,
+Specs, Backlog, Gates, Tests, Skills e About.
 
 ```bash
 specsfy
@@ -25,8 +25,8 @@ specsfy --version
 
 ## `specsfy --skill`
 
-Imprime a documentação do framework embutida. O argumento opcional escolhe um
-tema. A saída é Markdown e também fica disponível no recurso MCP
+Imprime a documentação do framework embutida, enquanto o argumento opcional escolhe
+um tema. A saída é Markdown e também fica disponível no recurso MCP
 `specsfy://skill`.
 
 ```bash
@@ -39,9 +39,9 @@ specsfy skill gates
 
 Publica as skills base, `.specsfy/`, templates e blocos gerenciados de
 `AGENTS.md` e `CLAUDE.md`. `--detected` instala os especialistas encontrados
-pela stack. `--specialist <nome>` pode ser repetido. `--force` substitui
-conteúdo gerenciado que recebeu alteração local. `--json` emite a lista de
-caminhos alterados.
+pela stack, enquanto `--specialist <nome>` pode ser repetido. `--force` substitui
+conteúdo gerenciado que recebeu alteração local, enquanto `--json` emite a
+lista de caminhos alterados.
 
 ```bash
 specsfy install --project .
@@ -57,7 +57,7 @@ specsfy install --project . --detected --force --json
 | `specsfy update` | Atualiza skills, templates e blocos gerenciados do projeto. Skills externas e arquivos de `.specsfy/templates/custom/` permanecem intactos. `--force` substitui conteúdo gerenciado alterado e `--json` informa os caminhos modificados. |
 | `specsfy upgrade` | Consulta a última release e substitui o próprio binário em uso. `--check` apenas informa se existe versão nova. O projeto não é alterado. |
 | `specsfy skills list` | Lista o catálogo do framework e dos especialistas. `--json` entrega objetos estruturados. A leitura usa a credencial `github.token`. |
-| `specsfy skills detect` | Compara o projeto com as regras do catálogo e retorna as skills recomendadas. O comando apenas consulta, sem instalar arquivos. |
+| `specsfy skills detect` | Compara o projeto com os sinais de detecção do catálogo e retorna as skills recomendadas. O comando apenas consulta, sem instalar arquivos. |
 | `specsfy skills install` | Materializa as skills nomeadas no projeto. Não instala o catálogo inteiro. |
 | `specsfy skills remove` | Remove somente as skills nomeadas e preserva skills externas. Conteúdo local divergente impede a remoção, a menos que `--force` seja informado. |
 | `specsfy skills update` | Atualiza as skills Specsfy já instaladas. `--force` substitui conteúdo gerenciado alterado e `--json` retorna os caminhos. Skills externas e templates personalizados permanecem intactos. |
@@ -71,8 +71,9 @@ checklists, backlog e inbox. `progress` projeta o mesmo conjunto com filtro por
 spec e modo contínuo.
 
 Opções de `progress`: `--spec <spec>`, `--watch` e `--json`. O identificador
-aceita número, nome da pasta, slug ou caminho. `--watch` emite um novo retrato
-somente quando as specs mudam; com `--json`, imprime uma linha por mudança.
+da spec aceita o número, o nome da pasta, o slug ou o caminho. O `--watch` emite um novo
+retrato somente quando as specs mudam e, com `--json`, imprime uma linha por
+mudança.
 
 ```bash
 specsfy status
@@ -91,7 +92,7 @@ specsfy progress --watch
 | `specsfy specs new` | Cria `specs/draft/<NNNN>-<slug>/spec.md` a partir do template resolvido. Aceita `--title`, `--slug` e `--project`. O comando aloca o próximo identificador local e imprime o caminho absoluto. |
 | `specsfy specs effort` | Registra a pontuação inteira de 1 a 10 e sua justificativa na spec. O identificador, a pontuação e `--reason <texto>` são obrigatórios. Pontuação fora do intervalo ou spec ambígua é recusada. |
 | `specsfy specs research` | Carrega e confere a pesquisa indexada da spec. O identificador é obrigatório e aceita número, nome da pasta, slug ou caminho. |
-| `specsfy specs change` | Projeta o impacto de um pedido tardio sem editar a spec. `--base <ref>` escolhe a referência de comparação e `--mode impact\|changelog` escolhe a leitura. `changelog` lista IDs adicionados, removidos e alterados. |
+| `specsfy specs change` | Projeta o impacto de uma mudança tardia sem editar a spec. `--base <ref>` escolhe a referência de comparação e `--mode impact\|changelog` escolhe a leitura. `changelog` lista IDs adicionados, removidos e alterados. |
 | `specsfy specs migrate` | Converte o layout anterior `specs/specs/` e alinha o campo `Status`. Quando não há fonte legada, a execução não altera arquivos. |
 | `specsfy tasks next` | Mostra a próxima tarefa pronta da spec e diferencia trabalho concluído de dependência ainda aberta. `--all` lista todas as tarefas prontas. |
 | `specsfy tasks check` | Marca ou desmarca o checkbox da tarefa ou de um item do checklist. `--undo` desfaz a marcação. |
@@ -166,8 +167,8 @@ specsfy inbox process \
 
 ## `specsfy gate`
 
-Roda um gate sobre a spec. O código de saída `0` aprova e `10` reprova. Com
-`--json`, o campo `data` traz o resultado estruturado.
+Roda um gate sobre a spec, com código de saída `0` para aprovação e `10` para
+reprovação. Com `--json`, o campo `data` traz o resultado estruturado.
 
 | Gate | Opções principais |
 | --- | --- |
@@ -194,7 +195,7 @@ specsfy gate database --project . --command "php artisan test"
 ## `specsfy verify`
 
 Executa a política inteira e é a entrada do CI. `--boundary local|git|ci`
-escolhe a fronteira, `--attestation <arquivo>` grava a atestação e
+escolhe o modo de verificação, `--attestation <arquivo>` grava a atestação e
 `--timeout-seconds` e `--max-output-bytes` limitam a execução. O código de saída
 `10` indica gate reprovado.
 
@@ -213,8 +214,8 @@ specsfy verify --attestation run.json
 | `specsfy context interface` | Inspeciona rotas, componentes e telas para orientar uma descoberta de interface. |
 | `specsfy context monitor` | Classifica mudanças staged, unstaged e untracked e aponta contexto derivado desatualizado. `--check` retorna `PENDING` quando existe pendência. `--acknowledge-project-no-change` e `--acknowledge-rules-no-change` registram uma avaliação sem impacto material. |
 | `specsfy context stack` | Atualiza o bloco `specsfy:stack` de `.specsfy/STACK.md` a partir de manifests, lockfiles e configurações, preservando o conteúdo humano. |
-| `specsfy context rule` | Registra uma regra confirmada em `.specsfy/RULES.md` com `--section` e `--rule`. |
-| `specsfy context database` | Atualiza o bloco `specsfy:database` de `.specsfy/DATABASE.md` a partir de schemas, migrations, models e configurações, sem copiar dados ou segredos. |
+| `specsfy context rule` | Registra uma diretriz confirmada em `.specsfy/RULES.md` com `--section` e `--rule`. |
+| `specsfy context database` | Atualiza o bloco `specsfy:database` de `.specsfy/DATABASE.md` a partir de schemas, migrations, models e configurações, sem copiar registros ou segredos. |
 | `specsfy context data` | Registra informações confirmadas na seção `Informações a guardar confirmadas`. Aceita `--name`, `--purpose`, `--store`, `--format`, `--links`, `--access`, `--lifecycle` e `--sources`. |
 | `specsfy context usage` | Estima o custo de leitura de uma spec. `--json` devolve a leitura estruturada. |
 
@@ -247,9 +248,9 @@ NO_COLOR=1 specsfy test --project .
 
 ## `specsfy tui`
 
-Abre explicitamente a TUI para o projeto selecionado. `--tab` escolhe a aba
+Abre explicitamente a TUI para o projeto selecionado, enquanto `--tab` escolhe a aba
 inicial. A TUI só escreve configuração, instala skills e executa testes depois
-de uma ação da pessoa. `Ctrl+Q` encerra a interface.
+de uma ação sua. `Ctrl+Q` encerra a interface.
 
 ```bash
 specsfy tui
@@ -270,8 +271,8 @@ Opções e exemplos completos saem em `specsfy <comando> --help`.
 
 ## `specsfy mcp`
 
-Inicia o servidor MCP sobre `stdio`. `--list` lista tools, recursos e prompts. A
-configuração do cliente é:
+Inicia o servidor MCP sobre `stdio`, enquanto `--list` lista tools, recursos e
+prompts. A configuração do cliente é:
 
 ```json
 {

@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Especialista - Arquitetura de software"
-  short_description: "Boundaries, decisões e evolução arquitetural"
+  short_description: "Limites, dependências e evolução arquitetural"
   default_prompt: "Use $specsfy-specialist-software-architecture para orientar esta tarefa com padrões e validação especializados."

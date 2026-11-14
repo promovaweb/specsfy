@@ -15,12 +15,12 @@ estar funcionando antes de seguir para o próximo marco. Não é sprint, versão
 ## Comece pelo MVP
 
 Use `$specsfy-mvp-milestone-interviewer` depois de apresentar a ideia do
-produto. A conversa começa com a finalidade, quem será atendido e qual jornada
+produto. A conversa começa com a finalidade, o público atendido e a jornada
 precisa funcionar. Depois de cada resposta, o agente resume o entendimento e
 faz a próxima pergunta que falta para definir o menor produto utilizável.
 
 A entrevista termina quando você puder confirmar uma frase como: “o MVP estará
-pronto quando uma equipe comercial conseguir capturar um lead, consultá-lo e
+pronto quando o setor comercial conseguir capturar um lead, consultá-lo e
 atribuir uma pessoa responsável em ambiente publicado”.
 
 O agente propõe normalmente de quatro a oito milestones. Para cada uma, você
@@ -40,7 +40,7 @@ specs/
 └── <estado>/<NNNN>-<slug>/spec.md
 ```
 
-`specs.md` é o mapa do projeto: mostra a sequência das specs, o estado de cada
+`specs.md` é o painel do projeto: mostra a sequência das specs, o estado de cada
 uma e os marcos vinculados. A fonte de comportamento continua em cada
 `spec.md`; o objetivo e a condição de saída ficam no arquivo de milestone.
 
@@ -57,7 +57,7 @@ outro vínculo quando a mesma capacidade contribui para dois estados reais do
 produto. O backlog aparece no marco como trabalho relacionado, mas não aumenta
 o percentual de conclusão.
 
-## Atualize o mapa automaticamente
+## Atualize o painel automaticamente
 
 Depois de alterar relações ou status, execute:
 
@@ -66,11 +66,12 @@ specsfy milestones sync --project .
 ```
 
 O comando atualiza blocos identificados em `specs.md` e em
-`specs/milestones/MNN.md`. Texto fora desses blocos continua seu. Um marco
+`specs/milestones/MNN.md`, enquanto o texto fora desses blocos continua sob seu
+controle. Um marco
 referenciado por spec ou backlog e ainda sem arquivo recebe um esqueleto, para
 você completar na entrevista.
 
-`specsfy specs transition` também sincroniza o mapa depois de mover uma spec. Use o
+`specsfy specs transition` também sincroniza o painel depois de mover uma spec. Use o
 comando direto quando tiver alterado vínculos no Markdown ou refinado backlog.
 
 ## Cinco usos do comando
@@ -100,10 +101,10 @@ condição de saída foi demonstrada ou validada.
 
 Quando o MVP estiver aceito, use
 `$specsfy-roadmap-milestone-interviewer`. Ele parte dos limites já aprovados e
-organiza evolução, integrações, automações e hipóteses que dependem de uso
-real. Se uma resposta mudar o núcleo do MVP, o agente pede confirmação e
+planeja evolução, integrações, automações e suposições que dependem de uso
+real. Quando uma resposta muda o núcleo do MVP, o agente solicita confirmação e
 encaminha a alteração da spec para `$specsfy-update-spec`.
 
-Para revisar o mapa existente e encontrar relações ausentes, use
+Para revisar o painel existente e encontrar relações ausentes, use
 `$specsfy-milestone-governor`. Ele sincroniza a projeção, aponta lacunas e
 propõe ajustes; não altera objetivo ou condição de saída sem sua confirmação.

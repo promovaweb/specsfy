@@ -41,7 +41,7 @@ specsfy install --project . --detected
 6. Trate Server Actions e Route Handlers como superfícies públicas: valide
    autenticação, autorização e entrada em cada mutation.
 7. Derive testes para estados, redirects, autorização, invalidação e isolamento
-   de dados entre usuários.
+   das informações de cada usuário.
 8. Execute lint, typecheck, testes, build e runtime de produção conforme os
    scripts do `package.json`.
 

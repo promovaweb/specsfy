@@ -47,7 +47,7 @@ Compartilhado aplicável ao projeto consumidor.
 1. Validar sintaxe, `ansible-lint`, check mode e diff sem revelar segredos no
    output.
 1. Testar a role em ambiente descartável e repetir a mesma execução para
-   provar que a segunda rodada não relata `changed`.
+   provar que a segunda execução não relata `changed`.
 1. Aplicar em produção com serialização (`serial`), limites (`--limit`) e
    regra de parada (`max_fail_percentage`/`any_errors_fatal`) compatíveis
    com o alcance da mudança.

@@ -47,10 +47,11 @@ overlay com `app`.
 
 O arquivo `deploy` oferece nomes curtos para ações que você pode copiar em
 outro painel do Herdr. Você não precisa iniciar o fluxo por esses comandos. Um
-pedido como “faça o deploy desta aplicação” continua sendo a entrada normal, e
-a IA executa as ferramentas conforme o estado encontrado.
+uma solicitação como “faça o deploy desta aplicação” continua sendo a entrada
+normal.
+A IA executa as ferramentas conforme o estado encontrado.
 
-## O que muda quando você pede outro deploy
+## O que muda quando você solicita outro deploy
 
 Na primeira preparação, o gerador cria a base quando nenhum dos destinos
 existe. Nas chamadas seguintes, a IA não executa o gerador sobre os mesmos
@@ -66,12 +67,11 @@ que exija outra extensão PHP deve aparecer nessa análise antes do build.
 O mesmo exame alcança `compose.yaml`, `stack.yaml`, `docker/` e `ansible/`.
 Quando um arquivo possui personalizações do projeto, a skill preserva esses
 trechos e apresenta a comparação dos arquivos alterados antes de substituir
-uma estrutura sem marcações gerenciadas. Repetir o pedido não significa gerar
-tudo novamente. Significa reconciliar o estado existente com a aplicação que
-será publicada.
+uma estrutura sem marcações gerenciadas. Uma nova solicitação reconcilia o
+estado existente com a aplicação que será publicada, sem gerar tudo novamente.
 
 Essa reconciliação também confere o ingresso. Sem uma escolha diferente, a IA
-mantém Cloudflare Tunnel como serviço da stack. Quando você pedir outro proxy,
+mantém Cloudflare Tunnel como serviço da stack. Quando você escolhe outro proxy,
 ela remove ou deixa de gerar os componentes do túnel e prepara a alternativa
 solicitada sem misturar tokens entre os dois caminhos.
 
@@ -86,32 +86,32 @@ por rodada. Para cada máquina, você confirma:
 | alias | nome estável dentro do Ansible | `app01` |
 | endereço | IP ou hostname alcançável | `203.0.113.10` |
 | porta | porta usada pelo SSH | `22` |
-| usuário inicial | conta que já consegue entrar no host | `root` |
+| usuário inicial | usuário que já consegue entrar no host | `root` |
 | papel | função do node no Docker Swarm | `manager` |
 
 Essas respostas formam `ansible/inventory.yml`. O arquivo de exemplo ensina o
-formato, mas nunca substitui o inventário real durante uma conexão.
+formato, mas não substitui o inventário real durante uma conexão.
 
 Quando você disser “adicione um novo servidor”, a skill lê os hosts atuais e
-pergunta somente pelos dados da nova máquina. Depois, ela acrescenta o host ao
+pergunta somente pelo endereço, pela porta e pelo papel da nova máquina. Depois, ela acrescenta o host ao
 grupo escolhido, testa o SSH, sincroniza as chaves públicas, prepara o usuário
 `deploy`, instala o Docker e integra o node ao Swarm. Os servidores anteriores
 permanecem no arquivo e não são renomeados ou removidos nessa operação.
 
-## A conta do servidor e a conta do container
+## O usuário do servidor e o usuário do container
 
 O host e o container usam nomes diferentes porque cumprem funções diferentes.
-No Debian, `deploy` é a conta operacional que recebe as chaves SSH, pertence ao
+No Debian, `deploy` é o usuário operacional que recebe as chaves SSH, pertence ao
 grupo `docker` e administra os diretórios sob `/opt/apps`. Dentro da imagem,
-`app` continua sendo a conta sem privilégios que executa o Laravel Octane.
+`app` continua sendo o usuário sem privilégios que executa o Laravel Octane.
 
 ```text
 máquina local ──SSH──> deploy@servidor ──Docker──> container: usuário app
 ```
 
-O acesso por senha da conta `deploy` permanece desabilitado. O grupo `docker`
+O acesso por senha do usuário `deploy` permanece desabilitado. O grupo `docker`
 concede controle amplo sobre o host, por isso a automação não adiciona outras
-contas a esse grupo sem uma necessidade confirmada.
+usuários a esse grupo sem uma necessidade confirmada.
 
 ## Teste das conexões
 
@@ -150,7 +150,7 @@ Quando você quiser executar apenas essa etapa em um painel do Herdr, use:
 ./deploy sync-keys
 ```
 
-A operação primeiro executa `check-hosts`. Depois, mantém as chaves já presentes
+O comando primeiro executa `check-hosts`. Depois, mantém as chaves já presentes
 e inclui somente as ausentes. Ela não usa sincronização exclusiva e, portanto,
 não remove o acesso de outra máquina administrativa.
 

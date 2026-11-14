@@ -48,7 +48,7 @@ inventar um percentual confiável.
 
 O relatório separa os itens vinculados às tarefas dos outros checkboxes. No
 CLI, o percentual usa a tarefa e seus itens canônicos; anotações soltas ficam
-na contagem de outros checkboxes. Exemplos dentro de blocos de código são
+no total de outros checkboxes. Exemplos dentro de blocos de código são
 ignorados. Sem itens de tarefa, o CLI calcula o percentual pelos três gates.
 
 Itens como `PREP` ou `VERIFY` fora de uma tarefa aparecem com o número da

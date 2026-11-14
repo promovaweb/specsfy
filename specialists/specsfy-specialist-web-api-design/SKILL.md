@@ -9,7 +9,7 @@ description: Projetar e revisar APIs HTTP com recursos, métodos, status, erros,
 
 - Acionar ao projetar ou revisar contratos HTTP, REST, JSON, webhooks ou
   descrições OpenAPI para consumidores internos ou externos.
-- Acionar para decisões de recursos, métodos, status, erros, paginação,
+- Acionar para escolhas de recursos, métodos, status, erros, paginação,
   idempotência, concorrência, autenticação e compatibilidade.
 - Não acionar para RPC ou eventos como se fossem recursos HTTP sem primeiro
   confirmar o estilo do contrato real.
@@ -31,7 +31,7 @@ description: Projetar e revisar APIs HTTP com recursos, métodos, status, erros,
    limiting e comportamento diante de dados mutáveis.
 6. Materializar OpenAPI/JSON Schema e contract tests positivos, negativos e de
    compatibilidade executados contra a implementação.
-7. Definir logs, métricas, correlação, depreciação, migração e critérios para
+7. Definir logs, métricas, correlação, depreciação, migração e condições para
    remover comportamento antigo sem quebrar consumidores conhecidos.
 
 ## Padrões
@@ -67,7 +67,7 @@ description: Projetar e revisar APIs HTTP com recursos, métodos, status, erros,
   paginação enquanto itens entram e saem.
 - Fazer lint e validação estrutural de OpenAPI/JSON Schema e comparar breaking
   changes contra a última versão publicada.
-- Não declarar compatibilidade ou idempotência sem evidência de replay e teste
+- Não declarar compatibilidade ou idempotência sem comprovação de replay e teste
   automatizado do contrato observado pelo consumidor.
 
 ## Skills relacionadas

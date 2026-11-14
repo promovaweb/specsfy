@@ -22,10 +22,10 @@ os outros capítulos explicam em detalhe e aponta onde aprofundar cada assunto.
 | `specs/<estado>/<NNNN>-<slug>/research/` | evidências de pesquisa indexadas pela spec |
 | `specs.md` e `specs/milestones/MNN.md` | projeção de milestones, specs e backlog |
 | `PROJECT.md` | história, finalidade, capacidades e limites do projeto |
-| `INTERFACE.md` | mapa do design system e dos componentes reutilizáveis |
-| `DESIGNSYSTEM.MD` | regras macro de interface, padrões de CRUD e exceções |
+| `INTERFACE.md` | registro do design system e dos componentes reutilizáveis |
+| `DESIGNSYSTEM.MD` | orientações gerais de interface, padrões de CRUD e exceções |
 | `.specsfy/STACK.md` | tecnologias estruturais e suas evidências |
-| `.specsfy/RULES.md` | regras confirmadas pela pessoa responsável |
+| `.specsfy/RULES.md` | diretrizes confirmadas pelo projeto |
 | `.specsfy/DATABASE.md` | quadro completo de persistência |
 | `.specsfy/PACKAGES.md` | pacotes npm e Composer com finalidade curta |
 | `.specsfy/USER-PROFILE.md` | nível de conhecimento e respostas já confirmadas |
@@ -33,8 +33,9 @@ os outros capítulos explicam em detalhe e aponta onde aprofundar cada assunto.
 | `.agents/skills/` | skills instaladas no projeto |
 | `docs/` | documentação técnica reconstruída do sistema |
 
-O Specsfy nunca cria `plan.md`, `tasks.md`, `research.md` ou
-`data-model.md`. Tudo o que governa a entrega fica na `spec.md`.
+O Specsfy não cria `plan.md`, `tasks.md`, `research.md` ou `data-model.md`.
+Tudo o que governa a entrega, do plano às tarefas e às pesquisas, fica na
+`spec.md`.
 
 Aprofunde em [Informações permanentes do projeto](project-context.md) e na
 [Referência do método](method-reference.md).
@@ -73,7 +74,7 @@ O que reabre cada ato:
 
 - mudança de comportamento reabre os atos I, II e III;
 - mudança somente de plano reabre os atos II e III;
-- um gate posterior nunca permanece aprovado sobre uma entrada invalidada.
+- um gate posterior não permanece aprovado sobre uma entrada invalidada.
 
 ## Effort
 
@@ -86,8 +87,8 @@ O que reabre cada ato:
 
 Effort mede a capacidade de raciocínio e execução necessária, não prazo nem
 prioridade. Atualize com
-`specsfy specs effort <id> <1-10> --reason "<motivo>"` sempre que surgir informação
-material.
+`specsfy specs effort <id> <1-10> --reason "<motivo>"` a cada informação
+material nova.
 
 ## Identificadores
 
@@ -105,10 +106,11 @@ material.
 O marcador `SPECSFY:` no teste liga o caso aos IDs que ele comprova, por
 exemplo `// SPECSFY: US-001 FR-001 AC-001`.
 
-Mínimos de cobertura:
+A cobertura mínima que o Specsfy exige em cada spec segue estas condições, que
+os validadores do framework conferem antes de aprovar o Delivery Gate:
 
 - três cenários `AC` distintos para a feature e para cada `US`, `FR` e `NFR`,
-  contando somente os IDs declarados em `**Cobre**`;
+  considerando somente os IDs declarados em `**Cobre**`;
 - três casos TDD executáveis para a feature e para cada `US`, `FR` e `NFR`,
   cada um com seu próprio marcador.
 
@@ -136,7 +138,7 @@ Mínimos de cobertura:
 | `specsfy-07-implement` | for implementar a entrega |
 | `specsfy-update-spec` | algo mudar depois da definição |
 | `specsfy-progress` | quiser consultar o estado sem alterar nada |
-| `specsfy-interviewer` | quiser conversar sobre a spec antes de avançar |
+| `specsfy-interviewer` | quiser conversar sobre a spec e só depois avançar |
 | `specsfy-mvp-milestone-interviewer` | for definir o MVP de um produto |
 | `specsfy-roadmap-milestone-interviewer` | for planejar a evolução após o MVP |
 | `specsfy-milestone-governor` | precisar manter os milestones alinhados |
@@ -149,7 +151,7 @@ Skills de apoio, chamadas pelo próprio fluxo:
 | `specsfy-setup` | prepara e reconcilia o contexto antes de qualquer skill |
 | `specsfy-documentator` | reconstrói `docs/` e `.specsfy/PACKAGES.md` após cada implementação |
 | `specsfy-aux-stack` | atualiza `.specsfy/STACK.md` após mudança de tecnologia |
-| `specsfy-aux-rules` | registra regras confirmadas em `.specsfy/RULES.md` |
+| `specsfy-aux-rules` | registra diretrizes confirmadas em `.specsfy/RULES.md` |
 | `specsfy-aux-database` | atualiza `.specsfy/DATABASE.md` quando o banco muda |
 
 Aprofunde no índice de [Skills base](skills/README.md).
@@ -173,7 +175,7 @@ Aprofunde no índice de [Skills base](skills/README.md).
 | `specsfy specs new --title "<título>"` | cria uma spec em `specs/draft/` pelo template |
 | `specsfy specs transition <id> <pasta>` | move a spec de estado |
 | `specsfy specs effort <id> <1-10> --reason "<motivo>"` | registra o Effort |
-| `specsfy specs change <id>` | projeta o impacto de um pedido tardio, sem editar |
+| `specsfy specs change <id>` | projeta o impacto de uma mudança tardia, sem editar |
 | `specsfy tasks next <id>` | mostra a próxima tarefa pronta |
 | `specsfy inbox capture` | grava uma captura na Inbox |
 | `specsfy inbox process` | retira da fila capturas cobertas por specs aprovadas |
@@ -186,9 +188,9 @@ Aprofunde no índice de [Skills base](skills/README.md).
 | `specsfy mcp` | inicia o servidor MCP para o agente |
 | `specsfy config list` | mostra as preferências |
 
-Quase todos aceitam `--project <caminho>` e `--json`, e
-`specsfy <comando> --help` mostra as opções. A lista completa, com os códigos
-de saída, está na [Referência dos comandos](cli-reference.md).
+Quase todos aceitam `--project <caminho>` e `--json`. O
+`specsfy <comando> --help` mostra as opções de cada comando do CLI. A lista completa, com
+os códigos de saída, está na [Referência dos comandos](cli-reference.md).
 
 ## Mensagens de transição
 
@@ -200,13 +202,13 @@ Transição automática: $<origem> → $<destino> — motivo: <motivo> — resul
 Retomada automática: $<destino> → $<origem> — pendência resolvida: <resultado>
 ```
 
-Uma transição nunca autoriza sozinha ações destrutivas, publicação, deploy ou
-instalação de especialista. Cada uma dessas ações pede sua autorização.
+Uma transição não autoriza sozinha ações destrutivas, publicação, deploy ou
+instalação de especialista. Cada uma dessas ações depende da sua autorização.
 
 ## Proteções que não podem ser desligadas
 
 - nenhum teste roda no banco de desenvolvimento;
-- comandos que apagam ou recriam banco são sempre recusados, como
+- comandos que apagam ou recriam banco são recusados em qualquer situação, como
   `migrate:fresh`, `migrate:refresh`, `db:wipe`, `DROP TABLE` e `TRUNCATE`;
 - testes Laravel usam `DatabaseTransactions` e exigem `.env.testing` com banco
   separado;
@@ -218,8 +220,8 @@ instalação de especialista. Cada uma dessas ações pede sua autorização.
 | Termo | Significado |
 | --- | --- |
 | BDD | descrição do comportamento em cenários `Given`, `When`, `Then`, legíveis por qualquer pessoa |
-| TDD | prática de escrever o teste antes do código e vê-lo falhar primeiro |
-| RED | falha do teste antes da implementação, causada pela ausência do comportamento |
+| TDD | prática de escrever o teste primeiro e vê-lo falhar |
+| RED | falha do teste causada pela ausência do comportamento ainda não implementado |
 | GREEN | o mesmo teste passando depois da implementação |
 | REFACTOR | melhoria do código mantendo os testes verdes |
 | Gate | ponto de controle que só passa com prova registrada |
@@ -245,7 +247,8 @@ conceitos por trás de cada etapa:
 | Vitest | documentação oficial | `https://vitest.dev/guide/` |
 | Spec Kit | repositório do GitHub Spec Kit | `https://github.com/github/spec-kit` |
 
-O Specsfy usa essas ideias como base, mas a regra que vale no seu projeto é a
+O Specsfy usa essas ideias como base, mas a definição que vale no seu projeto é
+a
 registrada no contrato instalado em `.specsfy/Spec.md` e na `spec.md` de cada
 entrega.
 
