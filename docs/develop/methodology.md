@@ -35,13 +35,13 @@ As pastas seguem a mesma ordem: `draft`, `defined`, `planned`,
 `in-progress`, `review` e `completed`. `specsfy transition` move o pacote e
 sincroniza o campo `Status`; `specsfy migrate` converte o layout anterior.
 
-`Effort` é inteiro de 1 a 10, acompanhado de data e justificativa. O
-entrevistador recalibra a estimativa quando novas informações alteram a
-capacidade de execução exigida. Quando ClickUpfy está instalado e `ClickUp
-Task` existe na spec, a skill da etapa sincroniza a projeção remota.
+`Effort` vai de 1 a 10, com data e justificativa recalibradas pelo
+entrevistador. Com ClickUpfy e `ClickUp Task`, a skill da etapa sincroniza a
+tarefa remota: próxima etapa até um agente atuar, `em andamento` só durante a
+execução, próxima etapa com comentário se parar sem concluir, `revisar` na
+entrega e `pronto` ou `concluido` só por ordem humana.
 
-Transições não são meras etiquetas. Cada uma depende da evidência registrada na
-spec e nos testes.
+Cada transição depende da comprovação registrada na spec e nos testes.
 
 ## Leitura integral do consumidor
 

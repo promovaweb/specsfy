@@ -4,6 +4,13 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.29.3] - 2026-11-15
+
+### Alterado
+
+- Skills `specsfy-06-tdd-bdd`, `specsfy-07-implement` e `specsfy-interviewer` e o contrato `skills/Spec.md` descrevem o status da tarefa remota no ClickUp pelo trabalho real do agente: próxima etapa até um agente atuar, `em andamento` só durante a execução, volta para próxima etapa com comentário ao parar sem concluir, `revisar` na entrega e `pronto` ou `concluido` só por ordem humana.
+- Documentação do método, dos casos de uso e do entrevistador alinhada à mesma regra.
+
 ## [0.29.2] - 2026-11-14
 
 ### Corrigido

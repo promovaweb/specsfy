@@ -223,6 +223,10 @@ node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/<est
   `Gate do Ato III — Entrega` da seção 13. Use `Passed` somente sem gap
   obrigatório, com todas as tarefas concluídas e a Definition of Done
   comprovada.
+- `Delivery Gate: In Progress` é estado local. Com `ClickUp Task` e
+  ClickUpfy presentes, a tarefa remota fica em `em andamento` só enquanto um
+  agente executa o trabalho; sem agente atuando, ela volta para próxima etapa
+  com comentário do ponto onde parou.
 
 ## Auditar QA
 

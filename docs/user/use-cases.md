@@ -281,7 +281,10 @@ Tests, Skills e About. O formato `--json` serve para scripts e dashboards.
 `specsfy verify` roda todos os gates como etapa da integração contínua. Quando houver
 skills `clickupfy-*` instaladas, a transição de estado e o Effort também podem
 ser sincronizados com uma tarefa do ClickUp; o estado local continua sendo a
-referência.
+referência. A tarefa remota fica em próxima etapa até um agente começar a
+executá-la, passa para `em andamento` só enquanto ele atua, volta para próxima
+etapa com comentário quando ele para sem concluir e vai para `revisar` na
+entrega. `pronto` e `concluido` dependem de ordem humana.
 
 ## Retomar uma entrega interrompida
 

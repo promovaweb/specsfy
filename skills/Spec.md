@@ -66,6 +66,14 @@ sempre que a descoberta, o plano ou a execução trouxer informação material.
 do Effort. O estado local continua canônico quando a integração estiver ausente
 ou pendente.
 
+O status remoto segue o trabalho real do agente, não a pasta da spec. Tarefa
+que nenhum agente começou fica no status de próxima etapa da lista
+(`proxima etapa` no ClickUp da Promovaweb, `To Do` em listas padrão, ou o
+mapeamento configurado pelo projeto). `em andamento` (`In Progress`) vale só
+enquanto um agente executa a tarefa; ao parar sem concluir, a tarefa volta
+para próxima etapa com comentário do ponto onde parou. Na entrega, use
+`revisar` (`In Review`). `pronto` e `concluido` exigem ordem humana.
+
 ## Contexto persistente do projeto
 
 - `PROJECT.md`, na raiz, mantém a história, a finalidade, as capacidades e os

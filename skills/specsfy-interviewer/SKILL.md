@@ -86,9 +86,20 @@ continua válida: use-a para escolher o perfil de execução `light`, `standard`
 
 Se o projeto contiver uma skill `clickupfy-*` e a spec tiver `ClickUp Task`,
 carregue a skill ClickUpfy apropriada depois de uma transição ou ajuste de
-Effort. Use o mapeamento configurado pelo projeto ou, quando ausente,
-`draft`/`defined`/`planned` para `To Do`, `in-progress` para `In Progress`,
-`review` para `In Review` e `completed` para `Complete`.
+Effort. Use o mapeamento configurado pelo projeto ou, quando ausente, o
+status de próxima etapa da lista (`proxima etapa` no ClickUp da Promovaweb,
+`To Do` em listas padrão) e os equivalentes abaixo:
+
+- tarefa criada ou planejada que nenhum agente começou a executar fica em
+  próxima etapa, inclusive com a spec em `draft`, `defined` ou `planned`;
+- `em andamento` (`In Progress`) vale somente enquanto um agente executa a
+  tarefa naquele momento. A transição local para `in-progress` não basta;
+- quando o agente para sem concluir, a tarefa volta para próxima etapa com um
+  comentário do ponto onde parou, mesmo que a spec continue em
+  `in-progress`;
+- na entrega, com a spec em `review`, use `revisar` (`In Review`);
+- `pronto`, `concluido` ou `Complete` só mediante ordem humana explícita,
+  mesmo com a spec em `completed`.
 
 O estado local permanece canônico. Se a atualização remota não ocorrer,
 registre a pendência na spec sem declarar sincronização concluída.

@@ -144,7 +144,10 @@ são sequenciais.
    nova mudança.
 7. Antes da primeira alteração de produção, defina `Status: Implementing`,
    `Delivery Gate: In Progress` e execute `specsfy specs transition <id> in-progress`,
-   equivalente a `specsfy specs transition <id> in-progress`.
+   equivalente a `specsfy specs transition <id> in-progress`. Com
+   `ClickUp Task` e ClickUpfy presentes, mova a tarefa remota para
+   `em andamento` (`In Progress`) neste momento, porque um agente passa a
+   executá-la. Antes disso ela permanece em próxima etapa.
 8. Selecione o próximo trabalho pronto:
 
    ```bash
@@ -325,6 +328,16 @@ Com tudo comprovado, altere `Delivery Gate` para `Passed`, defina
 `specsfy specs transition <id> review`. O aceite final e a mudança para
 `completed` pertencem ao `$specsfy-04-validate`. Se alguma comprovação faltar,
 não declare conclusão.
+
+Com `ClickUp Task` e ClickUpfy presentes, mova a tarefa remota para `revisar`
+(`In Review`) na entrega. `pronto` e `concluido` só mediante ordem humana.
+
+Se a execução parar antes do Delivery Gate, por pausa, pendência, mudança de
+escopo ou fim da sessão, a spec continua em `in-progress`, mas a tarefa remota
+volta para próxima etapa (`proxima etapa` no ClickUp da Promovaweb, `To Do` ou
+o mapeamento do projeto), com comentário que informe a última tarefa
+concluída, a tarefa aberta e o próximo passo. Ao retomar, mova de novo para
+`em andamento`.
 
 Projete o resumo de entrega sem criar arquivo:
 

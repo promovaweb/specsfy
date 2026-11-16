@@ -56,4 +56,6 @@ estimativa mudou.
 O entrevistador não aprova gates, implementa código ou move a spec. Ao fechar a
 lacuna, ele entrega o trabalho à skill responsável pela fase atual. Quando
 ClickUpfy estiver instalado e houver uma tarefa vinculada, essa skill também
-atualiza a projeção remota.
+atualiza a projeção remota: próxima etapa enquanto nenhum agente executa a
+tarefa, `em andamento` só com um agente atuando, `revisar` na entrega e
+`pronto` ou `concluido` apenas por ordem humana.
