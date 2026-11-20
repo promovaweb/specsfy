@@ -1,21 +1,21 @@
- ▌ Specsfy v0.33.1  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.33.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
- Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
-                                 ▬▬▬▬▬▬▬▬▬▬▬                                                                                                
+   Overview       Specs        Backlog        Gates         Tests         Skills        About                                               
  ╭─ Specs ────────────────────────────────────╮╭─ Gates ──────────────────────────────────────────────────────────────────────────────────╮ 
- │ Legacy (specs/specs) · 6                   ││ Enter runs 8 gate(s) on 0001-diretorio-global-usuarios.                                  │ 
- │ > 0001-diretorio-global-usuarios 3/3 100%  ││ gate spec             ○ pending  Validate the structure of a spec (Specsfy/2.0 contract) │ 
- │   0002-busca-paginacao-usuarios  3/3 100%  ││ gate tasks            ○ pending   Validate the tasks in section 14 of a spec.            │ 
- │   0003-perfil-publico-usuario    3/3 100%  ││ gate interface    ○ pendingValidate the interface phase of the tasks of a spec with a hu │ 
- │   0004-diretorio-global-equipes  3/3 100%  ││ gate trace          ○ pending  Check traceability between the spec IDs and the test mark │ 
- │   0005-detalhe-publico-equipe    3/3 100%  ││ gate acceptance   ○ pendingVerify that every acceptance criterion (AC) of a spec has a p │ 
- │   0006-produtos                  1/3  33%  ││ gate evidence     ○ pending Verify the material evidence of the tasks of a spec (Evidenc │ 
- │                                            ││ gate findings     ○ pendingValidate the product, architecture and security findings reco │ 
- │                                            ││ gate database    ○ pending Check that tests use a separate database and that a command c │ 
- │                                            │╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
- │                                            │╭─ Output ─────────────────────────────────────────────────────────────────────────────────╮ 
- │                                            ││ No output yet.                                                                           │ 
- │                                            ││                                                                                          │ 
+ │ Draft · 1                                  ││ Enter runs 8 gate(s) on 0008-programa-de-fidelidade.                                     │ 
+ │ > 0008-programa-de-fidelidade    0/3   0%  ││ gate spec             ○ pending  Validate the structure of a spec (Specsfy/2.0 contract) │ 
+ │ Defined · 1                                ││ gate tasks            ○ pending   Validate the tasks in section 14 of a spec.            │ 
+ │   0007-lista-de-desejos          1/3   0%  ││ gate interface    ○ pendingValidate the interface phase of the tasks of a spec with a hu │ 
+ │ Planned · 1                                ││ gate trace          ○ pending  Check traceability between the spec IDs and the test mark │ 
+ │   0006-rastreio-de-pedidos       2/3   0%  ││ gate acceptance   ○ pendingVerify that every acceptance criterion (AC) of a spec has a p │ 
+ │ In progress · 2                            ││ gate evidence     ○ pending Verify the material evidence of the tasks of a spec (Evidenc │ 
+ │   0004-cupons-de-desconto        2/3  75%  ││ gate findings     ○ pendingValidate the product, architecture and security findings reco │ 
+ │   0005-avaliacoes-de-produtos    2/3  25%  ││ gate database    ○ pending Check that tests use a separate database and that a command c │ 
+ │ Review · 1                                 │╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
+ │   0003-checkout-com-pix          2/3 100%  │╭─ Output ─────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Completed · 2                              ││ No output yet.                                                                           │ 
+ │   0001-catalogo-de-produtos      3/3 100%  ││                                                                                          │ 
+ │   0002-carrinho-de-compras       3/3 100%  ││                                                                                          │ 
  │                                            ││                                                                                          │ 
  │                                            ││                                                                                          │ 
  │                                            ││                                                                                          │ 
@@ -37,4 +37,4 @@
  │                                            ││                                                                                          │ 
  │                                            ││                                                                                          │ 
  ╰────────────────────────────────────────────╯╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
-  ↑/↓  spec   Enter  run gates   PgUp/PgDn  scroll   ←/→  tab   1-9  go   ?  help   q  quit
+  ↑/↓  spec   Enter  run gates   PgUp/PgDn  scroll   /  filter   ←/→  tab   1-9  go   ?  help   q  quit

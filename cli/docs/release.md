@@ -7,6 +7,9 @@ Release.
 
 ## Antes de publicar
 
+O script da seção seguinte faz os passos 1, 2 e 4; a lista fica para conferir o
+que ele deixou e para a publicação feita sem o script.
+
 1. Confira o `VERSION` da raiz. O CLI não abre uma numeração própria.
 2. Atualize `version` em `cli/package.json` para o mesmo valor.
 3. Registre a mudança em `cli/CHANGELOG.md`, no formato Keep a Changelog,
@@ -19,17 +22,50 @@ Release.
    ```
 
    O encadeamento cobre `embed:check`, `typecheck`, `bun test`, `skills:check`,
-   `opencli:check`, `showcase:check`, `docs:check` e `build`. Se a TUI mudou
+   `opencli:check`, `showcase:check`, `docs:check`, `build` e `smoke`. O
+   `smoke` roda o binário compilado `dist/specsfy` sem rede (`--version`,
+   `--skill tui`, `mcp --list`, `doctor --json`, `install` num projeto
+   temporário a partir do próprio repositório e `update --check`) e pega
+   falha que só aparece no binário compilado, antes da tag. Se a TUI mudou
    desde a última release, rode `bun run showcase -- --all` para que os
-   prints de `docs/user/assets/showcase/` mostrem a versão nova.
+   prints de `docs/user/assets/showcase/` mostrem a versão nova. Para rodar o
+   `smoke` sozinho, use `bun run build` e depois `bun run smoke`.
 5. Confira que `src/engine/skills.gen.ts` está atualizado. Depois de mudar
    `../skills/`, rode `bun run embed`.
 6. Revise o diff e o `git status --short`. Mudanças que já existiam ficam
    preservadas.
 
+## Script de release
+
+`scripts/release.mjs`, na raiz do monorepo, executa os dois passos. O mesmo
+comando atende por `npm run release -- X.Y.Z`:
+
+```bash
+node scripts/release.mjs X.Y.Z
+node scripts/release.mjs X.Y.Z --publish
+```
+
+O primeiro comando prepara e não commita. Ele grava `X.Y.Z` em `VERSION`,
+`cli/package.json` e `cli/npm/package.json`, regenera as skills embutidas, o
+lançador, o `opencli` e todo o showcase, recompila o ebook, confere a versão e
+roda os testes da raiz, a validação das skills e o `validate` do CLI. Depois
+dele, revise o diff e escreva `## [X.Y.Z]` em `cli/CHANGELOG.md`.
+
+O segundo comando publica. Ele commita o que estiver no working tree como
+`chore(release): vX.Y.Z`, cria a tag, faz push, espera o workflow `CLI Release`
+(refaz uma vez um job que falhar), confere os cinco executáveis com o
+`SHA256SUMS` e publica o wrapper npm. Ele recusa a execução sem a seção do
+changelog, com a tag já existente ou com o `VERSION` diferente de `X.Y.Z`.
+
+O trabalho de funcionalidade se commita antes do `--publish`: tudo o que
+sobrar no working tree entra no commit de release. O gitlink, a versão e a
+release do Hub ficam fora do script.
+
 ## Tag e GitHub Release
 
-O CLI fica no monorepo `promovaweb/specsfy`, e a tag pertence ao monorepo:
+O CLI fica no monorepo `promovaweb/specsfy`, e a tag pertence ao monorepo. O
+`--publish` do script executa os comandos abaixo; eles ficam aqui para
+conferência e para retomar uma publicação parcial:
 
 ```bash
 git tag -a vX.Y.Z -m "Specsfy CLI vX.Y.Z"

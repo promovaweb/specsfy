@@ -82,6 +82,7 @@ export function createBacklogScreen(store: ProjectStore): Screen {
       renderer.once("destroy", () => { unsubscribe(); generation += 1; style.destroy(); list = undefined; reader = undefined; });
       return rootBox;
     },
+    filter: (query) => list?.setFilter(query),
     onKey: (name) => {
       switch (name) {
         case "up": case "k": list?.move(-1); return true;

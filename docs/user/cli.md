@@ -268,11 +268,11 @@ A TUI tem sete abas:
 - **Skills**, skills instaladas e do catálogo; instala, remove e atualiza.
 - **About**, identidade do binário, runtime, projeto, licença e créditos.
 
-Teclas globais: `←`/`→`, `[`/`]` e `Tab` trocam de aba, `1` a `9` vão
-direto à aba, `?` mostra o help de teclas e `q`, `Esc` ou `Ctrl+C` saem.
-`--tab` ou `tui.initialTab` escolhem a aba inicial. A TUI relê as specs a cada
-`tui.watchInterval` segundos (padrão `0.75`) e usa a paleta de `tui.theme`:
-`terminal` (padrão, herda as cores do terminal), `night` ou `day`.
+Teclas globais: `←`/`→`, `[`/`]`, `Tab` e `1` a `9` mudam de aba; `/` filtra
+a lista da tela (Enter mantém, `Esc` limpa) e `?` mostra o help de teclas.
+`q`, `Esc` ou `Ctrl+C` saem. `--tab` ou `tui.initialTab` escolhem a aba
+inicial. A TUI relê as specs a cada `tui.watchInterval` segundos (padrão
+`0.75`) e usa `tui.theme`: `terminal` (tema do terminal), `night` ou `day`.
 
 ### Percurso visual
 

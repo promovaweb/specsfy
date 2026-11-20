@@ -177,7 +177,7 @@ function gatesPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOvervi
     label: `${passed}/3 gates`,
     value: passedPerSpec.filter((value) => value === passed).length,
     color: passed === 3 ? theme.ok : passed === 0 ? theme.error : theme.warn,
-    suffix: " specs",
+    suffix: passedPerSpec.filter((value) => value === passed).length === 1 ? " spec" : " specs",
   })), { labelWidth: 11, width: layout.perSpecBar }));
   return nodes;
 }
@@ -188,8 +188,11 @@ export const SPEC_ROWS = 12;
 function specsPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOverview, layout: OverviewLayout): Renderable[] {
   if (!overview.specs.length) return [dim(renderer, theme, "No specs yet. Capture an idea with $specsfy-01-inbox.")];
   const order = (spec: SpecSummary) => FOLDER_ORDER.indexOf(spec.folder);
-  const open = overview.specs.filter((spec) => spec.percent < 100).sort((a, b) => order(b) - order(a) || b.percent - a.percent);
-  const done = overview.specs.filter((spec) => spec.percent >= 100);
+  // A spec is done when it reached Completed (or, in the legacy layout
+  // that has no state folders, when all its tasks are checked).
+  const isDone = (spec: SpecSummary) => (spec.folder === "legacy" ? spec.percent >= 100 : spec.folder === "completed");
+  const open = overview.specs.filter((spec) => !isDone(spec)).sort((a, b) => order(b) - order(a) || b.percent - a.percent);
+  const done = overview.specs.filter(isDone);
   const rows = [...open, ...done].slice(0, SPEC_ROWS);
   const nodes: Renderable[] = rows.map((spec) => {
     const { full, empty } = barCells(spec.percent, 100, layout.specBar);
@@ -232,11 +235,12 @@ function queuePanel(renderer: CliRenderer, theme: Theme, overview: ProjectOvervi
 function stepsPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOverview): Renderable[] {
   return [
     heading(renderer, theme, "Next steps"),
-    list(renderer, theme, nextSteps(overview), glyphs.arrow),
+    // Two steps and the MCP line fit the eight rows of the panel; more makes
+    // the layout squeeze the first item to one line.
+    list(renderer, theme, nextSteps(overview).slice(0, 2), glyphs.arrow),
     spacer(renderer),
     heading(renderer, theme, "For agents (MCP)"),
     dim(renderer, theme, `{ "command": "${manifest.bin}", "args": ["mcp"] }`),
-    dim(renderer, theme, `${manifest.bin} mcp --list  lists the tools`),
   ];
 }
 

@@ -163,6 +163,7 @@ export function createGatesScreen(store: ProjectStore, focus: SpecFocus): Screen
     onEnter: () => {
       if (focus.spec) list?.selectId(focus.spec);
     },
+    filter: (query) => list?.setFilter(query),
     onKey: (name) => {
       switch (name) {
         case "up": case "k": list?.move(-1); return true;

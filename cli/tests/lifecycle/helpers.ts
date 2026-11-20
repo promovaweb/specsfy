@@ -5,18 +5,28 @@
  */
 import { cpSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 import { HOME_VARIABLE } from "../../src/config/paths.ts";
 
 export const CLI_DIR = join(import.meta.dir, "..", "..");
 export const EXAMPLE_DIR = join(CLI_DIR, "..", "example");
 export const SKILLS_DIR = join(CLI_DIR, "..", "skills");
 
+/**
+ * Installed dependencies and build output of `example/`. They hold hundreds
+ * of megabytes the commands under test never read, and copying them made
+ * `beforeAll` hit its time limit now and then.
+ */
+const HEAVY_FOLDERS = new Set(["node_modules", "vendor", ".git", "public/build", "storage/framework", "storage/logs"]);
+
 /** Copies `example/` to a new temporary directory and returns the copy. */
 export function copyExample(): string {
   const root = mkdtempSync(join(tmpdir(), "specsfy-lifecycle-"));
   const project = join(root, "project");
-  cpSync(EXAMPLE_DIR, project, { recursive: true });
+  cpSync(EXAMPLE_DIR, project, {
+    recursive: true,
+    filter: (source) => !HEAVY_FOLDERS.has(relative(EXAMPLE_DIR, source).split(sep).join("/")),
+  });
   return project;
 }
 

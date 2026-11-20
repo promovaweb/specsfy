@@ -3,7 +3,8 @@
  * `docs/user/assets/showcase/` of the monorepo.
  *
  * Mounts the TUI on the OpenTUI test renderer (140x40) with the read-only
- * `example/` project of the repository and captures each tab, plus the key
+ * demo project of `tests/fixtures/showcase-project/` (an online store with
+ * specs in every state, built by `bun run demo:build`) and captures each tab, plus the key
  * help, in the `night` and `day` themes. Every shot is saved twice:
  *
  * - `<theme>-<shot>.png`: the image, rendered from the colored
@@ -39,7 +40,7 @@ import { defaultServices } from "../src/tui/services.ts";
 import { themes, type Theme } from "../src/tui/theme.ts";
 
 const CLI = resolve(import.meta.dir, "..");
-const EXAMPLE = resolve(CLI, "../example");
+const EXAMPLE = join(CLI, "tests", "fixtures", "showcase-project");
 const CATALOG = resolve(CLI, "../specialists/catalog.json");
 const OUT = resolve(CLI, "../docs/user/assets/showcase");
 /** Older names used by docs/user/cli.md, the website and the root READMEs. */
@@ -54,7 +55,7 @@ const FRAMES = join(CLI, "tests/showcase-frames");
 const PLAYWRIGHT = resolve(CLI, "../.ebook/node_modules/");
 const WIDTH = 140;
 const HEIGHT = 40;
-const SHOWN_PATH = "~/projects/example";
+const SHOWN_PATH = "~/projects/loja-online";
 
 /** One screenshot: file name, initial tab and keys pressed before capture. */
 interface Shot {

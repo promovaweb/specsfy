@@ -50,6 +50,23 @@ assets do release e seção do changelog e retome apenas a etapa ausente.
 
 ## 2. Preparar versão
 
+O caminho padrão é o script da raiz, que não commita:
+
+```bash
+node scripts/release.mjs X.Y.Z
+```
+
+Ele grava `X.Y.Z` em `VERSION`, `cli/package.json` e `cli/npm/package.json`,
+regenera as skills embutidas, o lançador, o `opencli` e todo o showcase,
+recompila o ebook, confere a versão e roda os testes da raiz, a validação das
+skills e o `validate` do CLI. O `validate` inclui o `smoke` do binário
+compilado. Depois dele, revisar o diff e escrever `## [X.Y.Z]` em
+`cli/CHANGELOG.md`. O script não escreve as notas: a extração abaixo continua
+sendo o caminho para o release.
+
+A sequência manual continua válida e serve de conferência do que o script
+produziu:
+
 ```bash
 bun \
   cli/.agents/skills/specsfy-release-cli/scripts/release-changelog.mjs prepare \
@@ -102,7 +119,9 @@ Incluir na entrega:
 - `ebook/build.json` e os artefatos da edição atual;
 - documentação, skills e especialistas alterados pela entrega.
 
-Apresentar notas e diff. Após confirmação:
+Apresentar notas e diff. Com o `--publish` do passo 4, o commit, a tag e o
+push saem do script; a lista acima continua sendo o que a release contém. Após
+confirmação:
 
 ```bash
 make verify-version
@@ -117,6 +136,24 @@ git rev-list -n 1 vX.Y.Z
 Os hashes devem ser idênticos. A tag pertence ao monorepo.
 
 ## 4. Publicar e comprovar
+
+O caminho padrão é o script da raiz, depois da seção `## [X.Y.Z]` escrita no
+changelog e do diff revisado:
+
+```bash
+node scripts/release.mjs X.Y.Z --publish
+```
+
+Ele commita tudo o que estiver no working tree como `chore(release): vX.Y.Z`,
+cria a tag, faz push de `main` e da tag, espera o workflow `CLI Release`, refaz
+uma vez um job que falhar, confere os cinco executáveis com o `SHA256SUMS` e
+publica o wrapper npm. Recusa a execução sem a seção do changelog, com a tag já
+existente ou com o `VERSION` diferente de `X.Y.Z`. O trabalho de
+funcionalidade se commita antes: tudo o que sobrar no working tree entra no
+commit de release. O gitlink, a versão e a release do Hub ficam fora do script.
+
+As conferências abaixo continuam obrigatórias, inclusive depois de uma
+publicação pelo script que parou no meio.
 
 Não crie o GitHub Release à mão. O workflow `CLI Release` roda o workflow
 `Specsfy`, compila os binários e cria o release com a seção do changelog e os

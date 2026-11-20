@@ -158,6 +158,9 @@ export interface SelectItem {
  * automatic reload never activates a different object. Headers group rows
  * (for example, by spec state) and are skipped by `move`. `onChange` fires
  * when the selected id changes, including the first selection.
+ * `setFilter` keeps only the rows whose label contains the query (case and
+ * accents ignored), with the headers that still have rows, and shows the
+ * query in the title.
  */
 export function selectList(renderer: CliRenderer, theme: Theme, options: {
   title: string;
@@ -175,6 +178,8 @@ export function selectList(renderer: CliRenderer, theme: Theme, options: {
     minHeight: 0, minWidth: 0, scrollY: true, scrollX: false,
     contentOptions: { flexDirection: "column" },
   });
+  let all: SelectItem[] = [];
+  let query = "";
   let items: SelectItem[] = [];
   let rows: TextRenderable[] = [];
   let index = -1;
@@ -208,11 +213,13 @@ export function selectList(renderer: CliRenderer, theme: Theme, options: {
     for (let i = from; i >= 0 && i < items.length; i += step) if (!items[i]!.header) return i;
     return -1;
   };
-  const setItems = (next: SelectItem[]) => {
+  const render = () => {
     const keep = index >= 0 ? items[index]?.id : undefined;
     for (const row of rows) { box.remove(row); row.destroy(); }
-    items = next;
-    const list = items.length ? items : [{ id: "", label: options.emptyText, header: true }];
+    items = query ? filterItems(all, query) : all;
+    box.title = query ? ` ${options.title} · /${query} ` : ` ${options.title} `;
+    const empty = query && all.length ? `Nothing matches "${query}". Esc clears the filter.` : options.emptyText;
+    const list = items.length ? items : [{ id: "", label: empty, header: true }];
     rows = list.map((item) => {
       const row = new TextRenderable(renderer, { content: item.label, height: 1, flexShrink: 0, wrapMode: "none", fg: theme.text });
       box.add(row);
@@ -228,6 +235,15 @@ export function selectList(renderer: CliRenderer, theme: Theme, options: {
     }
     if (items.length) paint();
     notify();
+  };
+  const setItems = (next: SelectItem[]) => {
+    all = next;
+    render();
+  };
+  const setFilter = (next: string) => {
+    if (next === query) return;
+    query = next;
+    render();
   };
   const move = (delta: number) => {
     if (index < 0) return;
@@ -251,7 +267,31 @@ export function selectList(renderer: CliRenderer, theme: Theme, options: {
     notify();
   };
   setItems([]);
-  return { box, setItems, move, selectId, selected: (): SelectItem | undefined => (index >= 0 ? items[index] : undefined) };
+  return { box, setItems, setFilter, filter: () => query, move, selectId, selected: (): SelectItem | undefined => (index >= 0 ? items[index] : undefined) };
+}
+
+/** Lower case without accents, for matching typed queries. */
+function fold(text: string): string {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+/**
+ * Rows of `items` whose label contains `query`, ignoring case and accents.
+ * A header stays only when at least one row below it (until the next
+ * header) matches.
+ */
+export function filterItems(items: readonly SelectItem[], query: string): SelectItem[] {
+  const needle = fold(query.trim());
+  if (!needle) return [...items];
+  const result: SelectItem[] = [];
+  let header: SelectItem | undefined;
+  for (const item of items) {
+    if (item.header) { header = item; continue; }
+    if (!fold(item.label).includes(needle)) continue;
+    if (header) { result.push(header); header = undefined; }
+    result.push(item);
+  }
+  return result;
 }
 
 /**

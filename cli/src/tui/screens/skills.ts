@@ -282,6 +282,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
     onEnter: () => {
       if (catalog.status === "idle") api?.loadCatalog();
     },
+    filter: (query) => list?.setFilter(query),
     onKey: (name) => {
       if (pending) {
         if (name === "y") confirm();

@@ -232,6 +232,8 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | 0014 | Overview com estatísticas das specs | done |
 | 0015 | Update pelo inventário de skills | done |
 | 0016 | Consolidação das skills do framework | done |
+| 0017 | Filtro e abas da TUI | done |
+| 0018 | Projeto de demonstração do showcase | done |
 
 ## Notes
 
@@ -273,3 +275,5 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 - 2026-11-20: spec 0014 (Overview com estatísticas das specs) closed.
 - 2026-11-20: spec 0015 (Update pelo inventário de skills) closed.
 - 2026-11-20: spec 0016 (Consolidação das skills do framework) closed.
+- 2026-11-20: spec 0017 (Filtro e abas da TUI) closed.
+- 2026-11-20: spec 0018 (Projeto de demonstração do showcase) closed.

@@ -36,4 +36,9 @@ export interface Screen {
   onLeave?: (ctx: ScreenContext) => void;
   /** Keys handled by the screen itself. Returns `true` when consumed. */
   onKey?: (name: string, ctx: ScreenContext) => boolean;
+  /**
+   * Screens with a list implement it to support `/`: the host collects the
+   * typed query and calls it on every change; an empty query clears it.
+   */
+  filter?: (query: string) => void;
 }

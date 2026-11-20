@@ -1,8 +1,13 @@
 # Showcase da TUI
 
 Prints de todas as telas da TUI do Specsfy ficam em
-`docs/user/assets/showcase/`, gerados a partir do projeto
-[`example/`](../../example/) nos temas `night` e `day`, numa tela de 140×40.
+`docs/user/assets/showcase/`, gerados a partir do projeto de demonstração de
+[`cli/tests/fixtures/showcase-project/`](../../cli/tests/fixtures/showcase-project/),
+nos temas `night` e `day`, numa tela de 140×40. O projeto é uma loja online
+com 8 specs em todos os estados, itens de backlog e capturas de inbox,
+construído por [`cli/scripts/build-demo-project.ts`](../../cli/scripts/build-demo-project.ts)
+a partir de uma spec real do [`example/`](../../example/). A raiz desse projeto
+aparece nos prints como `~/projects/loja-online`.
 As imagens saem do próprio código da TUI. Quando uma tela muda, o
 `bun run validate` do CLI falha até que esta pasta seja atualizada. Pode
 usar as imagens em material de divulgação: elas mostram sempre a TUI da versão
@@ -28,10 +33,13 @@ abre a TUI. Por isso ele não tem print fixo aqui.
 
 ```bash
 cd cli
+bun run demo:build
 bun run showcase
 ```
 
-O comando monta a TUI no renderer de teste do OpenTUI, abre cada aba e o
+O `demo:build` regrava `tests/fixtures/showcase-project/` de forma
+determinística, com as specs, o backlog e o inbox do projeto de demonstração.
+O `showcase` monta a TUI no renderer de teste do OpenTUI, abre cada aba e o
 help e grava duas coisas por tela:
 
 | Arquivo | Conteúdo |
@@ -51,9 +59,9 @@ para gerar todas de novo, como antes de uma release.
 roda dentro de `bun run validate`. Versão, plataforma e runtime ficam de fora
 da comparação, então uma release sozinha não exige prints novos.
 
-Os prints não mostram nada da máquina de quem gerou: a raiz do projeto
-aparece como `~/projects/example`, a pasta de dados como `~/.specsfy` e o PID
-como `4242`. O catálogo de especialistas vem de
+Os prints não mostram nada da máquina de quem gerou: a raiz do projeto de
+demonstração aparece como `~/projects/loja-online`, a pasta de dados como
+`~/.specsfy` e o PID como `4242`. O catálogo de especialistas vem de
 [`specialists/catalog.json`](../../specialists/catalog.json), sem rede.
 
 As imagens usam o Playwright instalado para o ebook. Na primeira vez, na raiz

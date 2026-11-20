@@ -39,8 +39,25 @@ globais aparecem depois das teclas da screen.
 | `←` `→` `[` `]` | aba anterior ou seguinte |
 | `Tab` | próxima aba |
 | `1` … `9` | ir para a aba de mesmo número |
+| `/` | filtrar a lista da tela |
 | `?` | mostrar ou esconder o help de teclas |
 | `q` `Esc` `Ctrl+C` | sair |
+
+## Filtro
+
+`/` abre o filtro nas telas com lista: `specs`, `backlog`, `gates` e `skills`.
+O que a pessoa digita filtra a lista pelo rótulo, sem diferenciar maiúsculas
+nem acentos, e os títulos de grupo que ainda têm itens continuam visíveis. O
+título da lista mostra a consulta, como ` · /cupom`.
+
+`Enter` mantém o filtro e fecha a digitação, `Esc` limpa o filtro e
+`Backspace` apaga o último caractere. Durante a digitação, as teclas globais
+(`q`, `1` a `9` e `?`) não disparam, então a consulta pode conter esses
+caracteres. Trocar de aba limpa o filtro.
+
+A barra de teclas mostra `/ filter` nas telas que têm lista e, durante a
+digitação, troca as teclas pela consulta e por `Enter` e `Esc`. Sem resultado,
+a lista mostra `Nothing matches "<consulta>". Esc clears the filter.`
 
 ## Overview
 
@@ -50,9 +67,9 @@ A Overview é o painel de estatísticas do projeto:
 | --- | --- |
 | Progress | Barra `Overall` com a média do progresso das specs, medidores de specs completas, gates aprovados, tarefas e itens de checklist (`valor/total` e porcentagem) e uma linha com specs, tarefas pendentes, itens órfãos, backlog e inbox. |
 | Specs by state | Gráfico de barras com quantas specs há em cada estado, na ordem do ciclo. |
-| Specs | Uma linha por spec, as abertas primeiro: os três gates (definição, planejamento e entrega) como `✓`, `!`, `✗` ou `○`, barra de progresso, porcentagem, tarefas e estado. |
+| Specs | Uma linha por spec, as abertas antes das concluídas: os três gates (definição, planejamento e entrega) como `✓`, `!`, `✗` ou `○`, barra de progresso, porcentagem, tarefas e estado. Concluída é a spec no estado `completed`; no layout legado, sem pastas de estado, é a spec com todas as tarefas marcadas. |
 | Gates | Gates aprovados por tipo, total de aprovados, pendentes e reprovados e o gráfico de quantas specs têm 3, 2, 1 ou 0 gates aprovados. |
-| Backlog and inbox, Guide | Itens do backlog, capturas pendentes, próximos passos e o bloco MCP. |
+| Backlog and inbox, Guide | Itens do backlog, capturas pendentes, os dois primeiros próximos passos e uma linha com o bloco MCP (`{"command": "{{bin}}", "args": ["mcp"]}`). |
 
 As barras acompanham a largura do terminal. Em terminais com menos de 38
 linhas, a linha de backlog e guia sai da Overview (a aba Backlog mostra o

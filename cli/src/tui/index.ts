@@ -141,11 +141,22 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
   rule.add(new TextRenderable(renderer, { content: "─".repeat(400), fg: theme.border, wrapMode: "none", height: 1, selectable: false }));
   app.add(rule);
 
+  // Every tab has the same width with its title centered, so the gaps
+  // between titles look even; the selected tab is marked by its background
+  // only (no underline row, which rendered as a dashed line one column off).
+  // TabSelect keeps two cells of padding and cuts longer names with "…",
+  // so the centering works on the inner width and never pads the end.
+  // Up to three cells of air on each side, but never wider than the
+  // terminal can show for all tabs (80 columns fit seven tabs of 11).
+  const longest = Math.max(...screens.map((s) => s.title.length));
+  const tabWidth = Math.max(longest + 2, Math.min(longest + 6, Math.floor((renderer.width - 2) / screens.length)));
+  const centered = (title: string) => `${" ".repeat(Math.floor((tabWidth - 2 - title.length) / 2))}${title}`;
   const tabs = new TabSelectRenderable(renderer, {
     width: "100%",
-    height: 2,
-    tabWidth: 11,
-    options: screens.map((s) => ({ name: s.title, description: s.description })),
+    height: 1,
+    tabWidth,
+    showUnderline: false,
+    options: screens.map((s) => ({ name: centered(s.title), description: s.description })),
     backgroundColor: theme.background,
     textColor: theme.textDim,
     focusedBackgroundColor: theme.background,
@@ -187,16 +198,56 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
     quit,
   };
 
+  // Filter mode of `/`: while it is on, printable keys go to the query and
+  // no global key fires; Enter keeps the filter, Esc clears it.
+  let filtering = false;
+  let query = "";
+  const filterKeys = [
+    { key: "type", action: "filter" },
+    { key: "Enter", action: "keep" },
+    { key: "Esc", action: "clear" },
+  ];
   const refreshFooter = (screen: Screen) => {
     app.remove(footer);
-    footer = keyBar(renderer, theme, [...(screen.keys ?? []), ...globalKeys]);
+    const own = [...(screen.keys ?? []), ...(screen.filter ? [{ key: "/", action: "filter" }] : [])];
+    footer = keyBar(renderer, theme, filtering ? [{ key: `/${query}`, action: "" }, ...filterKeys] : [...own, ...globalKeys]);
     app.add(footer);
+  };
+  const setQuery = (next: string) => {
+    query = next;
+    active?.filter?.(query);
+    if (active) refreshFooter(active);
+  };
+  /** Handles a key in filter mode; returns true when consumed. */
+  const filterKey = (key: KeyEvent): boolean => {
+    if (!filtering) return false;
+    if (key.name === "escape") {
+      filtering = false;
+      setQuery("");
+      return true;
+    }
+    if (key.name === "return" || key.name === "enter") {
+      filtering = false;
+      if (active) refreshFooter(active);
+      return true;
+    }
+    if (key.name === "backspace") {
+      setQuery(query.slice(0, -1));
+      return true;
+    }
+    if (["up", "down", "pageup", "pagedown"].includes(key.name)) return false;
+    const text = key.sequence ?? "";
+    if (!key.ctrl && !key.meta && text.length === 1 && text >= " ") setQuery(query + text);
+    return true;
   };
 
   const show = (index: number) => {
     const screen = screens[index];
     if (!screen || screen === active) return;
     if (active) {
+      if (query) active.filter?.("");
+      filtering = false;
+      query = "";
       active.onLeave?.(context);
       const previous = mounted.get(active.id);
       if (previous) content.remove(previous);
@@ -255,6 +306,14 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
   tabs.on(TabSelectRenderableEvents.ITEM_SELECTED, (index: number) => show(index));
 
   const onKey = (key: KeyEvent) => {
+    if (filterKey(key)) return;
+    if (key.name === "/" || key.sequence === "/") {
+      if (active?.filter) {
+        filtering = true;
+        refreshFooter(active);
+        return;
+      }
+    }
     if (active?.onKey?.(key.name, context)) return;
     switch (key.name) {
       case "q":

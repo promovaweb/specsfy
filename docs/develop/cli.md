@@ -202,10 +202,14 @@ bun run validate
 ```
 
 `validate` encadeia `embed:check`, `launcher:check`, `typecheck`, `bun test`,
-`skills:check`, `opencli:check`, `showcase:check`, `docs:check` e `build`.
-`docs:check` exige que todo command, screen, tool, resource, prompt, key e
-exit code do código apareça em `cli/docs/`. Quando o registry muda, rode
-`bun run opencli` e revise o diff de `cli/docs/opencli.json`.
+`skills:check`, `opencli:check`, `showcase:check`, `docs:check`, `build` e
+`smoke`. O `smoke` roda o binário compilado `dist/specsfy` sem rede
+(`--version`, `--skill tui`, `mcp --list`, `doctor --json`, `install` num
+projeto temporário a partir do próprio repositório e `update --check`) e pega
+falha que só aparece no binário compilado, antes da tag. `docs:check` exige
+que todo command, screen, tool, resource, prompt, key e exit code do código
+apareça em `cli/docs/`. Quando o registry muda, rode `bun run opencli` e
+revise o diff de `cli/docs/opencli.json`.
 
 Mudanças de interface atualizam também
 [`docs/user/cli.md`](../user/cli.md) e a
