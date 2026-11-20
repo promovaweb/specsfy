@@ -53,7 +53,6 @@ Consulte antes de criar arquivos, escolher nomes ou definir tratamento de erro.
 ## Nomenclatura e erros
 
 - Diretórios e slugs usam kebab-case.
-- Módulos Python e testes usam snake_case.
 - IDs usam `US`, `FR`, `NFR`, `AC`, `DEC` e `T`.
 - Scripts retornam código diferente de zero para contrato inválido.
 - Mensagens identificam caminho, regra violada e correção possível.

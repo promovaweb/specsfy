@@ -35,20 +35,17 @@ Leia ao introduzir linguagem, runner, formato ou ferramenta transversal. Use
 
 Este arquivo explica escolhas. Manifests, lockfiles, workflows e comandos são
 fontes executáveis de versão e configuração. O CLI mantém manifest e lockfile
-Node.js próprios. As automações Python usam biblioteca padrão ou dependências
-efêmeras declaradas nos comandos.
+Bun próprios (`cli/package.json` e `cli/bun.lock`). As automações da raiz usam
+Node.js, com dependências em `package.json` e `package-lock.json`.
 
 ## Stack vigente
 
 | Tecnologia | Responsabilidade | Fonte executável |
 | --- | --- | --- |
 | Markdown | skills, specs e contexto legível | arquivos versionados |
-| Python 3 | validadores e testes de contrato | scripts e ambiente de execução |
-| Node.js e TypeScript | CLI, TUI e distribuição npm | `cli/package.json` e lockfile |
-| biblioteca padrão | automação determinística principal | imports dos scripts |
-| Behave | aceite Gherkin | comandos e arquivos em `tests/features/` |
-| `unittest` | TDD e regressão | arquivos `tests/test_*.py` |
-| `uv` | ambiente efêmero para runners auxiliares | comandos documentados |
+| Node.js 22.20 ou superior | validadores, testes de contrato e ebook | `package.json` da raiz e `.ebook/package.json` |
+| Bun e TypeScript | CLI, TUI, servidor MCP e executável compilado | `cli/package.json` e `cli/bun.lock` |
+| `node:test` | TDD, regressão e aceite Gherkin (`tests/bdd.mjs`) | `tests/*.test.mjs` e `tests/features/` |
 | GitHub Actions | verificação em CI | `.github/workflows/` |
 
 ## Aplicação de validação
@@ -71,9 +68,11 @@ não transforma PHP, JavaScript ou seu runtime em dependências do Specsfy.
 <!-- markdownlint-disable MD013 -->
 | Área | Responsabilidade | Fonte executável |
 | --- | --- | --- |
-| TypeScript, Commander e APIs do Node.js | comandos, instalação, projeção, runners e detecção de versões | `cli/src/` |
-| neo-blessed, marked e marked-terminal | interface terminal e Markdown | `cli/package.json` e lockfile |
-| npm | instalação, atualização e publicação local do wrapper | `cli/npm/package.json` |
+| TypeScript sobre Bun, com registry próprio de commands | comandos, instalação, projeção, runners e detecção de versões | `cli/src/` |
+| OpenTUI (`@opentui/core`) | interface terminal | `cli/package.json` e `cli/bun.lock` |
+| MCP SDK e Zod | servidor MCP via stdio e schemas das tools | `cli/package.json` e `cli/bun.lock` |
+| `bun build --compile` | executáveis de linux-x64, linux-arm64, darwin-x64, darwin-arm64 e windows-x64 | `cli/scripts/build.ts` |
+| npm | wrapper que baixa o binário e publicação local desse wrapper | `cli/npm/package.json` |
 | Markdown/YAML | instruções e metadata das skills | `skills/` e `specialists/` |
 | JSON | catálogo detectável e lock de instalação | `specialists/catalog.json` e lock do consumidor |
 <!-- markdownlint-enable MD013 -->

@@ -65,7 +65,7 @@ O ownership de conteúdo continua delimitado por diretório.
 
 O monorepo é publicado em
 [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy). GitHub Actions
-executa os contratos locais como fronteira de CI. O CLI consulta tags do mesmo
+executa os contratos locais como fronteira de CI. O CLI consulta a última GitHub Release do mesmo
 repositório e baixa `skills/` e `specialists/` do mesmo checkout.
 
 - Ferramenta externa indisponível não converte verificação ausente em sucesso.

@@ -25,7 +25,7 @@ brand/ ──governa identidade─► publicações
 raiz ──integra e testa──────► módulos
 example/ ──exercita─────────► metodologia + contratos
 cli/ ──instala──────────────► skills/ + specialists/
-cli/ ──consulta catálogo/tags autenticados──► GitHub + cache local
+cli/ ──consulta catálogo/releases autenticados──► GitHub + cache local
 
 AGENTS.md ──orienta──► skills ──executam──► spec.md
 input ─► inbox ─► backlog ─► spec.md
@@ -41,8 +41,9 @@ release-cli ─► cli/CHANGELOG.md + versão + binário ─► tag + GitHub Rel
 - Commits e pull requests pertencem à raiz única.
 - O CLI clona o monorepo e seleciona `skills/` ou `specialists/`.
 - A raiz oficial não é destino válido para instalação consumidora.
-- Catálogo e updater autenticam na API pelo ambiente ou pela sessão do `gh`.
-  Somente o updater grava metadados no cache e delega upgrade ao npm.
+- Catálogo e updater autenticam na API pela credencial `github.token`, pelo
+  ambiente ou pela sessão do `gh`. Somente o updater grava metadados no
+  cache; o upgrade delega ao npm apenas quando o binário veio do wrapper npm.
 - Especialistas exigem autorização específica.
 - Documentação derivada não redefine código, manifests, schemas ou specs.
 

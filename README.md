@@ -55,7 +55,8 @@ responsabilidades próprias.
 
 ## Instalação
 
-Requisitos: Node.js 22.20 ou superior e npm.
+O pacote npm pede Node.js 18 ou superior e npm. O executável da GitHub Release
+dispensa os dois.
 
 ```bash
 npm install --global @promovaweb/specsfy
@@ -121,12 +122,15 @@ preserva os artefatos originais nos mesmos caminhos.
 
 ## Uso
 
-Abra a TUI no projeto:
+Para abrir a TUI, rode `specsfy` sem argumentos dentro da pasta do projeto.
+Não é preciso escrever `tui`:
 
 ```bash
 specsfy
-specsfy tui --project .
 ```
+
+`specsfy tui` só é necessário para abrir outro projeto ou já numa aba
+específica: `specsfy tui --project ../api --tab specs`.
 
 Consulte o estado e o progresso:
 
@@ -195,7 +199,8 @@ mostra todas as ferramentas, resources e prompts.
 
 ## Saída para scripts
 
-Comandos de leitura aceitam `--json`:
+Todos os comandos aceitam `--json`, com o envelope `{ ok, command, data }` ou
+`{ ok, command, error }`:
 
 ```bash
 specsfy progress --project . --json
@@ -206,8 +211,8 @@ specsfy gate spec 0001 --json
 | --- | --- |
 | `0` | sucesso |
 | `1` | falha geral, sem classificação específica |
-| `3` | configuração inválida ou diagnóstico com requisito reprovado |
 | `2` | uso inválido de argumentos, opções ou subcomando |
+| `3` | configuração inválida ou diagnóstico com requisito reprovado |
 | `6` | recurso não encontrado, como o projeto ou a spec |
 | `10` | gate ou validação reprovada |
 
@@ -245,7 +250,7 @@ de `brand/` com `make brand-guide`.
 | Projeto | Para quê |
 | --- | --- |
 | [Bun](https://github.com/oven-sh/bun) | compilação do binário |
-| [Node.js](https://github.com/nodejs/node) | lançador do pacote npm e instalação |
+| [Node.js](https://github.com/nodejs/node) | lançador do pacote npm e de `get.specsfy.dev` |
 | [Termfy](https://github.com/promovaweb/termfy) | framework de CLI, TUI e MCP da Promovaweb |
 | [OpenTUI](https://github.com/anomalyco/opentui) | componentes da TUI |
 | [Model Context Protocol SDK](https://github.com/modelcontextprotocol/typescript-sdk) | servidor MCP |

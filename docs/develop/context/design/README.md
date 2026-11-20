@@ -108,7 +108,7 @@ motivo concreto.
 ## Validação
 
 Use o contrato em `tests/features/interface_design_system.feature`, o teste
-focal de design system, `quick_validate.py`, a suíte Python, o Behave e os
+focal de design system, `npm run validate:skills`, `npm test` na raiz e os
 testes do CLI. Confira também que o instalador publica o template e que o
 catálogo resolve as dependências da interface.
 

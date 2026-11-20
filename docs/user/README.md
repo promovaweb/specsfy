@@ -66,8 +66,8 @@ IDs, pesquisa, tarefas e progresso.
 ### 2. Instale o Specsfy
 
 Com o método entendido, siga a [Instalação](installation.md) para instalar o
-CLI e preparar seu repositório. Ao final, `specsfy skills list` mostra as
-skills disponíveis e `specsfy progress --project .` confirma que o CLI
+CLI e preparar seu repositório. Ao final, `specsfy skills list` mostra os
+especialistas do catálogo e `specsfy progress --project .` confirma que o CLI
 consegue ler o projeto, mesmo que ainda não exista uma spec.
 
 ### 3. Faça a primeira entrega

@@ -48,19 +48,21 @@ Veja as demais telas e comandos no [guia do CLI](../docs/user/cli.md).
 
 ## O que você precisa
 
-- Node.js 22.20 ou superior, com o npm disponível.
-- o comando [`skills`](https://github.com/vercel-labs/skills) ou `npx`.
+- o executável `specsfy` da GitHub Release, ou Node.js 18 ou superior com npm
+  para instalar pelo pacote `@promovaweb/specsfy` ou por `get.specsfy.dev`.
+- Git, usado para baixar o framework. O CLI [`skills`](https://github.com/vercel-labs/skills)
+  já roda dentro do binário.
 - um projeto existente ou recém-criado no qual o Specsfy será aplicado.
 
 O monorepo [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy) não é
-um projeto consumidor. O CLI recusa o bootstrap nessa raiz.
+um projeto consumidor. Não instale o framework nessa raiz.
 
 ## Instalação passo a passo
 
 ### 1. Instale o CLI
 
-Baixe o executável pela URL oficial `get.specsfy.dev` ou mantenha a instalação
-e as atualizações gerenciadas pelo npm:
+Instale pelo npm, baixe o lançador da URL oficial `get.specsfy.dev` ou pegue o
+executável da plataforma na GitHub Release:
 
 ```bash
 npm install --global @promovaweb/specsfy
@@ -298,12 +300,13 @@ Resultado:
 Reviewing · 3/3 etapas · nenhuma pendência
 ```
 
-Você também pode abrir a mesma visão pelo CLI:
+Você também pode abrir a mesma visão pelo CLI. Para a TUI, basta rodar
+`specsfy` sem argumentos na pasta do projeto:
 
 ```bash
+specsfy
 specsfy progress --project .
 specsfy progress --project . --json
-specsfy tui --project .
 ```
 
 ### 10. Converse antes da próxima etapa — `$specsfy-interviewer`
@@ -321,7 +324,8 @@ automaticamente.
 
 ## Atualização
 
-Atualize o pacote global do CLI:
+Atualize o pacote global do CLI (ou rode `specsfy upgrade`, que faz o mesmo
+pelo npm):
 
 ```bash
 npm update --global @promovaweb/specsfy
@@ -362,8 +366,9 @@ descarta a customização protegida.
   ```
 
 - Use `specsfy skills detect --project .` para consultar especialistas
-  recomendados sem instalá-los. Na aba **Skills** da TUI, alterações também
-  permanecem como um plano. Nada é instalado ou removido antes de **Aplicar**.
+  recomendados sem instalá-los. Na aba **Skills** da TUI, `i` instala, `x`
+  remove e `u` atualiza, sempre com confirmação.
+  Nada é instalado ou removido antes da confirmação com `y`; `n` ou `Esc` cancela.
 
 - Trate o progresso como leitura: o CLI projeta checkboxes e gates, mas não
   aprova gates nem altera a fonte normativa da spec.

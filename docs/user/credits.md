@@ -27,8 +27,9 @@ ativos e orientações desse diretório ao apresentar o projeto.
 ## Componentes relacionados
 
 O instalador do Specsfy delega a instalação de skills ao projeto
-[`vercel-labs/skills`](https://github.com/vercel-labs/skills). O CLI pode usar
-o executável `skills` ou o fallback por `npx`, conforme documentado no
+[`vercel-labs/skills`](https://github.com/vercel-labs/skills). O binário roda
+o CLI `skills` no runtime Bun embutido; `SPECSFY_SKILLS_CLI` e
+`SPECSFY_NPX_COMMAND` trocam esse runtime, conforme o
 [guia de instalação](installation.md).
 
 ## Inspirações e fontes

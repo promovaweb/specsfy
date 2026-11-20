@@ -263,7 +263,7 @@ projeta `docs/` junto de `.specsfy/PACKAGES.md`.
 
 ## Instalação
 
-`cli/src/installer.ts` define o conjunto instalado. O instalador:
+`cli/src/domain/installer.ts` define o conjunto instalado. O instalador:
 
 - clona somente o diretório necessário do monorepo.
 - delega materialização ao instalador `skills`.

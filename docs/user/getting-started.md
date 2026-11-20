@@ -247,8 +247,10 @@ trabalho disponível. Você também pode consultar o mesmo estado pelo CLI:
 ```bash
 specsfy progress --project .
 specsfy progress --project . --json
-specsfy tui --project .
+specsfy
 ```
+
+O último comando abre a TUI na pasta atual.
 
 Depois do aceite final, a entrega pronta aparece como `Complete` em
 `completed/`, com os três gates aprovados e sem pendência documental. Capturas em `specs/inbox/` e itens em

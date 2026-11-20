@@ -1,196 +1,205 @@
 # Arquitetura do CLI e da TUI
 
-O módulo `cli/` distribui o framework, gerencia especialistas, projeta progresso
-e oferece a interface terminal. A implementação usa TypeScript sobre Node.js e
-não define requisitos nem aprova gates.
+O módulo `cli/` é o binário `specsfy`, a ferramenta do método. Um único
+executável em Bun, construído sobre o Termfy Starter Kit do framework
+[Termfy](https://github.com/promovaweb/termfy), instala e atualiza
+o framework, lê e altera o estado das specs dentro das regras, roda os gates e
+serve essas operações a agentes. O código é TypeScript e não define requisitos
+nem aprova gates por conta própria.
+
+As fontes executáveis deste resumo são [`cli/AGENTS.md`](../../cli/AGENTS.md),
+[`cli/CLISPEC.md`](../../cli/CLISPEC.md), as specs de evolução em
+[`cli/specs/`](../../cli/specs/) e a documentação embutida em
+[`cli/docs/`](../../cli/docs/). Em caso de divergência, elas prevalecem.
 
 ## Entradas
 
-`cli/src/cli.ts` define:
+O mesmo executável tem três modos, decididos em `cli/src/main.ts`:
 
-```text
-specsfy install
-specsfy doctor
-specsfy update
-specsfy upgrade
-specsfy skills
-specsfy progress
-specsfy milestones sync
-specsfy test
-specsfy tui
-specsfy config
-```
+| Modo | Como abre | Uso |
+| --- | --- | --- |
+| TUI | `specsfy` sem argumentos, em um TTY | acompanhar specs, gates, testes e skills ao vivo |
+| CLI | `specsfy <command> [subcommand]` | saída em texto ou envelope `--json` para pessoas e CI |
+| MCP | `specsfy mcp` | servidor Model Context Protocol via stdio para agentes |
 
-Sem subcomando, a aplicação abre a TUI.
+Sem argumentos e sem TTY, o binário imprime o help e sai com exit code 2.
+`specsfy tui` existe para passar `--project <dir>` ou `--tab <tab>`; abrir a
+TUI não exige escrever `tui`. A TUI tem as abas Overview, Specs, Backlog,
+Gates, Tests, Skills e About e fecha com `q`, `Esc` ou `Ctrl+C`.
 
-## Componentes
+A lista completa de commands, screens, tools, resources e prompts fica na
+seção `Surface` do `CLISPEC.md` e em `cli/docs/cli.md`, `cli/docs/tui.md` e
+`cli/docs/mcp.md`. Este documento não repete esse registro.
 
-| Módulo | Responsabilidade |
+## Camadas
+
+`cli/docs/architecture.md` descreve a árvore de `cli/src/`. Em resumo:
+
+| Camada | Responsabilidade |
 | --- | --- |
-| `cli.ts` | parser Commander, despacho e saída não interativa |
-| `installer.ts` | framework, skills, merge e proteção local |
-| `prerequisites.ts` | diagnóstico de Node.js, executáveis e projeto |
-| `catalog.ts` | catálogo remoto de especialistas |
-| `skill-lock.ts` | seleção instalada, fingerprints e proteção |
-| `progress.ts` | leitura e resumo das specs |
-| `milestones.ts` | projeção de milestones, vínculos e índice `specs.md` |
-| `backlog.ts` | projeção dos itens de backlog |
-| `project-testing.ts` | detecção e execução do runner consumidor |
-| `config.ts` | configuração por projeto |
-| `updater.ts` | descoberta de tags e oferta de atualização |
-| `github.ts` | headers e autenticação da API do GitHub |
-| `tui.ts` | dashboard neo-blessed e interações |
+| `app/` | manifest do binário, tabela de exit codes e `AppError` |
+| `config/` | `~/.specsfy/`, `settings.json`, cofre cifrado e master key |
+| `core/` | raiz do projeto, resolução do identificador da spec e visão de leitura |
+| `domain/` | estados da spec, progresso, backlog, inbox, instalador, catálogo, lock, updater, testes do projeto, milestones e GitHub |
+| `engine/` | `ScriptCommandDef` e o runner dos scripts `.mjs` embutidos |
+| `cli/` | registry próprio de commands, parser, help, OpenCLI e formatação |
+| `mcp/` | `McpServer` sobre stdio, tools, resources e prompts |
+| `tui/` | montagem com OpenTUI (`@opentui/core`), tema e uma screen por arquivo |
+| `skill/` | `docs/` embutida e referência gerada do registry para `--skill` |
+
+As regras de dependência valem para toda mudança: `app/` não importa de outra
+camada, `domain/` não conhece CLI, MCP ou TUI, e `mcp/` e `tui/` podem
+reutilizar funções de coleta de `cli/commands/*`, nunca o contrário. Cores da
+TUI ficam somente em `src/tui/theme.ts`. O parser valida options e arguments
+contra o registry, e as tools MCP declaram o `inputSchema` com Zod.
+
+Um command apoiado em script do framework usa `ScriptCommandDef` em
+`src/cli/commands/<grupo>.ts`. A mesma definição gera o command do CLI e a
+tool MCP, por isso os dois nunca divergem.
+
+## Scripts embutidos
+
+A árvore de [`skills/`](../../skills/) entra no binário como texto em
+`src/engine/skills.gen.ts`, gerado por `bun run embed`. Na primeira execução
+de cada versão, `runner.ts` grava essa árvore em
+`~/.specsfy/runtime/<version>-<digest>/skills/` e roda cada `.mjs` com o
+próprio executável e `BUN_BE_BUN=1`, sem Node.js na máquina. Quando um script
+chama `node`, um shim no `PATH` reexecuta o binário como Bun. Depois de mudar
+qualquer arquivo de `skills/`, rode `bun run embed` e inclua o módulo gerado.
 
 ## Instalação
 
-`specsfy doctor` apresenta todos os requisitos do ambiente. Antes de qualquer
-escrita, `specsfy install` exige Node.js 22.20 ou superior, Git, um projeto
-legível e gravável e `npx` no `PATH`. A materialização de toda skill, base ou
-especialista, usa `npx skills add`; o diagnóstico também informa a
-disponibilidade do npm, usado por `upgrade`.
+`specsfy doctor --project .` apresenta os requisitos do ambiente. Antes de
+qualquer escrita, `install`, `update` e `skills` exigem Git, um projeto
+legível e gravável e o CLI `skills`. Esse CLI roda no próprio runtime Bun do
+binário (`<binário> x --bun skills@<versão>`), sem Node.js nem `npx`;
+`SPECSFY_SKILLS_CLI` e `SPECSFY_NPX_COMMAND` substituem esse caminho nos
+testes.
 
-`SkillInstaller` valida que o destino é um projeto consumidor, obtém `skills/`
-do monorepo e instala o conjunto `FRAMEWORK_SKILLS` por `npx skills add`. Esse
-conjunto inclui setup,
-três auxiliares, documentador e skills base, incluindo as entrevistas de MVP,
-roadmap e governança de milestones.
+`SkillInstaller`, em `src/domain/installer.ts`, recusa a raiz oficial do
+monorepo, clona o repositório definido em `catalog.repository` e delega a
+materialização ao `skills add`, com os agentes de `skills.agents`. O módulo
+mantém o `skills-lock.json`, os fingerprints e os blocos gerenciados de
+`AGENTS.md` e `CLAUDE.md`.
 
-Conteúdo gerenciado recebe fingerprints. Se a cópia local divergir do último
-fingerprint registrado, atualização e remoção recusam a operação sem `--force`.
-
-O instalador publica `Inbox.md`, `Backlog.md`, `Spec.md`, `Tasks.md`,
-`Project.md`, `Stack.md`, `Rules.md`, `Database.md` e `UserProfile.md` em
-`.specsfy/templates/`. Cada template possui digest próprio. Assim, uma
-customização local em qualquer um deles impede somente uma substituição
-explicitamente forçada.
-
-O instalador também cria `.specsfy/templates/custom/`, sem registrar os
-arquivos desse diretório no lock. Um arquivo
-`.specsfy/templates/custom/<Nome>.md` prevalece sobre o homônimo gerenciado.
-Atualizações, remoções e `--force` nunca alteram essa camada do usuário.
+Conteúdo gerenciado recebe fingerprint. Se a cópia local divergir do último
+fingerprint registrado, atualização e remoção recusam a operação sem
+`--force`. Os templates publicados em `.specsfy/templates/` têm digest próprio,
+então a customização de um deles impede somente a substituição desse arquivo.
+`.specsfy/templates/custom/` pertence ao usuário: fica fora do lock, prevalece
+sobre o homônimo gerenciado e nunca é alterado por atualização, remoção ou
+`--force`.
 
 ## Catálogo
 
-`specialists/catalog.json` é a fonte executável. `Catalog.fetch()` usa a API de
-conteúdo do GitHub e aceita override local por
-`SPECSFY_SPECIALISTS_CATALOG`.
+`specialists/catalog.json` é a fonte executável do catálogo de especialistas.
+`src/domain/catalog.ts` lê o arquivo pela API de conteúdo do GitHub quando
+`catalog.repository` aponta para o GitHub e por clone raso nos demais
+repositórios Git. `SPECSFY_SPECIALISTS_CATALOG` aponta para um arquivo local e
+dispensa a rede.
 
-Como o repositório é privado, a autenticação procura:
+A autenticação do GitHub, em `src/domain/github.ts`, procura o token nesta
+ordem:
 
-1. `GH_TOKEN`.
-2. `GITHUB_TOKEN`.
-3. `gh auth token`.
+1. credencial `github.token` do cofre.
+2. `GH_TOKEN`.
+3. `GITHUB_TOKEN`.
+4. `gh auth token`.
 
-O token permanece no ambiente ou no armazenamento do GitHub CLI e não é
-gravado pelo Specsfy.
+O token nunca é impresso nem copiado para outro arquivo. Sem token, as
+requisições públicas continuam funcionando.
 
 ## Progresso
 
-O scanner lê `specs/<estado>/*/spec.md`, com compatibilidade de leitura do layout
-legado. Status, gates, tarefas e checklists são projeções. `--watch` recalcula
-quando o fingerprint das fontes muda.
+`src/domain/progress.ts` lê `specs/<estado>/*/spec.md`, com leitura
+compatível dos layouts legados. Status, gates, tarefas e checklists são
+projeções. A TUI e `specsfy progress --watch` recalculam quando o fingerprint
+das fontes muda, a cada `tui.watchInterval` segundos. O mesmo módulo faz a
+edição de checkbox de `tasks check`, com as mesmas expressões usadas na
+contagem.
 
 ## Milestones
 
 `specsfy milestones sync --project .` lê o campo `Milestones` das specs e do
-backlog. O comando atualiza blocos gerados em `specs.md` e em
+backlog e atualiza os blocos gerados em `specs.md` e em
 `specs/milestones/MNN.md`, preservando o restante do Markdown. Consulte
 [Milestones](milestones.md) para o contrato, os limites de escrita e os
 testes do módulo.
 
 ## Testes do consumidor
 
-`project-testing.ts` reconhece runners suportados a partir do projeto
-selecionado. O comando transmite a saída e preserva o exit code. A TUI separa
-resumo e detalhes, mas usa o mesmo contrato.
-
-Para Laravel, `runProjectTests` valida `.env.testing`, compara o destino efetivo
-com o `.env` e procura `RefreshDatabase` ou `DatabaseMigrations` antes de criar
-o processo do Artisan. Qualquer pendência lança erro e mantém o runner sem
-execução. O teste desse contrato usa diretórios temporários e um executável PHP
-fictício, sem conexão com banco.
-
-O painel detalhado usa uma caixa rolável com o conteúdo acumulado. O componente
-`blessed.log` não deve ser usado nessa tela porque agenda a rolagem depois da
-renderização e tenta acessar o widget anterior quando uma nova linha recria a
-aba.
+`src/domain/project-testing.ts` detecta hoje Laravel com Pest. Antes de criar
+o processo, o módulo exige um banco de teste separado em `.env.testing`; sem
+essa prova, a execução para com `GATE_FAILED` e o PHP não inicia. Projeto sem
+runner conhecido recebe `NOT_FOUND`. O command `test`, a tool MCP
+`project_test` e a aba Tests usam o mesmo caminho.
 
 ## Atualização
 
-`specsfy update` atualiza todas as skills Specsfy registradas no projeto.
-`specsfy skills update` usa a mesma função para preservar compatibilidade.
-Ambos executam o preflight do instalador antes de baixar as origens.
+`specsfy update` atualiza as skills Specsfy registradas no projeto que não
+têm mudança local. `specsfy skills update` usa a mesma função.
 
-`specsfy upgrade` força uma nova consulta ao registro npm e só atualiza quando a
-versão publicada supera `VERSION`. Assim, uma tag de desenvolvimento mais
-recente que a publicação disponível não provoca downgrade.
+`specsfy upgrade` compara a versão em execução com a última GitHub Release de
+`promovaweb/specsfy` e troca a instalação conforme a origem detectada em
+`src/domain/updater.ts`:
 
-`updater.ts` consulta o registro npm, usa tags semânticas estáveis apenas para
-proveniência, respeita intervalo e ETag, oferece consentimento e atualiza a
-instalação detectada:
+| Origem | Como é trocada |
+| --- | --- |
+| wrapper npm `@promovaweb/specsfy` | `npm install --global @promovaweb/specsfy@latest`; o wrapper baixa o binário novo na próxima execução |
+| launcher de `get.specsfy.dev` | o launcher é substituído; ele baixa o próprio binário depois |
+| executável avulso | baixa o asset da plataforma, confere `SHA256SUMS` e `--version` e troca o arquivo atomicamente |
+| código-fonte | recusa; atualize o checkout com Git |
 
-```text
-npm install --global @promovaweb/specsfy@latest
-```
-
-Quando o processo atual é o executável avulso `bin/specsfy`, o updater baixa
-`https://get.specsfy.dev`, confirma a versão com `--version` e substitui o
-arquivo atomicamente. Se o caminho for um symlink, resolve o arquivo apontado
-antes da troca para preservar o comando exposto no `PATH`. A recusa ou uma
-falha de atualização registra a versão adiada no cache; o aviso reaparece
-somente depois do intervalo configurado. `specsfy upgrade` usa consulta forçada
-e ignora esse adiamento.
-
-Falha de rede não impede a abertura. Configurações e metadados ficam em
-`~/.specsfy/cli.json` com permissão `0600`. O cache inclui a versão e o horário
-do último adiamento, além das versões e ETags consultadas. Credenciais não são
-persistidas.
+`upgrade --check` apenas informa as versões. A checagem diária do `doctor`
+usa o cache `~/.specsfy/update.json` e é desligada por `update.check`. Falha
+de rede não impede a abertura da TUI nem dos commands de leitura.
 
 ## Artefato versionado
 
-`scripts/build-executable.mjs` constrói `cli/bin/specsfy` e
-`cli/bin/specsfy.build.json`. O executável Node é distribuído publicamente por
-`get.specsfy.dev`. O fingerprint usa modos equivalentes aos preservados pelo
-Git para produzir o mesmo resultado localmente e no CI.
+`bun run build` compila `src/main.ts` em `cli/dist/specsfy` com
+`bun build --compile`. `bun run build:all` gera os cinco alvos: linux-x64,
+linux-arm64, darwin-x64, darwin-arm64 e windows-x64. O executável carrega o
+OpenTUI nativo, `docs/`, `package.json` e a árvore de skills, e não depende de
+Bun nem de Node.js na máquina que o executa.
 
-Toda mudança em `cli/` reconstrói e versiona esses artefatos.
+O workflow `CLI Release` compila esses alvos a partir da tag e publica a
+GitHub Release com `SHA256SUMS`. O pacote npm `@promovaweb/specsfy` é só um
+wrapper que baixa o binário da plataforma e sai pela máquina local. O
+`cli/bin/specsfy` versionado é o launcher servido por `get.specsfy.dev`,
+gerado por `bun run launcher` a partir de `cli/npm/bin/specsfy.cjs`. O fluxo
+completo está em `cli/docs/release.md` e em
+[Release do CLI](context/flows/cli-release.md).
 
 ## Testes
 
-`SpecsfyTui.start()` aceita um `screen` do neo-blessed, um catálogo conhecido e
-a opção de desligar o polling. A suíte monta o mesmo renderer usado pelo
-executável em terminais virtuais de `80x24`, `129x44` e `160x50`. O buffer
-resultante confirma as seis abas, os painéis e os textos visíveis. Eventos de
-teclado e mouse conferem foco, filtros, busca, seleção de skills e o modal de
-spec. Os atalhos de controle também são enviados como bytes de terminal. Essa
-cobertura inclui os nomes `linefeed` e `backspace`, usados pelo neo-blessed para
-`Ctrl+J` e `Ctrl+H`, e impede combinações indistinguíveis de `Tab` e `Enter`.
-O modal mantém o foco entre seu conteúdo e o botão **Fechar Esc**. No
-fechamento, a implementação remove os controles do overlay da pilha de foco do
-neo-blessed antes de destruir os widgets e devolve o foco à lista de specs.
-As regressões usam também o byte Escape enviado por um TTY real.
+A suíte usa `bun test` em `cli/tests/`, separada por área: `core/`,
+`domain/`, `lifecycle/`, `gates/`, `framework/` e `tui/`. Os testes de
+framework rodam `install`, `update`, `skills` e `doctor --project` em
+subprocesso contra um repositório Git local, com um CLI `skills` simulado e
+uma pasta de dados isolada. O teste do wrapper npm baixa o binário de um
+espelho local e confere `SHA256SUMS`.
 
-`TUI_THEME`, em `tui.ts`, centraliza cores semânticas derivadas da paleta dark
-de `brand/tokens.json`. A suíte calcula a razão de contraste dos pares usados
-em texto, borda, seleção e foco. Texto principal e foco devem alcançar `7:1`, a
-seleção deve alcançar `4.5:1` e a borda deve alcançar `3:1`. As cores
-hexadecimais também evitam a variação introduzida por nomes configuráveis da
-paleta de 16 cores do terminal.
+As screens são montadas com `createTestRenderer` de `@opentui/core/testing`,
+com serviços simulados para catálogo, gates, testes e `skills`, sem rede.
+`tui-theme.test.ts` confere as paletas `terminal`, `night` e `day` e o
+contraste dos pares usados em texto e borda.
 
 ```bash
 cd cli
-npm ci
-npm run build:executable
-npm run check
-node dist/main.js --help
-./bin/specsfy --version
+bun install
+bun run validate
+./dist/specsfy --version
 ```
+
+`validate` encadeia `embed:check`, `launcher:check`, `typecheck`, `bun test`,
+`skills:check`, `opencli:check`, `showcase:check`, `docs:check` e `build`.
+`docs:check` exige que todo command, screen, tool, resource, prompt, key e
+exit code do código apareça em `cli/docs/`. Quando o registry muda, rode
+`bun run opencli` e revise o diff de `cli/docs/opencli.json`.
 
 Mudanças de interface atualizam também
 [`docs/user/cli.md`](../user/cli.md) e a
-[`referência pública dos comandos`](../user/cli-reference.md). A regressão
-compara os comandos registrados no Commander com as seções dessa referência e
-exige cinco exemplos por comando ou subcomando.
+[`referência pública dos comandos`](../user/cli-reference.md).
 
 Os prints de todas as telas da TUI e o fluxo para atualizá-los estão em
 [`showcase.md`](showcase.md).

@@ -29,7 +29,7 @@ Consulte antes de criar ou mover arquivos entre módulos.
 | `example/` | aplicação interna e documentação operacional |
 | `specsfy/` | tutorial público detalhado |
 | `specialists/` | catálogo técnico opcional |
-| `cli/` | pacote Node.js, CLI, TUI, instalação e progresso |
+| `cli/` | executável Bun com CLI, TUI e servidor MCP, instalação e progresso |
 
 Todos compartilham a raiz Git, remoto, branch, histórico, issues, tags e
 releases do monorepo

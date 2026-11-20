@@ -21,7 +21,7 @@ da spec. Backlog relacionado não integra o cálculo de entrega.
 
 ## Sincronização
 
-`syncMilestones()` em `cli/src/milestones.ts` lê specs aceitas pelos layouts do
+`syncMilestones()` em `cli/src/domain/milestones.ts` lê specs aceitas pelos layouts do
 ciclo de vida e arquivos Markdown em `specs/backlog/`. O comando público
 `specsfy milestones sync --project .` escreve somente blocos delimitados:
 
@@ -50,6 +50,6 @@ spec existente segue para `specsfy-update-spec`.
 
 ## Verificação
 
-Os contratos de filesystem estão em `cli/tests/milestones.test.ts`. A cobertura
+Os contratos de filesystem estão em `cli/tests/domain/milestones.test.ts`. A cobertura
 confere geração de `specs.md`, percentual por specs completas, preservação de
 texto humano e presença de backlog sem efeito indevido sobre a conclusão.

@@ -23,17 +23,17 @@ registra os arquivos publicados:
 specsfy install --project . --detected
 ```
 
-Quando o catálogo listar tecnologias que não pertencem à aplicação, repita
-`--specialist` somente com os nomes confirmados. Assim, o instalador publica as
+Quando o catálogo listar tecnologias que não pertencem à aplicação, passe a
+`--specialist` somente os nomes confirmados, separados por vírgula. Assim, o instalador publica as
 bases e ignora as recomendações que não foram escolhidas:
 
 ```bash
 specsfy install --project . \
-  --specialist specsfy-specialist-laravel \
-  --specialist specsfy-specialist-postgres
+  --specialist specsfy-specialist-laravel,specsfy-specialist-postgres
 ```
 
 Em um projeto já preparado, acrescente somente os especialistas escolhidos com
+`specsfy skills install <nomes...>`. Sem o binário, o mesmo resultado sai do
 `npx skills add`:
 
 ```bash
@@ -50,7 +50,7 @@ gates.
 
 ```bash
 specsfy progress --project . --json
-specsfy progress --project . --watch --interval 0.5 --json
+specsfy progress --project . --watch --json
 ```
 
 O JSON contém `summary` e `specs`. Com `--watch`, um snapshot novo aparece
@@ -61,12 +61,13 @@ skill responsável.
 ## Ajuste a atualização visual
 
 ```bash
-specsfy config show --project .
-specsfy config set --project . --watch-interval 0.5
+specsfy config get tui.watchInterval
+specsfy config set tui.watchInterval 0.5
 ```
 
-A configuração vive em `<projeto>/.specsfy/config.json` e preserva chaves
-desconhecidas. Consulte todos os recursos no [guia do CLI](cli.md).
+A key `tui.watchInterval` (padrão `0.75` segundos) vale para a TUI e para
+`progress --watch` e fica em `~/.specsfy/settings.json`, junto das demais
+preferências do usuário. Consulte todos os recursos no [guia do CLI](cli.md).
 
 ## Atualize sem perder customizações
 
@@ -79,15 +80,15 @@ customização local. Uma diferença local faz a atualização ou a remoção se
 recusada. Use `--force` somente depois de revisar a comparação e confirmar que
 o conteúdo protegido pode ser descartado.
 
-Quando o CLI foi instalado pelo npm, o comando abaixo atualiza o pacote
-global:
+O comando abaixo atualiza o CLI. Quando ele foi instalado pelo npm, delega a
+atualização ao npm:
 
 ```bash
 specsfy upgrade
 ```
 
-Quando a instalação usa o executável Node oficial, `specsfy upgrade` pode
-substituí-lo automaticamente. Para fazer a troca manual, use o download e
+No lançador de `get.specsfy.dev` e no executável avulso, `specsfy upgrade`
+substitui o próprio arquivo. Para fazer a troca manual, use o download e
 restaure a permissão:
 
 ```bash

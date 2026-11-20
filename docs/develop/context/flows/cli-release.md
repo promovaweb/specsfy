@@ -38,7 +38,8 @@ release-cli ──promove──► cli/CHANGELOG.md
 ```
 
 - A skill local do módulo `cli/` governa a sequência.
-- `cli/` contém changelog, versão, lock e executável.
+- `cli/` contém changelog, versão, lock e o launcher `bin/specsfy`; o CI
+  compila os cinco executáveis da GitHub Release.
 - A raiz Git contém commit e tag.
 - GitHub hospeda o remoto, CI e release.
 - O registro npm hospeda `@promovaweb/specsfy`. O CI não publica no npm; o

@@ -139,15 +139,15 @@ Validadores focais permanecem documentados no `AGENTS.md` do módulo responsáve
 e na spec executada.
 
 Especialistas executam contratos e validação de metadata em
-`specialists/`. O CLI mantém testes unitários, montagem da TUI e build:
+`specialists/`. O CLI mantém testes com `bun test`, montagem da TUI com o renderer de teste do
+OpenTUI, checagem de documentação e build:
 
 ```bash
 npm run test:specialists
 
 cd cli
-npm ci
-npm run build:executable
-npm run check
+bun install
+bun run validate
 ```
 
 `specsfy test --project <consumidor>` é uma porta de entrada para executar e

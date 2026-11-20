@@ -110,8 +110,17 @@ prompts.
 
 ## TUI
 
-A TUI abre na raiz do projeto e se atualiza sozinha quando os arquivos das
-specs mudam. As abas são Overview, Specs, Backlog, Gates, Tests, Skills e
+Para abrir a TUI, rode `specsfy` sem argumentos dentro da pasta do projeto,
+num terminal interativo. Não é preciso escrever `tui`:
+
+```bash
+specsfy
+```
+
+`specsfy tui` só é necessário para escolher outro projeto ou a aba inicial,
+como em `specsfy tui --project ../api --tab specs`. A TUI encontra a raiz do
+projeto subindo a partir da pasta atual e se atualiza sozinha quando os
+arquivos das specs mudam. As abas são Overview, Specs, Backlog, Gates, Tests, Skills e
 About.
 
 ![Dashboard Home](https://promovaweb.com/docs/specsfy/cli/cli-dash.png)

@@ -24,10 +24,14 @@ execuções seguintes usam o cache e repassam argumentos, `stdin`, `stdout`,
 ```bash
 npm install -g @promovaweb/specsfy
 specsfy --version
+specsfy            # dentro da pasta do projeto, abre a TUI
 ```
 
+Rodar `specsfy` sem argumentos abre a TUI; não é preciso escrever `tui`.
+
 Plataformas: `linux-x64`, `linux-arm64`, `darwin-x64`, `darwin-arm64` e
-`windows-x64`. O pacote não tem dependências.
+`windows-x64`. O pacote não tem dependências e roda em Node.js 18 ou superior;
+o binário baixado não depende de Node.js.
 
 | Variável | Efeito |
 | --- | --- |

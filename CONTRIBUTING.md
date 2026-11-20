@@ -105,7 +105,7 @@ Exemplos de mudança transversal:
 
 ## Regras do código
 
-- Diretórios e slugs usam kebab-case. Módulos Python e testes usam snake_case.
+- Diretórios e slugs usam kebab-case.
 - Os identificadores do método usam `US`, `FR`, `NFR`, `AC`, `DEC` e `T`.
 - Scripts retornam código diferente de zero para contrato inválido.
 - Mensagens de erro identificam o caminho, a regra violada e a correção

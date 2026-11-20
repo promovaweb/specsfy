@@ -271,9 +271,9 @@ o achado:
 ```
 
 Os validadores dos outros atos seguem o mesmo padrão:
-`specsfy gate tasks` para o Plan Gate, `specsfy gate trace --full-chain` para
-conferir a cadeia entre requisito, cenário e teste e
-`specsfy gate evidence --delivery` para o Delivery Gate. Cada gate sai com
+`specsfy gate tasks 0001` para o Plan Gate, `specsfy gate trace 0001 --full-chain`
+para conferir a cadeia entre requisito, cenário e teste e
+`specsfy gate evidence 0001 --delivery` para o Delivery Gate. Cada gate sai com
 código `0` quando aprova e `10` quando reprova.
 
 ## 11. O resultado no terminal

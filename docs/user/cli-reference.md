@@ -3,7 +3,7 @@
 Esta referência descreve a interface pública do `specsfy` gerado a partir do
 framework. O caminho informado por `--project` aponta para a raiz do projeto
 consumidor. Sem a opção, o CLI usa o diretório atual e sobe até a raiz mais
-próxima que contenha `specs/` ou `.specsfy/`. Os comandos que consultam catálogo
+próxima que contenha `specs/`, `.specsfy/` ou `skills-lock.json`. Os comandos que consultam catálogo
 ou releases usam a credencial `github.token`, `GH_TOKEN`, `GITHUB_TOKEN` ou a
 sessão de `gh auth token`, nesta ordem.
 
@@ -26,20 +26,21 @@ specsfy --version
 ## `specsfy --skill`
 
 Imprime a documentação do framework embutida, enquanto o argumento opcional escolhe
-um tema. A saída é Markdown e também fica disponível no recurso MCP
+um tema: `cli`, `tui`, `mcp`, `config`, `exit-codes` ou `reference`. Outro
+tema sai com código `2`. A saída é Markdown e também fica disponível no recurso MCP
 `specsfy://skill`.
 
 ```bash
 specsfy --skill
 specsfy skill cli
-specsfy skill gates
+specsfy skill exit-codes
 ```
 
 ## `specsfy install`
 
 Publica as skills base, `.specsfy/`, templates e blocos gerenciados de
 `AGENTS.md` e `CLAUDE.md`. `--detected` instala os especialistas encontrados
-pela stack, enquanto `--specialist <nome>` pode ser repetido. `--force` substitui
+pela stack, enquanto `--specialist` recebe nomes separados por vírgula (repetida, a opção guarda só o último valor). `--force` substitui
 conteúdo gerenciado que recebeu alteração local, enquanto `--json` emite a
 lista de caminhos alterados.
 
@@ -93,10 +94,10 @@ specsfy progress --watch
 | `specsfy specs effort` | Registra a pontuação inteira de 1 a 10 e sua justificativa na spec. O identificador, a pontuação e `--reason <texto>` são obrigatórios. Pontuação fora do intervalo ou spec ambígua é recusada. |
 | `specsfy specs research` | Carrega e confere a pesquisa indexada da spec. O identificador é obrigatório e aceita número, nome da pasta, slug ou caminho. |
 | `specsfy specs change` | Projeta o impacto de uma mudança tardia sem editar a spec. `--base <ref>` escolhe a referência de comparação e `--mode impact\|changelog` escolhe a leitura. `changelog` lista IDs adicionados, removidos e alterados. |
-| `specsfy specs migrate` | Converte o layout anterior `specs/specs/` e alinha o campo `Status`. Quando não há fonte legada, a execução não altera arquivos. |
+| `specsfy specs migrate` | Converte os layouts anteriores `specs/<slug>/` e `specs/specs/<slug>/` e alinha o campo `Status`. Quando não há fonte legada, a execução não altera arquivos. |
 | `specsfy tasks next` | Mostra a próxima tarefa pronta da spec e diferencia trabalho concluído de dependência ainda aberta. `--all` lista todas as tarefas prontas. |
 | `specsfy tasks check` | Marca ou desmarca o checkbox da tarefa ou de um item do checklist. `--undo` desfaz a marcação. |
-| `specsfy tasks delivery` | Projeta o resumo de entrega sem criar arquivo. Escreve somente em `stdout`. `--format markdown\|text` escolhe o formato. `--preview` é usado enquanto a entrega estiver aberta. |
+| `specsfy tasks delivery` | Projeta o resumo de entrega sem criar arquivo. Escreve somente em `stdout`. `--format markdown\|json` escolhe o formato. Sem `--preview`, exige Delivery Gate aprovado e nenhuma tarefa aberta. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
 
@@ -150,7 +151,7 @@ specsfy inbox capture \
 
 Retira de `specs/inbox/` uma captura integralmente coberta por specs com
 `Definition Gate: Passed` e a guarda em `specs/inbox/processed/`. `--spec` é
-obrigatório e pode ser repetido. Cada spec precisa estar fora de `draft`,
+obrigatório e recebe uma ou mais specs separadas por vírgula. Cada spec precisa estar fora de `draft`,
 declarar `Status` diferente de `Draft` e `Definition Gate: Passed` na primeira
 tabela de metadados. Se qualquer spec falhar, nada é movido.
 
@@ -160,8 +161,7 @@ specsfy inbox process \
   --spec 0007-avisos-de-atraso
 specsfy inbox process \
   2026-07-28-143205-avisar-clientes.md \
-  --spec 0007-avisos-por-email \
-  --spec 0008-avisos-por-sms \
+  --spec 0007-avisos-por-email,0008-avisos-por-sms \
   --project . --json
 ```
 
@@ -173,7 +173,7 @@ reprovação. Com `--json`, o campo `data` traz o resultado estruturado.
 | Gate | Opções principais |
 | --- | --- |
 | `gate spec <spec>` | `--allow-draft` |
-| `gate tasks <spec>` | `--allow-draft`, `--delivery` |
+| `gate tasks <spec>` | `--allow-draft` (com Evidence Contract 1, aplica `--delivery` sozinho em specs `Reviewing` ou `Complete`) |
 | `gate interface <spec>` | nenhuma |
 | `gate trace <spec>` | `--kinds`, `--full-chain`, `--minimum-tests` |
 | `gate acceptance <spec>` | `--attestation <arquivo>` |
@@ -212,12 +212,12 @@ specsfy verify --attestation run.json
 | `specsfy context setup` | Renderiza `PROJECT.md`, `STACK.md`, `RULES.md`, `DATABASE.md`, `INTERFACE.md`, `DESIGNSYSTEM.MD` e `.specsfy/USER-PROFILE.md`. Prefere `.specsfy/templates/custom/<Nome>.md` e recorre aos templates gerenciados. O comando é idempotente e não substitui arquivos existentes. |
 | `specsfy context inspect` | Lê o projeto e devolve as fontes na ordem recomendada: instruções, manifests, configuração, aplicação, rotas, persistência, integrações, interface, testes e documentação. |
 | `specsfy context interface` | Inspeciona rotas, componentes e telas para orientar uma descoberta de interface. |
-| `specsfy context monitor` | Classifica mudanças staged, unstaged e untracked e aponta contexto derivado desatualizado. `--check` retorna `PENDING` quando existe pendência. `--acknowledge-project-no-change` e `--acknowledge-rules-no-change` registram uma avaliação sem impacto material. |
+| `specsfy context monitor` | Classifica mudanças staged, unstaged e untracked e aponta contexto derivado desatualizado. `--check` sai com `10` (`status: pending`) quando existe pendência. `--paths` troca o diff do Git por caminhos separados por vírgula. `--acknowledge-project-no-change` e `--acknowledge-rules-no-change` registram uma avaliação sem impacto material. |
 | `specsfy context stack` | Atualiza o bloco `specsfy:stack` de `.specsfy/STACK.md` a partir de manifests, lockfiles e configurações, preservando o conteúdo humano. |
 | `specsfy context rule` | Registra uma diretriz confirmada em `.specsfy/RULES.md` com `--section` e `--rule`. |
 | `specsfy context database` | Atualiza o bloco `specsfy:database` de `.specsfy/DATABASE.md` a partir de schemas, migrations, models e configurações, sem copiar registros ou segredos. |
 | `specsfy context data` | Registra informações confirmadas na seção `Informações a guardar confirmadas`. Aceita `--name`, `--purpose`, `--store`, `--format`, `--links`, `--access`, `--lifecycle` e `--sources`. |
-| `specsfy context usage` | Estima o custo de leitura de uma spec. `--json` devolve a leitura estruturada. |
+| `specsfy context usage` | Estima o custo de leitura de uma spec por seção. `--usage-json <arquivo>` ingere `input_tokens` e `output_tokens` medidos e `--compare <arquivo>` compara com outra spec ou medição. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
 
@@ -227,7 +227,7 @@ Opções e exemplos completos saem em `specsfy <comando> --help`.
 | --- | --- |
 | `specsfy docs build` | Reconstrói `docs/` e `.specsfy/PACKAGES.md` a partir do código e das specs. `--check` sai com `10` quando a documentação está desatualizada. |
 | `specsfy milestones sync` | Projeta os vínculos das specs para `specs.md` e `specs/milestones/MNN.md`. Somente blocos gerados são substituídos. |
-| `specsfy milestones import-mvp` | Converte `MVP.md` em `M01`, backlog e specs Draft. Aceita os mesmos campos da entrevista de MVP e `--project`. |
+| `specsfy milestones import-mvp` | Converte `MVP.md` em `M01`, backlog e specs Draft. Lê `MVP.md` do projeto ou do superprojeto Git; aceita só `--project`. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
 
@@ -235,9 +235,10 @@ Opções e exemplos completos saem em `specsfy <comando> --help`.
 
 Detecta o runner da stack, executa os testes e preserva o código de saída. Em
 Laravel com Pest, chama `php artisan test`. O comando não aceita uma string
-arbitrária de shell e recusa projeto sem runner compatível. Antes de iniciar o
-processo PHP, exige `.env.testing`, `APP_ENV=testing` e um banco de teste
-separado do banco de desenvolvimento.
+arbitrária de shell. Antes de iniciar o processo PHP, exige `.env.testing`,
+`APP_ENV=testing` e um banco de teste separado do banco de desenvolvimento; sem
+essa prova sai com `10`. Sem runner conhecido sai com `6`, e uma suíte
+reprovada sai com `1`, com o código do runner em `data.exitCode`.
 
 ```bash
 specsfy test
@@ -248,13 +249,16 @@ NO_COLOR=1 specsfy test --project .
 
 ## `specsfy tui`
 
-Abre explicitamente a TUI para o projeto selecionado, enquanto `--tab` escolhe a aba
-inicial. A TUI só escreve configuração, instala skills e executa testes depois
-de uma ação sua. `Ctrl+Q` encerra a interface.
+Rodar `specsfy` sem argumentos já abre a TUI; `specsfy tui` serve para escolher
+outro projeto com `--project` ou a aba inicial com `--tab`. `--tab` aceita
+`overview`, `specs`, `backlog`, `gates`, `tests`, `skills` e `about`. A TUI
+roda gates e testes só com `Enter` e instala, remove ou atualiza skills só
+depois da confirmação com `y`. Fora de um TTY sai com `8`. `q`, `Esc` ou
+`Ctrl+C` encerram a interface.
 
 ```bash
-specsfy tui
-specsfy tui --project .
+specsfy
+specsfy tui --project ./api
 specsfy tui --project ./api --tab about
 ```
 
@@ -263,8 +267,8 @@ specsfy tui --project ./api --tab about
 | Comando | O que faz |
 | --- | --- |
 | `specsfy config` | Lê e grava preferências em `~/.specsfy/settings.json`. Os subcomandos são `list`, `get`, `set`, `unset`, `path` e `schema`. |
-| `specsfy credentials` | Guarda segredos cifrados em `~/.specsfy/credentials.json`. Os subcomandos são `set`, `get`, `list`, `remove`, `status` e `clear`. `--stdin` lê o valor da entrada padrão. A credencial `github.token` alimenta o catálogo, as releases e o diagnóstico do projeto. |
-| `specsfy doctor` | Confere o runtime embutido, o terminal, as configurações, a origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens do projeto (Git, `npx`, lock de skills e token do GitHub). Qualquer checagem reprovada produz código de saída `3`. |
+| `specsfy credentials` | Guarda segredos cifrados em `~/.specsfy/credentials.json`. Os subcomandos são `set`, `get`, `list`, `remove`, `status`, `clear` e `rotate-key`. `set --stdin` lê o valor da entrada padrão e `get --reveal` mostra o valor sem máscara. A credencial `github.token` alimenta o catálogo, as releases e o diagnóstico do projeto. |
+| `specsfy doctor` | Confere o runtime embutido, o terminal, as configurações, a origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens do projeto (Git, CLI de skills, `skills-lock.json`, token do GitHub e checagem diária de release). Qualquer checagem reprovada produz código de saída `3`. |
 | `specsfy scripts run` | Executa um script embutido pelo nome impresso em `specsfy scripts list`. É a saída de emergência para um script sem command dedicado. Os argumentos depois de `--` chegam ao script sem alteração. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
@@ -310,8 +314,8 @@ e de `specsfy --skill exit-codes`.
 
 Depois de qualquer escrita, confirme o resultado com uma leitura compatível:
 `specs show`, `progress`, `milestones sync --json` ou `config list`. Falhas do
-CLI são impressas em `stderr` com o prefixo `erro:` e retornam código diferente
-de zero. `--help` mostra a gramática instalada e `--version` confirma qual
+CLI são impressas em `stderr` com o prefixo `error` e o código entre colchetes,
+como `[2 USAGE]`; com `--json`, o erro sai no envelope `{ ok, command, error }`. `--help` mostra a gramática instalada e `--version` confirma qual
 release está em execução.
 
 ## Justificativa de tamanho

@@ -30,9 +30,9 @@ npm install --global @promovaweb/specsfy
 specsfy --version
 ```
 
-O pacote npm é um wrapper: na primeira execução ele baixa o binário correto para
-o sistema operacional. O download direto em `get.specsfy.dev` entrega o mesmo
-executável, que dispensa o Node.js.
+O pacote npm e o lançador de `get.specsfy.dev` são arquivos em Node.js (18 ou
+superior) que baixam e conferem o binário da plataforma na primeira execução.
+Para dispensar o Node.js, baixe o executável da GitHub Release.
 
 Depois de instalar o programa, prepare o projeto consumidor:
 
@@ -63,11 +63,11 @@ detectados:
 ```bash
 specsfy install --project . --detected
 specsfy install --project . \
-  --specialist specsfy-specialist-laravel \
-  --specialist specsfy-specialist-postgres
+  --specialist specsfy-specialist-laravel,specsfy-specialist-postgres
 ```
 
-Depois da instalação inicial, os subcomandos de `skills` gerenciam o catálogo:
+`--specialist` recebe uma lista separada por vírgulas; repetida, só a última
+vale. Depois da instalação inicial, os subcomandos de `skills` gerenciam o catálogo:
 
 ```bash
 specsfy skills list
@@ -98,8 +98,9 @@ specsfy specs transition 0001 completed --project .
 
 O identificador da spec aceita número, nome da pasta, slug ou caminho. A raiz do
 projeto vem de `--project <dir>`; sem a opção, o CLI usa o diretório atual e
-sobe até a raiz mais próxima que contenha `specs/` ou `.specsfy/`. Specs no
-layout antigo, `specs/specs/<slug>/`, mudam de pasta com `specsfy specs migrate`.
+sobe até a raiz mais próxima com `specs/`, `.specsfy/` ou `skills-lock.json`.
+Specs nos layouts antigos, `specs/<slug>/` e `specs/specs/<slug>/`, mudam de
+pasta com `specsfy specs migrate`.
 
 Para abrir uma spec nova, use:
 
@@ -219,8 +220,8 @@ specsfy docs build --project .
 specsfy docs build --project . --check
 ```
 
-`context monitor --check` retorna `PENDING` quando um documento derivado ficou
-desatualizado. `context usage` estima o custo de leitura de uma spec. `docs
+`context monitor --check` marca `status: pending` e sai com `10` quando um
+documento derivado ficou desatualizado. `context usage` estima o custo de leitura de uma spec. `docs
 build --check` sai com `10` quando a documentação está desatualizada.
 
 ## Milestones
@@ -255,26 +256,22 @@ Execute sem argumentos dentro do projeto consumidor para abrir a TUI:
 specsfy
 ```
 
-`specsfy tui --project PATH` abre explicitamente outro projeto. A TUI tem sete
-abas:
+Não é preciso escrever `tui`; `specsfy tui --project PATH` abre outro projeto.
+A TUI tem sete abas:
 
-- **Overview**, com o resumo de specs, tarefas, gates, backlog e inbox.
-- **Specs**, com a lista e o progresso de cada especificação.
-- **Backlog**, com leitura e acompanhamento dos itens.
-- **Gates**, com o estado dos gates por spec.
-- **Tests**, com a execução do runner detectado.
-- **Skills**, com catálogo, detalhes e plano de instalação ou remoção.
-- **About**, com versão, runtime, plataforma e créditos.
+- **Overview**, painel de estatísticas das specs, gates, tarefas e checklist.
+- **Specs**, specs por estado, com gates, tarefas e o Markdown da selecionada.
+- **Backlog**, itens do backlog e capturas do inbox, com preview do Markdown.
+- **Gates**, roda os gates da spec selecionada com `Enter`.
+- **Tests**, roda a suíte do projeto com `Enter`.
+- **Skills**, skills instaladas e do catálogo; instala, remove e atualiza.
+- **About**, identidade do binário, runtime, projeto, licença e créditos.
 
-No dashboard, os cards e as tabelas combinam o estado global com a situação de
-cada spec:
-
-- quantidade total e concluída de specs.
-- tarefas `T...` concluídas, pendentes e totais.
-- itens de checklist concluídos, pendentes e totais.
-- gates aprovados por spec.
-- porcentagem e barra de progresso global.
-- porcentagem e barra de progresso de cada spec.
+Teclas globais: `←`/`→`, `[`/`]` e `Tab` trocam de aba, `1` a `9` vão
+direto à aba, `?` mostra o help de teclas e `q`, `Esc` ou `Ctrl+C` saem.
+`--tab` ou `tui.initialTab` escolhem a aba inicial. A TUI relê as specs a cada
+`tui.watchInterval` segundos (padrão `0.75`) e usa a paleta de `tui.theme`:
+`terminal` (padrão, herda as cores do terminal), `night` ou `day`.
 
 ### Percurso visual
 
@@ -300,15 +297,17 @@ status e conteúdo sem sair da TUI.
 ![Specs](assets/cli/cli-specs.png)
 
 A aba Specs agrupa as specs por estado. A selecionada mostra gates, tarefas e
-progresso, com o Markdown abaixo. `↑`/`↓` trocam de spec e `g` roda os gates.
+progresso, com o Markdown abaixo. `↑`/`↓` trocam de spec, `PgUp`/`PgDn` rolam,
+`g` abre a aba Gates e `r` recarrega.
 
-#### Skills: planejar antes de aplicar
+#### Skills: instalar com confirmação
 
 ![Skills](assets/cli/cli-skills.png)
 
 A aba Skills lista as skills instaladas e as disponíveis no catálogo, por
 categoria, com o detalhe da selecionada ao lado. `i` instala, `x` remove, `u`
-atualiza todas e `c` abre o catálogo. Todas as telas estão no [showcase](../develop/showcase.md).
+atualiza todas e `c` baixa o catálogo de novo. Cada ação pede confirmação: `y`
+executa e `n` ou `Esc` cancela sem mudar nada. Todas as telas estão no [showcase](../develop/showcase.md).
 
 ## Servidor MCP
 
@@ -372,7 +371,7 @@ A credencial `github.token` é usada para consultar o catálogo e as releases.
 
 `specsfy doctor` confere o runtime embutido, o terminal, as configurações, a
 origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens
-do projeto, como `git`, `npx`, o lock de skills e o token do GitHub. Qualquer
+do projeto, como `git`, o CLI de skills, o `skills-lock.json` e o token do GitHub. Qualquer
 checagem reprovada produz código de saída `3`.
 
 ## Justificativa de tamanho

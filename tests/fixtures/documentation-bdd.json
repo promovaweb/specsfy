@@ -78,6 +78,6 @@
     "specsfy --help",
     "specsfy progress --project . --json",
     "specsfy progress --project . --watch",
-    "Nada é instalado ou removido antes de **Aplicar**"
+    "Nada é instalado ou removido antes da confirmação com `y`"
   ]
 }

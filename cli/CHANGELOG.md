@@ -4,6 +4,33 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.31.1] - 2026-11-20
+
+### Corrigido
+
+- Abrir a TUI: READMEs (raiz, `specsfy/`, `cli/`, `skills/` e o do pacote
+  npm), guias e referência deixam claro que `specsfy` sem argumentos, na
+  pasta do projeto, já abre a TUI. `specsfy tui` aparece só para
+  `--project` e `--tab`. As teclas de saída citadas são as reais: `q`,
+  `Esc` ou `Ctrl+C`, no lugar de `Ctrl+Q`.
+- Documentação de usuário alinhada ao binário: o executável não precisa de
+  Node.js nem de `npx` (o CLI de skills roda no runtime embutido; só o
+  wrapper npm e o launcher de `get.specsfy.dev` usam Node 18 ou superior);
+  `--specialist` e `--spec` recebem lista separada por vírgula; tópicos
+  válidos de `skill`; `tasks delivery --format markdown|json`; sem
+  `gate tasks --delivery`; `context monitor --check` sai com 10;
+  `credentials rotate-key` e `get --reveal`; `doctor --project` confere o
+  CLI de skills; exit codes de `test`; abas, teclas e tema da TUI como são
+  hoje (sem botão **Aplicar**, ações confirmadas com `y`, `c` baixa o
+  catálogo de novo, `g` abre a aba Gates).
+- Documentação de desenvolvimento (`docs/develop/`) descreve o CLI atual em
+  Bun, OpenTUI e MCP, no lugar do CLI antigo em Node, Commander e
+  neo-blessed: arquitetura, pacotes, stack, testes, contribuição,
+  atualização do binário e privacidade. As ferramentas da raiz aparecem como
+  Node.js e `node:test`, sem as referências a Python, Behave e `uv`.
+- `cli/docs/tui.md` documenta os componentes de gráfico e as cores reais da
+  lista com seleção.
+
 ## [0.31.0] - 2026-11-20
 
 ### Adicionado

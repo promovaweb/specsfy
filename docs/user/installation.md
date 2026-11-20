@@ -10,15 +10,19 @@
 
 ## Instale o CLI
 
-O Specsfy requer Node.js 22.20 ou uma versão mais recente. O pacote oficial
+O `specsfy` é um binário compilado em Bun e não precisa de Node.js para rodar.
+Até a 0.26, o CLI era escrito em Node.js e exigia Node.js 22.20; desde a
+0.27.1, o Node.js só é usado pelo pacote npm e pelo lançador de
+`get.specsfy.dev`, que pedem Node.js 18 ou superior. O pacote oficial
 publicado no npm instala o comando no ambiente global do usuário:
 
 ```bash
 npm install --global @promovaweb/specsfy
 ```
 
-Execute `specsfy --version` para confirmar que o terminal localiza o comando e
-que o Node.js consegue abrir o aplicativo:
+Na primeira execução, o pacote baixa o executável da plataforma da GitHub
+Release da mesma versão e confere o SHA-256. Execute `specsfy --version` para
+confirmar que o terminal localiza o comando:
 
 ```bash
 specsfy --version
@@ -43,11 +47,16 @@ curl -fL get.specsfy.dev -o "$HOME/.local/bin/specsfy"
 chmod +x "$HOME/.local/bin/specsfy"
 ```
 
+Sem Node.js, baixe da [GitHub Release](https://github.com/promovaweb/specsfy/releases)
+o executável da plataforma (`specsfy-linux-x64`, `specsfy-linux-arm64`,
+`specsfy-darwin-x64`, `specsfy-darwin-arm64` ou `specsfy-windows-x64.exe`),
+confira o hash no `SHA256SUMS` e coloque-o em um diretório do `PATH`. O script
+`scripts/install-cli.sh` do repositório faz esse download e a conferência.
+
 ## Prepare o projeto consumidor
 
 Abra a raiz do repositório que receberá a metodologia. Não execute a instalação
-dentro do monorepo oficial do Specsfy, porque o CLI reconhece essa raiz como
-ambiente de desenvolvimento e recusa o comando:
+dentro do monorepo oficial do Specsfy, que não é um projeto consumidor:
 
 ```bash
 cd caminho/do/projeto
@@ -55,11 +64,13 @@ specsfy doctor --project .
 specsfy install --project .
 ```
 
-O diagnóstico confere Node.js 22.20 ou superior, Git, npm, o diretório do
-projeto e o `npx`. Toda materialização usa `npx skills add`, inclusive quando
-o CLI foi instalado pelo npm. `install` repete as verificações necessárias
-antes de escrever qualquer arquivo e reúne todas as correções na mesma
-mensagem.
+O diagnóstico confere o runtime, o terminal, as configurações e, com
+`--project`, o Git, o CLI de skills, o diretório do projeto, o
+`skills-lock.json`, o token do GitHub e a checagem diária de release. As skills
+são materializadas pelo CLI oficial `skills`, executado no runtime Bun embutido
+no binário, sem Node.js nem `npx` na máquina. `install` repete as verificações
+necessárias antes de escrever qualquer arquivo e reúne todas as correções na
+mesma mensagem.
 
 Quando o projeto estiver em um Hub, use o subdiretório escolhido pela pessoa em
 `--project`, como `specsfy install --project apps/portal`. O setup confirma o
@@ -94,9 +105,10 @@ de produto nem altera o código da aplicação.
 ## Instalação no Windows e recuperação após falha
 
 No Windows, o diagnóstico procura executáveis com as extensões do PATHEXT,
-como git.exe. A instalação chama o entrypoint JavaScript do npx pelo Node,
-para preservar caminhos com espaços sem passar os argumentos por um shell.
-Se o npm estiver incompleto, repare sua instalação antes de tentar novamente.
+como git.exe. As variáveis `SPECSFY_SKILLS_CLI` (um executável que se comporta
+como `skills`) e `SPECSFY_NPX_COMMAND` (um executável no estilo `npx`)
+substituem o runtime embutido; um shim `.cmd` roda pelo `cmd.exe` com os
+argumentos escapados, preservando caminhos com espaços.
 
 Quando o instalador delegado falha, o Specsfy tenta restaurar o contrato,
 os templates, as skills e os locks gerenciados que existiam antes da operação.
@@ -109,15 +121,15 @@ Windows nativo depende do teste no computador que apresentou a falha.
 ## Confira os arquivos instalados
 
 Na mesma raiz, liste o catálogo e consulte o progresso. O primeiro comando
-mostra as skills instaladas, enquanto o segundo confirma que consegue ler o
-diretório de specs:
+mostra o catálogo de especialistas do framework, enquanto o segundo confirma
+que consegue ler o diretório de specs:
 
 ```bash
 specsfy skills list
 specsfy progress --project .
 ```
 
-O catálogo deve mostrar as skills do Specsfy. Em um projeto novo, o comando de
+O catálogo deve mostrar os especialistas do Specsfy. Em um projeto novo, o comando de
 progresso pode retornar zero specs. Esse resultado confirma que o CLI leu o
 repositório e ainda não encontrou arquivos em
 `specs/<estado>/<NNNN>-<slug>/spec.md`.
@@ -131,19 +143,21 @@ specsfy
 ```
 
 O dashboard deve carregar as abas do projeto mesmo quando as tabelas ainda
-estiverem vazias. Use `Ctrl+Q` para sair.
+estiverem vazias. Use `q`, `Esc` ou `Ctrl+C` para sair.
 
 ## Atualize sem perder customizações
 
-Para atualizar o próprio CLI instalado pelo npm:
+Para atualizar o próprio CLI:
 
 ```bash
 specsfy upgrade
 specsfy --version
 ```
 
-Na instalação pelo arquivo de `get.specsfy.dev`, o `specsfy upgrade` troca
-o próprio lançador pela versão nova. Para atualizar
+Pelo npm, o `specsfy upgrade` atualiza o pacote global com o npm. Na
+instalação pelo arquivo de `get.specsfy.dev`, ele troca o próprio lançador; no
+executável avulso, baixa o da plataforma, confere o `SHA256SUMS` e se
+substitui. Para atualizar
 as skills já instaladas, execute `specsfy update`. O CLI compara os
 fingerprints e preserva os arquivos customizados:
 
@@ -162,13 +176,15 @@ descarta a customização protegida no arquivo indicado.
 
 - **Comando ausente:** confira o resultado de `npm prefix --global` e o `PATH`
   usado pelo terminal.
-- **Node.js incompatível:** execute `node --version`. O aplicativo requer
-  Node.js 22.20 ou uma versão mais recente.
+- **Node.js incompatível:** o pacote npm e o lançador de `get.specsfy.dev`
+  pedem Node.js 18 ou superior; confira com `node --version` ou use o
+  executável da GitHub Release, que dispensa o Node.js.
 - **Permissão negada:** execute novamente
   `chmod +x "$HOME/.local/bin/specsfy"` quando usar o download. Em instalações
   pelo npm, configure um diretório global gravável pelo seu usuário.
-- **Mensagem `npx não encontrado`:** instale ou repare o npm e disponibilize
-  `npx` no `PATH`.
+- **CLI de skills indisponível:** `doctor --project .` indica quando
+  `SPECSFY_SKILLS_CLI` ou `SPECSFY_NPX_COMMAND` aponta para um arquivo que não
+  é executável; corrija ou remova a variável.
 - **Arquivo gerenciado customizado:** preserve sua versão ou compare as
   mudanças oficiais e só então repita o comando com `--force`.
 

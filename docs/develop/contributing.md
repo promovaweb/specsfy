@@ -67,10 +67,9 @@ CLI:
 
 ```bash
 cd cli
-npm ci
-npm run build:executable
-npm run check
-./bin/specsfy --version
+bun install
+bun run validate
+./dist/specsfy --version
 ```
 
 Especialistas:

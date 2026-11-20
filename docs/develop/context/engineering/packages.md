@@ -50,13 +50,14 @@ aplicativo, não um catálogo de pacotes obrigatórios para usar o Specsfy.
 
 | Pacote ou ferramenta | Papel | Forma atual |
 | --- | --- | --- |
-| Behave | executar aceite Gherkin | fornecido de forma efêmera por `uv` |
-| PyYAML | validar metadata de skills | fornecido de forma efêmera por `uv` |
-| Commander | definir e despachar os comandos do CLI | `cli/package.json` |
-| neo-blessed | renderizar a TUI do CLI | `cli/package.json` |
-| marked e marked-terminal | renderizar Markdown na TUI | `cli/package.json` |
-| TypeScript e esbuild | verificar tipos e construir distribuições | `cli/package.json` |
-| Vitest | executar regressões do CLI | `cli/package.json` |
+| `node:test` | executar testes e aceite Gherkin (`tests/bdd.mjs`) | runtime do Node.js 22.20 ou superior |
+| `yaml` | validar metadata de skills | `devDependencies` do `package.json` da raiz |
+| Bun | executar, testar (`bun test`) e compilar (`bun build --compile`) o CLI | `engines` de `cli/package.json` e `cli/bun.lock` |
+| OpenTUI (`@opentui/core`) | renderizar a TUI do CLI | `cli/package.json` |
+| MCP SDK (`@modelcontextprotocol/sdk`) | servir `specsfy mcp` via stdio | `cli/package.json` |
+| Zod | declarar o `inputSchema` das tools MCP | `cli/package.json` |
+| TypeScript | verificar tipos do CLI (`bun run typecheck`) | `cli/package.json` |
+| `skills` | materializar skills nos projetos consumidores | `cli/package.json` e `src/domain/prerequisites.ts` |
 
 ## Política de dependências
 

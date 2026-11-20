@@ -66,7 +66,10 @@ persiste o arquivo e não copia o valor para logs ou mensagens.
 - Fixtures usam dados sintéticos.
 - Mensagens de erro expõem regra e caminho, não conteúdo sensível.
 - Saída JSON obedece às mesmas restrições da saída humana.
-- `~/.specsfy/cli.json` guarda somente configurações e metadados de tags, usa
-  permissão `0600` e não recebe credenciais, telemetria ou fontes do projeto.
-- A autenticação da API vem de `GH_TOKEN`, `GITHUB_TOKEN` ou da sessão do
-  GitHub CLI e permanece fora dos arquivos administrados pelo Specsfy.
+- `~/.specsfy/settings.json` guarda preferências e `~/.specsfy/update.json`
+  guarda somente o horário e a versão da última checagem de release. Os dois
+  usam permissão `0600` e não recebem credenciais, telemetria ou fontes do
+  projeto.
+- A autenticação da API vem da credencial `github.token`, cifrada em
+  `~/.specsfy/credentials.json`, de `GH_TOKEN`, `GITHUB_TOKEN` ou da sessão
+  do GitHub CLI. O token nunca é impresso nem copiado para outro arquivo.

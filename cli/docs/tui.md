@@ -1,7 +1,8 @@
 # TUI
 
-A interface de terminal abre com `{{bin}}` sem argumentos ou com
-`{{bin}} tui`. Ela exige stdin e stdout em um TTY; fora disso o processo
+A interface de terminal abre com `{{bin}}` sem argumentos, na pasta do
+projeto; não é preciso escrever `tui`. `{{bin}} tui` serve para passar
+`--tab` ou `--project`. Ela exige stdin e stdout em um TTY; fora disso o processo
 encerra com exit code 8.
 
 ```bash
@@ -25,7 +26,7 @@ ou `skills-lock.json`.
 | `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `r` recarrega |
 | `gates` | Executa os gates do framework na spec selecionada e mostra a saída. | `↑/↓` muda a spec, `Enter` roda os gates, `PgUp/PgDn` rola |
 | `tests` | Executa a suíte do projeto pelo mesmo caminho do command `test`. | `Enter` roda os testes, `PgUp/PgDn` rola |
-| `skills` | Skills instaladas e disponíveis no catálogo, com detalhe e estado. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` abre o catálogo |
+| `skills` | Skills instaladas e disponíveis no catálogo, com detalhe e estado. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` baixa o catálogo de novo; toda ação pede `y` para confirmar |
 | `about` | Identidade e runtime do binário, projeto, licença, créditos e padrões seguidos. | nenhuma própria |
 
 Cada screen declara o campo `keys`, que monta a barra inferior. As teclas
@@ -56,6 +57,15 @@ A Overview é o painel de estatísticas do projeto:
 As barras acompanham a largura do terminal. Em terminais com menos de 38
 linhas, a linha de backlog e guia sai da Overview (a aba Backlog mostra o
 mesmo) e o primeiro próximo passo aparece em `Progress`, como `→ Next:`.
+
+## Gráficos e medidores
+
+| Componente | Uso |
+| --- | --- |
+| `segments(renderer, parts)` | Linha com pedaços de texto de cores diferentes, sem quebra. |
+| `meter(renderer, theme, { label, labelWidth, value, total, width, color })` | Rótulo, barra, `valor/total` e porcentagem. |
+| `barChart(renderer, theme, items, { labelWidth, width })` | Barras horizontais proporcionais ao maior valor. |
+| `barCells(value, total, width)` e `percentOf(value, total)` | Células cheias e vazias de uma barra e porcentagem sem arredondar 99% para 100%. |
 
 ## Atualização automática
 
@@ -148,7 +158,8 @@ Princípios do visual, no estilo modern unix:
 1. Copie `template/screen/example.ts` para `src/tui/screens/<id>.ts`.
 2. Preencha `id`, `title`, `description`, `keys` e `mount(ctx)`. Use os
    componentes de `src/tui/components.ts` (`panel`, `keyValueTable`, `list`,
-   `heading`, `dim`) e as cores de `ctx.theme`.
+   `heading`, `dim`, `progressBar`, `meter`, `barChart` e `segments`) e as
+   cores de `ctx.theme`.
 3. Se a screen precisar de atualização periódica, leia o store do projeto no
    `mount` e limpe o timer em `onLeave`.
 4. Registre em `src/tui/screens/index.ts`. A ordem da lista é a ordem das
@@ -173,8 +184,8 @@ o frame com `captureCharFrame`. `mountTui` aceita qualquer renderer;
 ## Lista com seleção
 
 `listPanel(renderer, theme, { title, items, onSelect })` monta uma lista
-com `ScrollBoxRenderable`. O item atual recebe `theme.surfaceHigh` no fundo
-e `theme.accent` no texto. A rolagem acompanha o item selecionado.
+com `ScrollBoxRenderable`. O item atual recebe `theme.selection` no fundo
+e `theme.selectionText` no texto. A rolagem acompanha o item selecionado.
 
 | Retorno | Uso |
 | --- | --- |

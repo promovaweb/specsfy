@@ -83,6 +83,5 @@ schema. O arquivo de banco local é ignorado pelo Git e nunca é fonte normativa
 - Pacotes de spec contêm somente `spec.md` e research opcional.
 - IDs não são renumerados nem reutilizados.
 - Gates e tarefas permanecem coerentes com o estado canônico.
-- Caches Python não são artefatos versionados das skills.
 - Fixtures e seeders de `example/` usam dados sintéticos. Credenciais, passkeys
   e dados pessoais reais não são registrados como evidência.

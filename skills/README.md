@@ -239,9 +239,10 @@ specsfy-{base-<responsabilidade>|setup|documentator|aux-<responsabilidade>}/
 
 ## Disponibilizar as skills
 
-O binário compilado por plataforma pode ser baixado em `get.specsfy.dev`. O
-pacote npm `@promovaweb/specsfy` instala um wrapper que baixa esse binário na
-primeira execução, sem exigir Node.js depois da instalação. Para materializar o
+O binário compilado por plataforma sai em cada GitHub Release e dispensa o
+Node.js. O pacote npm `@promovaweb/specsfy` e o lançador de `get.specsfy.dev`
+são wrappers em Node.js que baixam e conferem esse binário na primeira
+execução. Para materializar o
 catálogo base:
 
 ```bash

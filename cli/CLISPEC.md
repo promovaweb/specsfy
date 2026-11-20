@@ -124,7 +124,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | `backlog` | backlog e inbox com preview | `↑/↓` item, `PgUp/PgDn` scroll, `r` reload |
 | `gates` | roda os gates da spec selecionada e mostra o resultado de cada um | `↑/↓` spec, `Enter` run gates, `PgUp/PgDn` scroll |
 | `tests` | roda a suíte do projeto com a proteção de banco e mostra resumo e saída | `Enter` run tests, `PgUp/PgDn` scroll |
-| `skills` | skills instaladas e disponíveis, com instalar, remover e atualizar confirmados | `↑/↓` skill, `i` install, `x` remove, `u` update all, `c` catalog |
+| `skills` | skills instaladas e disponíveis, com instalar, remover e atualizar confirmados | `↑/↓` skill, `i` install, `x` remove, `u` update all, `c` recarrega o catálogo |
 | `about` | About | globais |
 
 ### MCP
