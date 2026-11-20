@@ -4,6 +4,17 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.32.1] - 2026-11-20
+
+### Corrigido
+
+- O binário compilado lia o inventário de skills por dois caminhos de
+  importação e, no build de release, podia receber texto no lugar do objeto,
+  falhando ao iniciar com `invalid skills inventory: not an object`. O
+  inventário passa a ser lido só da árvore de skills embutida. A 0.32.0 não
+  teve binários publicados por causa dessa falha; esta é a primeira versão
+  com o `update` pelo inventário.
+
 ## [0.32.0] - 2026-11-20
 
 ### Adicionado
