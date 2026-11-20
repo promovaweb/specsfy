@@ -18,7 +18,8 @@ import { join } from "node:path";
 import { projectOverview, type ProjectOverview } from "../core/overview.ts";
 import { gateDefinitions } from "../cli/commands/gates.ts";
 import { executeScriptCommand, type ScriptCommandDef } from "../engine/script-command.ts";
-import { inboxCaptureDef, lifecycleActions, specCreateDef, taskNextDef } from "../cli/commands/lifecycle.ts";
+import { backlogStartDef, inboxCaptureDef, lifecycleActions, specCreateDef, taskNextDef } from "../cli/commands/lifecycle.ts";
+import { runVerify } from "../cli/commands/gates.ts";
 import { runProjectTests, type TestRun } from "../domain/project-testing.ts";
 import { Catalog } from "../domain/catalog.ts";
 import { FRAMEWORK_SKILLS, releaseRef, SkillInstaller } from "../domain/installer.ts";
@@ -67,6 +68,16 @@ export interface TuiServices {
   createSpec(project: string, title: string): Promise<string>;
   /** Records a capture in specs/inbox/, as `inbox capture`; returns the script output. */
   captureInbox(project: string, title: string, text: string): Promise<string>;
+  /** Unmarks a task or checklist item, as `tasks check --undo`. */
+  uncheckItem(project: string, spec: string, task: string, item?: string): Promise<void>;
+  /** Records the effort (1 to 10) of a spec with its rationale, as `specs effort`. */
+  setEffort(project: string, spec: string, effort: number, reason: string): Promise<void>;
+  /** Moves an inbox capture out of the queue, as `inbox process --spec`. */
+  processCapture(project: string, capture: string, specs: string[]): Promise<void>;
+  /** Creates a backlog item from a title and the idea, as `backlog start`. */
+  startBacklog(project: string, title: string, idea: string): Promise<string>;
+  /** Runs the whole project policy, as `specsfy verify`. */
+  verify(project: string): Promise<GateRun>;
 }
 
 /** Runs a write script and fails with its output when it does not succeed. */
@@ -154,6 +165,16 @@ export function defaultServices(): TuiServices {
     checkNextItem,
     createSpec: (project, title) => runWrite(specCreateDef, { title }, project),
     captureInbox: (project, title, text) => runWrite(inboxCaptureDef, { title, input: text }, project),
+    uncheckItem: async (project, spec, task, item) => { await lifecycleActions.check(project, spec, task, item, true); },
+    setEffort: async (project, spec, effort, reason) => { await lifecycleActions.effort(project, spec, effort, reason); },
+    processCapture: async (project, capture, specs) => { await lifecycleActions.process(project, capture, specs); },
+    // The remaining required fields are filled for later refinement in the
+    // backlog skill; the TUI only asks for what a person can type quickly.
+    startBacklog: (project, title, idea) => runWrite(backlogStartDef, { title, idea, problem: "A esclarecer", person: "A esclarecer", result: "A esclarecer", context: "Criado pela TUI" }, project),
+    verify: async (project) => {
+      const { data } = await runVerify({ project });
+      return { ok: data.ok, exitCode: data.exitCode, output: formatScriptOutput(data.result, data.stderr) };
+    },
   };
 }
 

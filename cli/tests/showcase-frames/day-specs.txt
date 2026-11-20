@@ -37,4 +37,4 @@
  │                                            ││ ├─────────────────────────────────────┼───────────────────────────────────────────────┤  │ 
  │                                            ││ │Atualizada em                        │2026-11-20                                     │  │ 
  ╰────────────────────────────────────────────╯╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
-  ↑/↓  spec   PgUp/PgDn  scroll   t  move   Space  check   n  new   r  reload   /  filter   ←/→  tab   1-9  go   ?  help   q  quit
+  ↑/↓  spec   PgUp/PgDn  scroll   t  move   Space  check   u  undo   e  effort   n  new   r  reload   /  filter   ?  help   q  quit

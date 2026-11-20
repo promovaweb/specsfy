@@ -222,6 +222,14 @@ export function selectList(renderer: CliRenderer, theme: Theme, options: {
     const list = items.length ? items : [{ id: "", label: empty, header: true }];
     rows = list.map((item) => {
       const row = new TextRenderable(renderer, { content: item.label, height: 1, flexShrink: 0, wrapMode: "none", fg: theme.text });
+      // A click selects the row, the same as moving to it with the keys.
+      row.onMouseDown = () => {
+        const clicked = rows.indexOf(row);
+        if (clicked < 0 || !items[clicked] || items[clicked]!.header || clicked === index) return;
+        index = clicked;
+        paint();
+        notify();
+      };
       box.add(row);
       return row;
     });
@@ -519,4 +527,13 @@ export function actionBar(renderer: CliRenderer, theme: Theme) {
     return true;
   };
   return { box, ask, choose, message, handleKey, busy: () => question !== undefined };
+}
+
+/**
+ * Width of a list column: the preferred width on wide terminals, down to
+ * 40% of the terminal (never under 28 cells) on narrow ones, so the preview
+ * beside it keeps room to read.
+ */
+export function listWidth(renderer: CliRenderer, preferred: number): number {
+  return Math.max(28, Math.min(preferred, Math.floor(renderer.width * 0.4)));
 }

@@ -168,6 +168,13 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
     showScrollArrows: false,
     wrapSelection: true,
   });
+  // A click on a tab selects it while every tab fits the bar (when the bar
+  // scrolls, the keys and the digits still reach every tab).
+  tabs.onMouseDown = (event) => {
+    if (tabWidth * screens.length > renderer.width) return;
+    const index = Math.floor((event.x - tabs.x) / tabWidth);
+    if (index >= 0 && index < screens.length) tabs.setSelectedIndex(index);
+  };
   app.add(tabs);
 
   const content = new BoxRenderable(renderer, { flexGrow: 1, flexDirection: "column", paddingLeft: 1, paddingRight: 1 });
@@ -218,6 +225,20 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
     { key: "Enter", action: "confirm" },
     { key: "Esc", action: "cancel" },
   ];
+  /**
+   * Screen keys plus the global ones that fit the width. When they do not
+   * fit, the global keys shrink to help and quit; `?` lists all of them.
+   */
+  const fitKeys = (own: Array<{ key: string; action: string }>) => {
+    const width = (pairs: Array<{ key: string; action: string }>) => pairs.reduce((sum, { key, action }) => sum + key.length + action.length + 5, 1);
+    const all = [...own, ...globalKeys];
+    if (width(all) <= renderer.width) return all;
+    const essential = globalKeys.filter(({ key }) => key === "?" || key === "q");
+    const kept = [...own];
+    // Still too wide: drop the screen's own hints from the end; `?` lists them.
+    while (kept.length > 1 && width([...kept, ...essential]) > renderer.width) kept.pop();
+    return [...kept, ...essential];
+  };
   const refreshFooter = (screen: Screen) => {
     app.remove(footer);
     const own = [...(screen.keys ?? []), ...(screen.filter ? [{ key: "/", action: "filter" }] : [])];
@@ -228,7 +249,7 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
         ? [{ key: `${typing.label}: ${typing.value}▏`, action: "" }, ...promptKeys]
         : filtering
           ? [{ key: `/${query}`, action: "" }, ...filterKeys]
-          : [...own, ...globalKeys],
+          : fitKeys(own),
     );
     app.add(footer);
   };

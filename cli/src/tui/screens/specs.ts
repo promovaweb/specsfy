@@ -11,7 +11,7 @@
  */
 import { BoxRenderable, type CliRenderer, type Renderable } from "@opentui/core";
 import type { SpecSummary } from "../../core/overview.ts";
-import { actionBar, selectList, markdownView, markdownStyle, panel, keyValueTable, progressBar, fit, dim, type SelectItem } from "../components.ts";
+import { actionBar, selectList, markdownView, markdownStyle, panel, keyValueTable, progressBar, fit, dim, type SelectItem, listWidth } from "../components.ts";
 import { nextFolders } from "../../domain/lifecycle.ts";
 import type { Theme } from "../theme.ts";
 import type { Screen, ScreenContext } from "../screen.ts";
@@ -95,14 +95,47 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
         }));
     });
   };
+  // Last item marked in this session, so `u` can undo it.
+  let lastChecked: { spec: SpecSummary; task: string; item?: string } | undefined;
   const checkNext = () => {
     const spec = current();
     if (!spec) return;
     actions?.ask(`Mark the next checklist item of ${spec.slug}`, () =>
       run("Marking", async () => {
         const result = await store.services.checkNextItem(store.project, spec.path);
-        return `${spec.slug}: ${result.task}${result.item ? ` ${result.item}` : ""} marked`;
+        lastChecked = { spec, ...result };
+        return `${spec.slug}: ${result.task}${result.item ? ` ${result.item}` : ""} marked (u undoes)`;
       }));
+  };
+  const undo = () => {
+    const last = lastChecked;
+    if (!last) {
+      actions?.message("Nothing to undo: no item was marked in this session.");
+      return;
+    }
+    const label = `${last.task}${last.item ? ` ${last.item}` : ""}`;
+    actions?.ask(`Unmark ${label} of ${last.spec.slug}`, () =>
+      run("Unmarking", async () => {
+        await store.services.uncheckItem(store.project, last.spec.path, last.task, last.item);
+        lastChecked = undefined;
+        return `${last.spec.slug}: ${label} unmarked`;
+      }));
+  };
+  const effort = (ctx: ScreenContext) => {
+    const spec = current();
+    if (!spec) return;
+    ctx.prompt(`Effort of ${spec.slug} (1 to 10)`, (value) => {
+      const number = /^\d+$/.test(value) ? Number(value) : Number.NaN;
+      if (!(number >= 1 && number <= 10)) {
+        actions?.message("Effort must be an integer from 1 to 10.", "error");
+        return;
+      }
+      ctx.prompt("Why this effort", (reason) =>
+        run("Recording", async () => {
+          await store.services.setEffort(store.project, spec.path, number, reason);
+          return `${spec.slug}: effort ${number}/10`;
+        }));
+    });
   };
   const create = (ctx: ScreenContext) => {
     ctx.prompt("Title of the new spec", (title) =>
@@ -120,6 +153,8 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
       { key: "PgUp/PgDn", action: "scroll" },
       { key: "t", action: "move" },
       { key: "Space", action: "check" },
+      { key: "u", action: "undo" },
+      { key: "e", action: "effort" },
       { key: "n", action: "new" },
       { key: "r", action: "reload" },
     ],
@@ -157,7 +192,7 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
         );
       };
 
-      list = selectList(renderer, theme, { title: "Specs", emptyText: "No specs found", active: true, width: 46, onChange: showSpec });
+      list = selectList(renderer, theme, { title: "Specs", emptyText: "No specs found", active: true, width: listWidth(renderer, 46), onChange: showSpec });
       rootBox.add(list.box);
       right.add(detail);
       right.add(reader.box);
@@ -189,6 +224,8 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
       switch (name) {
         case "t": transition(); return true;
         case "space": checkNext(); return true;
+        case "u": undo(); return true;
+        case "e": effort(ctx); return true;
         case "n": create(ctx); return true;
         case "up": case "k": list?.move(-1); return true;
         case "down": case "j": list?.move(1); return true;

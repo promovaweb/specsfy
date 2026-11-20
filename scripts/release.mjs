@@ -24,9 +24,20 @@
  *      checks the five executables plus SHA256SUMS;
  *   4. publishes the npm wrapper from cli/npm (npm needs a logged-in user).
  *
- * The Hub gitlink, its version and its release stay with the Hub. Commit
- * the feature work before `--publish`: everything left in the working tree
- * goes into the release commit.
+ * Hub — when this monorepo is the `specsfy` submodule of the Promovaweb Hub:
+ *
+ *   node scripts/release.mjs 0.34.0 --publish --hub
+ *   node scripts/release.mjs 0.34.0 --hub            (after a publish)
+ *
+ *   1. fast-forwards the Hub to origin/main (other people's uncommitted
+ *      files stay untouched; a Hub with staged files is refused);
+ *   2. bumps the Hub patch version and writes its changelog entry from the
+ *      bullets of ## [X.Y.Z] in cli/CHANGELOG.md (or from --hub-note "...");
+ *   3. commits only VERSION, CHANGELOG.md and the specsfy gitlink, tags,
+ *      pushes and creates the Hub GitHub Release.
+ *
+ * Commit the feature work before `--publish`: everything left in the
+ * working tree goes into the release commit.
  */
 import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -39,6 +50,10 @@ const EXPECTED_ASSETS = 6;
 
 const [version, ...flags] = process.argv.slice(2);
 const publish = flags.includes("--publish");
+const hub = flags.includes("--hub");
+const noteIndex = flags.indexOf("--hub-note");
+const hubNote = noteIndex >= 0 ? flags[noteIndex + 1] : undefined;
+const HUB = resolve(ROOT, "..");
 
 if (!version || !/^\d+\.\d+\.\d+$/.test(version)) {
   console.error("Usage: node scripts/release.mjs <X.Y.Z> [--publish]");
@@ -131,8 +146,51 @@ function publishRelease() {
   }
   console.log(`✓ GitHub Release ${tag} with ${assets} assets`);
   step("npm wrapper", "npm", ["publish", "--access", "public"], join(CLI, "npm"));
-  console.log(`\n✓ Specsfy ${version} published. Next: the Hub gitlink, version and release.`);
+  console.log(`\n✓ Specsfy ${version} published.${hub ? "" : " Next: the Hub gitlink, version and release (--hub)."}`);
+}
+
+/** One-line summary of the changelog section: first sentence of each bullet. */
+function changelogSummary() {
+  const text = readFileSync(join(CLI, "CHANGELOG.md"), "utf8");
+  const section = text.split(`## [${version}]`)[1]?.split(/\n## \[/u)[0] ?? "";
+  const bullets = [];
+  for (const line of section.split("\n")) {
+    if (line.startsWith("- ")) bullets.push(line.slice(2).trim());
+    else if (/^\s{2,}\S/u.test(line) && bullets.length) bullets[bullets.length - 1] += ` ${line.trim()}`;
+  }
+  const first = (bullet) => (bullet.match(/^.*?[.:](?=\s|$)/u)?.[0] ?? bullet).replace(/[.:]$/u, "");
+  return bullets.map(first).join("; ") || "veja specsfy/cli/CHANGELOG.md";
+}
+
+/** Bumps the Hub with the new specsfy gitlink, version, changelog, tag and release. */
+function releaseHub() {
+  const run = (args, cwd = HUB) => output("git", args, cwd);
+  if (!/specsfy/u.test(run(["submodule", "status", "specsfy"]))) {
+    console.error(`${HUB} is not the Hub with the specsfy submodule.`);
+    process.exit(1);
+  }
+  if (run(["diff", "--cached", "--name-only"])) {
+    console.error("The Hub has staged files; commit or unstage them first. Nothing was changed.");
+    process.exit(1);
+  }
+  step("Hub fetch", "git", ["fetch", "-q", "origin"], HUB);
+  step("Hub fast-forward", "git", ["merge", "--ff-only", "-q", "origin/main"], HUB);
+  const current = readFileSync(join(HUB, "VERSION"), "utf8").trim();
+  const [major, minor, patch] = current.split(".").map(Number);
+  const next = `${major}.${minor}.${patch + 1}`;
+  const note = `Specsfy ${version}: ${hubNote ?? changelogSummary()}.`;
+  writeFileSync(join(HUB, "VERSION"), `${next}\n`);
+  const changelog = readFileSync(join(HUB, "CHANGELOG.md"), "utf8");
+  writeFileSync(join(HUB, "CHANGELOG.md"), changelog.replace("# Changelog do Hub\n\n", `# Changelog do Hub\n\n## [${next}] - ${new Date().toISOString().slice(0, 10)}\n\n### Alterado\n\n- ${note}\n\n`));
+  step("Hub stage", "git", ["add", "VERSION", "CHANGELOG.md", "specsfy"], HUB);
+  step("Hub commit", "git", ["commit", "-q", "-m", `chore: specsfy ${version} no Hub ${next}`], HUB);
+  step("Hub tag", "git", ["tag", `v${next}`], HUB);
+  step("Hub push", "git", ["push", "-q", "origin", "main"], HUB);
+  step("Hub push tag", "git", ["push", "-q", "origin", `v${next}`], HUB);
+  step("Hub release", "gh", ["release", "create", `v${next}`, "--title", `v${next}`, "--notes", `### Alterado\n\n- ${note}`], HUB);
+  console.log(`✓ Hub ${next} published with Specsfy ${version}`);
 }
 
 if (publish) publishRelease();
-else prepare();
+else if (!hub) prepare();
+if (hub) releaseHub();

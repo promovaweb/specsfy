@@ -13,7 +13,7 @@
 import { BoxRenderable, TextRenderable, type ColorInput, type Renderable } from "@opentui/core";
 import type { SpecSummary } from "../../core/overview.ts";
 import type { ScriptCommandDef } from "../../engine/script-command.ts";
-import { selectList, scrollText, panel, dim, fit, type SelectItem } from "../components.ts";
+import { selectList, scrollText, panel, dim, fit, type SelectItem, listWidth } from "../components.ts";
 import { glyphs, type Theme } from "../theme.ts";
 import type { Screen } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
@@ -43,6 +43,8 @@ export function createGatesScreen(store: ProjectStore, focus: SpecFocus): Screen
   let list: ReturnType<typeof selectList> | undefined;
   let output: ReturnType<typeof scrollText> | undefined;
   let run: (() => void) | undefined;
+  let verify: (() => void) | undefined;
+  let verifying = false;
   const results = new Map<string, Map<string, GateResult>>();
   let runningSpec: string | undefined;
   let disposed = false;
@@ -54,6 +56,7 @@ export function createGatesScreen(store: ProjectStore, focus: SpecFocus): Screen
     keys: [
       { key: "↑/↓", action: "spec" },
       { key: "Enter", action: "run gates" },
+      { key: "v", action: "verify project" },
       { key: "PgUp/PgDn", action: "scroll" },
     ],
     mount: ({ renderer, theme }) => {
@@ -134,7 +137,20 @@ export function createGatesScreen(store: ProjectStore, focus: SpecFocus): Screen
         })();
       };
 
-      list = selectList(renderer, theme, { title: "Specs", emptyText: "No specs found", active: true, width: 46, onChange: (item: SelectItem | undefined) => {
+      // `v` runs the whole policy of the project (specsfy verify) and shows
+      // its report in the output panel, without touching the spec results.
+      verify = () => {
+        if (verifying || runningSpec) return;
+        verifying = true;
+        output?.setTitle?.("Verify");
+        output?.setText(`${glyphs.running} Running specsfy verify on the whole project…`, theme.warn);
+        void store.services.verify(store.project).then(
+          (outcome) => { if (!disposed) output?.setText(`${outcome.ok ? glyphs.ok : glyphs.error} verify ${outcome.ok ? "passed" : `failed (exit ${outcome.exitCode})`}\n\n${outcome.output}`, outcome.ok ? theme.text : theme.error); },
+          (error) => { if (!disposed) output?.setText(`Unable to run verify: ${errorMessage(error)}`, theme.error); },
+        ).finally(() => { verifying = false; output?.setTitle?.("Output"); });
+      };
+
+      list = selectList(renderer, theme, { title: "Specs", emptyText: "No specs found", active: true, width: listWidth(renderer, 46), onChange: (item: SelectItem | undefined) => {
         if (item) focus.spec = item.id;
         drawGates();
       } });
@@ -157,7 +173,7 @@ export function createGatesScreen(store: ProjectStore, focus: SpecFocus): Screen
       };
       draw(store.state());
       const unsubscribe = store.subscribe(draw);
-      renderer.once("destroy", () => { disposed = true; unsubscribe(); list = undefined; output = undefined; run = undefined; });
+      renderer.once("destroy", () => { disposed = true; unsubscribe(); list = undefined; output = undefined; run = undefined; verify = undefined; });
       return rootBox;
     },
     onEnter: () => {
@@ -169,6 +185,7 @@ export function createGatesScreen(store: ProjectStore, focus: SpecFocus): Screen
         case "up": case "k": list?.move(-1); return true;
         case "down": case "j": list?.move(1); return true;
         case "return": case "enter": run?.(); return true;
+        case "v": verify?.(); return true;
         case "pageup": output?.scroll(-10); return true;
         case "pagedown": case "space": output?.scroll(10); return true;
         default: return false;

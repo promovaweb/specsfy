@@ -27,8 +27,8 @@ describe("example project", () => {
   afterAll(() => expect(exampleStatus()).toBe(before));
 
   const expectations: Record<string, string[]> = {
-    overview: ["Progress", "5/6", "16/18", "Legacy", "Gates passed per spec", "Next: Plan the tasks of 0006-produtos", "0006-produtos"],
-    specs: ["Legacy (specs/specs) · 6", "> 0001-diretorio-global-usuarios", "Definition gate", "✓ Passed", "Especificação integrada"],
+    overview: ["Progress", "5/6", "16/18", "Completed", "Gates passed per spec", "Next: Plan the tasks of 0006-produtos", "0006-produtos"],
+    specs: ["Defined · 1", "Completed · 5", "> 0006-produtos", "Definition gate", "Especificação integrada"],
     backlog: ["Backlog · 2", "Inbox · 0", "BACKLOG-0001"],
     gates: ["No gates are registered in this build.", "0006-produtos"],
     tests: ["Not run in this session.", "No output yet."],
@@ -84,8 +84,11 @@ describe("example project", () => {
   test("specs: j moves the selection and the detail follows; g opens Gates on it", async () => {
     const tui = await mount({ project: EXAMPLE, initialTab: "specs" });
     try {
+      // Defined comes before Completed, so 0006 opens selected; j and k walk.
+      await tui.waitFor("> 0006-produtos");
+      await tui.press("j");
       await tui.waitFor("> 0001-diretorio-global-usuarios");
-      for (let i = 0; i < 5; i++) await tui.press("j");
+      await tui.press("k");
       await tui.waitFor("> 0006-produtos");
       await tui.waitFor("Cadastro e gestão de produtos");
       expect(tui.frame()).toContain("! Pending");

@@ -52,7 +52,7 @@ describe("context", () => {
 
 describe("milestones", () => {
   test("milestones sync --json returns the updated milestones", async () => {
-    const spec = join(project, "specs/specs/0001-diretorio-global-usuarios/spec.md");
+    const spec = join(project, "specs/completed/0001-diretorio-global-usuarios/spec.md");
     writeFileSync(spec, readFileSync(spec, "utf8").replace("| Status | Complete |", "| Status | Complete |\n| Milestones | M01 |"));
     const r = await cli("milestones", "sync", "--json");
     expect(r.code).toBe(0);

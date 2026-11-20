@@ -1,6 +1,6 @@
 /** Spec lifecycle commands (spec 0003) end to end, on copies of `example/`. */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { copyExample, removeCopy, runCli } from "./helpers.ts";
@@ -63,6 +63,10 @@ describe("specs effort and migrate", () => {
   });
 
   test("migrates the remaining legacy specs", async () => {
+    // example/ already uses the state folders: put one spec back in the
+    // legacy layout to exercise the migration.
+    mkdirSync(join(project, "specs/specs"), { recursive: true });
+    renameSync(join(project, "specs/completed/0003-perfil-publico-usuario"), join(project, "specs/specs/0003-perfil-publico-usuario"));
     const r = await cli("specs", "migrate", "--json");
     expect(r.code).toBe(0);
     expect(r.json.data.count).toBeGreaterThan(0);

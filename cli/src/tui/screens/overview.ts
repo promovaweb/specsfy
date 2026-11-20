@@ -17,6 +17,7 @@ import { barCells, barChart, dim, heading, list, meter, panel, segments, spacer,
 import { glyphs, type Theme } from "../theme.ts";
 import type { Screen } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
+import type { SpecFocus } from "./specs.ts";
 import { FOLDER_ORDER, folderLabel, gateTone, replaceChildren, stateText } from "./shared.ts";
 import type { CliRenderer, ColorInput } from "@opentui/core";
 
@@ -89,7 +90,8 @@ export function overviewLayout(width: number, height: number): OverviewLayout {
   const mainInner = Math.max(20, width - 2 - side - 4);
   const specBar = mainInner >= 80 ? 20 : 10;
   const showSpecState = mainInner >= 80;
-  const fixed = 1 + 3 + 2 + specBar + 5 + 14 + (showSpecState ? 12 : 0);
+  // Marker (2), gates (3+1), gaps, bar, percent, tasks and state columns.
+  const fixed = 2 + 1 + 3 + 2 + specBar + 5 + 14 + (showSpecState ? 11 : 0);
   return {
     side,
     overallBar: Math.max(10, Math.min(52, mainInner - 11 - 6)),
@@ -185,23 +187,28 @@ function gatesPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOvervi
 /** Most specs that fit: open ones first, each with gates, bar and tasks. */
 export const SPEC_ROWS = 12;
 
-function specsPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOverview, layout: OverviewLayout): Renderable[] {
-  if (!overview.specs.length) return [dim(renderer, theme, "No specs yet. Capture an idea with $specsfy-01-inbox.")];
+/** Specs in the order the Overview lists them: open ones first, at most SPEC_ROWS. */
+export function overviewSpecs(overview: ProjectOverview): SpecSummary[] {
   const order = (spec: SpecSummary) => FOLDER_ORDER.indexOf(spec.folder);
   // A spec is done when it reached Completed (or, in the legacy layout
   // that has no state folders, when all its tasks are checked).
   const isDone = (spec: SpecSummary) => (spec.folder === "legacy" ? spec.percent >= 100 : spec.folder === "completed");
   const open = overview.specs.filter((spec) => !isDone(spec)).sort((a, b) => order(b) - order(a) || b.percent - a.percent);
-  const done = overview.specs.filter(isDone);
-  const rows = [...open, ...done].slice(0, SPEC_ROWS);
-  const nodes: Renderable[] = rows.map((spec) => {
+  return [...open, ...overview.specs.filter(isDone)].slice(0, SPEC_ROWS);
+}
+
+function specsPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOverview, layout: OverviewLayout, selected: number): Renderable[] {
+  if (!overview.specs.length) return [dim(renderer, theme, "No specs yet. Capture an idea with $specsfy-01-inbox.")];
+  const rows = overviewSpecs(overview);
+  const nodes: Renderable[] = rows.map((spec, index) => {
     const { full, empty } = barCells(spec.percent, 100, layout.specBar);
     const gates: Segment[] = GATES.map(([, key]) => {
       const tone = gateTone(theme, spec[key]);
       return [tone.text.charAt(0), tone.color];
     });
     return segments(renderer, [
-      [fit(spec.slug, layout.slug), spec.percent >= 100 ? theme.text : theme.textStrong],
+      [index === selected ? "> " : "  ", theme.accent],
+      [fit(spec.slug, layout.slug), index === selected ? theme.accent : spec.percent >= 100 ? theme.text : theme.textStrong],
       [" ", theme.text],
       ...gates,
       ["  ", theme.text],
@@ -209,7 +216,7 @@ function specsPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOvervi
       [empty, theme.textDim],
       [`${String(Math.round(spec.percent)).padStart(4)}%`, theme.textStrong],
       [`  ${spec.completed_tasks}/${spec.total_tasks} tasks`.padEnd(14), theme.text],
-      [layout.showSpecState ? fit(spec.folder === "legacy" ? "Legacy" : folderLabel(spec.folder), 12) : "", stateColor(theme, spec.folder)],
+      [layout.showSpecState ? fit(spec.folder === "legacy" ? "Legacy" : folderLabel(spec.folder), 11) : "", stateColor(theme, spec.folder)],
     ]);
   });
   if (overview.specs.length > rows.length) nodes.push(dim(renderer, theme, `… and ${overview.specs.length - rows.length} more in the Specs tab`));
@@ -245,12 +252,19 @@ function stepsPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOvervi
 }
 
 /** Creates the Overview screen bound to a project store. */
-export function createOverviewScreen(store: ProjectStore): Screen {
+export function createOverviewScreen(store: ProjectStore, focus: SpecFocus = {}): Screen {
+  let selected = 0;
+  let current: SpecSummary[] = [];
+  let redraw: () => void = () => {};
   return {
     id: "overview",
     title: "Overview",
     description: "Project progress, states, backlog and next steps",
-    keys: [{ key: "r", action: "reload" }],
+    keys: [
+      { key: "↑/↓", action: "spec" },
+      { key: "Enter", action: "open" },
+      { key: "r", action: "reload" },
+    ],
     mount: ({ renderer, theme }) => {
       const rootBox = new BoxRenderable(renderer, { flexDirection: "column", flexGrow: 1 });
       const topRow = new BoxRenderable(renderer, { flexDirection: "row", flexShrink: 0 });
@@ -295,11 +309,14 @@ export function createOverviewScreen(store: ProjectStore): Screen {
         if (state.status === "error") nodes.push(stateText(renderer, theme, state));
         replaceChildren(progress, nodes);
         replaceChildren(states, statesPanel(renderer, theme, overview, layout));
-        replaceChildren(specs, specsPanel(renderer, theme, overview, layout));
+        current = overviewSpecs(overview);
+        selected = Math.max(0, Math.min(selected, current.length - 1));
+        replaceChildren(specs, specsPanel(renderer, theme, overview, layout, selected));
         replaceChildren(gates, gatesPanel(renderer, theme, overview, layout));
         replaceChildren(queue, queuePanel(renderer, theme, overview));
         replaceChildren(steps, stepsPanel(renderer, theme, overview));
       };
+      redraw = () => draw(last);
       draw(store.state());
       const unsubscribe = store.subscribe(draw);
       const onResize = () => draw(last);
@@ -310,10 +327,20 @@ export function createOverviewScreen(store: ProjectStore): Screen {
       });
       return rootBox;
     },
-    onKey: (name) => {
-      if (name !== "r") return false;
-      void store.reload();
-      return true;
+    onKey: (name, ctx) => {
+      switch (name) {
+        case "up": case "k": selected = Math.max(0, selected - 1); redraw(); return true;
+        case "down": case "j": selected = Math.min(Math.max(0, current.length - 1), selected + 1); redraw(); return true;
+        case "return": case "enter": {
+          const spec = current[selected];
+          if (!spec) return true;
+          focus.spec = spec.path;
+          ctx.goTo("specs");
+          return true;
+        }
+        case "r": void store.reload(); return true;
+        default: return false;
+      }
     },
   };
 }

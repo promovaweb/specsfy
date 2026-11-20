@@ -36,7 +36,7 @@ describe("gates", () => {
     });
     const tui = await mount({ project: EXAMPLE, initialTab: "gates", services });
     try {
-      await tui.waitFor("Enter runs 2 gate(s) on 0001-diretorio-global-usuarios");
+      await tui.waitFor("Enter runs 2 gate(s) on 0006-produtos");
       await tui.press("RETURN");
       await tui.waitFor("… running");
       await tui.press("RETURN");
@@ -49,8 +49,8 @@ describe("gates", () => {
       expect(frame).toContain("spec looks fine");
       expect(frame).toContain("missing tasks section");
       expect(calls).toEqual([
-        `spec:${join(EXAMPLE, "specs/specs/0001-diretorio-global-usuarios/spec.md")}`,
-        `tasks:${join(EXAMPLE, "specs/specs/0001-diretorio-global-usuarios/spec.md")}`,
+        `spec:${join(EXAMPLE, "specs/defined/0006-produtos/spec.md")}`,
+        `tasks:${join(EXAMPLE, "specs/defined/0006-produtos/spec.md")}`,
       ]);
     } finally {
       await tui.close();
@@ -58,7 +58,7 @@ describe("gates", () => {
   });
 
   test("the real service runs an embedded gate script on the example spec", async () => {
-    const run = await defaultServices().runGate(gateDef("spec"), join(EXAMPLE, "specs/specs/0001-diretorio-global-usuarios/spec.md"), EXAMPLE);
+    const run = await defaultServices().runGate(gateDef("spec"), join(EXAMPLE, "specs/completed/0001-diretorio-global-usuarios/spec.md"), EXAMPLE);
     expect(typeof run.ok).toBe("boolean");
     expect(run.exitCode).toBeGreaterThanOrEqual(0);
     expect(run.output.length).toBeGreaterThan(0);

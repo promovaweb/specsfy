@@ -22,14 +22,14 @@ de abas rola até a aba selecionada.
 
 | Screen | Função | Teclas da screen |
 | --- | --- | --- |
-| `overview` | Painel das specs: barra de progresso geral, medidores de specs, gates, tarefas e checklist, gráfico de specs por estado, gates aprovados por tipo e por spec, lista das specs com gates e barra própria, backlog, inbox e próximos passos. | `r` recarrega |
-| `specs` | Specs agrupadas por estado, com detalhe de gates e tarefas e o Markdown da selecionada. | `↑/↓` muda a spec, `t` muda o estado, `Espaço` marca o próximo item de checklist, `n` cria uma spec, `g` abre os gates, `r` recarrega |
-| `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `c` captura uma ideia, `r` recarrega |
+| `overview` | Painel das specs: barra de progresso geral, medidores de specs, gates, tarefas e checklist, gráfico de specs por estado, gates aprovados por tipo e por spec, lista das specs com gates e barra própria, backlog, inbox e próximos passos. | `↑/↓` spec, `Enter` open, `r` recarrega |
+| `specs` | Specs agrupadas por estado, com detalhe de gates e tarefas e o Markdown da selecionada. | `↑/↓` muda a spec, `t` muda o estado, `Espaço` marca o próximo item de checklist, `u` desfaz a última marcação, `e` registra o esforço, `n` cria uma spec, `g` abre os gates, `r` recarrega |
+| `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `c` captura uma ideia, `p` processa a captura, `b` cria um item de backlog, `r` recarrega |
 | `milestones` | Milestones de `specs/milestones/`, com o título, a porcentagem do progresso derivado e a prévia do Markdown. | `↑/↓` muda o milestone, `PgUp/PgDn` rola, `s` sincroniza, `/` filtra |
 | `context` | Documentos de contexto do projeto, com `✓` quando existem e `○` quando faltam, e a prévia do selecionado. | `↑/↓` muda o documento, `PgUp/PgDn` rola, `/` filtra |
-| `gates` | Executa os gates do framework na spec selecionada e mostra a saída. | `↑/↓` muda a spec, `Enter` roda os gates, `PgUp/PgDn` rola |
+| `gates` | Executa os gates do framework na spec selecionada e mostra a saída. | `↑/↓` muda a spec, `Enter` roda os gates, `v` roda o verify do projeto, `PgUp/PgDn` rola |
 | `tests` | Executa a suíte do projeto pelo mesmo caminho do command `test`. | `Enter` roda os testes, `PgUp/PgDn` rola |
-| `skills` | Skills instaladas e disponíveis no catálogo, com detalhe, estado e a linha `Inventory`, que avisa quando as skills do projeto diferem do inventário do binário. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` baixa o catálogo de novo; toda ação pede `y` para confirmar |
+| `skills` | Skills instaladas e disponíveis no catálogo, com detalhe, estado e a linha `Inventory`, que avisa quando as skills do projeto diferem do inventário do binário. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` baixa o catálogo de novo; toda ação pede `y` para confirmar, `n` ou `Esc` cancela e o resultado aparece no rodapé |
 | `about` | Identidade e runtime do binário, projeto, licença, créditos e o painel Doctor, com as checagens locais de `specsfy doctor`. | nenhuma própria |
 
 Cada screen declara o campo `keys`, que monta a barra inferior. As teclas
@@ -45,8 +45,13 @@ em vermelho quando falha. A cada resultado a TUI recarrega o projeto.
 | --- | --- | --- |
 | `t` | Specs | Mostra os estados vizinhos numerados da spec selecionada; o número escolhe, `y` confirma e `Esc` cancela. Specs no layout legado `specs/specs/` pedem `specsfy specs migrate`. |
 | `Espaço` | Specs | Marca o próximo item de checklist da primeira tarefa pronta, igual a `specsfy tasks next` mais `tasks check`; `y` confirma e `n` ou `Esc` cancela. |
+| `u` | Specs | Desfaz o último item marcado com `Espaço` nesta sessão, igual a `specsfy tasks check --undo`; pede `y` e avisa `Nothing to undo` quando nada foi marcado. |
+| `e` | Specs | Registra o esforço da spec: pede o número de 1 a 10 e depois o motivo na barra de teclas, igual a `specsfy specs effort`; número fora de 1 a 10 é recusado. |
 | `n` | Specs | Pede o título na barra de teclas e cria uma spec em `specs/draft/`, igual a `specsfy specs new`; `Enter` cria e `Esc` cancela. |
 | `c` | Backlog | Pede uma linha na barra de teclas e registra uma captura em `specs/inbox/`, igual a `specsfy inbox capture`; `Enter` registra e `Esc` cancela. |
+| `p` | Backlog | Processa a captura selecionada de `specs/inbox/`, pedindo as specs que a cobrem (por exemplo, `0004,0005`), igual a `specsfy inbox process --spec`. |
+| `b` | Backlog | Cria um item de backlog pedindo o título e a ideia; os outros campos ficam `A esclarecer` para refinar com `$specsfy-02-backlog`, igual a `specsfy backlog start`. |
+| `v` | Gates | Roda o `specsfy verify` do projeto inteiro e mostra o relatório no painel Output; `Enter` continua rodando todos os gates da spec selecionada. |
 
 `PgUp/PgDn` continuam rolando o Markdown; na aba Specs, `Espaço` deixou de
 rolar.
@@ -61,6 +66,16 @@ rolar.
 | `/` | filtrar a lista da tela |
 | `?` | mostrar ou esconder o help de teclas |
 | `q` `Esc` `Ctrl+C` | sair |
+
+Quando a barra de teclas não cabe na largura do terminal, as teclas globais
+encolhem para `?` help e `q` quit e, se ainda faltar espaço, as dicas da
+própria tela são cortadas a partir do fim. `?` continua mostrando todas.
+
+## Mouse
+
+Um clique num item de lista o seleciona, e um clique numa aba a abre, quando
+todas as abas cabem na barra. Com a barra rolando, as teclas e os números
+continuam alcançando cada aba. A roda rola as listas e as prévias.
 
 ## Filtro
 
@@ -199,7 +214,10 @@ Princípios do visual, no estilo modern unix:
    cores de `ctx.theme`. Para telas que executam ações, use `actionBar` para
    pedir `y`/`n`, oferecer escolhas numeradas e mostrar a mensagem de
    resultado, e `ctx.prompt(label, onSubmit)` para pedir uma linha de texto na
-   barra de teclas.
+   barra de teclas. Para listas ao lado de uma prévia, use
+   `listWidth(renderer, <largura preferida>)`: em terminais estreitos a coluna
+   da lista ocupa até 40% da largura (no mínimo 28 colunas) e a prévia ao lado
+   ganha espaço.
 3. Se a screen precisar de atualização periódica, leia o store do projeto no
    `mount` e limpe o timer em `onLeave`.
 4. Registre em `src/tui/screens/index.ts`. A ordem da lista é a ordem das

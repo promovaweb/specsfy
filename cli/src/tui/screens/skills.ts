@@ -16,7 +16,7 @@ import { BoxRenderable, TextRenderable, type CliRenderer, type ColorInput, type 
 import type { Catalog, CatalogEntryValue } from "../../domain/catalog.ts";
 import { inSync, inventoryDrift } from "../../domain/inventory.ts";
 import { DOCUMENTATION_SKILLS, FRAMEWORK_SKILLS } from "../../domain/installer.ts";
-import { selectList, panel, keyValueTable, dim, fit, type SelectItem } from "../components.ts";
+import { actionBar, selectList, panel, keyValueTable, dim, fit, type SelectItem, listWidth } from "../components.ts";
 import { glyphs, type Theme } from "../theme.ts";
 import type { Screen } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
@@ -140,7 +140,7 @@ function detailRows(renderer: CliRenderer, theme: Theme, option: SkillOption | u
 /** Creates the Skills screen. */
 export function createSkillsScreen(store: ProjectStore): Screen {
   let catalog: CatalogState = { status: "idle" };
-  let pending: PendingAction | undefined;
+  let bar: ReturnType<typeof actionBar> | undefined;
   let busy = false;
   let message = "";
   let list: ReturnType<typeof selectList> | undefined;
@@ -151,30 +151,22 @@ export function createSkillsScreen(store: ProjectStore): Screen {
     installed: () => Set<string>;
   } | undefined;
 
+  /** Asks for confirmation in the action bar, then runs the action once. */
   const ask = (action: PendingAction) => {
     if (busy) {
-      message = "Another skill action is running. Wait for it to finish.";
-      api?.redraw();
+      bar?.message("Another skill action is running. Wait for it to finish.", "error");
       return;
     }
-    pending = action;
-    api?.redraw();
-  };
-
-  const confirm = () => {
-    const action = pending;
-    pending = undefined;
-    if (!action || busy) return;
-    busy = true;
-    message = `${glyphs.running} ${action.label}…`;
-    api?.redraw();
-    action.run().then(
-      (changed) => { message = `${glyphs.ok} ${action.done(changed)}`; },
-      (error) => { message = `${glyphs.error} ${errorMessage(error)}`; },
-    ).finally(() => {
-      busy = false;
-      api?.redraw();
-      void store.reload();
+    bar?.ask(action.label, () => {
+      busy = true;
+      bar?.message(`${action.label}…`);
+      action.run().then(
+        (changed) => bar?.message(action.done(changed), "ok"),
+        (error) => bar?.message(errorMessage(error), "error"),
+      ).finally(() => {
+        busy = false;
+        void store.reload();
+      });
     });
   };
 
@@ -196,9 +188,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
       const detail = panel(renderer, theme, { title: "Detail", flexGrow: 1 });
       const status = panel(renderer, theme, { title: "Status" });
       status.flexShrink = 0;
-      const confirmBar = new BoxRenderable(renderer, { height: 1, flexShrink: 0, flexDirection: "row", backgroundColor: theme.primary, paddingLeft: 1 });
-      const confirmText = new TextRenderable(renderer, { content: "", fg: theme.primaryText, bg: theme.primary, wrapMode: "none" });
-      confirmBar.add(confirmText);
+      bar = actionBar(renderer, theme);
       let options: SkillOption[] = [];
       let installed = new Set<string>();
       let lockError: string | undefined;
@@ -234,13 +224,6 @@ export function createSkillsScreen(store: ProjectStore): Screen {
         if (lockError) lines.push(new TextRenderable(renderer, { content: `${glyphs.warn} ${lockError}`, fg: theme.warn, wrapMode: "word" }));
         if (message) lines.push(new TextRenderable(renderer, { content: message, fg: message.startsWith(glyphs.error) ? theme.error : message.startsWith(glyphs.ok) ? theme.ok : theme.warn, wrapMode: "word" }));
         replaceChildren(status, lines);
-        if (pending) {
-          confirmText.content = `${pending.label}? Press y to confirm, n or Esc to cancel.`;
-          confirmBar.visible = true;
-        } else {
-          confirmText.content = "";
-          confirmBar.visible = false;
-        }
       };
 
       const loadCatalog = () => {
@@ -253,7 +236,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
         ).finally(() => redraw());
       };
 
-      list = selectList(renderer, theme, { title: "Skills", emptyText: "No skills", active: true, width: 60, onChange: () => {
+      list = selectList(renderer, theme, { title: "Skills", emptyText: "No skills", active: true, width: listWidth(renderer, 60), onChange: () => {
         if (!disposed) replaceChildren(detail, detailRows(renderer, theme, selected()));
       } });
       body.add(list.box);
@@ -261,7 +244,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
       right.add(detail);
       body.add(right);
       rootBox.add(body);
-      rootBox.add(confirmBar);
+      rootBox.add(bar.box);
 
       const draw = (state: StoreState) => {
         if (state.status === "loading" || !state.snapshot) {
@@ -276,7 +259,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
       api = { loadCatalog, redraw, selected, installed: () => installed };
       draw(store.state());
       const unsubscribe = store.subscribe(draw);
-      renderer.once("destroy", () => { disposed = true; unsubscribe(); list = undefined; api = undefined; });
+      renderer.once("destroy", () => { disposed = true; unsubscribe(); list = undefined; api = undefined; bar = undefined; });
       return rootBox;
     },
     onEnter: () => {
@@ -284,11 +267,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
     },
     filter: (query) => list?.setFilter(query),
     onKey: (name) => {
-      if (pending) {
-        if (name === "y") confirm();
-        else if (name === "n" || name === "escape") { pending = undefined; message = "Cancelled. Nothing changed."; api?.redraw(); }
-        return true;
-      }
+      if (bar?.handleKey(name)) return true;
       const option = api?.selected();
       switch (name) {
         case "up": case "k": list?.move(-1); return true;
@@ -296,7 +275,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
         case "c": api?.loadCatalog(); return true;
         case "i":
           if (!option) return true;
-          if (option.installed) { message = `${option.name} is already installed.`; api?.redraw(); return true; }
+          if (option.installed) { bar?.message(`${option.name} is already installed.`); return true; }
           ask({
             label: `Install ${option.name}`,
             run: () => store.services.installSkills(store.project, [option.name], catalog.status === "ready" ? catalog.catalog : undefined),
@@ -305,7 +284,7 @@ export function createSkillsScreen(store: ProjectStore): Screen {
           return true;
         case "x":
           if (!option) return true;
-          if (!option.installed) { message = `${option.name} is not installed.`; api?.redraw(); return true; }
+          if (!option.installed) { bar?.message(`${option.name} is not installed.`); return true; }
           ask({
             label: `Remove ${option.name}`,
             run: () => store.services.removeSkills(store.project, [option.name]),

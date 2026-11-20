@@ -9,7 +9,7 @@
  */
 import { BoxRenderable } from "@opentui/core";
 import type { ProjectOverview } from "../../core/overview.ts";
-import { actionBar, selectList, markdownView, markdownStyle, fit, type SelectItem } from "../components.ts";
+import { actionBar, selectList, markdownView, markdownStyle, fit, type SelectItem, listWidth } from "../components.ts";
 import type { Theme } from "../theme.ts";
 import type { Screen, ScreenContext } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
@@ -48,6 +48,39 @@ export function createBacklogScreen(store: ProjectStore): Screen {
       );
     });
   };
+  /** Runs a write, shows its outcome and reloads the project. */
+  const run = (label: string, work: () => Promise<string>) => {
+    actions?.message(`${label}…`);
+    work().then(
+      (done) => { actions?.message(done, "ok"); void store.reload(); },
+      (error) => actions?.message(errorMessage(error).split("\n")[0] ?? "Failed.", "error"),
+    );
+  };
+  /** Moves the selected inbox capture out of the queue, naming the specs that cover it. */
+  const processCapture = (ctx: ScreenContext) => {
+    const id = list?.selected()?.id ?? "";
+    if (!/^specs\/inbox\/[^/]+\.md$/u.test(id)) {
+      actions?.message("Select a pending capture of specs/inbox/ to process it.", "error");
+      return;
+    }
+    const name = id.slice("specs/inbox/".length);
+    ctx.prompt(`Specs that cover ${name} (e.g. 0004,0005)`, (value) => {
+      const specs = value.split(/[\s,]+/u).filter(Boolean);
+      run("Processing", async () => {
+        await store.services.processCapture(store.project, name, specs);
+        return `${name} processed, covered by ${specs.join(", ")}`;
+      });
+    });
+  };
+  /** Creates a backlog item from a typed title and idea. */
+  const startBacklog = (ctx: ScreenContext) => {
+    ctx.prompt("Title of the backlog item", (title) =>
+      ctx.prompt("The idea, in one line", (idea) =>
+        run("Creating", async () => {
+          await store.services.startBacklog(store.project, title, idea);
+          return `Backlog item "${title}" created; refine it with $specsfy-02-backlog`;
+        })));
+  };
   return {
     id: "backlog",
     title: "Backlog",
@@ -56,6 +89,8 @@ export function createBacklogScreen(store: ProjectStore): Screen {
       { key: "↑/↓", action: "item" },
       { key: "PgUp/PgDn", action: "scroll" },
       { key: "c", action: "capture" },
+      { key: "p", action: "process" },
+      { key: "b", action: "backlog" },
       { key: "r", action: "reload" },
     ],
     mount: ({ renderer, theme }) => {
@@ -82,7 +117,7 @@ export function createBacklogScreen(store: ProjectStore): Screen {
         );
       };
 
-      list = selectList(renderer, theme, { title: "Backlog and inbox", emptyText: "Loading…", active: true, width: 46, onChange: preview });
+      list = selectList(renderer, theme, { title: "Backlog and inbox", emptyText: "Loading…", active: true, width: listWidth(renderer, 46), onChange: preview });
       rootBox.add(list.box);
       rootBox.add(reader.box);
 
@@ -105,6 +140,8 @@ export function createBacklogScreen(store: ProjectStore): Screen {
       if (actions?.handleKey(name)) return true;
       switch (name) {
         case "c": capture(ctx); return true;
+        case "p": processCapture(ctx); return true;
+        case "b": startBacklog(ctx); return true;
         case "up": case "k": list?.move(-1); return true;
         case "down": case "j": list?.move(1); return true;
         case "pageup": reader?.scroll(-10); return true;

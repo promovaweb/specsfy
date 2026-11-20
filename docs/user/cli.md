@@ -260,17 +260,17 @@ specsfy
 Não é preciso escrever `tui`; `specsfy tui --project PATH` abre outro projeto.
 A TUI tem nove abas:
 
-- **Overview**, painel de estatísticas das specs, gates, tarefas e checklist.
-- **Specs**, specs por estado, com gates, tarefas e o Markdown; `t` muda o estado, `Espaço` marca o próximo item e `n` cria uma spec.
-- **Backlog**, itens do backlog e capturas do inbox; `c` registra uma captura.
+- **Overview**, painel das specs, gates, tarefas e checklist; `↑`/`↓` escolhem e `Enter` abre a spec selecionada.
+- **Specs**, specs por estado, com gates, tarefas e o Markdown; `t` muda o estado, `Espaço` marca o próximo item, `u` desfaz a marcação, `e` registra o esforço e `n` cria uma spec.
+- **Backlog**, itens do backlog e capturas do inbox; `c` captura, `p` processa a captura selecionada e `b` cria um item de backlog.
 - **Milestones**, milestones de `specs/milestones/` com progresso e preview.
 - **Context**, documentos de contexto do projeto, com `✓` quando existem.
-- **Gates**, roda os gates da spec selecionada com `Enter`.
+- **Gates**, roda os gates da spec selecionada com `Enter`; `v` roda o `specsfy verify` do projeto.
 - **Tests**, roda a suíte do projeto com `Enter`.
 - **Skills**, skills instaladas e do catálogo; instala, remove e atualiza.
 - **About**, identidade do binário, runtime, projeto, licença e créditos.
 
-Cada ação pede confirmação ou texto e mostra o resultado no rodapé.
+Cada ação pede confirmação ou texto e mostra o resultado no rodapé. Um clique seleciona o item de lista e abre a aba, e a roda rola listas e prévias.
 
 Teclas globais: `←`/`→`, `[`/`]`, `Tab` e `1` a `9` mudam de aba; `/` filtra
 a lista da tela (Enter mantém, `Esc` limpa) e `?` mostra o help de teclas.

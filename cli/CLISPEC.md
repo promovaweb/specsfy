@@ -119,12 +119,12 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 
 | Screen | Função | Teclas |
 | --- | --- | --- |
-| `overview` | projeto, resumo de progresso, estados, backlog, inbox, próximos passos e MCP | `r` reload |
-| `specs` | specs por estado com gates, tarefas e o Markdown da selecionada | `↑/↓` spec, `t` move, `Espaço` check, `n` new spec, `g` gates, `r` reload |
-| `backlog` | backlog e inbox com preview | `↑/↓` item, `PgUp/PgDn` scroll, `c` capture, `r` reload |
+| `overview` | projeto, resumo de progresso, estados, backlog, inbox, próximos passos e MCP | `↑/↓` spec, `Enter` open, `r` reload |
+| `specs` | specs por estado com gates, tarefas e o Markdown da selecionada | `↑/↓` spec, `t` move, `Espaço` check, `u` undo, `e` effort, `n` new spec, `g` gates, `r` reload |
+| `backlog` | backlog e inbox com preview | `↑/↓` item, `PgUp/PgDn` scroll, `c` capture, `p` process, `b` backlog, `r` reload |
 | `milestones` | milestones de `specs/milestones/` com a porcentagem do progresso derivado e a prévia | `↑/↓` milestone, `PgUp/PgDn` scroll, `s` sync |
 | `context` | documentos de contexto do projeto, com `✓` quando existem e a prévia | `↑/↓` file, `PgUp/PgDn` scroll |
-| `gates` | roda os gates da spec selecionada e mostra o resultado de cada um | `↑/↓` spec, `Enter` run gates, `PgUp/PgDn` scroll |
+| `gates` | roda os gates da spec selecionada e mostra o resultado de cada um | `↑/↓` spec, `Enter` run gates, `v` verify project, `PgUp/PgDn` scroll |
 | `tests` | roda a suíte do projeto com a proteção de banco e mostra resumo e saída | `Enter` run tests, `PgUp/PgDn` scroll |
 | `skills` | skills instaladas e disponíveis, com instalar, remover e atualizar confirmados | `↑/↓` skill, `i` install, `x` remove, `u` update all, `c` recarrega o catálogo |
 | `about` | identidade, runtime, projeto, licença, créditos e o painel Doctor com as checagens locais | globais |
@@ -237,6 +237,8 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | 0017 | Filtro e abas da TUI | done |
 | 0018 | Projeto de demonstração do showcase | done |
 | 0019 | Ações e telas novas na TUI | done |
+| 0020 | Example nas pastas de estado e release do Hub | done |
+| 0021 | Navegação e mais ações na TUI | done |
 
 ## Notes
 
@@ -281,3 +283,5 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 - 2026-11-20: spec 0017 (Filtro e abas da TUI) closed.
 - 2026-11-20: spec 0018 (Projeto de demonstração do showcase) closed.
 - 2026-11-20: spec 0019 (Ações e telas novas na TUI) closed.
+- 2026-11-20: spec 0020 (Example nas pastas de estado e release do Hub) closed.
+- 2026-11-20: spec 0021 (Navegação e mais ações na TUI) closed.

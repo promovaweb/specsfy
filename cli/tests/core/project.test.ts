@@ -100,10 +100,10 @@ describe("read model", () => {
     expect(specs.map((item) => item.slug)).toEqual(["0003-export-orders-csv"]);
   });
 
-  test("the example project has six legacy specs", async () => {
+  test("the example project has six specs in the state folders", async () => {
     const overview = await projectOverview(example);
     expect(overview.specs).toHaveLength(6);
-    expect(overview.states.legacy).toBe(6);
+    expect(overview.states).toMatchObject({ completed: 5, defined: 1, legacy: 0 });
   });
 
   test("specDetail includes the Markdown only on request", async () => {

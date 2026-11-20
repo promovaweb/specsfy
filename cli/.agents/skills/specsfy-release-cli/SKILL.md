@@ -150,7 +150,25 @@ uma vez um job que falhar, confere os cinco executáveis com o `SHA256SUMS` e
 publica o wrapper npm. Recusa a execução sem a seção do changelog, com a tag já
 existente ou com o `VERSION` diferente de `X.Y.Z`. O trabalho de
 funcionalidade se commita antes: tudo o que sobrar no working tree entra no
-commit de release. O gitlink, a versão e a release do Hub ficam fora do script.
+commit de release.
+
+O caminho padrão para o Hub é o próprio script. Junto do `--publish`, o `--hub`
+publica o Specsfy e segue para o Hub; sozinho, executa somente a etapa do Hub,
+depois de uma publicação:
+
+```bash
+node scripts/release.mjs X.Y.Z --publish --hub
+node scripts/release.mjs X.Y.Z --hub
+```
+
+No Hub, o script avança para o `origin/main` sem tocar nos arquivos não
+commitados de outras pessoas e recusa um repositório com arquivos preparados
+(staged). Em seguida, sobe o patch do `VERSION` do Hub, escreve a entrada do
+`CHANGELOG.md` do Hub com os itens da seção `## [X.Y.Z]` de
+`cli/CHANGELOG.md` (ou com o texto de `--hub-note "..."`), commita apenas
+`VERSION`, `CHANGELOG.md` e o gitlink `specsfy`, cria a tag, faz push e cria a
+GitHub Release do Hub. Conferir no Hub o commit, a tag e a release depois da
+execução continua obrigatório.
 
 As conferências abaixo continuam obrigatórias, inclusive depois de uma
 publicação pelo script que parou no meio.

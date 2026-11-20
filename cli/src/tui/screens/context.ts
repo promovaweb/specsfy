@@ -9,7 +9,7 @@
 import { BoxRenderable } from "@opentui/core";
 import { access } from "node:fs/promises";
 import { join } from "node:path";
-import { markdownStyle, markdownView, selectList, type SelectItem } from "../components.ts";
+import { markdownStyle, markdownView, selectList, type SelectItem, listWidth } from "../components.ts";
 import { glyphs, type Theme } from "../theme.ts";
 import type { Screen } from "../screen.ts";
 import type { ProjectStore } from "../store.ts";
@@ -73,7 +73,7 @@ export function createContextScreen(store: ProjectStore): Screen {
           },
         );
       };
-      list = selectList(renderer, theme, { title: "Context", emptyText: "Loading…", active: true, width: 60, onChange: preview });
+      list = selectList(renderer, theme, { title: "Context", emptyText: "Loading…", active: true, width: listWidth(renderer, 60), onChange: preview });
       rootBox.add(list.box);
       rootBox.add(reader.box);
       const refresh = () => void contextItems(theme, store.project).then((items) => list?.setItems(items));

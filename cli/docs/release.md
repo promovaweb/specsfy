@@ -43,6 +43,8 @@ comando atende por `npm run release -- X.Y.Z`:
 ```bash
 node scripts/release.mjs X.Y.Z
 node scripts/release.mjs X.Y.Z --publish
+node scripts/release.mjs X.Y.Z --publish --hub
+node scripts/release.mjs X.Y.Z --hub
 ```
 
 O primeiro comando prepara e não commita. Ele grava `X.Y.Z` em `VERSION`,
@@ -58,8 +60,17 @@ O segundo comando publica. Ele commita o que estiver no working tree como
 changelog, com a tag já existente ou com o `VERSION` diferente de `X.Y.Z`.
 
 O trabalho de funcionalidade se commita antes do `--publish`: tudo o que
-sobrar no working tree entra no commit de release. O gitlink, a versão e a
-release do Hub ficam fora do script.
+sobrar no working tree entra no commit de release.
+
+O `--hub` inclui o Hub da Promovaweb na publicação. Junto do `--publish`, o
+script publica o Specsfy e segue para o Hub. Sozinho, depois de uma publicação,
+ele executa somente a etapa do Hub. No Hub, o script avança para o `origin/main`
+sem tocar nos arquivos não commitados de outras pessoas e recusa um repositório
+com arquivos preparados (staged). Em seguida, sobe o patch do `VERSION` do Hub,
+escreve a entrada do `CHANGELOG.md` do Hub com os itens da seção `## [X.Y.Z]` de
+`cli/CHANGELOG.md` (ou com o texto de `--hub-note "..."`), commita apenas
+`VERSION`, `CHANGELOG.md` e o gitlink `specsfy`, cria a tag, faz push e cria a
+GitHub Release do Hub.
 
 ## Tag e GitHub Release
 

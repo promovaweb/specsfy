@@ -21,7 +21,7 @@ import { join, resolve } from "node:path";
 import { syncMilestones } from "../src/domain/milestones.ts";
 
 const CLI = resolve(import.meta.dir, "..");
-const BASE = resolve(CLI, "../example/specs/specs/0001-diretorio-global-usuarios/spec.md");
+const BASE = resolve(CLI, "../example/specs/completed/0001-diretorio-global-usuarios/spec.md");
 export const DEMO_PROJECT = join(CLI, "tests", "fixtures", "showcase-project");
 const DATE = "2026-11-20";
 

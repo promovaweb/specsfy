@@ -9,7 +9,7 @@
 import { BoxRenderable } from "@opentui/core";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-import { actionBar, markdownStyle, markdownView, selectList, type SelectItem } from "../components.ts";
+import { actionBar, markdownStyle, markdownView, selectList, type SelectItem, listWidth } from "../components.ts";
 import type { Screen } from "../screen.ts";
 import type { ProjectStore } from "../store.ts";
 import { errorMessage } from "../store.ts";
@@ -70,7 +70,7 @@ export function createMilestonesScreen(store: ProjectStore): Screen {
           (error) => { if (mine === generation) reader?.setMarkdown(`Unable to read the file: ${errorMessage(error)}`); },
         );
       };
-      list = selectList(renderer, theme, { title: "Milestones", emptyText: "No milestones yet", active: true, width: 46, onChange: preview });
+      list = selectList(renderer, theme, { title: "Milestones", emptyText: "No milestones yet", active: true, width: listWidth(renderer, 46), onChange: preview });
       rootBox.add(list.box);
       rootBox.add(reader.box);
       screenBox.add(rootBox);

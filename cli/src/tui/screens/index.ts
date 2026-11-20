@@ -28,7 +28,7 @@ export const SCREEN_IDS = ["overview", "specs", "backlog", "milestones", "contex
 export function createScreens(store: ProjectStore): Screen[] {
   const focus: SpecFocus = {};
   return [
-    createOverviewScreen(store),
+    createOverviewScreen(store, focus),
     createSpecsScreen(store, focus),
     createBacklogScreen(store),
     createMilestonesScreen(store),
