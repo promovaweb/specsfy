@@ -4,6 +4,14 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.35.1] - 2026-11-20
+
+### Corrigido
+
+- O teste do filtro `/` falhava às vezes no CI: a prévia do Markdown da spec
+  selecionada antes carrega de forma assíncrona e ainda citava o nome dela.
+  O teste passa a conferir só a coluna da lista.
+
 ## [0.35.0] - 2026-11-20
 
 ### Adicionado
