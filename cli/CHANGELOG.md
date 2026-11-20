@@ -4,6 +4,17 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.36.1] - 2026-11-20
+
+### Alterado
+
+- Publicação sempre sincronizada: dentro do Hub, `scripts/release.mjs
+  --publish` publica o Specsfy e em seguida atualiza o site
+  (`/docs/specsfy/` sincronizado, ebook e imagens no R2, sitespec, release
+  do website e conferência em produção) e o Hub (gitlinks do specsfy e do
+  website, versão, changelog e release). `--no-site` e `--no-hub` pulam
+  essas etapas.
+
 ## [0.36.0] - 2026-11-20
 
 ### Adicionado
