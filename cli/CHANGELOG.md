@@ -4,6 +4,8 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.29.4] - 2026-11-20
+
 ### Corrigido
 
 - `specsfy update`, `specsfy doctor` e a TUI leem o `skills-lock.json` na
@@ -31,6 +33,18 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 - `check_traceability.mjs` ignora `.claude/`, onde o Claude Code cria
   worktrees com cópias dos testes.
 - Contribuições de Lucas Fuad na PR #54.
+
+### Validação
+
+- `npm test` na raiz: 493 testes, 11 novos, com RED observado no 0.29.3.
+- CLI: `bun run validate`, com typecheck, testes, OpenCLI, docs e build.
+- `npm run validate:skills`, `npm run test:example` e `make verify-version`.
+- O lock na versão 2 foi reproduzido com o gerenciador `skills` 1.9.0.
+
+### Atualização
+
+- Atualize o CLI com `npm install -g @promovaweb/specsfy@0.29.4` e as skills
+  do projeto com `specsfy update`, preservando alterações locais.
 
 ## [0.29.3] - 2026-11-15
 
