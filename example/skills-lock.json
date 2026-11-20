@@ -24,7 +24,7 @@
     "specsfy-05-tasks": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "8b32d2e1f3875f7f26777c20209aefe249643bfb1d276bf65ef8653a9ac5a7d6"
+      "computedHash": "c2efc7a980d28a5cce2d112a369b6eb9aee10df93cdd12315f71fb6114842559"
     },
     "specsfy-06-implement": {
       "source": "../skills",

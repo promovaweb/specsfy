@@ -22,8 +22,8 @@
     "specsfy-05-tasks": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.887557+00:00",
-      "content_sha256": "e1be72a784c69f9cfdddee4c0dc592bc219333358f88e7ae792965cd0f8da41f",
-      "updated_at": "2026-11-20T15:27:26.972Z"
+      "content_sha256": "7e56b1c36b091cda65ee302ec048e9e365546153b945a1062e0f7343357dab4f",
+      "updated_at": "2026-11-20T17:51:41.882Z"
     },
     "specsfy-specialist-laravel": {
       "source": "specialists",

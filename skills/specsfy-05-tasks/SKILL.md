@@ -319,6 +319,19 @@ node .agents/skills/specsfy-05-tasks/scripts/progress.mjs <raiz> --json
   entram no progresso normativo. Sem nenhuma spec, o código de saída é 2.
 - Um gate `In Progress` isolado não é falha. Gate `Failed`, checklist
   incoerente e dependência sem caminho pronto impedem o avanço.
+- Pendência `PENDING` apontada pelo `specsfy context monitor` também impede o
+  avanço, mesmo com todos os checkboxes marcados: siga a skill indicada pelo
+  monitor e volte ao progresso depois que o documento for atualizado ou que a
+  avaliação sem impacto estiver registrada.
+- `docs/` ausente ou desatualizado também impede a entrega: carregue
+  `$specsfy-documentator` e volte ao progresso depois que `docs/` for
+  reconstruída.
+- Encaminhe pelo estado observado, anunciando e carregando a skill na mesma
+  conversa, sem pedir confirmação: se uma spec existente precisar mudar de
+  comportamento ou de plano, carregue `$specsfy-update-spec`; sem nenhuma spec
+  e com captura a avançar, carregue `$specsfy-02-backlog`; com intenção e
+  definição suficientes, carregue `$specsfy-03-specify`; nos demais casos,
+  siga a próxima skill responsável que o relatório do progresso indica.
 - Não edite specs, checkboxes, testes ou código durante a consulta e não
   deduza progresso de commits, arquivos soltos ou memória da conversa. Para
   mudar estado, carregue a skill responsável.

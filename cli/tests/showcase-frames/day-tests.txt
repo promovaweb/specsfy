@@ -1,4 +1,4 @@
- ▌ Specsfy v0.33.0  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.33.1  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
  Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
                                             ▬▬▬▬▬▬▬▬▬▬▬                                                                                     
