@@ -43,7 +43,9 @@ comando atende por `npm run release -- X.Y.Z`:
 ```bash
 node scripts/release.mjs X.Y.Z
 node scripts/release.mjs X.Y.Z --publish
-node scripts/release.mjs X.Y.Z --publish --hub
+node scripts/release.mjs X.Y.Z --publish --no-site
+node scripts/release.mjs X.Y.Z --publish --no-hub
+node scripts/release.mjs X.Y.Z --site
 node scripts/release.mjs X.Y.Z --hub
 ```
 
@@ -53,24 +55,45 @@ lançador, o `opencli` e todo o showcase, recompila o ebook, confere a versão e
 roda os testes da raiz, a validação das skills e o `validate` do CLI. Depois
 dele, revise o diff e escreva `## [X.Y.Z]` em `cli/CHANGELOG.md`.
 
-O segundo comando publica. Ele commita o que estiver no working tree como
-`chore(release): vX.Y.Z`, cria a tag, faz push, espera o workflow `CLI Release`
-(refaz uma vez um job que falhar), confere os cinco executáveis com o
-`SHA256SUMS` e publica o wrapper npm. Ele recusa a execução sem a seção do
-changelog, com a tag já existente ou com o `VERSION` diferente de `X.Y.Z`.
+O segundo comando publica e mantém tudo sincronizado: um único `--publish`
+leva a versão nova ao CLI, às skills, ao ebook, à documentação do repositório,
+às páginas de `/docs/specsfy/` do site e ao Hub, sem etapa manual no meio.
+
+Ele commita o que estiver no working tree como `chore(release): vX.Y.Z`, cria a
+tag, faz push, espera o workflow `CLI Release` (refaz uma vez um job que
+falhar), confere os cinco executáveis com o `SHA256SUMS` e publica o wrapper
+npm. Em seguida roda a etapa do site e depois a etapa do Hub. Ele recusa a
+execução sem a seção do changelog, com a tag já existente ou com o `VERSION`
+diferente de `X.Y.Z`.
 
 O trabalho de funcionalidade se commita antes do `--publish`: tudo o que
 sobrar no working tree entra no commit de release.
 
-O `--hub` inclui o Hub da Promovaweb na publicação. Junto do `--publish`, o
-script publica o Specsfy e segue para o Hub. Sozinho, depois de uma publicação,
-ele executa somente a etapa do Hub. No Hub, o script avança para o `origin/main`
-sem tocar nos arquivos não commitados de outras pessoas e recusa um repositório
-com arquivos preparados (staged). Em seguida, sobe o patch do `VERSION` do Hub,
+As opções controlam as etapas seguintes. `--no-site` e `--no-hub` pulam a
+etapa correspondente; `--site` e `--hub` executam somente aquela etapa, depois
+de uma publicação.
+
+A etapa do site publica a documentação de `promovaweb.com/docs/specsfy`. Ela
+roda `npm run sync:docs:specsfy` no Hub, leva os arquivos que o comando
+escreveu em `website/` para um worktree limpo do `origin/main` do website e
+devolve o checkout do website como estava, então o trabalho de outras sessões
+continua intacto. Depois publica a mídia no R2 com `npm run media:publicar`,
+escreve uma sitespec, sobe o patch do website com o changelog e commita apenas
+esses caminhos (nunca o registro de imagens responsivas). Por fim cria a tag,
+faz push, cria a GitHub Release do website e roda `npm run site:specsfy:check`
+em produção.
+
+A etapa do Hub roda depois da do site. O script avança para o `origin/main` sem
+tocar nos arquivos não commitados de outras pessoas e recusa um repositório com
+arquivos preparados (staged). Em seguida, sobe o patch do `VERSION` do Hub,
 escreve a entrada do `CHANGELOG.md` do Hub com os itens da seção `## [X.Y.Z]` de
-`cli/CHANGELOG.md` (ou com o texto de `--hub-note "..."`), commita apenas
-`VERSION`, `CHANGELOG.md` e o gitlink `specsfy`, cria a tag, faz push e cria a
-GitHub Release do Hub.
+`cli/CHANGELOG.md` (ou com o texto de `--hub-note "..."`), aponta o gitlink do
+`specsfy` para a versão publicada e o gitlink do `website` para o commit que a
+etapa do site publicou, commita apenas `VERSION`, `CHANGELOG.md` e esses
+gitlinks, cria a tag, faz push e cria a GitHub Release do Hub.
+
+O registro na lista Website do ClickUp continua manual, pelo MCP `website`,
+depois que a etapa do site termina.
 
 ## Tag e GitHub Release
 

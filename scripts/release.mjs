@@ -24,10 +24,24 @@
  *      checks the five executables plus SHA256SUMS;
  *   4. publishes the npm wrapper from cli/npm (npm needs a logged-in user).
  *
- * Hub — when this monorepo is the `specsfy` submodule of the Promovaweb Hub:
+ * Inside the Promovaweb Hub (this monorepo is its `specsfy` submodule),
+ * `--publish` keeps everything in sync: after npm it runs the site step and
+ * then the Hub step below. `--no-site` and `--no-hub` skip them; `--site`
+ * and `--hub` run only that step after a publish.
  *
- *   node scripts/release.mjs 0.34.0 --publish --hub
- *   node scripts/release.mjs 0.34.0 --hub            (after a publish)
+ * Site — the documentation of promovaweb.com/docs/specsfy:
+ *
+ *   1. runs `npm run sync:docs:specsfy` in the Hub and takes the files it
+ *      wrote under website/ (pages, build.json, ebook and images);
+ *   2. moves them to a clean worktree of the website origin/main and gives
+ *      the website checkout back as it was (other work there stays intact);
+ *   3. publishes the media to R2 (`npm run media:publicar`), writes a
+ *      sitespec, bumps the website patch version and changelog, commits only
+ *      those paths, tags, pushes and creates the website GitHub Release;
+ *   4. runs `npm run site:specsfy:check` against production.
+ *   The ClickUp record of the Website list stays manual (MCP website).
+ *
+ * Hub:
  *
  *   1. fast-forwards the Hub to origin/main (other people's uncommitted
  *      files stay untouched; a Hub with staged files is refused);
@@ -40,7 +54,8 @@
  * working tree goes into the release commit.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -50,7 +65,17 @@ const EXPECTED_ASSETS = 6;
 
 const [version, ...flags] = process.argv.slice(2);
 const publish = flags.includes("--publish");
-const hub = flags.includes("--hub");
+const HUB_PRESENT = (() => {
+  try {
+    return /specsfy/u.test(execFileSync("git", ["-C", resolve(dirname(fileURLToPath(import.meta.url)), "..", ".."), "submodule", "status", "specsfy"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }));
+  } catch {
+    return false;
+  }
+})();
+const hub = flags.includes("--hub") || (publish && HUB_PRESENT && !flags.includes("--no-hub"));
+const site = flags.includes("--site") || (publish && HUB_PRESENT && !flags.includes("--no-site"));
+/** Website commit published by the site step, for the Hub gitlink. */
+let websiteCommit;
 const noteIndex = flags.indexOf("--hub-note");
 const hubNote = noteIndex >= 0 ? flags[noteIndex + 1] : undefined;
 const HUB = resolve(ROOT, "..");
@@ -146,7 +171,7 @@ function publishRelease() {
   }
   console.log(`✓ GitHub Release ${tag} with ${assets} assets`);
   step("npm wrapper", "npm", ["publish", "--access", "public"], join(CLI, "npm"));
-  console.log(`\n✓ Specsfy ${version} published.${hub ? "" : " Next: the Hub gitlink, version and release (--hub)."}`);
+  console.log(`\n✓ Specsfy ${version} published.${hub ? "" : " Next: the Hub gitlink, version and release (--hub)."}${site ? "" : " The site was not updated (--site)."}`);
 }
 
 /** One-line summary of the changelog section: first sentence of each bullet. */
@@ -160,6 +185,115 @@ function changelogSummary() {
   }
   const first = (bullet) => (bullet.match(/^.*?[.:](?=\s|$)/u)?.[0] ?? bullet).replace(/[.:]$/u, "");
   return bullets.map(first).join("; ") || "veja o cli/CHANGELOG.md do Specsfy";
+}
+
+/** Next free sitespec id of the website (four digits). */
+function nextSitespecId(worktree) {
+  const ids = readdirSync(join(worktree, ".sitespec")).map((name) => Number(name.slice(0, 4))).filter(Number.isFinite);
+  return String(Math.max(0, ...ids) + 1).padStart(4, "0");
+}
+
+/** Publishes the Specsfy documentation, ebook and images on the website. */
+function releaseSite() {
+  const WEBSITE = join(HUB, "website");
+  const sync = spawnSync("npm", ["run", "sync:docs:specsfy"], { cwd: HUB, encoding: "utf8" });
+  if (sync.status !== 0) {
+    console.error(`✗ npm run sync:docs:specsfy failed\n${sync.stdout}${sync.stderr}`);
+    process.exit(1);
+  }
+  // The sync lists every path it wrote as "- website/<path>".
+  const written = [...new Set([...sync.stdout.matchAll(/^- website\/(\S+)$/gmu)].map(([, path]) => path))];
+  if (!written.length) {
+    console.log("✓ site already matches the Specsfy docs; nothing to publish");
+    return;
+  }
+  step("website fetch", "git", ["fetch", "-q", "origin"], WEBSITE);
+  const worktree = join(mkdtempSync(join(tmpdir(), "specsfy-site-")), "website");
+  const branch = `specsfy-docs-${version}`;
+  step("website worktree", "git", ["worktree", "add", "-q", "-B", branch, worktree, "origin/main"], WEBSITE);
+  try {
+    for (const path of written) {
+      if (!existsSync(join(WEBSITE, path))) continue;
+      mkdirSync(dirname(join(worktree, path)), { recursive: true });
+      cpSync(join(WEBSITE, path), join(worktree, path));
+    }
+    // Give the website checkout back: tracked files return to HEAD and new
+    // files the sync created there are removed (media stays, it is ignored).
+    for (const path of written) {
+      const tracked = spawnSync("git", ["-C", WEBSITE, "ls-files", "--error-unmatch", path], { stdio: "ignore" }).status === 0;
+      if (tracked) spawnSync("git", ["-C", WEBSITE, "checkout", "--", path], { stdio: "ignore" });
+      else if (!/\.(png|jpe?g|webp|gif|avif|pdf|epub|zip)$/iu.test(path)) rmSync(join(WEBSITE, path), { force: true });
+    }
+    symlinkSync(join(WEBSITE, "node_modules"), join(worktree, "node_modules"));
+    step("media to R2", "npm", ["run", "media:publicar"], worktree);
+    const id = nextSitespecId(worktree);
+    const sitespec = join(worktree, ".sitespec", `${id}-specsfy-docs-${version.replaceAll(".", "")}`, "SITEPEC.md");
+    const now = new Date().toISOString();
+    mkdirSync(dirname(sitespec), { recursive: true });
+    writeFileSync(sitespec, [
+      "---",
+      'schemaVersion: "1.0.0"',
+      `id: "${id}"`,
+      `slug: specsfy-docs-${version.replaceAll(".", "")}`,
+      `title: "Docs do Specsfy na versão ${version}"`,
+      `summary: A documentação pública do Specsfy em /docs/specsfy/ passa a refletir a versão ${version}, com o ebook e as imagens do guia publicados no R2.`,
+      "status: done",
+      `createdAt: "${now}"`,
+      `updatedAt: "${now}"`,
+      "primarySkill: astrofy-documentation",
+      "reviewSkills:",
+      "  - astrofy-seo",
+      "relatedFiles:",
+      "  - src/content/opensource-docs/specsfy/",
+      "  - public/docs/specsfy/downloads/build.json",
+      "  - scripts/media-manifest.json",
+      "tags:",
+      "  - specsfy",
+      "  - docs",
+      `source: Publicação da Specsfy ${version} pelo scripts/release.mjs do Specsfy (regra do Luiz de 20/11/2026: tudo sincronizado a cada atualização).`,
+      "priority: medium",
+      "---",
+      "",
+      "## Descrição",
+      "",
+      `Publicação automática da documentação do Specsfy ${version}: páginas regeneradas pelo npm run sync:docs:specsfy, ebook e imagens enviados ao R2 pelo npm run media:publicar a partir de um worktree limpo do origin/main, e conferência em produção pelo npm run site:specsfy:check.`,
+      "",
+      "## Checklist",
+      "",
+      `- [x] Páginas de /docs/specsfy/ sincronizadas com a Specsfy ${version} {#sd01}`,
+      "- [x] Ebook e imagens do guia publicados no R2 e registrados no media-manifest.json {#sd02}",
+      "- [x] Release do website criada; conferência em produção pelo npm run site:specsfy:check {#sd03}",
+      "",
+    ].join("\n"));
+    const pkg = JSON.parse(readFileSync(join(worktree, "package.json"), "utf8"));
+    const [major, minor, patch] = pkg.version.split(".").map(Number);
+    const next = `${major}.${minor}.${patch + 1}`;
+    const previous = pkg.version;
+    pkg.version = next;
+    writeFileSync(join(worktree, "package.json"), `${JSON.stringify(pkg, null, "\t")}\n`);
+    let count = 0;
+    const lock = readFileSync(join(worktree, "package-lock.json"), "utf8").replace(new RegExp(`"version": "${previous.replaceAll(".", "\\.")}"`, "g"), (match) => (count++ < 2 ? `"version": "${next}"` : match));
+    writeFileSync(join(worktree, "package-lock.json"), lock);
+    const entry = `Documentação do Specsfy em \`/docs/specsfy/\` na versão ${version}, com o ebook e as imagens do guia publicados no R2. Sitespec ${id}.`;
+    const changelog = readFileSync(join(worktree, "CHANGELOG.md"), "utf8");
+    writeFileSync(join(worktree, "CHANGELOG.md"), changelog.replace("# Changelog do website\n\n", `# Changelog do website\n\n## [${next}] - ${now.slice(0, 10)}\n\n### Alterado\n\n- ${entry}\n\n`));
+    // Only these paths: a worktree without the media regenerates registries
+    // (imagens-responsivas-registro.json) that must never be committed.
+    const paths = ["package.json", "package-lock.json", "CHANGELOG.md", "scripts/media-manifest.json", ".sitespec", "src/content/opensource-docs/specsfy", "public/docs/specsfy/downloads/build.json"];
+    step("website stage", "git", ["add", "--", ...paths], worktree);
+    step("website commit", "git", ["commit", "-q", "-m", `docs: Specsfy ${version} em /docs/specsfy ${next}`], worktree);
+    step("website tag", "git", ["tag", `v${next}`], worktree);
+    step("website push", "git", ["push", "-q", "origin", "HEAD:main"], worktree);
+    step("website push tag", "git", ["push", "-q", "origin", `v${next}`], worktree);
+    step("website release", "gh", ["release", "create", `v${next}`, "--repo", "promovaweb/website", "--title", `v${next}`, "--notes", `### Alterado\n\n- ${entry}`], worktree);
+    websiteCommit = output("git", ["rev-parse", "HEAD"], worktree);
+    console.log(`✓ website ${next} published with the Specsfy ${version} docs`);
+  } finally {
+    spawnSync("git", ["-C", WEBSITE, "worktree", "remove", "--force", worktree], { stdio: "ignore" });
+    spawnSync("git", ["-C", WEBSITE, "branch", "-D", branch], { stdio: "ignore" });
+  }
+  const check = spawnSync("npm", ["run", "site:specsfy:check"], { cwd: HUB, encoding: "utf8" });
+  console.log(check.status === 0 ? "✓ production check passed" : `! production check: ${(check.stdout + check.stderr).trim().split("\n").slice(-4).join(" | ")} (the deploy may still be running; rerun npm run site:specsfy:check)`);
 }
 
 /** Bumps the Hub with the new specsfy gitlink, version, changelog, tag and release. */
@@ -178,11 +312,14 @@ function releaseHub() {
   const current = readFileSync(join(HUB, "VERSION"), "utf8").trim();
   const [major, minor, patch] = current.split(".").map(Number);
   const next = `${major}.${minor}.${patch + 1}`;
-  const note = `Specsfy ${version}: ${hubNote ?? changelogSummary()}.`;
+  const note = `Specsfy ${version}: ${hubNote ?? changelogSummary()}.${websiteCommit ? " Site /docs/specsfy sincronizado." : ""}`;
   writeFileSync(join(HUB, "VERSION"), `${next}\n`);
   const changelog = readFileSync(join(HUB, "CHANGELOG.md"), "utf8");
   writeFileSync(join(HUB, "CHANGELOG.md"), changelog.replace("# Changelog do Hub\n\n", `# Changelog do Hub\n\n## [${next}] - ${new Date().toISOString().slice(0, 10)}\n\n### Alterado\n\n- ${note}\n\n`));
   step("Hub stage", "git", ["add", "VERSION", "CHANGELOG.md", "specsfy"], HUB);
+  // The website checkout may be on other work; the gitlink points to the
+  // commit the site step published.
+  if (websiteCommit) step("Hub website gitlink", "git", ["update-index", "--cacheinfo", `160000,${websiteCommit},website`], HUB);
   step("Hub commit", "git", ["commit", "-q", "-m", `chore: specsfy ${version} no Hub ${next}`], HUB);
   step("Hub tag", "git", ["tag", `v${next}`], HUB);
   step("Hub push", "git", ["push", "-q", "origin", "main"], HUB);
@@ -192,5 +329,6 @@ function releaseHub() {
 }
 
 if (publish) publishRelease();
-else if (!hub) prepare();
+else if (!hub && !site) prepare();
+if (site) releaseSite();
 if (hub) releaseHub();

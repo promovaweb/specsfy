@@ -230,6 +230,12 @@ revisão.
 `VERSION` na raiz é a fonte única da versão pública. O CLI, as skills, os
 especialistas, o ebook, a tag e a GitHub Release usam o mesmo SemVer.
 
+Toda atualização do Specsfy sai 100% sincronizada: a publicação usa
+`node scripts/release.mjs X.Y.Z --publish` dentro de `specsfy/` e leva a versão
+nova ao CLI, às skills, ao ebook, à documentação do repositório, às páginas de
+`/docs/specsfy/` do site com o ebook e as imagens no R2, e aos gitlinks e à
+release do Hub; o registro na lista Website do ClickUp é feito em seguida.
+
 1. Atualize `VERSION` e repita o valor em `cli/package.json` e
    `cli/npm/package.json`.
 2. Registre a mudança em [`cli/CHANGELOG.md`](cli/CHANGELOG.md), no formato

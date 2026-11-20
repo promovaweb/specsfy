@@ -14,6 +14,14 @@ build a embute no binário; `cli/npm/package.json` repete a versão do wrapper
 monorepo, sem arquivos de versão próprios. Hub e website não participam desse
 número.
 
+A publicação padrão é `node scripts/release.mjs X.Y.Z` seguido de
+`node scripts/release.mjs X.Y.Z --publish`. Dentro do Hub, esse `--publish`
+sincroniza o CLI, as skills, o ebook, a documentação do repositório, as páginas
+de `/docs/specsfy/` do site com o ebook e as imagens no R2, e os gitlinks e a
+release do Hub. Não pergunte se o site deve ser atualizado: a etapa do site faz
+parte da publicação, junto com a do Hub. O registro na lista Website do ClickUp
+é feito em seguida, pelo MCP `website`.
+
 Os binários não são versionados no Git. O workflow `CLI Release`
 (`.github/workflows/cli-release.yml`) compila os cinco alvos de
 `cli/scripts/build.ts --all` (`specsfy-linux-x64`, `specsfy-linux-arm64`,
@@ -152,23 +160,37 @@ existente ou com o `VERSION` diferente de `X.Y.Z`. O trabalho de
 funcionalidade se commita antes: tudo o que sobrar no working tree entra no
 commit de release.
 
-O caminho padrão para o Hub é o próprio script. Junto do `--publish`, o `--hub`
-publica o Specsfy e segue para o Hub; sozinho, executa somente a etapa do Hub,
-depois de uma publicação:
+O caminho padrão para o site e o Hub é o próprio script. Depois do npm, o
+`--publish` executa a etapa do site e depois a do Hub; `--no-site` e `--no-hub`
+pulam a etapa correspondente, e `--site` ou `--hub`, sozinhos, executam somente
+aquela etapa depois de uma publicação:
 
 ```bash
-node scripts/release.mjs X.Y.Z --publish --hub
-node scripts/release.mjs X.Y.Z --hub
+node scripts/release.mjs X.Y.Z --publish            # Specsfy, site e Hub
+node scripts/release.mjs X.Y.Z --publish --no-site  # Specsfy e Hub
+node scripts/release.mjs X.Y.Z --site               # somente o site
+node scripts/release.mjs X.Y.Z --hub                # somente o Hub
 ```
 
-No Hub, o script avança para o `origin/main` sem tocar nos arquivos não
+A etapa do site roda `npm run sync:docs:specsfy` no Hub, leva os arquivos que o
+comando escreveu em `website/` para um worktree limpo do `origin/main` do
+website e devolve o checkout do website como estava, então o trabalho de outras
+sessões continua intacto. Em seguida publica a mídia no R2 com
+`npm run media:publicar`, escreve uma sitespec, sobe o patch do website com o
+changelog e commita apenas esses caminhos, nunca o registro de imagens
+responsivas. Por fim cria a tag, faz push, cria a GitHub Release do website e
+roda `npm run site:specsfy:check` em produção. O registro na lista Website do
+ClickUp continua manual, pelo MCP `website`, depois dessa etapa.
+
+Na etapa do Hub, o script avança para o `origin/main` sem tocar nos arquivos não
 commitados de outras pessoas e recusa um repositório com arquivos preparados
 (staged). Em seguida, sobe o patch do `VERSION` do Hub, escreve a entrada do
 `CHANGELOG.md` do Hub com os itens da seção `## [X.Y.Z]` de
-`cli/CHANGELOG.md` (ou com o texto de `--hub-note "..."`), commita apenas
-`VERSION`, `CHANGELOG.md` e o gitlink `specsfy`, cria a tag, faz push e cria a
-GitHub Release do Hub. Conferir no Hub o commit, a tag e a release depois da
-execução continua obrigatório.
+`cli/CHANGELOG.md` (ou com o texto de `--hub-note "..."`), aponta o gitlink
+`specsfy` para a versão publicada e o gitlink `website` para o commit que a
+etapa do site publicou, commita apenas `VERSION`, `CHANGELOG.md` e esses
+gitlinks, cria a tag, faz push e cria a GitHub Release do Hub. Conferir no Hub o
+commit, a tag e a release depois da execução continua obrigatório.
 
 As conferências abaixo continuam obrigatórias, inclusive depois de uma
 publicação pelo script que parou no meio.
