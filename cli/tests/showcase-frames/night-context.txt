@@ -1,40 +1,40 @@
- ▌ Specsfy v0.35.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.36.0  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
    Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
- ╭─ Context ────────────────────────────────────────────────╮╭─ PROJECT.md ───────────────────────────────────────────────────────────────╮ 
- │ > ✓ PROJECT.md                product, people and scope  ││ Loja online                                                                │ 
- │   ○ DESIGNSYSTEM.MD           design system              ││                                                                            │ 
- │   ○ INTERFACE.md              screens, routes and compon ││ Loja virtual de produtos artesanais, com vendas por Pix e cartão.          │ 
- │   ✓ .specsfy/STACK.md         stack and evidence         ││                                                                            │ 
- │   ✓ .specsfy/RULES.md         confirmed rules            ││ Pessoas                                                                    │ 
- │   ○ .specsfy/DATABASE.md      persistence and data map   ││                                                                            │ 
- │   ○ .specsfy/PACKAGES.md      npm and Composer packages  ││ - Cliente que compra pelo celular.                                         │ 
- │   ○ .specsfy/USER-PROFILE.md  how to talk to the person  ││ - Lojista que cadastra produtos e acompanha pedidos.                       │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- │                                                          ││                                                                            │ 
- ╰──────────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Context ────────────────────────────────────────────╮╭─ PROJECT.md ───────────────────────────────────────────────────────────────────╮ 
+ │ > ✓ PROJECT.md                product, people and sc ││ Loja online                                                                    │ 
+ │   ○ DESIGNSYSTEM.MD           design system          ││                                                                                │ 
+ │   ○ INTERFACE.md              screens, routes and co ││ Loja virtual de produtos artesanais, com vendas por Pix e cartão.              │ 
+ │   ✓ .specsfy/STACK.md         stack and evidence     ││                                                                                │ 
+ │   ✓ .specsfy/RULES.md         confirmed rules        ││ Pessoas                                                                        │ 
+ │   ○ .specsfy/DATABASE.md      persistence and data m ││                                                                                │ 
+ │   ○ .specsfy/PACKAGES.md      npm and Composer packa ││ - Cliente que compra pelo celular.                                             │ 
+ │   ○ .specsfy/USER-PROFILE.md  how to talk to the per ││ - Lojista que cadastra produtos e acompanha pedidos.                           │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ │                                                      ││                                                                                │ 
+ ╰──────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────────────────────────────╯ 
   ↑/↓  file   PgUp/PgDn  scroll   /  filter   ←/→  tab   1-9  go   ?  help   q  quit

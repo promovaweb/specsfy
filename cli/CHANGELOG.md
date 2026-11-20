@@ -4,6 +4,31 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.36.0] - 2026-11-20
+
+### Adicionado
+
+- `scripts/release.mjs --hub`: depois da publicação, atualiza o Hub da
+  Promovaweb com o gitlink novo, a versão, o changelog (gerado dos itens da
+  seção da versão), a tag e a GitHub Release, sem tocar em arquivos não
+  commitados de outras pessoas.
+- TUI: Enter numa spec da Overview abre a spec na aba Specs; `u` desfaz o
+  último item marcado e `e` registra o esforço (aba Specs); `p` processa a
+  captura selecionada do inbox e `b` cria um item de backlog (aba Backlog);
+  `v` roda o `specsfy verify` do projeto (aba Gates).
+- Mouse na TUI: clique seleciona itens de lista e abre abas; a roda rola.
+
+### Alterado
+
+- A aba Skills usa a mesma barra de ações das outras telas.
+- A barra de teclas se ajusta à largura: as teclas globais encolhem para
+  `? help` e `q quit` e, se faltar espaço, as dicas da tela são cortadas
+  do fim. As listas ocupam até 40% da largura em terminais estreitos.
+- O `example/` passa a usar as pastas de estado: as specs 0001 a 0005 em
+  `specs/completed/` e a 0006 em `specs/defined/`. Os testes que dependiam
+  do layout antigo foram ajustados, e o teste da migração monta o próprio
+  caso legado.
+
 ## [0.35.1] - 2026-11-20
 
 ### Corrigido

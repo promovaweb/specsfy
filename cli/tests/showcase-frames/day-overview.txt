@@ -1,4 +1,4 @@
- ▌ Specsfy v0.35.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.36.0  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
    Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
  ╭─ Progress ───────────────────────────────────────────────────────────────────────────────╮╭─ Specs by state ───────────────────────────╮ 
@@ -12,14 +12,14 @@
  │ 8 specs • 16 pending tasks • 0 orphans • 3 backlog • 1 inbox                             ││                                            │ 
  ╰──────────────────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────╯ 
  ╭─ Specs ──────────────────────────────────────────────────────────────────────────────────╮╭─ Gates ────────────────────────────────────╮ 
- │ > 0003-checkout-com-pix         ✓✓!  ████████████████████ 100%  4/4 tasks   Review       ││ Definition ████████████░░      7/8  87%    │ 
- │   0004-cupons-de-desconto       ✓✓!  ███████████████░░░░░  75%  3/4 tasks   In progress  ││ Plan       ███████████░░░      6/8  75%    │ 
- │   0005-avaliacoes-de-produtos   ✓✓!  █████░░░░░░░░░░░░░░░  25%  1/4 tasks   In progress  ││ Delivery   ████░░░░░░░░░░      2/8  25%    │ 
- │   0006-rastreio-de-pedidos      ✓✓!  ░░░░░░░░░░░░░░░░░░░░   0%  0/4 tasks   Planned      ││                                            │ 
- │   0007-lista-de-desejos         ✓!!  ░░░░░░░░░░░░░░░░░░░░   0%  0/4 tasks   Defined      ││ ✓ 15 passed  ! 9 pending  ✗ 0 failed       │ 
- │   0008-programa-de-fidelidade   !!!  ░░░░░░░░░░░░░░░░░░░░   0%  0/4 tasks   Draft        ││                                            │ 
- │   0001-catalogo-de-produtos     ✓✓✓  ████████████████████ 100%  4/4 tasks   Completed    ││ Gates passed per spec                      │ 
- │   0002-carrinho-de-compras      ✓✓✓  ████████████████████ 100%  4/4 tasks   Completed    ││ 3/3 gates   █████████░░░░░░░░░   2 specs   │ 
+ │ > 0003-checkout-com-pix          ✓✓!  ████████████████████ 100%  4/4 tasks   Review      ││ Definition ████████████░░      7/8  87%    │ 
+ │   0004-cupons-de-desconto        ✓✓!  ███████████████░░░░░  75%  3/4 tasks   In progress ││ Plan       ███████████░░░      6/8  75%    │ 
+ │   0005-avaliacoes-de-produtos    ✓✓!  █████░░░░░░░░░░░░░░░  25%  1/4 tasks   In progress ││ Delivery   ████░░░░░░░░░░      2/8  25%    │ 
+ │   0006-rastreio-de-pedidos       ✓✓!  ░░░░░░░░░░░░░░░░░░░░   0%  0/4 tasks   Planned     ││                                            │ 
+ │   0007-lista-de-desejos          ✓!!  ░░░░░░░░░░░░░░░░░░░░   0%  0/4 tasks   Defined     ││ ✓ 15 passed  ! 9 pending  ✗ 0 failed       │ 
+ │   0008-programa-de-fidelidade    !!!  ░░░░░░░░░░░░░░░░░░░░   0%  0/4 tasks   Draft       ││                                            │ 
+ │   0001-catalogo-de-produtos      ✓✓✓  ████████████████████ 100%  4/4 tasks   Completed   ││ Gates passed per spec                      │ 
+ │   0002-carrinho-de-compras       ✓✓✓  ████████████████████ 100%  4/4 tasks   Completed   ││ 3/3 gates   █████████░░░░░░░░░   2 specs   │ 
  │                                                                                          ││ 2/3 gates   ██████████████████   4 specs   │ 
  │                                                                                          ││ 1/3 gates   █████░░░░░░░░░░░░░   1 spec    │ 
  │                                                                                          ││ 0/3 gates   █████░░░░░░░░░░░░░   1 spec    │ 
