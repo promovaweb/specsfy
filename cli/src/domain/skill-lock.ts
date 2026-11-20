@@ -18,9 +18,16 @@ import { ExitCode } from "../app/exit-codes.ts";
 
 export const LOCK_FILENAME = "skills-lock.json";
 
+/**
+ * Lock versions the CLI reads. The `skills` manager writes version 2 since it
+ * started recording the source of each skill; both keep the same `skills`
+ * map, which is the only field this module reads.
+ */
+const SUPPORTED_LOCK_VERSIONS: ReadonlySet<unknown> = new Set([1, 2]);
+
 /** Minimal structure compatible with the `skills` CLI. */
 export interface SkillsLock {
-  version: 1;
+  version: 1 | 2;
   skills: Record<string, unknown>;
   [key: string]: unknown;
 }
@@ -57,7 +64,7 @@ export async function readSkillsLock(project: string): Promise<SkillsLock> {
     throw invalidLock(`invalid lock: ${path}`);
   }
   const lock = payload as Partial<SkillsLock>;
-  if (lock.version !== 1) {
+  if (!SUPPORTED_LOCK_VERSIONS.has(lock.version)) {
     throw invalidLock(`unsupported lock version in ${path}`);
   }
   if (!lock.skills || typeof lock.skills !== "object" || Array.isArray(lock.skills)) {

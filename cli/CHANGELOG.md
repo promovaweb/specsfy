@@ -4,6 +4,14 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Corrigido
+
+- `specsfy update`, `specsfy doctor` e a TUI leem o `skills-lock.json` na
+  versão 2, gravada pelo gerenciador `skills` a partir da 1.9. Um projeto
+  recém-instalado deixa de ser recusado com "unsupported lock version".
+  Versões desconhecidas continuam recusadas. Contribuição de Lucas Fuad na
+  PR #56.
+
 ## [0.29.3] - 2026-11-15
 
 ### Alterado
