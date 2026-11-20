@@ -3,7 +3,7 @@
  * reload, naming gate and spec states with a color and a word, and the
  * empty and loading texts every screen shows the same way.
  */
-import { TextRenderable, type BoxRenderable, type CliRenderer, type Renderable } from "@opentui/core";
+import { TextRenderable, type BoxRenderable, type CliRenderer, type ColorInput, type Renderable } from "@opentui/core";
 import type { SpecFolder } from "../../domain/lifecycle.ts";
 import { SPEC_FOLDERS } from "../../domain/lifecycle.ts";
 import type { SpecSummary } from "../../core/overview.ts";
@@ -20,7 +20,7 @@ export function replaceChildren(box: BoxRenderable, nodes: Renderable[]): void {
 }
 
 /** Glyph, word and color of a gate value such as `Passed` or `Pending`. */
-export function gateTone(theme: Theme, value: string): { text: string; color: string } {
+export function gateTone(theme: Theme, value: string): { text: string; color: ColorInput } {
   const normalized = value.trim().toLowerCase();
   if (normalized === "passed" || normalized === "approved") return { text: `${glyphs.ok} ${value}`, color: theme.ok };
   if (normalized === "failed" || normalized === "rejected" || normalized === "blocked") return { text: `${glyphs.error} ${value}`, color: theme.error };

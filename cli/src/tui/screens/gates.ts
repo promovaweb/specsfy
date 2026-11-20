@@ -10,7 +10,7 @@
  * Enter while gates run is ignored. With no gates registered in the build,
  * the tab says so instead of offering a run.
  */
-import { BoxRenderable, TextRenderable, type Renderable } from "@opentui/core";
+import { BoxRenderable, TextRenderable, type ColorInput, type Renderable } from "@opentui/core";
 import type { SpecSummary } from "../../core/overview.ts";
 import type { ScriptCommandDef } from "../../engine/script-command.ts";
 import { selectList, scrollText, panel, dim, fit, type SelectItem } from "../components.ts";
@@ -29,7 +29,7 @@ interface GateResult {
 }
 
 /** Glyph, word and color of a gate run state. */
-export function gateStateTone(theme: Theme, state: GateState): { text: string; color: string } {
+export function gateStateTone(theme: Theme, state: GateState): { text: string; color: ColorInput } {
   switch (state) {
     case "passed": return { text: `${glyphs.ok} passed`, color: theme.ok };
     case "failed": return { text: `${glyphs.error} failed`, color: theme.error };

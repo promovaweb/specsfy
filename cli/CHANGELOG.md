@@ -4,6 +4,18 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+### Adicionado
+
+- Tema `terminal` na TUI, agora o padrão de `tui.theme`. Cada cor é uma
+  referência à paleta ANSI ou ao texto e fundo padrão do terminal, sem RGB
+  fixo, então a TUI segue o tema do terminal (Ghostty, Alacritty, Kitty,
+  Omarchy, Termius, Herdr e outros), acompanha a troca de tema com a TUI
+  aberta e mantém a transparência do terminal. Ao abrir, a TUI consulta a
+  paleta (OSC 4, 10 e 11, espera de 300 ms) e escolhe os slots por contraste.
+  O turquesa da marca vira o ciano do terminal e o violeta da seleção vira o
+  magenta. `night` e `day` continuam como paletas fixas da marca. O método
+  é o mesmo do Termfy Starter Kit.
+
 ## [0.29.5] - 2026-11-20
 
 ### Corrigido

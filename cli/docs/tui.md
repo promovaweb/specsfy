@@ -57,15 +57,65 @@ em `overview` também aparece em `specs`, `backlog`, `gates`, `tests` e
 
 ## Tema
 
-Duas paletas em `src/tui/theme.ts`: `night` (padrão) e `day`. A escolha vem
-de `tui.theme`.
+Três paletas em `src/tui/theme.ts`: `terminal` (padrão), `night` e `day`.
+A escolha vem de `tui.theme`.
 
 ```bash
 {{bin}} config set tui.theme day
+{{bin}} config set tui.theme terminal
 ```
 
-As cores têm nomes de papel (`accent`, `textDim`, `border`), não de matiz,
-para que uma troca de paleta não exija tocar nas screens.
+As cores têm nomes de papel (`accent`, `textDim`, `selection`), não de
+matiz, para que uma troca de paleta não exija tocar nas screens.
+
+### terminal
+
+O tema `terminal` herda as cores do tema do terminal (Ghostty, Alacritty,
+Kitty, Omarchy, Termius, Herdr e outros). Cada cor da TUI é uma referência à
+paleta do terminal (as 16 cores ANSI) ou ao texto e fundo padrão, sem RGB
+fixo. O terminal pinta com o tema dele, então trocar o tema do terminal muda
+a TUI na hora. O fundo é o fundo padrão do terminal, então a transparência e
+o blur do terminal continuam.
+
+Ao abrir, a TUI pergunta a paleta ao terminal (OSC 4, 10 e 11) com espera
+curta de 300 ms. Com resposta, ela escolhe qual cor da paleta ocupa cada
+papel: texto apagado legível sobre o fundo (alguns temas, como o Solarized
+Dark, pintam o preto brilhante igual ao fundo), sombra do painel de detalhe,
+acentos com contraste (troca entre a cor normal e a brilhante) e o texto
+sobre os blocos coloridos da aba ativa, da linha selecionada e da barra de
+teclas. Sem resposta, usa o mapeamento padrão. A escolha do slot vale até a
+próxima abertura. As cores em si acompanham o terminal com a TUI aberta.
+
+A marca do Specsfy continua no tema `terminal` como escolha de slot: o
+turquesa do foco vira o ciano do terminal e o violeta da seleção vira o
+magenta.
+
+Mapeamento padrão:
+
+| Papel | Slot |
+| --- | --- |
+| `background`, `surface`, `surfaceHigh`, `barBackground` | fundo padrão do terminal |
+| `text`, `textStrong` | texto padrão do terminal |
+| `textDim`, `border`, `barText` | ANSI 8 (preto brilhante) |
+| `accent`, `borderActive`, `tabActive`, `primary`, `keyBackground` | ANSI 6 (ciano) |
+| `accentSecondary`, `selection` | ANSI 5 (magenta) |
+| `ok` | ANSI 2 (verde) |
+| `warn` | ANSI 3 (amarelo) |
+| `error` | ANSI 1 (vermelho) |
+| `keyText`, `tabActiveText`, `primaryText`, `selectionText` | texto padrão do terminal |
+
+### night e day
+
+`night` e `day` são as paletas fixas da marca, feitas com os tokens de
+`brand/tokens.json`: turquesa no foco e na aba ativa, violeta na linha
+selecionada e petróleo nas superfícies e ações primárias. Ficam iguais em
+qualquer terminal.
+
+Um token novo precisa existir nas três paletas. No `terminal`, ele aponta
+para um slot ANSI ou para o texto ou fundo padrão do terminal; um hex ali
+deixaria a TUI fora do tema do terminal. Para testar a escolha dos slots,
+passe uma paleta conhecida a `terminalTheme(colors)`, como faz
+`tests/tui-theme.test.ts`.
 
 Princípios do visual, no estilo modern unix:
 

@@ -28,7 +28,7 @@ import {
 } from "@opentui/core";
 import { manifest } from "../app/manifest.ts";
 import { readSettings, getPath } from "../config/settings.ts";
-import { glyphs, currentTheme, type Theme } from "./theme.ts";
+import { glyphs, currentTheme, resolveTheme, type Theme } from "./theme.ts";
 import { createScreens } from "./screens/index.ts";
 import { resolveProject } from "../core/project.ts";
 import { defaultServices, type TuiServices } from "./services.ts";
@@ -75,10 +75,14 @@ function keyBar(renderer: CliRenderer, theme: Theme, pairs: ReadonlyArray<{ key:
   return bar;
 }
 
-/** Opens the TUI on a real terminal and returns only when the user quits. */
+/**
+ * Opens the TUI on a real terminal and returns only when the user quits.
+ * With the `terminal` theme, the palette query runs before mounting so the
+ * first frame already uses the slots chosen for the terminal colors.
+ */
 export async function startTui(options: TuiOptions = {}): Promise<void> {
-  const theme = currentTheme();
-  const renderer = await createCliRenderer({ exitOnCtrlC: true, backgroundColor: theme.background, targetFps: 30 });
+  const renderer = await createCliRenderer({ exitOnCtrlC: true, backgroundColor: currentTheme().background, targetFps: 30 });
+  const theme = await resolveTheme(renderer);
   await mountTui(renderer, options, theme);
 }
 

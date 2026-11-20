@@ -15,7 +15,8 @@ import {
   TextAttributes,
   MarkdownRenderable,
   SyntaxStyle,
-  RGBA,
+  parseColor,
+  type ColorInput,
   type CliRenderer,
 } from "@opentui/core";
 import { glyphs, type Theme } from "./theme.ts";
@@ -48,17 +49,17 @@ export function keyValueRow(
   key: string,
   value: string,
   keyWidth: number,
-  valueColor?: string,
+  valueColor?: ColorInput,
 ): BoxRenderable {
   const row = new BoxRenderable(renderer, { flexDirection: "row", height: 1 });
   row.add(new TextRenderable(renderer, { content: key.padEnd(keyWidth), fg: theme.textDim, selectable: false, flexShrink: 0 }));
-  row.add(new TextRenderable(renderer, { content: "  ", flexShrink: 0 }));
+  row.add(new TextRenderable(renderer, { content: "  ", fg: theme.text, flexShrink: 0 }));
   row.add(new TextRenderable(renderer, { content: value, fg: valueColor ?? theme.text, wrapMode: "none" }));
   return row;
 }
 
 /** Creates aligned key/value rows. */
-export function keyValueTable(renderer: CliRenderer, theme: Theme, pairs: Array<[string, string, string?]>): BoxRenderable {
+export function keyValueTable(renderer: CliRenderer, theme: Theme, pairs: Array<[string, string, ColorInput?]>): BoxRenderable {
   const box = new BoxRenderable(renderer, { flexDirection: "column" });
   const width = Math.max(...pairs.map(([k]) => k.length));
   for (const [k, v, c] of pairs) box.add(keyValueRow(renderer, theme, k, v, width, c));
@@ -148,7 +149,7 @@ export interface SelectItem {
   label: string;
   header?: boolean;
   /** Foreground of the row when it is not selected. */
-  color?: string;
+  color?: ColorInput;
 }
 
 /**
@@ -272,7 +273,7 @@ export function scrollText(renderer: CliRenderer, theme: Theme, options: { title
   return {
     box,
     text,
-    setText: (content: string, color?: string) => {
+    setText: (content: string, color?: ColorInput) => {
       text.content = content;
       text.fg = color ?? theme.text;
     },
@@ -283,7 +284,7 @@ export function scrollText(renderer: CliRenderer, theme: Theme, options: { title
 
 /** Syntax style of the Markdown views, derived from the theme. */
 export function markdownStyle(renderer: CliRenderer, theme: Theme): SyntaxStyle {
-  const color = (hex: string) => RGBA.fromHex(hex);
+  const color = (value: ColorInput) => parseColor(value);
   return SyntaxStyle.fromStyles({
     "markup.heading": { fg: color(theme.accent), bold: true },
     "markup.heading.1": { fg: color(theme.accent), bold: true },

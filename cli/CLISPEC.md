@@ -198,7 +198,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | `output.format` | `enum` (`text`, `json`) | `text` | Default CLI output format when --json is not given. |
 | `output.colors` | `boolean` | `true` | Use ANSI colors in text output. NO_COLOR=1 always disables them. |
 | `tui.initialTab` | `enum` (`overview`, `specs`, `backlog`, `gates`, `tests`, `skills`, `about`) | `overview` | Tab opened when the TUI starts. |
-| `tui.theme` | `enum` (`night`, `day`) | `night` | TUI palette. `night` is the default modern unix palette. |
+| `tui.theme` | `enum` (`terminal`, `night`, `day`) | `terminal` | TUI palette. `terminal` (default) inherits the terminal theme colors; `night` and `day` are the fixed Specsfy brand palettes. |
 | `tui.watchInterval` | `number` | `0.75` | Seconds between checks for changed spec files in the TUI and in progress --watch. |
 | `catalog.repository` | `string` | `https://github.com/promovaweb/specsfy` | Git repository the framework skills are installed from. |
 | `skills.agents` | `string` | `universal` | Comma-separated agent targets passed to npx skills add (universal, claude-code, codex, opencode). |

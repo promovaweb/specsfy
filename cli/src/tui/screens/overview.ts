@@ -15,7 +15,7 @@ import { glyphs, type Theme } from "../theme.ts";
 import type { Screen } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
 import { FOLDER_ORDER, folderLabel, replaceChildren, stateText } from "./shared.ts";
-import type { CliRenderer } from "@opentui/core";
+import type { CliRenderer, ColorInput } from "@opentui/core";
 
 /** Next steps suggested from the project state, at most five. */
 export function nextSteps(overview: ProjectOverview): string[] {
@@ -54,7 +54,7 @@ function progressPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOve
 }
 
 function statesPanel(renderer: CliRenderer, theme: Theme, overview: ProjectOverview): Renderable[] {
-  const rows: Array<[string, string, string?]> = FOLDER_ORDER
+  const rows: Array<[string, string, ColorInput?]> = FOLDER_ORDER
     .filter((folder) => folder !== "legacy" || overview.states.legacy > 0)
     .map((folder) => [folderLabel(folder), String(overview.states[folder]), overview.states[folder] ? theme.textStrong : theme.textDim]);
   return [keyValueTable(renderer, theme, rows)];

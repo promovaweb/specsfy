@@ -51,7 +51,7 @@ Texto é o padrão quando `output.format` em settings.json é `text`. Com
 `--json`, ou com `output.format = json`, a saída segue este envelope:
 
 ```json
-{ "ok": true, "command": "{{bin}} config get", "data": { "key": "tui.theme", "value": "night" } }
+{ "ok": true, "command": "{{bin}} config get", "data": { "key": "tui.theme", "value": "terminal" } }
 ```
 
 `ok` acompanha o exit code. Quando o command termina com código diferente de

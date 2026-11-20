@@ -12,7 +12,7 @@
  * `n` or Esc cancels without changing anything. Only one action runs at a
  * time, and the project store reloads afterwards.
  */
-import { BoxRenderable, TextRenderable, type CliRenderer, type Renderable } from "@opentui/core";
+import { BoxRenderable, TextRenderable, type CliRenderer, type ColorInput, type Renderable } from "@opentui/core";
 import type { Catalog, CatalogEntryValue } from "../../domain/catalog.ts";
 import { AUXILIARY_SKILLS, DOCUMENTATION_SKILLS, FRAMEWORK_SKILLS } from "../../domain/installer.ts";
 import { selectList, panel, keyValueTable, dim, fit, type SelectItem } from "../components.ts";
@@ -124,7 +124,7 @@ interface PendingAction {
 
 function detailRows(renderer: CliRenderer, theme: Theme, option: SkillOption | undefined): Renderable[] {
   if (!option) return [dim(renderer, theme, "No skill selected.")];
-  const rows: Array<[string, string, string?]> = [
+  const rows: Array<[string, string, ColorInput?]> = [
     ["Skill", option.name, theme.textStrong],
     ["State", option.installed ? `${glyphs.ok} installed` : `${glyphs.pending} available`, option.installed ? theme.ok : theme.textDim],
     ["Category", categoryLabel(option.category)],

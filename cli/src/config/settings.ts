@@ -49,9 +49,9 @@ export const SETTINGS_SCHEMA: readonly SettingDefinition[] = Object.freeze([
   {
     key: "tui.theme",
     type: "enum",
-    default: "night",
-    values: ["night", "day"],
-    description: "TUI palette. `night` is the default modern unix palette.",
+    default: "terminal",
+    values: ["terminal", "night", "day"],
+    description: "TUI palette. `terminal` (default) inherits the terminal theme colors; `night` and `day` are the fixed Specsfy brand palettes.",
   },
   {
     key: "tui.watchInterval",

@@ -20,7 +20,7 @@ Keys em notação de ponto. O schema do Specsfy:
 | `output.format` | `text` ou `json` | `text` | formato padrão da saída do CLI |
 | `output.colors` | boolean | `true` | cores ANSI na saída de texto |
 | `tui.initialTab` | `overview`, `specs`, `backlog`, `gates`, `tests`, `skills` ou `about` | `overview` | aba aberta ao iniciar a TUI |
-| `tui.theme` | `night` ou `day` | `night` | paleta da TUI |
+| `tui.theme` | `terminal`, `night` ou `day` | `terminal` | paleta da TUI; `terminal` herda as cores do tema do terminal |
 | `tui.watchInterval` | number | `0.75` | segundos entre as checagens de arquivos alterados na TUI e no `progress --watch` |
 | `catalog.repository` | string | `https://github.com/promovaweb/specsfy` | repositório Git de onde as skills são instaladas |
 | `skills.agents` | string | `universal` | agentes passados ao `npx skills add`, separados por vírgula |
