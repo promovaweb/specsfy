@@ -4,6 +4,17 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.37.0] - 2026-11-20
+
+### Adicionado
+
+- A TUI avisa quando uma versão nova do `specsfy` é instalada com ela
+  aberta. O processo aberto não recarrega o próprio código. A cada 30 s a
+  TUI confere a data do executável em uso e do `specsfy` do PATH; se algum
+  mudou, ela pergunta a versão instalada. Quando a versão é diferente, o
+  cabeçalho mostra `• vX.Y.Z installed: press q and reopen`. No invólucro
+  npm, essa consulta já baixa o binário novo, e reabrir fica imediato.
+
 ## [0.36.2] - 2026-11-20
 
 ### Corrigido

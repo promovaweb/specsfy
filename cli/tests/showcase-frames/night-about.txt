@@ -1,8 +1,8 @@
- ▌ Specsfy v0.36.2  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.37.0  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
    Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
  ╭─ Binary ─────────────────────────────────────────────────────────────────────╮╭─ Project ──────────────────────────────────────────────╮ 
- │ Specsfy  v0.36.2                                                             ││ Author      Promovaweb                                 │ 
+ │ Specsfy  v0.37.0                                                             ││ Author      Promovaweb                                 │ 
  │ Install the Specsfy framework, run the spec lifecycle and its gates, and     ││ License     AGPL-3.0-only                              │ 
  │ serve them to agents over MCP.                                               ││ Site        https://promovaweb.com/docs/specsfy/cli/   │ 
  │                                                                              ││ Repository  https://github.com/promovaweb/specsfy      │ 
@@ -20,7 +20,7 @@
  │ MCP TypeScript SDK  Model Context Protocol server over stdio                 ││ ! settings    Not created                              │ 
  │                     https://modelcontextprotocol.io                          ││ ! master-key  none                                     │ 
  │ OpenCLI             standard description of the command-line interface       ││ ! credentials Not created                              │ 
- │                     https://opencli.org                                      ││ ✓ binary      specsfy 0.36.2                           │ 
+ │                     https://opencli.org                                      ││ ✓ binary      specsfy 0.37.0                           │ 
  │ Zod                 schema validation for MCP tools                          ││ ✓ platform    linux-x64                                │ 
  │                     https://zod.dev                                          ││                                                        │ 
  │                                                                              ││ All local checks pass. Run specsfy doctor --project    │ 
