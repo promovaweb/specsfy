@@ -19,7 +19,9 @@ Release.
    ```
 
    O encadeamento cobre `embed:check`, `typecheck`, `bun test`, `skills:check`,
-   `opencli:check`, `docs:check` e `build`.
+   `opencli:check`, `showcase:check`, `docs:check` e `build`. Se a TUI mudou
+   desde a última release, rode `bun run showcase -- --all` para que os
+   prints de `docs/user/assets/showcase/` mostrem a versão nova.
 5. Confira que `src/engine/skills.gen.ts` está atualizado. Depois de mudar
    `../skills/`, rode `bun run embed`.
 6. Revise o diff e o `git status --short`. Mudanças que já existiam ficam

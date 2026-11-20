@@ -282,32 +282,33 @@ cada spec:
 
 ![Dashboard Home](assets/cli/cli-dash.png)
 
-A Overview reúne o total de specs, o avanço das tarefas e checklists e a
-porcentagem global. O diretório selecionado aparece no topo e o rodapé confirma
-quantas specs estão completas.
+A Overview é o painel de estatísticas: barra **Overall** com a média das specs,
+medidores de specs, gates, tarefas e checklist, gráfico de specs por estado,
+cada spec com os três gates e barra própria (abertas primeiro), gates aprovados
+por tipo, backlog, inbox e o próximo passo.
 
 #### Backlog: lista e leitura lado a lado
 
 ![Backlogs](assets/cli/cli-backlogs.png)
 
-A aba Backlog mantém a seleção na coluna esquerda e renderiza o Markdown do item
-na direita. Assim é possível conferir metainformação, status e conteúdo sem
-abandonar o dashboard.
+A aba Backlog mantém a seleção na coluna esquerda e mostra o Markdown do item na
+direita, com as capturas do inbox na mesma lista. Assim é possível conferir
+status e conteúdo sem sair da TUI.
 
 #### Specs: gates, tarefas e progresso
 
 ![Specs](assets/cli/cli-specs.png)
 
-A aba Specs compara status, gates, tarefas, checklists e porcentagem por
-especificação. A linha destacada abre a spec completa em um modal Markdown. Use
-`Esc` para voltar à lista.
+A aba Specs agrupa as specs por estado. A selecionada mostra gates, tarefas e
+progresso, com o Markdown abaixo. `↑`/`↓` trocam de spec e `g` roda os gates.
 
 #### Skills: planejar antes de aplicar
 
 ![Skills](assets/cli/cli-skills.png)
 
-A aba Skills combina busca, filtros, plano, categoria e estado com o painel de
-detalhes da seleção. Nada muda no projeto até a ação **Aplicar**.
+A aba Skills lista as skills instaladas e as disponíveis no catálogo, por
+categoria, com o detalhe da selecionada ao lado. `i` instala, `x` remove, `u`
+atualiza todas e `c` abre o catálogo. Todas as telas estão no [showcase](../develop/showcase.md).
 
 ## Servidor MCP
 

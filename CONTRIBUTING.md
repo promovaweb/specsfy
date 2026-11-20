@@ -160,9 +160,12 @@ bun run validate
 ```
 
 `bun run validate` cobre `embed:check`, `launcher:check`, `typecheck`,
-`bun test`, `skills:check`, `opencli:check`, `docs:check` e `build`. Depois de
-alterar `skills/`, rode `bun run embed` para atualizar as skills embutidas no
-binário.
+`bun test`, `skills:check`, `opencli:check`, `showcase:check`, `docs:check` e
+`build`. Depois de alterar `skills/`, rode `bun run embed` para atualizar as
+skills embutidas no binário. Depois de mudar uma tela da TUI, rode
+`bun run showcase` para atualizar os prints de `docs/user/assets/showcase/`;
+o fluxo está em
+[`docs/develop/showcase.md`](docs/develop/showcase.md).
 
 Na aplicação de validação:
 

@@ -1,0 +1,40 @@
+ ▌ Specsfy v0.31.0  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
+                                 ▬▬▬▬▬▬▬▬▬▬▬                                                                                                
+ ╭─ Specs ────────────────────────────────────╮╭─ Gates ──────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Legacy (specs/specs) · 6                   ││ Enter runs 8 gate(s) on 0001-diretorio-global-usuarios.                                  │ 
+ │ > 0001-diretorio-global-usuarios 3/3 100%  ││ gate spec             ○ pending  Validate the structure of a spec (Specsfy/2.0 contract) │ 
+ │   0002-busca-paginacao-usuarios  3/3 100%  ││ gate tasks            ○ pending   Validate the tasks in section 14 of a spec.            │ 
+ │   0003-perfil-publico-usuario    3/3 100%  ││ gate interface    ○ pendingValidate the interface phase of the tasks of a spec with a hu │ 
+ │   0004-diretorio-global-equipes  3/3 100%  ││ gate trace          ○ pending  Check traceability between the spec IDs and the test mark │ 
+ │   0005-detalhe-publico-equipe    3/3 100%  ││ gate acceptance   ○ pendingVerify that every acceptance criterion (AC) of a spec has a p │ 
+ │   0006-produtos                  1/3  33%  ││ gate evidence     ○ pending Verify the material evidence of the tasks of a spec (Evidenc │ 
+ │                                            ││ gate findings     ○ pendingValidate the product, architecture and security findings reco │ 
+ │                                            ││ gate database    ○ pending Check that tests use a separate database and that a command c │ 
+ │                                            │╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
+ │                                            │╭─ Output ─────────────────────────────────────────────────────────────────────────────────╮ 
+ │                                            ││ No output yet.                                                                           │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ ╰────────────────────────────────────────────╯╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
+  ↑/↓  spec   Enter  run gates   PgUp/PgDn  scroll   ←/→  tab   1-9  go   ?  help   q  quit

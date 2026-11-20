@@ -81,8 +81,10 @@ bun \
 Exigir `X.Y.Z` em `VERSION`, `cli/package.json`, `cli/npm/package.json`,
 `./dist/specsfy --version`, `cli/docs/opencli.json`, ebook e
 `ebook/build.json`. `bun run validate` é o mesmo gate do job `binaries` do
-workflow de release: inclui typecheck, testes, `opencli:check`, `docs:check` e
-build. Um arquivo gerado com a versão antiga reprova a tag depois do push. O changelog promove as
+workflow de release: inclui typecheck, testes, `opencli:check`,
+`showcase:check`, `docs:check` e build. Quando a TUI mudou desde a última
+release, rodar `bun run showcase -- --all` em `cli/` e incluir os prints de
+`docs/user/assets/showcase/` e `docs/user/assets/cli/`. Um arquivo gerado com a versão antiga reprova a tag depois do push. O changelog promove as
 notas sob `## [X.Y.Z] - YYYY-MM-DD`. Os executáveis de `cli/dist/` servem só
 para conferência local e não entram no commit.
 

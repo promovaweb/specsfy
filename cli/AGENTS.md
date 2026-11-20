@@ -89,11 +89,17 @@ bun run validate
 ```
 
 `validate` encadeia `embed:check`, `typecheck`, `bun test`, `skills:check`,
-`opencli:check`, `docs:check` e `build`. `docs:check` exige que todo command,
-screen, tool, resource, prompt, key e exit code do código apareça em `docs/`.
+`opencli:check`, `showcase:check`, `docs:check` e `build`. `docs:check` exige
+que todo command, screen, tool, resource, prompt, key e exit code do código
+apareça em `docs/`.
 Quando o registry de commands mudar, rode `bun run opencli` antes e revise o
 diff de `docs/opencli.json`. Confira `git status --short` ao final e preserve
 mudanças que já existiam.
+
+Quando uma tela da TUI mudar, rode `bun run showcase` e inclua na mesma
+entrega os prints de `../docs/user/assets/showcase/`, as cópias em
+`../docs/user/assets/cli/` e os quadros de `tests/showcase-frames/`; o `showcase:check` falha até lá. O fluxo está
+em [`docs/develop/showcase.md`](../docs/develop/showcase.md).
 
 Para o check de documentação isolado:
 

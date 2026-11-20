@@ -1,0 +1,40 @@
+ ▌ Specsfy v0.31.0  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
+▬▬▬▬▬▬▬▬▬▬▬                                                                                                                                 
+ ╭─ Progress ───────────────────────────────────────────────────────────────────────────────╭─ Keys ─────────────────────────────────────╮╮ 
+ │ Overall    ██████████████████████████████████████████████░░░░░░  88%                     │ ←  →  [  ]      previous / next tab        ││ 
+ │                                                                                          │ Tab             next tab                   ││ 
+ │ Specs      █████████████████████████████████░░░░░░░        5/6  83%                      │ 1 … 9          go to the tab with that     ││ 
+ │ Gates      ████████████████████████████████████░░░░      16/18  88%                      │                number                      ││ 
+ │ Tasks      ████████████████████████████████████████      20/20 100%                      │ ?               show or hide this help     ││ 
+ │ Checklist  ████████████████████████████████████████    140/140 100%                      │ q  Esc  Ctrl+C  quit                       ││ 
+ │                                                                                          │ ↑ ↓  PgUp PgDn  move or scroll in a tab    ││ 
+ │ 6 specs • 0 pending tasks • 0 orphans • 2 backlog • 0 inbox                              ╰────────────────────────────────────────────╯│ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────╯ 
+ ╭─ Specs ──────────────────────────────────────────────────────────────────────────────────╮╭─ Gates ────────────────────────────────────╮ 
+ │ 0006-produtos                   ✓!!  ███████░░░░░░░░░░░░░  33%  0/0 tasks   Legacy       ││ Definition ██████████████      6/6 100%    │ 
+ │ 0001-diretorio-global-usuarios  ✓✓✓  ████████████████████ 100%  4/4 tasks   Legacy       ││ Plan       ████████████░░      5/6  83%    │ 
+ │ 0002-busca-paginacao-usuarios   ✓✓✓  ████████████████████ 100%  4/4 tasks   Legacy       ││ Delivery   ████████████░░      5/6  83%    │ 
+ │ 0003-perfil-publico-usuario     ✓✓✓  ████████████████████ 100%  4/4 tasks   Legacy       ││                                            │ 
+ │ 0004-diretorio-global-equipes   ✓✓✓  ████████████████████ 100%  4/4 tasks   Legacy       ││ ✓ 16 passed  ! 2 pending  ✗ 0 failed       │ 
+ │ 0005-detalhe-publico-equipe     ✓✓✓  ████████████████████ 100%  4/4 tasks   Legacy       ││                                            │ 
+ │                                                                                          ││ Gates passed per spec                      │ 
+ │                                                                                          ││ 3/3 gates   ██████████████████   5 specs   │ 
+ │                                                                                          ││ 2/3 gates   ░░░░░░░░░░░░░░░░░░   0 specs   │ 
+ │                                                                                          ││ 1/3 gates   ████░░░░░░░░░░░░░░   1 specs   │ 
+ │                                                                                          ││ 0/3 gates   ░░░░░░░░░░░░░░░░░░   0 specs   │ 
+ │                                                                                          ││                                            │ 
+ │                                                                                          ││                                            │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────╯ 
+ ╭─ Backlog and inbox ──────────────────────────────────────────────────────────────────────╮╭─ Guide ────────────────────────────────────╮ 
+ │ Backlog · 2                                                                              ││ Next steps                                 │ 
+ │ • BACKLOG-0001  Listagem para gestão de usuários  [Promoted]                             ││ → Plan the tasks of 0006-produtos with     │ 
+ │ • BACKLOG-0002  Consulta de equipes e seus usuários  [Promoted]                          ││   $specsfy-05-tasks                        │ 
+ │                                                                                          ││                                            │ 
+ │ Inbox · 0 pending of 0                                                                   ││ For agents (MCP)                           │ 
+ │ No pending captures in specs/inbox/.                                                     ││ { "command": "specsfy", "args": ["mcp"] }  │ 
+ │                                                                                          ││ specsfy mcp --list  lists the tools        │ 
+ │                                                                                          ││                                            │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────╯ 
+  r  reload   ←/→  tab   1-9  go   ?  help   q  quit

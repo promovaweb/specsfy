@@ -20,7 +20,7 @@ ou `skills-lock.json`.
 
 | Screen | Função | Teclas da screen |
 | --- | --- | --- |
-| `overview` | Progresso do projeto, estados das specs, backlog, inbox e próximos passos. | `r` recarrega |
+| `overview` | Painel das specs: barra de progresso geral, medidores de specs, gates, tarefas e checklist, gráfico de specs por estado, gates aprovados por tipo e por spec, lista das specs com gates e barra própria, backlog, inbox e próximos passos. | `r` recarrega |
 | `specs` | Specs agrupadas por estado, com detalhe de gates e tarefas e o Markdown da selecionada. | `↑/↓` muda a spec, `PgUp/PgDn` rola, `g` abre os gates, `r` recarrega |
 | `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `r` recarrega |
 | `gates` | Executa os gates do framework na spec selecionada e mostra a saída. | `↑/↓` muda a spec, `Enter` roda os gates, `PgUp/PgDn` rola |
@@ -40,6 +40,22 @@ globais aparecem depois das teclas da screen.
 | `1` … `9` | ir para a aba de mesmo número |
 | `?` | mostrar ou esconder o help de teclas |
 | `q` `Esc` `Ctrl+C` | sair |
+
+## Overview
+
+A Overview é o painel de estatísticas do projeto:
+
+| Painel | Conteúdo |
+| --- | --- |
+| Progress | Barra `Overall` com a média do progresso das specs, medidores de specs completas, gates aprovados, tarefas e itens de checklist (`valor/total` e porcentagem) e uma linha com specs, tarefas pendentes, itens órfãos, backlog e inbox. |
+| Specs by state | Gráfico de barras com quantas specs há em cada estado, na ordem do ciclo. |
+| Specs | Uma linha por spec, as abertas primeiro: os três gates (definição, planejamento e entrega) como `✓`, `!`, `✗` ou `○`, barra de progresso, porcentagem, tarefas e estado. |
+| Gates | Gates aprovados por tipo, total de aprovados, pendentes e reprovados e o gráfico de quantas specs têm 3, 2, 1 ou 0 gates aprovados. |
+| Backlog and inbox, Guide | Itens do backlog, capturas pendentes, próximos passos e o bloco MCP. |
+
+As barras acompanham a largura do terminal. Em terminais com menos de 38
+linhas, a linha de backlog e guia sai da Overview (a aba Backlog mostra o
+mesmo) e o primeiro próximo passo aparece em `Progress`, como `→ Next:`.
 
 ## Atualização automática
 

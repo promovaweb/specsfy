@@ -1,0 +1,40 @@
+ ▌ Specsfy v0.31.0  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+ Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
+                                                                  ▬▬▬▬▬▬▬▬▬▬▬                                                               
+ ╭─ Binary ─────────────────────────────────────────────────────────────────────╮╭─ Project ──────────────────────────────────────────────╮ 
+ │ Specsfy  v0.31.0                                                             ││ Author      Promovaweb                                 │ 
+ │ Install the Specsfy framework, run the spec lifecycle and its gates, and     ││ License     AGPL-3.0-only                              │ 
+ │ serve them to agents over MCP.                                               ││ Site        https://promovaweb.com/docs/specsfy/cli/   │ 
+ │                                                                              ││ Repository  https://github.com/promovaweb/specsfy      │ 
+ │ Executable  ~/.bun/bin/bun                                                   ││                                                        │ 
+ │ Runtime     Bun 1.4.4                                                        ││                                                        │ 
+ │ Platform    linux-x64                                                        ││                                                        │ 
+ │ PID         4242                                                             ││                                                        │ 
+ │ Data        ~/.specsfy                                                       ││                                                        │ 
+ ╰──────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────╯ 
+ ╭─ Credits ────────────────────────────────────────────────────────────────────╮╭─ Standards ────────────────────────────────────────────╮ 
+ │ Bun                 runtime, bundler and binary compiler                     ││ Interface                                              │ 
+ │                     https://bun.sh                                           ││ • OpenCLI 0.1 for the CLI description                  │ 
+ │ OpenTUI             terminal user interface rendering                        ││ • MCP 2025-11-25 over stdio                            │ 
+ │                     https://opentui.com                                      ││ • Fixed exit codes (0 success)                         │ 
+ │ MCP TypeScript SDK  Model Context Protocol server over stdio                 ││                                                        │ 
+ │                     https://modelcontextprotocol.io                          ││ Data                                                   │ 
+ │ OpenCLI             standard description of the command-line interface       ││ • settings.json in plain text                          │ 
+ │                     https://opencli.org                                      ││ • credentials.json with AES-256-GCM                    │ 
+ │ Zod                 schema validation for MCP tools                          ││ • master.key with mode 0600                            │ 
+ │                     https://zod.dev                                          ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ │                                                                              ││                                                        │ 
+ ╰──────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────╯ 
+  ←/→  tab   1-9  go   ?  help   q  quit

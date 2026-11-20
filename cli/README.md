@@ -122,6 +122,9 @@ About.
 
 ![Skills](https://promovaweb.com/docs/specsfy/cli/cli-skills.png)
 
+Os prints de todas as telas, nos temas `night` e `day`, estão no
+[showcase da TUI](../docs/develop/showcase.md).
+
 ## Configuração e credenciais
 
 As preferências ficam em `~/.specsfy/settings.json` e os segredos em
@@ -145,7 +148,8 @@ em [CLISPEC.md](CLISPEC.md) e cada evolução em [specs/](specs/).
 ```bash
 bun install
 bun run dev -- status --project ../example
-bun run validate                # tipos, testes, docs embutidas, OpenCLI e build
+bun run validate                # tipos, testes, docs embutidas, OpenCLI, showcase e build
+bun run showcase                # atualiza os prints da TUI em ../docs/user/assets/showcase/
 bun run build:all               # executáveis das cinco plataformas em dist/
 ```
 

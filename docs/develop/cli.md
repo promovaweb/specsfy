@@ -191,3 +191,6 @@ Mudanças de interface atualizam também
 [`referência pública dos comandos`](../user/cli-reference.md). A regressão
 compara os comandos registrados no Commander com as seções dessa referência e
 exige cinco exemplos por comando ou subcomando.
+
+Os prints de todas as telas da TUI e o fluxo para atualizá-los estão em
+[`showcase.md`](showcase.md).

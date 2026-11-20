@@ -33,12 +33,12 @@ afterAll(async () => {
 
 describe("tui", () => {
   test("opens on the Overview tab with header, panels and key bar", async () => {
-    const frame = await waitFor("Next steps");
+    const frame = await waitFor("Next:");
     expect(frame).toContain(manifest.title);
     expect(frame).toContain(`v${manifest.version}`);
     expect(frame).toContain(EXAMPLE);
     for (const title of ["Overview", "Specs", "Backlog", "Gates", "Tests", "Skills", "About"]) expect(frame).toContain(title);
-    expect(frame).toContain("Project");
+    expect(frame).toContain("Progress");
     expect(frame).toContain("quit");
   });
 
@@ -55,7 +55,7 @@ describe("tui", () => {
 
   test("Tab moves to the next tab, wrapping to the first", async () => {
     setup.mockInput.pressKey("TAB");
-    await waitFor("16/18 passed");
+    await waitFor("16/18");
   });
 
   test("q destroys the renderer", async () => {

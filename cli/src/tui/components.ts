@@ -346,3 +346,75 @@ export function fit(text: string, width: number): string {
   if (text.length <= width) return text.padEnd(width);
   return `${text.slice(0, Math.max(0, width - 1))}…`;
 }
+
+/** One colored piece of a line built by `segments`. */
+export type Segment = [text: string, color: ColorInput];
+
+/** Creates one line made of colored pieces, without wrapping. */
+export function segments(renderer: CliRenderer, parts: Segment[]): BoxRenderable {
+  const row = new BoxRenderable(renderer, { flexDirection: "row", height: 1 });
+  for (const [content, fg] of parts) {
+    if (content) row.add(new TextRenderable(renderer, { content, fg, flexShrink: 0, wrapMode: "none" }));
+  }
+  return row;
+}
+
+/** Filled and empty cells of a bar with `width` cells for `value / total`. */
+export function barCells(value: number, total: number, width: number): { full: string; empty: string } {
+  const ratio = total > 0 ? Math.max(0, Math.min(1, value / total)) : 0;
+  const filled = Math.round(ratio * width);
+  return { full: glyphs.barFull.repeat(filled), empty: glyphs.barEmpty.repeat(width - filled) };
+}
+
+/** Percentage of `value / total`, rounded down so 99.6% never shows as 100%. */
+export function percentOf(value: number, total: number): number {
+  if (total <= 0) return 0;
+  return value >= total ? 100 : Math.floor((value / total) * 100);
+}
+
+/**
+ * Creates a labeled meter: `Specs      ██████░░░░  5/6   83%`. The filled
+ * part uses `color`, the empty part the dim text color.
+ */
+export function meter(
+  renderer: CliRenderer,
+  theme: Theme,
+  options: { label: string; labelWidth: number; value: number; total: number; width: number; color?: ColorInput; countWidth?: number },
+): BoxRenderable {
+  const { full, empty } = barCells(options.value, options.total, options.width);
+  const count = `${options.value}/${options.total}`.padStart(options.countWidth ?? 7);
+  const percent = `${percentOf(options.value, options.total)}%`.padStart(5);
+  return segments(renderer, [
+    [options.label.padEnd(options.labelWidth), theme.textDim],
+    [full, options.color ?? theme.accent],
+    [empty, theme.textDim],
+    [`  ${count}`, theme.text],
+    [percent, theme.textStrong],
+  ]);
+}
+
+/**
+ * Creates a horizontal bar chart: one row per item, bars scaled to the
+ * largest value, with the value after the bar.
+ */
+export function barChart(
+  renderer: CliRenderer,
+  theme: Theme,
+  items: Array<{ label: string; value: number; color?: ColorInput; suffix?: string }>,
+  options: { labelWidth: number; width: number },
+): BoxRenderable {
+  const box = new BoxRenderable(renderer, { flexDirection: "column" });
+  const max = Math.max(1, ...items.map((item) => item.value));
+  for (const item of items) {
+    const { full, empty } = barCells(item.value, max, options.width);
+    box.add(segments(renderer, [
+      [fit(item.label, options.labelWidth), item.value ? theme.text : theme.textDim],
+      [" ", theme.text],
+      [item.value ? full : "", item.color ?? theme.accent],
+      [item.value ? empty : glyphs.barEmpty.repeat(options.width), theme.textDim],
+      [` ${String(item.value).padStart(3)}`, item.value ? theme.textStrong : theme.textDim],
+      [item.suffix ?? "", theme.textDim],
+    ]));
+  }
+  return box;
+}

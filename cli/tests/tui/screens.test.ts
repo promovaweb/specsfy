@@ -27,7 +27,7 @@ describe("example project", () => {
   afterAll(() => expect(exampleStatus()).toBe(before));
 
   const expectations: Record<string, string[]> = {
-    overview: ["Project", "5/6 complete", "16/18 passed", "Legacy (specs/specs)", "BACKLOG-0001", "Next steps", "0006-produtos", "\"args\": [\"mcp\"]"],
+    overview: ["Progress", "5/6", "16/18", "Legacy", "Gates passed per spec", "Next: Plan the tasks of 0006-produtos", "0006-produtos"],
     specs: ["Legacy (specs/specs) · 6", "> 0001-diretorio-global-usuarios", "Definition gate", "✓ Passed", "Especificação integrada"],
     backlog: ["Backlog · 2", "Inbox · 0", "BACKLOG-0001"],
     gates: ["No gates are registered in this build.", "0006-produtos"],
@@ -54,7 +54,7 @@ describe("example project", () => {
   test("digits walk every tab and q quits", async () => {
     const tui = await mount({ project: EXAMPLE });
     try {
-      await tui.waitFor("16/18 passed");
+      await tui.waitFor("16/18");
       await tui.press("2");
       await tui.waitFor("Delivery gate");
       await tui.press("3");
@@ -98,7 +98,7 @@ describe("example project", () => {
   test("day theme and 80x24 still render the overview", async () => {
     const tui = await mount({ project: EXAMPLE, theme: themes.day, width: 80, height: 24 });
     try {
-      const frame = await tui.waitFor("5/6 complete");
+      const frame = await tui.waitFor("5/6");
       expect(frame).toContain("Overview");
       expect(frame).toContain("About");
     } finally {
