@@ -318,7 +318,6 @@ Os guias de stack mostram como confirmar a detecção, instalar o especialista
 e aplicar suas convenções na spec:
 
 - [Laravel](laravel.md), com Pest, `.env.testing` e proteção do banco.
-- [Astro](astro.md), com `astro check`, build de produção e preview.
 - [Next.js](nextjs.md), com o especialista da stack.
 
 Para consultar rapidamente estados, gates, arquivos e comandos, siga para a

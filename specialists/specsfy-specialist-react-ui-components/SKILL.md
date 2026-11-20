@@ -124,8 +124,8 @@ uma escolha incremental, ler
   adaptação visual.
 - `$specsfy-specialist-web-accessibility` conduz auditoria WCAG e testes com
   tecnologia assistiva além da checagem básica da interface.
-- `$specsfy-specialist-nextjs` ou `$specsfy-specialist-astro` governa a
-  fronteira server/client e o roteamento do framework hospedeiro.
+- `$specsfy-specialist-nextjs` governa a fronteira server/client e o
+  roteamento do framework hospedeiro.
 
 Leia [references/standards.md](references/standards.md) para regras de
 seleção, adaptação, estado, dependências e comprovação. Carregue os demais

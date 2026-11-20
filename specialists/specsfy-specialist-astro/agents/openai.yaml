@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Astro"
-  short_description: "Astro server-first com ilhas eficientes"
-  default_prompt: "Use $specsfy-specialist-astro para orientar esta tarefa com padrões e validação especializados."

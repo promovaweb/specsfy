@@ -13,7 +13,7 @@ test('docs contém somente as árvores user e develop',()=>{
 });
 test('portal do usuário cobre a jornada completa',()=>{
  const portal=user('README.md');
- const routes={'Instalação':'installation.md','Primeiro projeto':'getting-started.md','Metodologia':'method.md','Inbox':'inbox.md','CLI e TUI':'cli.md','Informações permanentes do projeto':'project-context.md','Especialistas':'specialists.md','Documentação do sistema':'system-documentation.md','Mudanças posteriores':'update-spec.md','Laravel':'laravel.md','Astro':'astro.md','Next.js':'nextjs.md','Skills base':'skills/README.md','Milestones':'milestones.md'};
+ const routes={'Instalação':'installation.md','Primeiro projeto':'getting-started.md','Metodologia':'method.md','Inbox':'inbox.md','CLI e TUI':'cli.md','Informações permanentes do projeto':'project-context.md','Especialistas':'specialists.md','Documentação do sistema':'system-documentation.md','Mudanças posteriores':'update-spec.md','Laravel':'laravel.md','Next.js':'nextjs.md','Skills base':'skills/README.md','Milestones':'milestones.md'};
  for(const [label,target] of Object.entries(routes)){includes(portal,[label,`](${target})`]);assert.ok(existsSync(join(ROOT,'docs/user',target)));}
  includes(portal.toLowerCase(),['ideia','especificação','teste','implementação','progresso','exemplo']);
 });

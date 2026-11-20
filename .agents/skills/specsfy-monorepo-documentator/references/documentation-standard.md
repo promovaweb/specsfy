@@ -38,7 +38,7 @@ para `docs/develop/`.
 | documentação do sistema gerada | `docs/user/system-documentation.md` |
 | especialistas | `docs/user/specialists.md` |
 | automação avançada | `docs/user/advanced-usage.md` |
-| guias por framework | `docs/user/laravel.md`, `astro.md` e `nextjs.md` |
+| guias por framework | `docs/user/laravel.md` e `nextjs.md` |
 
 O download público do CLI usa a URL canônica `get.specsfy.dev`.
 Referências ao GitHub continuam sendo usadas para origem, contribuição e

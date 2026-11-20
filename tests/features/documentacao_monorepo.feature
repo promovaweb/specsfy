@@ -34,7 +34,7 @@ Feature: Documentação oficial do monorepo Specsfy
     And os exemplos mostram cada comando e seu resultado sem código de implementação
     And a porta pública oferece dicas operacionais do CLI
     And a documentação separa uso básico uso avançado repositórios e créditos
-    And Laravel Astro e Nextjs possuem guias temáticos verificáveis
+    And Laravel e Nextjs possuem guias temáticos verificáveis
 
   Scenario: Exibir a interface terminal na documentação
     Given a fonte da verdade distribuída do Specsfy

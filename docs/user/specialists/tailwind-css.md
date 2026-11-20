@@ -80,8 +80,8 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 - [ReUI](reui.md) fornece composições React e Tailwind gratuitas.
 - [shadcn/ui](shadcn-ui.md) constrói componentes sobre estes tokens.
-- [React](react.md), [Next.js](nextjs.md) e [Astro](astro.md) fornecem os
-  componentes onde as classes são aplicadas.
+- [React](react.md) e [Next.js](nextjs.md) fornecem os componentes onde as
+  classes são aplicadas.
 - [TypeScript](typescript.md) tipa variantes `cva`.
 - [Componentes React](react-ui-components.md) e [UI Design](ui-design.md)
   cuidam da composição visual da página.

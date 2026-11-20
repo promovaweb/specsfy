@@ -85,8 +85,8 @@ npx skills add https://github.com/promovaweb/specsfy \
 - [UI Design](ui-design.md) define hierarquia, tokens e estados visuais.
 - [UX Design](ux-design.md) pesquisa o sucesso das tarefas com tecnologias
   assistivas.
-- [React](react.md), [Astro](astro.md) e [Next.js](nextjs.md) implementam a
-  correção no framework.
+- [React](react.md) e [Next.js](nextjs.md) implementam a correção no
+  framework.
 - [Code Review](code-review.md) amplia a revisão para outras falhas.
 
 ## Referência técnica

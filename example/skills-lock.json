@@ -49,7 +49,7 @@
     "specsfy-setup": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "d75ff528e1dbe3290b4540d107fc8f3f1a63369bf9fc8c4a71ce600d76d3a6ba"
+      "computedHash": "bf1d55b4b48c998844635bb496a2f4fd705c0f35579d3eca058606070b482f09"
     },
     "specsfy-specialist-application-security": {
       "source": "../specialists",
@@ -89,7 +89,7 @@
     "specsfy-specialist-performance-engineering": {
       "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "4323a11bbc9c5d3f54d207fbb53420d8c280a4df827aa35c4e2192f87ae7b4a1"
+      "computedHash": "60454327f85bda0935c94ce79a450020ffc7143aa89da0c80275830c9f3a9cec"
     },
     "specsfy-specialist-postgres": {
       "source": "../specialists",
@@ -109,7 +109,7 @@
     "specsfy-specialist-shadcn-ui": {
       "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "094454cd0576fe7a5da02b5eaad52d73c57ef6ae0aa5d4abc365b7dc4dc9d444"
+      "computedHash": "fab298fd4f941415a17c2a64ebabdcca04d58e0a93b93203bcd729f0d6d7486a"
     },
     "specsfy-specialist-software-architecture": {
       "source": "../specialists",
@@ -134,12 +134,12 @@
     "specsfy-specialist-web-accessibility": {
       "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "57dcb5f53e0fae6cc3edf471411657ec544588e8d60fabb9b9f6aaf1ebd42656"
+      "computedHash": "b4d74a79f904ff9bcbfb1e47f7320175d2e9abaea01adcb104fe987e71e646e8"
     },
     "specsfy-specialist-web-api-design": {
       "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "629afab2a91b8e62f6295f076e0e7ae10404587a96a780f429b780710f8db555"
+      "computedHash": "3cc39a2c840e4160e5e3e2859d0b7c22a7c31a5bd74f74572a1ae99798acffc7"
     },
     "specsfy-update-spec": {
       "source": "../skills",

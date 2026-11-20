@@ -96,8 +96,6 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-astro` cobre projetos Astro e suas ilhas; não transportar
-  cache ou fronteiras server/client entre os frameworks.
 - `$specsfy-specialist-web-accessibility` aprofunda WCAG, foco e tecnologia
   assistiva nas rotas e Client Components.
 - `$specsfy-specialist-react` para hooks, estado, efeitos e composição

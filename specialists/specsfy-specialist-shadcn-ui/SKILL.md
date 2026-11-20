@@ -128,8 +128,6 @@ instala primeiro componentes gratuitos ReUI sobre esta base.
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-astro` governa integração e hidratação quando primitives
-  React são usadas como ilha Astro.
 - `$specsfy-specialist-tailwind-css` para o sistema de tokens e utilitários
   que sustenta o tema dos componentes.
 - `$specsfy-specialist-react` para a lógica de estado, effects e testes do

@@ -81,8 +81,8 @@ description: Implementar e auditar acessibilidade web com WCAG, HTML semântico,
   que precisam satisfazer contraste, reflow e foco.
 - `$specsfy-specialist-ux-design` pesquisa compreensão e sucesso de tarefa,
   inclusive com pessoas que usam tecnologias assistivas.
-- `$specsfy-specialist-react` e `$specsfy-specialist-astro` ou
-  `$specsfy-specialist-nextjs` implementam a correção no framework observado.
+- `$specsfy-specialist-react` e `$specsfy-specialist-nextjs` implementam a
+  correção no framework observado.
 - `$specsfy-specialist-code-review` amplia a revisão para falhas além do recorte
   de acessibilidade.
 

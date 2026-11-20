@@ -100,9 +100,9 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 
 - `$specsfy-specialist-react` para a lógica de componente que consome os
   tipos modelados aqui (props, estado, union de eventos).
-- `$specsfy-specialist-nextjs` e `$specsfy-specialist-astro` consomem estes
-  tipos para params de rota, Server Actions/endpoints e content collections;
-  esta skill não decide roteamento ou fronteira server/client.
+- `$specsfy-specialist-nextjs` consome estes tipos para params de rota, Server
+  Actions/endpoints e content collections; esta skill não decide roteamento ou
+  fronteira server/client.
 - `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-shadcn-ui` usam
   tipos desta skill para variantes (`cva`) e schemas de formulário fortemente
   tipados.

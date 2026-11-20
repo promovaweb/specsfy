@@ -96,8 +96,7 @@ O catálogo instala junto os especialistas Design System e UI Design.
 - [React](react.md) cuida do estado, dos efeitos e dos testes.
 - [Tailwind CSS](tailwind-css.md) cuida dos tokens e utilitários.
 - [Acessibilidade Web](web-accessibility.md) conduz a auditoria WCAG.
-- [Next.js](nextjs.md) e [Astro](astro.md) definem o limite entre servidor e
-  cliente.
+- [Next.js](nextjs.md) define o limite entre servidor e cliente.
 
 ## Referência técnica
 

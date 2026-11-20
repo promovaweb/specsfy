@@ -4,7 +4,7 @@
 
 As skills base conduzem a metodologia. As
 `specsfy-specialist-*` acrescentam orientação para a tecnologia encontrada no
-projeto, como Laravel, Astro, Next.js, Postgres ou Redis. Assim, você instala
+projeto, como Laravel, Next.js, Postgres ou Redis. Assim, você instala
 somente o conhecimento técnico usado pela aplicação.
 
 Na interface, cada uma usa o padrão `Specsfy - Especialista - Nome`, como
@@ -58,7 +58,7 @@ instalação.
 | --- | --- |
 | Laravel | Laravel e gestor de pacotes Laravel |
 | Supabase, PostgreSQL ou Redis | Supabase, PostgreSQL ou Redis correspondente |
-| React, Astro, Next.js ou TypeScript | especialista correspondente |
+| React, Next.js ou TypeScript | especialista correspondente |
 | Tailwind CSS ou shadcn/ui | Tailwind CSS ou shadcn/ui correspondente |
 | ReUI solicitado para React e Tailwind | ReUI, React, Tailwind CSS e shadcn/ui |
 | Docker, Swarm ou Ansible | especialista de plataforma e versionamento correspondente |
@@ -160,7 +160,7 @@ team ativo, o módulo e o título atual. Em Laravel, o padrão reaproveita o
 | Domínio | Especialistas |
 | --- | --- |
 | backend e banco de dados | Laravel, Supabase, Postgres, Redis e APIs web |
-| frontend | React, Astro, Next.js, TypeScript e Tailwind CSS |
+| frontend | React, Next.js, TypeScript e Tailwind CSS |
 | interface | design system, experiência de interface, shadcn/ui, UI, UX e acessibilidade web |
 | plataforma | versionamento, Docker, Docker Swarm, Ansible e engenharia de entrega |
 | qualidade | segurança, observabilidade e performance |
@@ -199,7 +199,6 @@ manual quando a entrega pedir aquele domínio.
 | [UX Design](specialists/ux-design.md) | Fluxos, arquitetura de informação, pesquisa e validação de uso. |
 | [Experiência de Interface](specialists/interface-experience.md) | Leitura do sistema atual, telas, formulários e tarefas de interface. |
 | [Acessibilidade Web](specialists/web-accessibility.md) | WCAG, semântica, teclado, foco e tecnologias assistivas. |
-| [Astro](specialists/astro.md) | Ilhas, conteúdo, renderização, integrações e performance em Astro. |
 | [Next.js](specialists/nextjs.md) | App Router, fronteiras server/client, cache, dados e deploy. |
 | [TypeScript](specialists/typescript.md) | Tipos, strictness, módulos e contratos de API. |
 | [Docker](specialists/docker.md) | Imagens, Compose, segurança, builds e ambiente local. |

@@ -36,6 +36,7 @@
   },
   "retired": [
     "specsfy-progress",
-    "specsfy-base-progress"
+    "specsfy-base-progress",
+    "specsfy-specialist-astro"
   ]
 }

@@ -253,6 +253,15 @@ describe("update reconciles the project with the inventory", () => {
     expect(existsSync(skill("specsfy-base-discuss"))).toBe(false);
   }, 60_000);
 
+  test("a retired specialist (specsfy-specialist-astro) is removed from the project", async () => {
+    await plant("specsfy-specialist-astro", true);
+    const r = await run(["update", "--project", project]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.plan.retire).toEqual(["specsfy-specialist-astro"]);
+    expect(existsSync(skill("specsfy-specialist-astro"))).toBe(false);
+    expect(Object.keys(readJsonFile(join(project, "skills-lock.json")).skills)).not.toContain("specsfy-specialist-astro");
+  }, 60_000);
+
   test("the tag of the binary is used, and --latest follows the default branch", async () => {
     git(repository, "tag", `v${manifest.version}`);
     const source = join(repository, "skills", "specsfy-01-inbox", "SKILL.md");

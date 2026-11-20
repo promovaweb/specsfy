@@ -379,7 +379,6 @@ O framework base é independente de linguagem. Especialistas acrescentam
 orientação técnica sem alterar os três atos:
 
 - [Laravel](../docs/user/laravel.md).
-- [Astro](../docs/user/astro.md).
 - [Next.js](../docs/user/nextjs.md).
 
 Você pode instalar recomendações detectadas:

@@ -110,10 +110,9 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 - `$specsfy-specialist-shadcn-ui` para o sistema de componentes construído
   sobre Tailwind + Radix; este especialista cobre o token/utilitário que o
   sustenta.
-- `$specsfy-specialist-react`, `$specsfy-specialist-nextjs` e
-  `$specsfy-specialist-astro` fornecem o componente/framework onde as classes
-  Tailwind são aplicadas; esta skill não decide estrutura de componente nem
-  fronteira server/client.
+- `$specsfy-specialist-react` e `$specsfy-specialist-nextjs` fornecem o
+  componente/framework onde as classes Tailwind são aplicadas; esta skill não
+  decide estrutura de componente nem fronteira server/client.
 - `$specsfy-specialist-typescript` tipa variantes `cva` quando o projeto
   expõe props de estilo fortemente tipadas.
 - `$specsfy-specialist-react-ui-components` e `$specsfy-specialist-ui-design`

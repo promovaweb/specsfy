@@ -35,6 +35,9 @@
  *      wrote under website/ (pages, build.json, ebook and images);
  *   2. moves them to a clean worktree of the website origin/main and gives
  *      the website checkout back as it was (other work there stays intact);
+ *      a page the sync removed (its source left this repository) is deleted
+ *      there and its route gets a 410 in src/config/gone.mjs, unless
+ *      src/config/redirects.mjs already sends it somewhere with a 301;
  *   3. publishes the media to R2 (`npm run media:publicar`), writes a
  *      sitespec, bumps the website patch version and changelog, commits only
  *      those paths, tags, pushes and creates the website GitHub Release;
@@ -193,6 +196,25 @@ function nextSitespecId(worktree) {
   return String(Math.max(0, ...ids) + 1).padStart(4, "0");
 }
 
+/**
+ * Registers removed documentation routes as 410 in src/config/gone.mjs of
+ * the website worktree. A route that already has a 301 in
+ * src/config/redirects.mjs (a page merged into another) or a 410 entry is
+ * left alone. Returns the routes added.
+ */
+function registerGoneRoutes(worktree, routes) {
+  if (!routes.length) return [];
+  const goneFile = join(worktree, "src", "config", "gone.mjs");
+  const redirects = readFileSync(join(worktree, "src", "config", "redirects.mjs"), "utf8");
+  let gone = readFileSync(goneFile, "utf8");
+  const added = routes.filter((route) => !redirects.includes(`'${route}'`) && !gone.includes(`'${route}'`));
+  if (!added.length) return [];
+  const lines = added.map((route) => `\t'${route}': 'Página da documentação do Specsfy retirada na versão ${version}: a fonte saiu do repositório, sem página equivalente.',`);
+  gone = gone.replace("export const goneRoutes = {\n", `export const goneRoutes = {\n${lines.join("\n")}\n`);
+  writeFileSync(goneFile, gone);
+  return added;
+}
+
 /** Publishes the Specsfy documentation, ebook and images on the website. */
 function releaseSite() {
   const WEBSITE = join(HUB, "website");
@@ -212,11 +234,20 @@ function releaseSite() {
   const branch = `specsfy-docs-${version}`;
   step("website worktree", "git", ["worktree", "add", "-q", "-B", branch, worktree, "origin/main"], WEBSITE);
   try {
+    // A listed path that no longer exists was removed by the sync (its
+    // source left this repository): it leaves the site with a 410.
+    const removed = [];
     for (const path of written) {
-      if (!existsSync(join(WEBSITE, path))) continue;
+      if (!existsSync(join(WEBSITE, path))) {
+        rmSync(join(worktree, path), { force: true });
+        const route = /^src\/content\/opensource-docs\/specsfy\/(.+)\.mdx?$/u.exec(path);
+        if (route) removed.push(`/docs/specsfy/${route[1]}`);
+        continue;
+      }
       mkdirSync(dirname(join(worktree, path)), { recursive: true });
       cpSync(join(WEBSITE, path), join(worktree, path));
     }
+    const gone = registerGoneRoutes(worktree, removed);
     // Give the website checkout back: tracked files return to HEAD and new
     // files the sync created there are removed (media stays, it is ignored).
     for (const path of written) {
@@ -286,12 +317,13 @@ function releaseSite() {
     let count = 0;
     const lock = readFileSync(join(worktree, "package-lock.json"), "utf8").replace(new RegExp(`"version": "${previous.replaceAll(".", "\\.")}"`, "g"), (match) => (count++ < 2 ? `"version": "${next}"` : match));
     writeFileSync(join(worktree, "package-lock.json"), lock);
-    const entry = `Documentação do Specsfy em \`/docs/specsfy/\` na versão ${version}, com o ebook e as imagens do guia publicados no R2. Sitespec ${id}.`;
+    const goneNote = gone.length ? ` Páginas retiradas, com 410: ${gone.map((route) => `\`${route}/\``).join(", ")}.` : "";
+    const entry = `Documentação do Specsfy em \`/docs/specsfy/\` na versão ${version}, com o ebook e as imagens do guia publicados no R2.${goneNote} Sitespec ${id}.`;
     const changelog = readFileSync(join(worktree, "CHANGELOG.md"), "utf8");
     writeFileSync(join(worktree, "CHANGELOG.md"), changelog.replace("# Changelog do website\n\n", `# Changelog do website\n\n## [${next}] - ${now.slice(0, 10)}\n\n### Alterado\n\n- ${entry}\n\n`));
     // Only these paths: a worktree without the media regenerates registries
     // (imagens-responsivas-registro.json) that must never be committed.
-    const paths = ["package.json", "package-lock.json", "CHANGELOG.md", "scripts/media-manifest.json", ".sitespec", "src/content/opensource-docs/specsfy", "public/docs/specsfy/downloads/build.json"];
+    const paths = ["package.json", "package-lock.json", "CHANGELOG.md", "scripts/media-manifest.json", ".sitespec", "src/content/opensource-docs/specsfy", "public/docs/specsfy/downloads/build.json", "src/config/gone.mjs"];
     step("website stage", "git", ["add", "--", ...paths], worktree);
     step("website commit", "git", ["commit", "-q", "-m", `docs: Specsfy ${version} em /docs/specsfy ${next}`], worktree);
     step("website tag", "git", ["tag", `v${next}`], worktree);

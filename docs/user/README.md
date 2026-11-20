@@ -157,7 +157,6 @@ integração ou tecnologia específica:
   - [Ansible](specialists/ansible.md)
   - [APIs Web](specialists/web-api-design.md)
   - [Arquitetura de Software](specialists/software-architecture.md)
-  - [Astro](specialists/astro.md)
   - [Code Review](specialists/code-review.md)
   - [Componentes React](specialists/react-ui-components.md)
   - [Debian Server](specialists/debian-server.md)
@@ -200,8 +199,7 @@ integração ou tecnologia específica:
 - [Senha do Vault e deploy pela IA](deploy-vault.md), para configurar a senha
   fora do Git e alternar entre execução manual e automatizada.
 - [Uso avançado](advanced-usage.md), para automação e integrações.
-- aplicação em projetos [Laravel](laravel.md), [Astro](astro.md) ou
-  [Next.js](nextjs.md).
+- aplicação em projetos [Laravel](laravel.md) ou [Next.js](nextjs.md).
 - [Quadro técnico](../develop/modules.md), para conhecer os módulos do monorepo.
 - [Referência rápida](reference.md), para consultar arquivos, estados, gates,
   IDs, skills, comandos, glossário e fontes externas em uma página.

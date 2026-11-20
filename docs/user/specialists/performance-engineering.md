@@ -73,8 +73,7 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Astro](astro.md) e [Next.js](nextjs.md) aplicam orçamentos e correções no
-  framework.
+- [Next.js](nextjs.md) aplica orçamentos e correções no framework.
 - [Debugging](debugging.md) isola defeitos funcionais que aparecem sob carga.
 - [Arquitetura de Software](software-architecture.md) trata mudanças
   estruturais quando a estrutura limita a capacidade.

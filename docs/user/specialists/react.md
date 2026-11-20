@@ -82,7 +82,6 @@ npx skills add https://github.com/promovaweb/specsfy \
 ## Especialistas relacionados
 
 - [ReUI](reui.md) fornece composições gratuitas para React e Tailwind.
-- [Astro](astro.md) define onde a ilha existe e como ela hidrata.
 - [shadcn/ui](shadcn-ui.md) identifica a base de primitives e os componentes
   visuais.
 - [Tailwind CSS](tailwind-css.md) estiliza os componentes.

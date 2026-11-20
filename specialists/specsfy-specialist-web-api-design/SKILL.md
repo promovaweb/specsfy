@@ -72,8 +72,6 @@ description: Projetar e revisar APIs HTTP com recursos, métodos, status, erros,
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-astro` implementa endpoints no framework; esta skill
-  mantém o contrato HTTP consumível fora do próprio site.
 - `$specsfy-specialist-application-security` cobre threat modeling, OAuth,
   proteção de segredo, abuso e trust boundaries.
 - `$specsfy-specialist-domain-modeling` define vocabulário e invariantes antes

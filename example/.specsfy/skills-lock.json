@@ -34,8 +34,8 @@
     "specsfy-specialist-shadcn-ui": {
       "source": "specialists",
       "installed_at": "2026-07-25T14:46:27.734625+00:00",
-      "content_sha256": "9f7672bce2ffa7907af76801dd9114d2eb46554fd6e1a395bd95b49584cf0f38",
-      "updated_at": "2026-11-20T15:11:53.330Z"
+      "content_sha256": "2a8d34d6a7e3f69a9b0320a9d26af5e92228a891e2feb74b30d30750a99bb12e",
+      "updated_at": "2026-11-20T23:57:04.827Z"
     },
     "specsfy-specialist-application-security": {
       "source": "specialists",
@@ -76,8 +76,8 @@
     "specsfy-specialist-performance-engineering": {
       "source": "specialists",
       "installed_at": "2026-07-26T00:42:43.812223+00:00",
-      "content_sha256": "ed2b6f0fd76b3a97664a7c29f0830ea437e7fb56df8d4c68b5e0dc706625c722",
-      "updated_at": "2026-11-20T15:11:53.329Z"
+      "content_sha256": "939d2168db030af5aefad73e3bbb3531191d4217cd41ec38776dfe84f96bd93d",
+      "updated_at": "2026-11-20T23:57:04.826Z"
     },
     "specsfy-specialist-postgres": {
       "source": "specialists",
@@ -124,20 +124,20 @@
     "specsfy-specialist-web-accessibility": {
       "source": "specialists",
       "installed_at": "2026-07-26T00:42:43.816684+00:00",
-      "content_sha256": "a5d219561d27fcf0c521ddacd226d9f8f5b977394e2951313b5d577fb704e066",
-      "updated_at": "2026-11-20T15:11:53.332Z"
+      "content_sha256": "d2f1fd2da4620676b2a95cf997d5bf55b38475f3fcdaf377c2fe01eb10088603",
+      "updated_at": "2026-11-20T23:57:04.827Z"
     },
     "specsfy-specialist-web-api-design": {
       "source": "specialists",
       "installed_at": "2026-07-26T00:42:43.817203+00:00",
-      "content_sha256": "178a5290903adf2b3d801bbd584bb9fd07353d3e16a5e03f45d016bb3585e80a",
-      "updated_at": "2026-11-20T15:11:53.332Z"
+      "content_sha256": "38168d0b158a2a2a953623f982d1d9ef6a8cdeb0d964f9d3d1765718941ae8b6",
+      "updated_at": "2026-11-20T23:57:04.828Z"
     },
     "specsfy-setup": {
       "source": "base",
       "installed_at": "2026-07-27T16:06:43.315970+00:00",
-      "content_sha256": "8b65a2aa53c598038cd1e832a14550839212e45df5d2f2c3cc9d79975a99813e",
-      "updated_at": "2026-11-20T17:29:42.913Z"
+      "content_sha256": "6ea21e5f4a3423469a8b0469c9da7c085115563e23445c19679c9e10ed9d238d",
+      "updated_at": "2026-11-20T23:57:04.725Z"
     },
     "specsfy-documentator": {
       "source": "base",

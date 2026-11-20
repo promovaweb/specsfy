@@ -114,8 +114,7 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 
 - `$specsfy-specialist-reui` para composições React e Tailwind do catálogo
   gratuito.
-- `$specsfy-specialist-astro` governa a fronteira da ilha e
-  `$specsfy-specialist-shadcn-ui` identifica a base de primitives e governa os
+- `$specsfy-specialist-shadcn-ui` identifica a base de primitives e governa os
   componentes visuais; esta skill governa o comportamento React dentro deles.
 - `$specsfy-specialist-tailwind-css` estiliza o componente sem assumir
   ownership de estado, effect ou concorrência.

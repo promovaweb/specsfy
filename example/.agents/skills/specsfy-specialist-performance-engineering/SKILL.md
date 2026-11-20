@@ -90,8 +90,8 @@ description: "Diagnosticar e melhorar performance com orçamento, medição, pro
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-astro` e `$specsfy-specialist-nextjs` aplicam budgets e
-  correções no framework depois que a medição localiza o gargalo.
+- `$specsfy-specialist-nextjs` aplica budgets e correções no framework depois
+  que a medição localiza o gargalo.
 - `$specsfy-specialist-debugging` isola defeitos funcionais que aparecem sob
   carga sem confundi-los com oportunidade de otimização.
 - `$specsfy-specialist-software-architecture` trata mudança estrutural quando o

@@ -75,7 +75,6 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Astro](astro.md) implementa endpoints consumidos fora do próprio site.
 - [Segurança de Aplicações](application-security.md) cobre ameaças, OAuth e
   segredos.
 - [Modelagem de Domínio](domain-modeling.md) define vocabulário e invariantes

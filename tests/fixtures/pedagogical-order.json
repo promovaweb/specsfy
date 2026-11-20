@@ -41,7 +41,6 @@
   "docs/user/specialists/react.md",
   "docs/user/specialists/reui.md",
   "docs/user/specialists/react-ui-components.md",
-  "docs/user/specialists/astro.md",
   "docs/user/specialists/nextjs.md",
   "docs/user/specialists/typescript.md",
   "docs/user/specialists/shadcn-ui.md",
@@ -70,7 +69,6 @@
   "docs/user/deploy-vault.md",
   "docs/user/advanced-usage.md",
   "docs/user/laravel.md",
-  "docs/user/astro.md",
   "docs/user/nextjs.md",
   "docs/user/reference.md",
   "docs/user/credits.md"

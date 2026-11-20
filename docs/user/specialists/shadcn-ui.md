@@ -91,7 +91,6 @@ npx skills add https://github.com/promovaweb/specsfy \
 ## Especialistas relacionados
 
 - [ReUI](reui.md) instala as composições gratuitas sobre esta base.
-- [Astro](astro.md) define a hidratação quando os primitives viram ilhas.
 - [Tailwind CSS](tailwind-css.md) cuida dos tokens e utilitários do tema.
 - [React](react.md) cuida do estado, dos efeitos e dos testes.
 - [TypeScript](typescript.md) tipa variantes `cva` e schemas de formulário.
