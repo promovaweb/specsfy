@@ -8,7 +8,7 @@
  */
 
 import { mkdir, readFile, readdir, rename } from "node:fs/promises";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, relative, sep } from "node:path";
 import { AppError, error } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
 import { isFile, pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
@@ -169,7 +169,9 @@ export async function migrateSpecs(project: string): Promise<SpecTransition[]> {
     if (await pathExists(targetDirectory)) {
       throw new AppError(ExitCode.GENERIC_ERROR, `The destination already holds a spec: ${targetDirectory}`);
     }
-    await writeTextAtomic(path, updateStatus(content, STATUS_BY_FOLDER[to]));
+    const legacyPrefix = relative(root, sourceDirectory).split(sep).join("/");
+    const migrated = content.replaceAll(`${legacyPrefix}/research/`, `specs/${to}/${identifier}/research/`);
+    await writeTextAtomic(path, updateStatus(migrated, STATUS_BY_FOLDER[to]));
     await mkdir(dirname(targetDirectory), { recursive: true });
     await rename(sourceDirectory, targetDirectory);
     results.push({

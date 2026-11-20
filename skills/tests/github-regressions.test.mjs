@@ -235,3 +235,52 @@ test('PR #40: um caminho declarado não inclui outro arquivo com o mesmo sufixo'
   assert.equal(result.status,0,result.stdout+result.stderr);
   assert.deepEqual(JSON.parse(result.stdout).files,['project/tests/a.test.ts']);
 });
+
+test('#48: inspetor normaliza separadores do Windows antes de classificar', { skip: process.platform === 'win32' }, (t) => {
+  const root = temporary(t);
+  // No Linux, a barra invertida é um caractere comum do nome: o arquivo reproduz o caminho relativo do Windows.
+  put(root, 'tests\\Feature\\IniciarTest.php', '<?php test("inicia", fn () => true);');
+  put(root, 'src\\Iniciar.php', '<?php final class Iniciar {}');
+  put(root, 'routes\\web.php', '<?php Route::get("/", fn () => "ok");');
+  const result = run(script('specsfy-setup', 'inspect_project'), ['--project', root], root);
+  assert.equal(result.status, 0, result.stderr);
+  const payload = JSON.parse(result.stdout);
+  assert.deepEqual(payload.source_groups.tests, ['tests/Feature/IniciarTest.php']);
+  assert.ok(payload.source_groups.application.includes('src/Iniciar.php'), JSON.stringify(payload.source_groups));
+  assert.ok(payload.source_groups.routes.includes('routes/web.php'), JSON.stringify(payload.source_groups));
+  assert.ok(Object.values(payload.source_groups).flat().every((path) => !path.includes('\\')));
+});
+
+test('#43: aceitação lê comando com pipe escapado sem deslocar a evidência', (t) => {
+  const root = temporary(t);
+  const spec = put(root, 'specs/completed/0001-pipe/spec.md', [
+    '#### AC-001 Exporta relatório', '',
+    '### 12. Plano de testes e rastreabilidade', '',
+    '| Requisito | AC | Nível | Comando | Evidência |',
+    '| --- | --- | --- | --- | --- |',
+    '| FR-001 | AC-001 | Integração | `npm test \\| tee saida.log` | Passed em 2026-11-20 |', '',
+    '### 13. Tarefas', '',
+  ].join('\n'));
+  const result = run(script('specsfy-06-tdd-bdd', 'verify_acceptance'), [spec, root, '--json'], root);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const payload = JSON.parse(result.stdout);
+  assert.equal(payload.results['AC-001'].command, '`npm test \\| tee saida.log`');
+  assert.match(payload.results['AC-001'].evidence, /^Passed/);
+});
+
+test('#43: dados conversados migram linha antiga com pipe escapado para o formato atual', (t) => {
+  const root = temporary(t);
+  put(root, '.specsfy/DATABASE.md', [
+    '# Banco de dados', '',
+    '<!-- specsfy:conversation-data:start -->',
+    '## Informações a guardar confirmadas', '',
+    '| Informação | Para que serve | O que guardar | Ligações | Quem usa | Quando muda ou sai | Fontes |',
+    '| --- | --- | --- | --- | --- | --- | --- |',
+    '| Credencial | Acessar o banco | nome `PG \\| Main` | Nenhuma | Equipe | Ao trocar a senha | conversa |',
+    '<!-- specsfy:conversation-data:end -->', '',
+  ].join('\n'));
+  const result = run(script('specsfy-data-discovery', 'registrar_dados_conversados'), ['--project', root, '--nome', 'Pedido', '--para-que-serve', 'Acompanhar pedidos', '--o-que-guardar', 'itens', '--formato-sugerido', 'texto', '--ligacoes', 'cliente', '--acesso', 'equipe', '--ciclo-de-vida', 'enquanto houver atendimento', '--fontes', 'conversa'], root);
+  assert.equal(result.status, 0, result.stderr);
+  const database = readFileSync(join(root, '.specsfy/DATABASE.md'), 'utf8');
+  assert.ok(database.includes('| Credencial | Acessar o banco | nome `PG \\| Main` | A confirmar | Nenhuma | Equipe | Ao trocar a senha | conversa |'), database);
+});

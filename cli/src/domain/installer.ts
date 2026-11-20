@@ -37,7 +37,7 @@ import {
   ensureSkillsLock,
   installedSkillNames,
 } from "./skill-lock.ts";
-import { resolveSkillsCommand } from "./prerequisites.ts";
+import { processInvocation, resolveSkillsCommand } from "./prerequisites.ts";
 import { AppError, error as appError } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
 
@@ -757,8 +757,10 @@ async function runSkillsCommand(
     );
   }
   const [executable, ...prefix] = resolved.command;
+  const invocation = processInvocation(executable!, [...prefix, ...arguments_]);
   try {
-    await execFileAsync(executable!, [...prefix, ...arguments_], {
+    await execFileAsync(invocation.file, invocation.args, {
+      windowsVerbatimArguments: invocation.windowsVerbatimArguments,
       cwd: project,
       encoding: "utf8",
       env: { ...process.env, ...resolved.env },

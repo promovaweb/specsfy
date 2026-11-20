@@ -146,6 +146,26 @@ describe("ciclo de vida das specs", () => {
     ).resolves.toContain("| Status | Complete |");
   });
 
+  for (const legacy of ["specs/specs", "specs"]) {
+    test(`#34: migração de ${legacy}/ reescreve o índice de research para a pasta de estado`, async () => {
+      const project = await temporaryDirectory();
+      const identifier = "0042-login-social";
+      const source = await createSpec(project, `${legacy}/${identifier}`, "Planned");
+      await mkdir(join(source, "..", "research"), { recursive: true });
+      await writeFile(join(source, "..", "research", "R-001-provider.md"), "# Provider\n");
+      await writeFile(
+        source,
+        `${await readFile(source, "utf8")}\n#### Artefatos de pesquisa armazenados\n\n- \`${legacy}/${identifier}/research/R-001-provider.md\`\n`,
+      );
+
+      await migrateSpecs(project);
+
+      const content = await readFile(join(project, "specs/planned", identifier, "spec.md"), "utf8");
+      expect(content).toContain(`specs/planned/${identifier}/research/R-001-provider.md`);
+      expect(content).not.toContain(`\`${legacy}/${identifier}/research/`);
+    });
+  }
+
   test("atualiza esforço entre 1 e 10 com justificativa e histórico", async () => {
     const project = await temporaryDirectory();
     await createSpec(project, "specs/draft/0042-login-social", "Draft");

@@ -85,6 +85,39 @@ export async function resolveSkillsCommand(
   return selfSkillsCommand();
 }
 
+/** How to spawn a resolved command with `execFile`. */
+export interface ProcessInvocation {
+  file: string;
+  args: string[];
+  windowsVerbatimArguments?: true;
+}
+
+// Characters cmd.exe interprets; escaped with ^ the same way cross-spawn does.
+const CMD_META = /([()\][%!^"`<>&|;, *?])/gu;
+
+/** Quotes one argument for the command line that cmd.exe passes to a batch file. */
+function cmdArgument(value: string): string {
+  const quoted = value.replace(/(\\*)"/gu, '$1$1\\"').replace(/(\\*)$/u, "$1$1");
+  return `"${quoted}"`.replace(CMD_META, "^$1");
+}
+
+/**
+ * Adapts a command to the platform before `execFile`. Since CVE-2024-27980,
+ * Node refuses to spawn `.cmd` and `.bat` files directly on Windows, so a
+ * batch shim such as `npx.cmd` runs through `cmd.exe /d /s /c` with the path
+ * and every argument escaped; paths with spaces, like `C:\\Program Files`, stay intact.
+ */
+export function processInvocation(
+  file: string,
+  args: string[],
+  platform: NodeJS.Platform = process.platform,
+  comspec: string | undefined = process.env.ComSpec,
+): ProcessInvocation {
+  if (platform !== "win32" || !/\.(?:cmd|bat)$/iu.test(file)) return { file, args };
+  const line = [file.replace(CMD_META, "^$1"), ...args.map(cmdArgument)].join(" ");
+  return { file: comspec || "cmd.exe", args: ["/d", "/s", "/c", `"${line}"`], windowsVerbatimArguments: true };
+}
+
 /** Human description of a skills command, without environment values. */
 export function describeSkillsCommand(command: SkillsCommand): string {
   if (command.source === "self") return `${SKILLS_PACKAGE} on the embedded Bun runtime (${command.command[0]} x --bun)`;

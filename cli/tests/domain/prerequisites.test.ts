@@ -8,6 +8,7 @@ import {
   assertPrerequisites,
   checkPrerequisites,
   isCompiledBinary,
+  processInvocation,
   resolveSkillsCommand,
   SKILLS_PACKAGE,
 } from "../../src/domain/prerequisites.ts";
@@ -109,5 +110,36 @@ describe("prerequisites", () => {
     await chmod(join(root, "git"), 0o644);
     const checks = await checkPrerequisites(root, { path: root, platform: "linux" });
     expect(checks.find(({ name }) => name === "git")?.ok).toBe(false);
+  });
+});
+
+describe("#29: Windows batch shims", () => {
+  const cmd = "C:\\Windows\\system32\\cmd.exe";
+
+  test("runs a .cmd through cmd.exe with the path and arguments escaped", () => {
+    const invocation = processInvocation(
+      "C:\\Program Files\\nodejs\\npx.cmd",
+      ["skills", "add", "https://github.com/promovaweb/specsfy", "-y"],
+      "win32",
+      cmd,
+    );
+    expect(invocation.file).toBe(cmd);
+    expect(invocation.windowsVerbatimArguments).toBe(true);
+    expect(invocation.args.slice(0, 3)).toEqual(["/d", "/s", "/c"]);
+    expect(invocation.args[3]).toBe(
+      '"C:\\Program^ Files\\nodejs\\npx.cmd ^"skills^" ^"add^" ^"https://github.com/promovaweb/specsfy^" ^"-y^""',
+    );
+  });
+
+  test("accepts .BAT in any case and falls back to cmd.exe without ComSpec", () => {
+    const invocation = processInvocation("D:\\tools\\SKILLS.BAT", ["list"], "win32", undefined);
+    expect(invocation.file).toBe("cmd.exe");
+    expect(invocation.args[3]).toBe('"D:\\tools\\SKILLS.BAT ^"list^""');
+  });
+
+  test("keeps executables and other platforms untouched", () => {
+    for (const [file, platform] of [["C:\\bin\\skills.exe", "win32"], ["/usr/bin/npx.cmd", "linux"], ["/usr/bin/npx", "darwin"]] as const) {
+      expect(processInvocation(file, ["skills", "list"], platform, cmd)).toEqual({ file, args: ["skills", "list"] });
+    }
   });
 });

@@ -29,8 +29,20 @@ function safe(value) {
   return value.trim().replaceAll("|", "\\|").replaceAll(/\r?\n/gu, " ");
 }
 
+/** Divide uma linha de tabela Markdown só nos pipes sem escape e preserva `\|` dentro da célula. */
+function tableCells(line) {
+  const cells = []; let value = ""; let slashes = 0;
+  for (const character of line.trim()) {
+    if (character === "|" && slashes % 2 === 0) { cells.push(value.trim()); value = ""; }
+    else value += character;
+    slashes = character === "\\" ? slashes + 1 : 0;
+  }
+  cells.push(value.trim());
+  return cells.slice(1, -1);
+}
+
 function withSuggestedFormat(row) {
-  const cells = row.split("|").slice(1, -1).map((cell) => cell.trim());
+  const cells = tableCells(row);
   if (cells.length !== 7) return row;
   return `| ${[...cells.slice(0, 3), "A confirmar", ...cells.slice(3)].join(" | ")} |`;
 }

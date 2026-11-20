@@ -14,6 +14,17 @@ function parse(argv) {
   if (values.positional.length !== 2) throw new Error("informe spec e raiz");
   return values;
 }
+/** Divide uma linha de tabela Markdown só nos pipes sem escape e preserva `\|` dentro da célula. */
+function tableCells(line) {
+  const cells = []; let value = ""; let slashes = 0;
+  for (const character of line.trim()) {
+    if (character === "|" && slashes % 2 === 0) { cells.push(value.trim()); value = ""; }
+    else value += character;
+    slashes = character === "\\" ? slashes + 1 : 0;
+  }
+  cells.push(value.trim());
+  return cells.slice(1, -1);
+}
 function traceSection(text) {
   const start = /^###\s+12\.\s+Plano de testes e rastreabilidade\s*$\n/mu.exec(text);
   if (!start || start.index === undefined) return "";
@@ -26,7 +37,7 @@ async function analyze(text, attestationPath) {
   const rows = {};
   for (const line of traceSection(text).split(/\r?\n/u)) {
     if (!line.trimStart().startsWith("|") || /^\s*\|\s*-/u.test(line)) continue;
-    const cells = line.trim().replace(/^\||\|$/gu, "").split("|").map((cell) => cell.trim());
+    const cells = tableCells(line);
     if (cells.length < 5 || cells[0].toLocaleLowerCase("pt-BR") === "requisito") continue;
     for (const criterion of cells[1].match(/\bAC-\d{3,}\b/gu) ?? []) rows[criterion] ??= { level: cells[2], command: cells[3], evidence: cells[4] };
   }
