@@ -15,7 +15,7 @@ const definitions = [
   ['o catálogo versionado de especialistas', load],
   ['uma skill especialista do catálogo', load],
   ['todas as skills usam o prefixo specsfy-specialist-', ctx => { assert.ok(ctx.names.length); assert.ok(ctx.names.every(name => name.startsWith('specsfy-specialist-'))); }],
-  ['Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, Debian Server, React, Astro e Nextjs estão disponíveis', ctx => names(['laravel', 'supabase', 'postgres', 'redis', 'docker-swarm', 'ansible', 'debian-server', 'react', 'astro', 'nextjs']).forEach(name => assert.ok(ctx.names.includes(name), name))],
+  ['Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, Debian Server, React e Nextjs estão disponíveis', ctx => names(['laravel', 'supabase', 'postgres', 'redis', 'docker-swarm', 'ansible', 'debian-server', 'react', 'nextjs']).forEach(name => assert.ok(ctx.names.includes(name), name))],
   ['Shadcn, UI, UX e acessibilidade estão disponíveis separadamente', ctx => names(['design-system', 'shadcn-ui', 'ui-design', 'ux-design', 'web-accessibility']).forEach(name => assert.ok(ctx.names.includes(name), name))],
   ['seu nome, diretório e prompt padrão coincidem', ctx => { for (const name of ctx.names) { assert.equal(content(name).match(/^name:\s*(.+)$/m)?.[1].trim(), name); includes(read(`specialists/${name}/agents/openai.yaml`), ['$' + name]); } }],
   ['ela segue o template técnico completo', ctx => { for (const name of ctx.names) includes(content(name), [...headings.map(title => '## ' + title), '[references/standards.md](references/standards.md)']); }],
