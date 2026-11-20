@@ -4,6 +4,14 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.36.2] - 2026-11-20
+
+### Corrigido
+
+- A sitespec que a etapa do site gera tinha um valor com dois-pontos sem
+  aspas, o que quebrava o frontmatter. Os valores de texto passam a ir entre
+  aspas, e a etapa valida a sitespec com o `astrofy` antes de commitar.
+
 ## [0.36.1] - 2026-11-20
 
 ### Alterado
