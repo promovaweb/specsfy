@@ -4,6 +4,29 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.29.5] - 2026-11-20
+
+### Corrigido
+
+- No Windows, um `npx.cmd` ou outro `.cmd`/`.bat` informado em
+  `SPECSFY_NPX_COMMAND` ou `SPECSFY_SKILLS_CLI` passa a rodar pelo `cmd.exe`,
+  com o caminho e os argumentos escapados. `specsfy install` e
+  `specsfy update` deixam de falhar com `EINVAL`, recusa do Node desde a
+  CVE-2024-27980, e com caminhos que têm espaço, como `C:\Program Files`.
+  Relato da issue #29.
+- `specsfy specs migrate` reescreve o índice de research do layout anterior
+  (`specs/specs/<id>/` e `specs/<id>/`) para a pasta de estado. Antes, o
+  `load_research.mjs` recusava como inseguro um artefato que o próprio comando
+  tinha movido. A transição entre estados já fazia isso. Issue #34.
+- `verify_acceptance.mjs` e `registrar_dados_conversados.mjs` dividem a
+  tabela só nos pipes sem escape. Um comando como `npm test \| tee log` não
+  desloca mais a evidência do AC, e uma linha antiga com `\|` em
+  `.specsfy/DATABASE.md` ganha a coluna de formato sugerido. Completa a
+  issue #43, que já valia para o `update_stack.mjs`.
+- `inspect_project.mjs` lê cada arquivo pelo caminho real depois de
+  normalizar o separador do Windows. Testes, aplicação e rotas em subpastas
+  voltam a ser classificados no Windows. Issue #48.
+
 ## [0.29.4] - 2026-11-20
 
 ### Corrigido
