@@ -159,7 +159,7 @@ function changelogSummary() {
     else if (/^\s{2,}\S/u.test(line) && bullets.length) bullets[bullets.length - 1] += ` ${line.trim()}`;
   }
   const first = (bullet) => (bullet.match(/^.*?[.:](?=\s|$)/u)?.[0] ?? bullet).replace(/[.:]$/u, "");
-  return bullets.map(first).join("; ") || "veja specsfy/cli/CHANGELOG.md";
+  return bullets.map(first).join("; ") || "veja o cli/CHANGELOG.md do Specsfy";
 }
 
 /** Bumps the Hub with the new specsfy gitlink, version, changelog, tag and release. */
