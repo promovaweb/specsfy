@@ -227,6 +227,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | 0009 | TUI do projeto | done |
 | 0010 | Skills chamam o binário | done |
 | 0011 | Distribuição | done |
+| 0012 | Tema do terminal na TUI | done |
 
 ## Notes
 
@@ -263,3 +264,4 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 - 2026-11-13: spec 0009 (TUI do projeto) closed.
 - 2026-11-13: spec 0010 (Skills chamam o binário) closed.
 - 2026-11-13: spec 0011 (Distribuição) closed.
+- 2026-11-20: spec 0012 (Tema do terminal na TUI) closed.
