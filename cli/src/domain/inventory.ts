@@ -12,7 +12,7 @@
  * Nothing here touches the network or writes files.
  */
 import { join } from "node:path";
-import embedded from "../../../skills/inventory.json" with { type: "json" };
+import { SKILL_FILES } from "../engine/skills.gen.ts";
 import { isFile, readJson } from "./filesystem.ts";
 import { AppError } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
@@ -72,8 +72,19 @@ export function parseInventory(payload: unknown): Inventory {
   return { skills, renamed, retired };
 }
 
-/** Inventory of the framework version this binary was built from. */
-export const EMBEDDED_INVENTORY: Inventory = parseInventory(embedded);
+/**
+ * Inventory of the framework version this binary was built from. It is read
+ * from the embedded skills tree, the only import of the file: importing the
+ * same path again as JSON lets the bundler pick either loader, and a
+ * compiled binary can then receive text where an object is expected.
+ */
+function embeddedInventory(): Inventory {
+  const text: unknown = SKILL_FILES[INVENTORY_FILENAME];
+  if (text === undefined) throw invalid("not embedded in the binary; run: bun run embed");
+  return parseInventory(typeof text === "string" ? JSON.parse(text) : text);
+}
+
+export const EMBEDDED_INVENTORY: Inventory = embeddedInventory();
 
 /**
  * Reads the inventory of a `skills/` checkout. A source without the file
