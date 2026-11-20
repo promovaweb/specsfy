@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "version": "0.30.0",
-  "edition": "v0.30.0",
-  "generated_at": "2026-11-20T12:02:22Z",
-  "source_sha256": "c399b04759c07655342743cd64ad0e82dc7d37e6d82cad45a08a3bdb80e93d97",
+  "version": "0.31.0",
+  "edition": "v0.31.0",
+  "generated_at": "2026-11-20T14:01:55Z",
+  "source_sha256": "1300485f126b89446e45ccb1889397e51a1519164fc9e2fd57b1372efae9de3a",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -28,6 +28,22 @@
     "docs/user/assets/cli/cli-dash.png",
     "docs/user/assets/cli/cli-skills.png",
     "docs/user/assets/cli/cli-specs.png",
+    "docs/user/assets/showcase/day-about.png",
+    "docs/user/assets/showcase/day-backlog.png",
+    "docs/user/assets/showcase/day-gates.png",
+    "docs/user/assets/showcase/day-help.png",
+    "docs/user/assets/showcase/day-overview.png",
+    "docs/user/assets/showcase/day-skills.png",
+    "docs/user/assets/showcase/day-specs.png",
+    "docs/user/assets/showcase/day-tests.png",
+    "docs/user/assets/showcase/night-about.png",
+    "docs/user/assets/showcase/night-backlog.png",
+    "docs/user/assets/showcase/night-gates.png",
+    "docs/user/assets/showcase/night-help.png",
+    "docs/user/assets/showcase/night-overview.png",
+    "docs/user/assets/showcase/night-skills.png",
+    "docs/user/assets/showcase/night-specs.png",
+    "docs/user/assets/showcase/night-tests.png",
     "docs/user/astro.md",
     "docs/user/backlog.md",
     "docs/user/cli-reference.md",
@@ -142,12 +158,12 @@
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.30.0.pdf",
-      "sha256": "693f43921e0c10eadbb86606fed3b61b4efb0a8da1b504e10420928234b51c9a"
+      "file": "Specsfy-Guia-do-Usuario-v0.31.0.pdf",
+      "sha256": "d95c3690305241066610a9b124ee0d29c5dc549174f95720c01e6254beb9b646"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.30.0.epub",
-      "sha256": "2ea590e1b8c92b4c708d027155d28cba5cfac0a6d7ae1f366f8aad0254db5322"
+      "file": "Specsfy-Guia-do-Usuario-v0.31.0.epub",
+      "sha256": "84ebf51f5f7f2d76c44be5c39053e4e9d5c055bb6b41bd484b141849660692bc"
     }
   }
 }

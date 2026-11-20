@@ -4,6 +4,31 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-11-20
+
+### Adicionado
+
+- Overview da TUI como painel de estatísticas das specs: barra de progresso
+  geral (média das specs), medidores de specs completas, gates aprovados,
+  tarefas e itens de checklist, gráfico de specs por estado, gates aprovados
+  por tipo e por spec, e a lista das specs com os três gates, barra própria,
+  tarefas e estado, com as abertas primeiro. As barras acompanham a largura
+  do terminal; com menos de 38 linhas, o backlog e o guia saem da Overview e o
+  primeiro próximo passo aparece em `Progress`.
+- Showcase da TUI em `docs/user/assets/showcase/`: prints de todas as telas
+  (Overview, Specs, Backlog, Gates, Tests, Skills, About e o help de teclas),
+  nos temas `night` e `day`, gerados a partir do projeto `example/`.
+  `bun run showcase` atualiza as imagens das telas que mudaram e
+  `bun run showcase:check`, agora parte do `validate`, falha quando uma
+  tela muda sem atualizar os prints.
+
+### Alterado
+
+- As imagens de `docs/user/assets/cli/` usadas pelo guia do CLI, pelo site e
+  pelos READMEs saem do showcase e mostram a TUI atual, no lugar dos prints
+  da 0.8.0. O texto do percurso visual em `docs/user/cli.md` acompanha as
+  telas de hoje.
+
 ## [0.30.0] - 2026-11-20
 
 ### Adicionado
