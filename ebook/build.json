@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "version": "0.29.5",
-  "edition": "v0.29.5",
-  "generated_at": "2026-11-20T11:57:08Z",
-  "source_sha256": "08e7342a78727989ecabfddaeb3fcb2a5a747f4bfe542f8be980673efca680c2",
+  "version": "0.30.0",
+  "edition": "v0.30.0",
+  "generated_at": "2026-11-20T12:02:22Z",
+  "source_sha256": "c399b04759c07655342743cd64ad0e82dc7d37e6d82cad45a08a3bdb80e93d97",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -142,12 +142,12 @@
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.29.5.pdf",
-      "sha256": "25dab2c60fbbafa194babf1d3e2ef24a16a8a0005a166c5087a2babca92600e6"
+      "file": "Specsfy-Guia-do-Usuario-v0.30.0.pdf",
+      "sha256": "693f43921e0c10eadbb86606fed3b61b4efb0a8da1b504e10420928234b51c9a"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.29.5.epub",
-      "sha256": "516c6ccdb43c5cf166620b3b4d61bf4c2642f70b99ac0022e8aafb96a5f42eae"
+      "file": "Specsfy-Guia-do-Usuario-v0.30.0.epub",
+      "sha256": "2ea590e1b8c92b4c708d027155d28cba5cfac0a6d7ae1f366f8aad0254db5322"
     }
   }
 }

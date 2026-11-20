@@ -4,6 +4,8 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-11-20
+
 ### Adicionado
 
 - Tema `terminal` na TUI, agora o padrão de `tui.theme`. Cada cor é uma
