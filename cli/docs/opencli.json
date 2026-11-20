@@ -3,7 +3,7 @@
   "opencli": "0.1",
   "info": {
     "title": "Specsfy",
-    "version": "0.31.1",
+    "version": "0.32.0",
     "summary": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP.",
     "description": "Install the Specsfy framework, run the spec lifecycle and its gates, and serve them to agents over MCP. Without arguments it opens the TUI; \"specsfy mcp\" starts the MCP server over stdio; any other command runs as a CLI with text or --json output.",
     "contact": {
@@ -3040,6 +3040,10 @@
             ]
           },
           {
+            "name": "--latest",
+            "description": "Use the default branch of the framework repository instead of the tag of this binary."
+          },
+          {
             "name": "--force",
             "description": "Replace managed files and skills that have local changes."
           },
@@ -3096,8 +3100,16 @@
       },
       {
         "name": "update",
-        "description": "Update the installed Specsfy skills, framework files and specialists that have no local changes.",
+        "description": "Bring the Specsfy skills of the project to the framework inventory: install missing, update changed, remove renamed and retired.",
         "options": [
+          {
+            "name": "--check",
+            "description": "Only report what would change; exit code 10 when the project differs from the inventory."
+          },
+          {
+            "name": "--latest",
+            "description": "Use the default branch of the framework repository instead of the tag of this binary."
+          },
           {
             "name": "--force",
             "description": "Replace managed files and skills that have local changes."
@@ -3119,6 +3131,7 @@
         ],
         "examples": [
           "specsfy update",
+          "specsfy update --check",
           "specsfy update --force --json"
         ],
         "exitCodes": [
@@ -3145,6 +3158,10 @@
           {
             "code": 7,
             "description": "PERMISSION: Permission denied on the file system."
+          },
+          {
+            "code": 10,
+            "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
           }
         ]
       },
@@ -3398,8 +3415,16 @@
           },
           {
             "name": "update",
-            "description": "Update every installed Specsfy skill; same as the top-level update.",
+            "description": "Bring the Specsfy skills of the project to the framework inventory; same as the top-level update.",
             "options": [
+              {
+                "name": "--check",
+                "description": "Only report what would change; exit code 10 when the project differs from the inventory."
+              },
+              {
+                "name": "--latest",
+                "description": "Use the default branch of the framework repository instead of the tag of this binary."
+              },
               {
                 "name": "--force",
                 "description": "Replace managed files and skills that have local changes."
@@ -3446,6 +3471,10 @@
               {
                 "code": 7,
                 "description": "PERMISSION: Permission denied on the file system."
+              },
+              {
+                "code": 10,
+                "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
               }
             ]
           }
@@ -4210,7 +4239,7 @@
         "options": [
           {
             "name": "--project",
-            "description": "Also check this project: Git, skills CLI, skills-lock.json, GitHub token and the daily release check.",
+            "description": "Also check this project: Git, skills CLI, skills-lock.json, the skills inventory, GitHub token and the daily release check.",
             "arguments": [
               {
                 "name": "dir",

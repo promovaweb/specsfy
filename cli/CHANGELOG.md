@@ -4,6 +4,37 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.32.0] - 2026-11-20
+
+### Adicionado
+
+- `skills/inventory.json`, a lista única das skills do framework, dos nomes
+  trocados (`renamed`) e das skills aposentadas (`retired`). O binário
+  embute o inventário da própria versão.
+- `specsfy update --check` mostra o que seria instalado, atualizado ou
+  removido sem escrever nada e sai com código 10 quando o projeto difere do
+  inventário. `--latest`, em `update` e `install`, usa a branch padrão
+  do repositório do framework.
+- Check `inventory` em `doctor --project` e linha `Inventory` na aba
+  Skills da TUI, que avisam sem rede quando as skills do projeto diferem do
+  inventário do binário. O `upgrade` lembra de rodar `update` nos
+  projetos.
+
+### Alterado
+
+- `specsfy update` (e `skills update`, tool `framework_update`) passa a
+  reconciliar o projeto com o inventário: instala as skills do framework que
+  faltam, atualiza as que mudaram, remove as renomeadas e as aposentadas e
+  atualiza os especialistas instalados, pelo CLI `skills`. Antes ele só
+  atualizava o que já estava instalado. O `--json` ganha `check`,
+  `in_sync` e `plan`.
+- Skill com alteração local deixa de interromper o `update`: ela é mantida
+  e listada em `kept`, e o restante é atualizado. `--force` continua
+  substituindo.
+- `install`, `update` e a aba Skills baixam as skills da tag `v<versão>`
+  do binário, para que skills e inventário sejam da mesma revisão. Sem essa
+  tag no repositório, vale a branch padrão.
+
 ## [0.31.1] - 2026-11-20
 
 ### Corrigido
