@@ -11,6 +11,13 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
   recém-instalado deixa de ser recusado com "unsupported lock version".
   Versões desconhecidas continuam recusadas. Contribuição de Lucas Fuad na
   PR #56.
+- A proteção do banco em `$specsfy-setup` compara o destino normalizado.
+  `DB_URL` é decomposta em driver, host, porta e banco, com os parâmetros da
+  query aplicados por último, como no Laravel. Aliases de driver, hosts locais e
+  portas padrão são equivalentes. Um `.env.testing` que aponta para o banco de
+  desenvolvimento escrito de outra forma passa a ser recusado. URLs sem banco
+  nos dois arquivos contam como o mesmo banco padrão. Contribuição de Lucas
+  Fuad na PR #55, com os dois casos apontados na revisão.
 
 ## [0.29.3] - 2026-11-15
 

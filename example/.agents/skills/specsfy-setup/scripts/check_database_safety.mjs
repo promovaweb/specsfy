@@ -44,6 +44,13 @@ const destructiveTestTraits = /\b(?:RefreshDatabase|DatabaseMigrations)\b/u;
 const errors = [];
 const ignored = [];
 
+/** Normalização do destino do banco; precisa existir antes da primeira inspeção. */
+const DRIVER_ALIASES = { postgres: "pgsql", postgresql: "pgsql", mariadb: "mysql", mysql2: "mysql", sqlite3: "sqlite", mssql: "sqlsrv" };
+const DEFAULT_PORTS = { pgsql: "5432", mysql: "3306", sqlsrv: "1433" };
+const LOCAL_HOSTS = new Set(["", "localhost", "127.0.0.1", "::1", "[::1]"]);
+/** Banco que o Laravel usa quando a URL não define um; os dois lados caem no mesmo padrão. */
+const DEFAULT_DATABASE = "(banco padrão do Laravel)";
+
 if (!existsSync(project)) {
   errors.push(`projeto não encontrado: ${project}`);
 } else {
@@ -209,16 +216,42 @@ function parseEnv(source) {
 /** Produz uma identidade comparável sem revelar credenciais ou nomes na saída. */
 function databaseTarget(environment, fallback = new Map()) {
   const get = (name) => environment.get(name) ?? fallback.get(name);
+  const target = {
+    driver: get("DB_CONNECTION") ?? "",
+    host: get("DB_HOST") ?? "",
+    port: get("DB_PORT") ?? "",
+    database: get("DB_DATABASE") ?? "",
+  };
   const url = get("DB_URL");
-  if (url) return `url:${url}`;
-  const database = get("DB_DATABASE");
-  if (!database) return "";
-  return [
-    get("DB_CONNECTION") ?? "",
-    get("DB_HOST") ?? "",
-    get("DB_PORT") ?? "",
-    database,
-  ].join("|");
+  if (url) {
+    // Segue o ConfigurationUrlParser do Laravel: os componentes da URL
+    // prevalecem sobre os campos DB_* e os parâmetros da query prevalecem
+    // sobre os componentes. Usuário e senha ficam fora da identidade.
+    let parsed;
+    try {
+      parsed = new URL(url);
+    } catch {
+      return `url:${url}`;
+    }
+    const path = decodeURIComponent(parsed.pathname);
+    Object.assign(target, Object.fromEntries(Object.entries({
+      driver: parsed.protocol.replace(/:$/u, ""),
+      host: decodeURIComponent(parsed.hostname),
+      port: parsed.port,
+      database: path && path !== "/" ? path.slice(1) : "",
+    }).filter(([, value]) => value)));
+    for (const key of ["driver", "host", "port", "database"]) {
+      const value = parsed.searchParams.get(key);
+      if (value) target[key] = value;
+    }
+    // Sem banco na URL nem nos campos, o Laravel usa o banco padrão da
+    // configuração; os dois arquivos nessa condição apontam para o mesmo banco.
+    if (!target.database) target.database = DEFAULT_DATABASE;
+  }
+  if (!target.database) return "";
+  const driver = DRIVER_ALIASES[target.driver.toLowerCase()] ?? target.driver.toLowerCase();
+  const host = LOCAL_HOSTS.has(target.host.toLowerCase()) ? "localhost" : target.host.toLowerCase();
+  return [driver, host, target.port || DEFAULT_PORTS[driver] || "", target.database].join("|");
 }
 
 /** Confere o conteúdo do alias de pacote acionado pelo comando informado. */
