@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "version": "0.34.1",
-  "edition": "v0.34.1",
-  "generated_at": "2026-11-20T18:37:09Z",
-  "source_sha256": "8456cdb2ec27703172787e16c1226d0c711f89187d4aeba54e2b81ba8af51386",
+  "version": "0.35.0",
+  "edition": "v0.35.0",
+  "generated_at": "2026-11-20T18:59:14Z",
+  "source_sha256": "f2cdc6bafc79413b6a0df8ffd8d87324daa5c7c92db7cbd4b48ca529d59e59c2",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -30,16 +30,20 @@
     "docs/user/assets/cli/cli-specs.png",
     "docs/user/assets/showcase/day-about.png",
     "docs/user/assets/showcase/day-backlog.png",
+    "docs/user/assets/showcase/day-context.png",
     "docs/user/assets/showcase/day-gates.png",
     "docs/user/assets/showcase/day-help.png",
+    "docs/user/assets/showcase/day-milestones.png",
     "docs/user/assets/showcase/day-overview.png",
     "docs/user/assets/showcase/day-skills.png",
     "docs/user/assets/showcase/day-specs.png",
     "docs/user/assets/showcase/day-tests.png",
     "docs/user/assets/showcase/night-about.png",
     "docs/user/assets/showcase/night-backlog.png",
+    "docs/user/assets/showcase/night-context.png",
     "docs/user/assets/showcase/night-gates.png",
     "docs/user/assets/showcase/night-help.png",
+    "docs/user/assets/showcase/night-milestones.png",
     "docs/user/assets/showcase/night-overview.png",
     "docs/user/assets/showcase/night-skills.png",
     "docs/user/assets/showcase/night-specs.png",
@@ -153,12 +157,12 @@
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.34.1.pdf",
-      "sha256": "cf7448d462047cf1dcfe3148ac8eb26d9b665636ca5414efb567c176ac13413b"
+      "file": "Specsfy-Guia-do-Usuario-v0.35.0.pdf",
+      "sha256": "11b0dd1d2a51b22b7d69d0483c1b49b72cabad377160c3a8cf73e5abf389cdd7"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.34.1.epub",
-      "sha256": "ab5af8f02310a29a5882fb2e1af769fdf2225dc4a10f00c0b9b03162b315eb55"
+      "file": "Specsfy-Guia-do-Usuario-v0.35.0.epub",
+      "sha256": "89bc1e1cab6d357a443d69e7429879655a0bfcc30488e56cc757062032ca4695"
     }
   }
 }

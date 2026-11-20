@@ -4,6 +4,35 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.35.0] - 2026-11-20
+
+### Adicionado
+
+- Ações na TUI, sempre pelas mesmas funções do CLI e com confirmação:
+  `t` muda o estado da spec selecionada (estados vizinhos numerados e `y`
+  para confirmar), `Espaço` marca o próximo item de checklist da primeira
+  tarefa pronta, `n` cria uma spec em `specs/draft/` pedindo o título na
+  barra de teclas, e `c`, na aba Backlog, registra uma captura no inbox. O
+  resultado aparece no rodapé da tela e o projeto recarrega.
+- Aba Milestones: os milestones de `specs/milestones/` com a porcentagem do
+  progresso derivado e a prévia do Markdown; `s` sincroniza, como
+  `specsfy milestones sync`.
+- Aba Context: os documentos de contexto do projeto (PROJECT.md, design
+  system, interface e os arquivos de `.specsfy/`), marcando os que existem,
+  com prévia.
+- Painel Doctor na aba About, com as checagens locais de `specsfy doctor`.
+- `actionBar` e `ctx.prompt` para telas que executam ações.
+
+### Alterado
+
+- A TUI passa de 7 para 9 abas; `--tab` e `tui.initialTab` aceitam
+  `milestones` e `context`. Em terminais estreitos, a barra de abas rola
+  até a aba selecionada.
+- Na aba Specs, `Espaço` deixa de rolar o Markdown (`PgUp`/`PgDn`
+  continuam). O painel Standards da aba About deu lugar ao Doctor.
+- O projeto de demonstração do showcase ganhou milestones e arquivos de
+  contexto; o showcase passa a ter 20 prints.
+
 ## [0.34.1] - 2026-11-20
 
 ### Corrigido
