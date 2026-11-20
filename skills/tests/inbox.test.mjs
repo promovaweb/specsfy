@@ -51,7 +51,7 @@ test('entrevista do MVP consulta contexto e preserva milestone confirmada', () =
   const source = read('skills/specsfy-milestones/references/mvp.md');
   const normalized = source.split(/\s+/).join(' ').toLowerCase();
   includes(normalized,['`mvp.md`','`brand.md`','fila ordenada de backlogs','`specs/milestones/m01.md`','milestone 1.0','não sobrescreva a milestone 1.0','texto integral da opção escolhida','informação a guardar ausente ou ambígua','superprojeto']);
-  includes(source,['$specsfy-01-inbox','$specsfy-02-backlog','$specsfy-data-discovery','$specsfy-milestones','$specsfy-03-specify','Português do Brasil','--show-superproject-working-tree']);
+  includes(source,['$specsfy-01-inbox','$specsfy-02-backlog','`$specsfy-setup` no modo `data-discovery`','$specsfy-milestones','$specsfy-03-specify','Português do Brasil','--show-superproject-working-tree']);
 });
 test('MVP gera milestone e backlogs entrevistáveis sem Inbox', t => {
   const root = temporary(t);

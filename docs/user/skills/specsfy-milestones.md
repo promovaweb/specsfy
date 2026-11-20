@@ -86,13 +86,14 @@ confirmado.
 
 A própria skill carrega `$specsfy-02-backlog`, que reaproveita os defaults e
 só pergunta por lacunas, ambiguidades, contradições ou escolhas reais. Ela
-chama `$specsfy-data-discovery` quando houver informações ambíguas e retorna à
-fila até entrevistar todos. Depois sincroniza os milestones e só chama
-`$specsfy-03-specify` para gerar uma spec Draft para cada backlog. Os campos
-sem resposta confiável ficam marcados como `Pendente`. A seção 10 de cada spec
-Draft também registra menus e navegação principal, usando o que o MVP informar
-ou `Pendente` quando essa parte não existir. A skill não implementa código,
-não executa tarefas e não passa os gates durante a conversa.
+chama `$specsfy-setup` no modo `data-discovery` quando houver informações
+ambíguas e retorna à fila até entrevistar todos. Depois sincroniza os
+milestones e só chama `$specsfy-03-specify` para gerar uma spec Draft para
+cada backlog. Os campos sem resposta confiável ficam marcados como `Pendente`.
+A seção 10 de cada spec Draft também registra menus e navegação principal,
+usando o que o MVP informar ou `Pendente` quando essa parte não existir. A
+skill não implementa código, não executa tarefas e não passa os gates durante
+a conversa.
 
 ### No modo `roadmap`
 

@@ -37,10 +37,10 @@ test('#43: atualizar stack preserva pipes escapados e texto humano', (t) => {
   const root = temporary(t);
   const row = '| Banco | PostgreSQL, credencial `PG \\| Main` | `workflow.json` |';
   put(root, '.specsfy/STACK.md', '# Contexto humano\n\n<!-- specsfy:stack:start -->\n| Camada | Tecnologia | Evidência |\n| --- | --- | --- |\n' + row + '\n<!-- specsfy:stack:end -->\n');
-  const result = run(script('specsfy-aux-stack', 'update_stack'), ['--project', root], root);
+  const result = run(script('specsfy-setup', 'update_stack'), ['--project', root], root);
   assert.equal(result.status, 0, result.stderr);
   assert.ok(readFileSync(join(root, '.specsfy/STACK.md'), 'utf8').includes(row));
-  assert.equal(run(script('specsfy-aux-stack', 'update_stack'), ['--project', root], root).stdout, '');
+  assert.equal(run(script('specsfy-setup', 'update_stack'), ['--project', root], root).stdout, '');
 });
 
 test('#36 / PR #12: setup instalado em caminho com espaços e acentos é idempotente', (t) => {
@@ -135,7 +135,7 @@ test('#25: stack registra manifests aninhados e ignora diretório descartado pel
   put(root, 'episodes/editor/package.json', '{"dependencies":{"react":"1","typescript":"1"}}');
   put(root, 'worker/pyproject.toml', '[project]\nname="worker"\n');
   put(root, 'descartado/package.json', '{"dependencies":{"astro":"1"}}');
-  const result = run(script('specsfy-aux-stack', 'update_stack'), ['--project', root], root);
+  const result = run(script('specsfy-setup', 'update_stack'), ['--project', root], root);
   assert.equal(result.status, 0, result.stderr);
   const stack = readFileSync(join(root, '.specsfy/STACK.md'), 'utf8');
   assert.ok(stack.includes('React') && stack.includes('Python') && stack.includes('episodes/editor/package.json'), stack);
@@ -279,7 +279,7 @@ test('#43: dados conversados migram linha antiga com pipe escapado para o format
     '| Credencial | Acessar o banco | nome `PG \\| Main` | Nenhuma | Equipe | Ao trocar a senha | conversa |',
     '<!-- specsfy:conversation-data:end -->', '',
   ].join('\n'));
-  const result = run(script('specsfy-data-discovery', 'registrar_dados_conversados'), ['--project', root, '--nome', 'Pedido', '--para-que-serve', 'Acompanhar pedidos', '--o-que-guardar', 'itens', '--formato-sugerido', 'texto', '--ligacoes', 'cliente', '--acesso', 'equipe', '--ciclo-de-vida', 'enquanto houver atendimento', '--fontes', 'conversa'], root);
+  const result = run(script('specsfy-setup', 'registrar_dados_conversados'), ['--project', root, '--nome', 'Pedido', '--para-que-serve', 'Acompanhar pedidos', '--o-que-guardar', 'itens', '--formato-sugerido', 'texto', '--ligacoes', 'cliente', '--acesso', 'equipe', '--ciclo-de-vida', 'enquanto houver atendimento', '--fontes', 'conversa'], root);
   assert.equal(result.status, 0, result.stderr);
   const database = readFileSync(join(root, '.specsfy/DATABASE.md'), 'utf8');
   assert.ok(database.includes('| Credencial | Acessar o banco | nome `PG \\| Main` | A confirmar | Nenhuma | Equipe | Ao trocar a senha | conversa |'), database);

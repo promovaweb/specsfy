@@ -20,10 +20,12 @@ scenario('Confirmar o destino da área depois de avançar',()=>{
  includes(contract.split(/\s+/).join(' '),['não volte ao assunto','reabrir explicitamente']);
 });
 scenario('Classificar todas as skills pelo modo de interação',()=>{
- const questioning=['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-aux-rules','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec','specsfy-data-discovery'];
- const silent=['specsfy-01-inbox','specsfy-aux-database','specsfy-aux-stack','specsfy-documentator'];
+ const questioning=['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec'];
+ const silent=['specsfy-01-inbox','specsfy-documentator'];
  const names=readdirSync(join(ROOT,'skills')).filter(name=>existsSync(join(ROOT,'skills',name,'SKILL.md')));
  assert.deepEqual(names.sort(),[...questioning,...silent].sort());
  for(const name of questioning)includes(read(`skills/${name}/SKILL.md`),['Modo de interação: `perguntas`.','Contrato de perguntas numeradas']);
  for(const name of silent)includes(read(`skills/${name}/SKILL.md`),['Modo de interação: `sem perguntas`.']);
+ for(const mode of ['setup','rules','data-discovery'])includes(read(`skills/specsfy-setup/references/${mode}.md`),['Modo de interação: `perguntas`.','Contrato de perguntas numeradas']);
+ for(const mode of ['stack','database'])includes(read(`skills/specsfy-setup/references/${mode}.md`),['Modo de interação: `sem perguntas`.']);
 });

@@ -123,8 +123,8 @@ Para cada item da fila, em sequência e sem pular responsabilidades. O objetivo
    que já foi declarado. A entrevista adaptativa cobre só lacunas,
    ambiguidades ou contradições restantes.
 3. Se houver informação a guardar ausente ou ambígua, anuncie a transição para
-   `$specsfy-data-discovery`, conclua a entrevista de dados e retome o backlog
-   com `.specsfy/DATABASE.md` como contexto.
+   `$specsfy-setup` no modo `data-discovery`, conclua a entrevista de dados e
+   retome o backlog com `.specsfy/DATABASE.md` como contexto.
 4. Ao terminar o refinamento do backlog, retome este modo, registre a situação
    do item na síntese da sessão e carregue `$specsfy-03-specify` para criar a
    spec Draft baseada nele. A seção 10 mantém a área de menus e navegação
@@ -149,8 +149,8 @@ geração automática de Drafts não autoriza implementação nem validação fi
    com no máximo oito perguntas por área.
 4. Explore só o necessário para entender jornada, dados indispensáveis,
    papéis, regras, integrações, limites, demonstração e validação. Cada
-   informação a guardar pouco clara passa por `$specsfy-data-discovery` antes
-   do próximo ponto. Não aplique formulário fixo nem repita resposta já
+   informação a guardar pouco clara passa por `$specsfy-setup` no modo
+   `data-discovery` antes do próximo ponto. Não aplique formulário fixo nem repita resposta já
    preservada.
 5. Quando a pessoa encerrar ou adiar uma área, capture a formulação dela e
    indique a Inbox correspondente na síntese, sem preencher lacunas por conta

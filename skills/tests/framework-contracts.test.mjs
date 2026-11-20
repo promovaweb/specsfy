@@ -5,8 +5,9 @@ import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, read } from '../../tests/helpers.mjs';
 
-const questioning = ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-aux-rules','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec','specsfy-data-discovery'];
-const silent = ['specsfy-01-inbox','specsfy-aux-database','specsfy-aux-stack','specsfy-documentator'];
+const questioning = ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec'];
+const silent = ['specsfy-01-inbox','specsfy-documentator'];
+const questioningModes = ['setup','rules','data-discovery'], silentModes = ['stack','database'];
 const names = readdirSync(join(ROOT, 'skills')).filter(name => existsSync(join(ROOT, 'skills', name, 'SKILL.md')));
 const source = path => read('skills/' + path);
 const includes = (text, terms) => { for (const term of terms) assert.ok(text.includes(term), term); };
@@ -15,6 +16,8 @@ test('todas as skills declaram seu modo de interação', () => {
   assert.deepEqual([...names].sort(), [...questioning, ...silent].sort());
   for (const name of questioning) includes(source(name + '/SKILL.md'), ['Modo de interação: `perguntas`.', 'Contrato de perguntas numeradas']);
   for (const name of silent) includes(source(name + '/SKILL.md'), ['Modo de interação: `sem perguntas`.']);
+  for (const mode of questioningModes) includes(source('specsfy-setup/references/' + mode + '.md'), ['Modo de interação: `perguntas`.', 'Contrato de perguntas numeradas']);
+  for (const mode of silentModes) includes(source('specsfy-setup/references/' + mode + '.md'), ['Modo de interação: `sem perguntas`.']);
 });
 test('contrato central preserva opções e encerramento por área', () => {
   includes(source('Spec.md'), ['## Contrato de perguntas numeradas','exatamente uma pergunta numerada por rodada','pelo menos três opções numeradas','`Escrever outra resposta`','`Gere outras opções`','`Avançar`','desde a primeira rodada','Pergunta 1','encerrar definitivamente','responder depois','Área encerrada pelo usuário','Área adiada pelo usuário','Português do Brasil','texto completo da opção','no máximo oito perguntas por área']);
@@ -37,12 +40,13 @@ test('arquivos normativos e exemplo mantêm estrutura carregável', () => {
 });
 test('framework aponta para contexto e setup canônicos', () => {
   const spec = source('Spec.md').replace(/\s+/g, ' ');
-  includes(spec, ['PROJECT.md','.specsfy/STACK.md','.specsfy/RULES.md','.specsfy/DATABASE.md','$specsfy-setup','$specsfy-aux-database','Antes de iniciar qualquer skill do framework','não se chama recursivamente','transição automática']);
+  includes(spec, ['PROJECT.md','.specsfy/STACK.md','.specsfy/RULES.md','.specsfy/DATABASE.md','$specsfy-setup','no modo `database`','Antes de iniciar qualquer skill do framework','não se chama recursivamente','transição automática']);
   for (const path of ['AGENTS.md', 'specsfy-setup/references/framework-instructions.md']) includes(source(path), ['Antes de iniciar qualquer skill do framework']);
 });
 test('todas as skills operacionais carregam setup no início e no handoff', () => {
   assert.ok(names.length > 1);
   for (const name of names.filter(name => name !== 'specsfy-setup')) includes(source(name + '/SKILL.md'), ['## Preparação obrigatória', 'Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup`', 'Em handoff automático, carregue-o de novo']);
+  for (const mode of ['stack', 'rules', 'database', 'data-discovery']) includes(source('specsfy-setup/references/' + mode + '.md'), ['## Preparação obrigatória', 'siga o modo `setup` de `$specsfy-setup`', 'Em handoff automático, repita o caminho curto']);
 });
 test('contrato de testes deriva da stack do consumidor', () => {
   const tdd = source('specsfy-06-implement/references/tests.md');

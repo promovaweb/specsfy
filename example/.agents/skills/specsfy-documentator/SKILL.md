@@ -1,6 +1,6 @@
 ---
 name: specsfy-documentator
-description: "Reconstrói a documentação técnica completa em docs/ e o registro de pacotes npm e Composer em .specsfy/PACKAGES.md a partir do código existente, manifests e lockfiles, preservando o conteúdo humano. Use depois de cada implementação, quando o monitor de contexto ou o progresso apontar docs/ ou PACKAGES.md ausente ou desatualizado, ou quando o usuário pedir para documentar o sistema. Não use para escrever specs, PROJECT.md ou regras (use specsfy-03-specify, specsfy-setup ou specsfy-aux-rules)."
+description: "Reconstrói a documentação técnica completa em docs/ e o registro de pacotes npm e Composer em .specsfy/PACKAGES.md a partir do código existente, manifests e lockfiles, preservando o conteúdo humano. Use depois de cada implementação, quando o monitor de contexto ou o progresso apontar docs/ ou PACKAGES.md ausente ou desatualizado, ou quando o usuário pedir para documentar o sistema. Não use para escrever specs, PROJECT.md ou regras (use specsfy-03-specify ou specsfy-setup)."
 ---
 
 # Documentar o sistema

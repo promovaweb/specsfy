@@ -1,13 +1,12 @@
----
-name: specsfy-aux-database
-description: "Mantém .specsfy/DATABASE.md como mapa tabular e completo da persistência: bancos, schemas, tabelas, campos, relações, índices e migrations, conferido contra o código. Use quando o monitor de contexto apontar persistência pendente, quando banco, tabela, coleção, model persistente, coluna, índice, relação, schema ou migration for criado ou alterado, ou ao auditar se o mapa corresponde ao código. Não use para descobrir com a pessoa quais dados guardar (use specsfy-data-discovery) nem para o stack (use specsfy-aux-stack)."
----
-
 # Manter o mapa de dados
 
-Esta skill garante que `.specsfy/DATABASE.md` mostre a estrutura de dados que
+Este modo garante que `.specsfy/DATABASE.md` mostre a estrutura de dados que
 o código realmente implementa, ao lado do que a conversa definiu. Uma mudança
 de dados só está completa quando o mapa a reflete.
+
+Referência do modo `database` de `$specsfy-setup`. Descobrir com a pessoa
+quais dados guardar é trabalho do modo `data-discovery`, e o stack fica com
+o modo `stack`.
 
 ## Pronto quando
 
@@ -20,15 +19,16 @@ de dados só está completa quando o mapa a reflete.
 
 ## Preparação obrigatória
 
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Antes de executar este modo, siga o modo `setup` de `$specsfy-setup` na
+raiz do projeto, pelo caminho curto quando o contexto já foi reconciliado
+nesta conversa. Em handoff automático, repita o caminho curto antes desta
+etapa. Reutilize a raiz confirmada na conversa e não prossiga se o setup
+apontar uma pendência.
 
 ## Modo de interação
 
 Modo de interação: `sem perguntas`.
-Não formule perguntas nesta skill. Quando faltar informação confirmada,
+Não formule perguntas neste modo. Quando faltar informação confirmada,
 sinalize o campo pendente para a etapa conversacional responsável.
 
 ## Executar
@@ -47,7 +47,7 @@ sinalize o campo pendente para a etapa conversacional responsável.
    script equivalente:
 
    ```bash
-   node .agents/skills/specsfy-aux-database/scripts/update_database.mjs \
+   node .agents/skills/specsfy-setup/scripts/update_database.mjs \
      --project <raiz>
    ```
 
@@ -71,7 +71,7 @@ sinalize o campo pendente para a etapa conversacional responsável.
 
 ## Conversa e código
 
-Quando `$specsfy-data-discovery` tiver registrado respostas confirmadas,
+Quando o modo `data-discovery` tiver registrado respostas confirmadas,
 preserve a seção `Informações a guardar confirmadas` e compare-a com o que o
 código revela. A conversa descreve o produto; este mapa mostra também o que já
 foi implementado, e divergências ficam visíveis em vez de corrigidas em

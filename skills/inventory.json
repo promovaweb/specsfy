@@ -2,9 +2,6 @@
   "schema_version": 1,
   "skills": {
     "specsfy-setup": "auxiliary",
-    "specsfy-aux-stack": "auxiliary",
-    "specsfy-aux-rules": "auxiliary",
-    "specsfy-aux-database": "auxiliary",
     "specsfy-documentator": "documentation",
     "specsfy-01-inbox": "base",
     "specsfy-02-backlog": "base",
@@ -14,8 +11,7 @@
     "specsfy-06-implement": "base",
     "specsfy-update-spec": "base",
     "specsfy-interviewer": "base",
-    "specsfy-milestones": "base",
-    "specsfy-data-discovery": "base"
+    "specsfy-milestones": "base"
   },
   "renamed": {
     "specsfy-base-idea": "specsfy-01-inbox",
@@ -32,7 +28,11 @@
     "specsfy-roadmap-milestone-interviewer": "specsfy-milestones",
     "specsfy-milestone-governor": "specsfy-milestones",
     "specsfy-06-tdd-bdd": "specsfy-06-implement",
-    "specsfy-07-implement": "specsfy-06-implement"
+    "specsfy-07-implement": "specsfy-06-implement",
+    "specsfy-aux-stack": "specsfy-setup",
+    "specsfy-aux-rules": "specsfy-setup",
+    "specsfy-aux-database": "specsfy-setup",
+    "specsfy-data-discovery": "specsfy-setup"
   },
   "retired": [
     "specsfy-progress",

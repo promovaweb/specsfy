@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 import {ROOT,read} from './helpers.mjs';
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 const user=path=>read('docs/user/'+path),develop=path=>read('docs/develop/'+path);
-const base=['specsfy-01-inbox','specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-update-spec','specsfy-interviewer','specsfy-milestones','specsfy-data-discovery'];
+const base=['specsfy-01-inbox','specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-update-spec','specsfy-interviewer','specsfy-milestones'];
 test('docs contém somente as árvores user e develop',()=>{
  assert.deepEqual(readdirSync(join(ROOT,'docs'),{withFileTypes:true}).filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort(),['develop','user']);assert.ok(existsSync(join(ROOT,'docs/README.md')));
 });

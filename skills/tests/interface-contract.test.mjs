@@ -6,6 +6,8 @@ import { ROOT, read, temporary, put, node } from '../../tests/helpers.mjs';
 
 const fixtures = JSON.parse(read('tests/fixtures/interface-contract.json'));
 const skill = name => read(`skills/${name}/SKILL.md`);
+/** The setup keeps its full procedure in the reference of the `setup` mode. */
+const setupText = () => skill("specsfy-setup") + read("skills/specsfy-setup/references/setup.md");
 const specialist = name => read(`specialists/specsfy-specialist-${name}/SKILL.md`);
 const includes = (text, terms) => terms.forEach(term => assert.ok(text.includes(term), term));
 const interfaceSpec = content => '| Interface para pessoas | Sim |\n\n### 10. Interfaces e contratos\n\n#### Interface para pessoas\n\n- Há uma interface para pessoas.\n\n' + content;
@@ -86,17 +88,17 @@ test('setup mapeia instruções, aplicação, persistência, testes e documenta�
   for (const [group, path] of Object.entries(sources)) assert.ok(report.source_groups[group].includes(path), group + ': ' + path);
 });
 test('setup instala especialistas detectados a partir da stack', () => {
-  includes(skill('specsfy-setup'), ['specsfy skills detect --project <raiz>', 'npx skills add https://github.com/promovaweb/specsfy', 'specsfy-specialist-data-modeling', 'specsfy-specialist-domain-modeling', 'specsfy-specialist-software-architecture', 'specsfy-specialist-react-ui-components', 'specsfy-specialist-reui', '## Stack e especialistas instalados pelo setup']);
+  includes(setupText(), ['specsfy skills detect --project <raiz>', 'npx skills add https://github.com/promovaweb/specsfy', 'specsfy-specialist-data-modeling', 'specsfy-specialist-domain-modeling', 'specsfy-specialist-software-architecture', 'specsfy-specialist-react-ui-components', 'specsfy-specialist-reui', '## Stack e especialistas instalados pelo setup']);
 });
 test('setup descobre CRUDs, menus e recompõe documentação do sistema', () => {
-  const text = skill('specsfy-setup');
+  const text = setupText();
   includes(text, ['## Cobertura funcional obrigatória no setup']);
   const normalized = text.split(/\s+/).join(' ');
   includes(normalized, ['criar, consultar, editar e apagar', 'menus do sistema', 'confirme com a pessoa', 'todo o sistema existente', '$specsfy-documentator']);
   includes(normalized.toLowerCase(), ['em toda execução completa do setup']);
 });
 test('contrato Laravel exige Octane com Open Swoole', () => {
-  for (const text of [read('skills/Spec.md'), read('skills/templates/Spec.md'), skill('specsfy-setup'), specialist('laravel')]) includes(text, ['Laravel Octane', 'obrigatório', 'laravel/octane', 'Open Swoole']);
+  for (const text of [read('skills/Spec.md'), read('skills/templates/Spec.md'), setupText(), specialist('laravel')]) includes(text, ['Laravel Octane', 'obrigatório', 'laravel/octane', 'Open Swoole']);
 });
 test('especialista ReUI documenta instalação pelo registry gratuito', () => {
   includes(specialist('reui'), ['componentes gratuitos', 'references/setup.md']);

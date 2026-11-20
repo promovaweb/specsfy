@@ -13,6 +13,11 @@ As skills base dividem o método por responsabilidade. Você pode chamar uma
 delas pelo nome ou explicar o resultado esperado. O agente lê o estado da spec,
 seleciona a etapa responsável e anuncia cada transição necessária.
 
+O framework tem 11 skills base: `specsfy-setup`, `specsfy-documentator`,
+`specsfy-01-inbox`, `specsfy-02-backlog`, `specsfy-03-specify`,
+`specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-implement`,
+`specsfy-update-spec`, `specsfy-interviewer` e `specsfy-milestones`.
+
 ## Nomes exibidos
 
 Os comandos técnicos continuam com o nome técnico, como `$specsfy-02-backlog`.
@@ -41,9 +46,9 @@ a área novamente, a menos que você a reabra. Se adiar, os pontos ficam
 registrados para retomada. Nenhuma das escolhas inventa uma resposta ou aprova
 uma etapa incompleta.
 
-Inbox, progresso, auxiliares de stack e banco e documentador não conduzem
-entrevista. Essas skills registram ou projetam o que já existe e encaminham
-qualquer pergunta para uma etapa conversacional.
+Inbox, progresso, `specsfy-documentator` e a `specsfy-setup` nos modos `stack`
+e `database` não conduzem entrevista. Essas skills registram ou projetam o que
+já existe e encaminham qualquer pergunta para uma etapa conversacional.
 
 | Etapa | Skill | Resultado principal |
 | --- | --- | --- |
@@ -56,7 +61,7 @@ qualquer pergunta para uma etapa conversacional.
 | incorporar mudança posterior | [`specsfy-update-spec`](specsfy-update-spec.md) | spec atualizada e gates reabertos |
 | conversar conforme a fase | [`specsfy-interviewer`](specsfy-interviewer.md) | respostas confirmadas e Effort recalibrado |
 | definir o MVP, planejar a evolução e manter a projeção | [`specsfy-milestones`](specsfy-milestones.md) | milestones do MVP e pós-MVP, `specs.md` e progresso derivado |
-| descobrir o que o sistema precisa guardar | [`specsfy-data-discovery`](specsfy-data-discovery.md) | respostas confirmadas em `DATABASE.md` |
+| descobrir o que o sistema precisa guardar | [`specsfy-setup` (modo `data-discovery`)](../project-context.md#conversar-sobre-os-dados) | respostas confirmadas em `DATABASE.md` |
 
 ## Encontre a skill pelo estado do trabalho
 
@@ -88,8 +93,9 @@ Para planejar um produto inteiro, comece pelo modo `mvp` de
 [Milestones](../milestones.md) com arquivos, relações e sincronização.
 
 Quando uma conversa revelar informações que o sistema precisa guardar, use
-`specsfy-data-discovery`. A skill pergunta em linguagem simples e mantém o
-registro em `.specsfy/DATABASE.md` antes de o backlog ou a spec avançar.
+a `specsfy-setup` no modo `data-discovery`. Ela pergunta em linguagem simples
+e mantém o registro em `.specsfy/DATABASE.md` antes de o backlog ou a spec
+avançar.
 
 Volte ao [guia completo](../README.md) ou leia [como a metodologia
 funciona](../method.md).

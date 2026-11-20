@@ -78,7 +78,7 @@ test('#52: stack registra a configuração do runner e preserva seu conteúdo', 
   mkdirSync(join(root, '.specsfy'));
   const source = JSON.stringify(custom, null, 2) + '\n';
   writeFileSync(join(root, '.specsfy/migrations.json'), source);
-  const updater = fileURLToPath(new URL('../specsfy-aux-stack/scripts/update_stack.mjs', import.meta.url));
+  const updater = fileURLToPath(new URL('../specsfy-setup/scripts/update_stack.mjs', import.meta.url));
   const first = spawnSync(process.execPath, [updater, '--project', root], { encoding: 'utf8' });
   assert.equal(first.status, 0, first.stderr);
   assert.match(readFileSync(join(root, '.specsfy/STACK.md'), 'utf8'), /Runner próprio.*\.specsfy\/migrations\.json/);

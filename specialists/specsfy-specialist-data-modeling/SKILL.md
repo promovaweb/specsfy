@@ -16,8 +16,8 @@ models, contratos e testes antes de propor alteração.
    consultar ou alterar cada informação.
 3. Descreva unicidade, consistência, retenção, exclusão, histórico e migração
    quando forem pertinentes.
-4. Atualize a seção de dados da spec e encaminhe respostas confirmadas para
-   `$specsfy-aux-database` e `.specsfy/DATABASE.md`.
+4. Atualize a seção de dados da spec e encaminhe respostas confirmadas para o
+   modo `database` de `$specsfy-setup` e `.specsfy/DATABASE.md`.
 5. Derive cenários para criação, leitura, atualização, exclusão, autorização e
    dados inválidos. A implementação usa o especialista do banco detectado.
 
@@ -62,7 +62,8 @@ precisa guardar quando o sistema atual não responder.
 
 ## Skills relacionadas
 
-- `$specsfy-aux-database` para manter o mapa persistente do projeto.
+- Modo `database` de `$specsfy-setup` para manter o mapa persistente do
+  projeto.
 - `$specsfy-specialist-postgres` para detalhes próprios do Postgres.
 - `$specsfy-specialist-laravel` para migrations e models Laravel.
 

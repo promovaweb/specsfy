@@ -37,9 +37,10 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
 3. Definir com a pessoa os nomes das branches permanentes (`main` de
    produção, `develop` de integração) e os prefixos das branches de vida
    curta (`feature/`, `release/`, `hotfix/`, `support/` quando aplicável).
-4. Registrar a escolha como regra confirmada do projeto (`$specsfy-aux-rules`
-   grava em `.specsfy/RULES.md`), incluindo prefixos, branch-alvo de cada
-   tipo e política de merge, não deixar a convenção apenas verbal.
+4. Registrar a escolha como regra confirmada do projeto (o modo `rules` de
+   `$specsfy-setup` grava em `.specsfy/RULES.md`), incluindo prefixos,
+   branch-alvo de cada tipo e política de merge, não deixar a convenção
+   apenas verbal.
 5. Orientar a abertura, a integração e o fechamento de cada tipo de branch:
    `feature/*` parte de e volta para `develop`; `release/*` parte de
    `develop` e vai para `main` e `develop`; `hotfix/*` parte de `main` e vai
@@ -103,8 +104,8 @@ description: "Aplicar e revisar o modelo Gitflow de branches (main, develop, fea
   presente em `develop` (`git log develop --oneline | grep <commit>` ou
   equivalente).
 - `.specsfy/RULES.md` (ou instrução equivalente do projeto) registrando a
-  convenção de nomes e a política de merge, revisitada por
-  `$specsfy-aux-rules` quando alguém a violar.
+  convenção de nomes e a política de merge, revisitada pelo modo `rules` de
+  `$specsfy-setup` quando alguém a violar.
 - Não declarar "o projeto segue Gitflow" apenas porque existe uma branch
   `develop`; a comprovação exige prefixos consistentes, merges `--no-ff`
   rastreáveis e o ciclo de `release`/`hotfix` fechado nos dois destinos.

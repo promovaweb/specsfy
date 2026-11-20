@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Configuração"
-  short_description: "Prepara e monitora o contexto do projeto"
-  default_prompt: "Use $specsfy-setup para confirmar a raiz do projeto, ler o sistema existente, reconciliar os arquivos de contexto sem substituir conteúdo humano, conferir a proteção do banco de testes, instalar os especialistas detectados e resolver toda pendência do monitor. Se o contexto já foi reconciliado nesta conversa, siga o caminho curto."
+  short_description: "Prepara e mantém o contexto do projeto"
+  default_prompt: "Use $specsfy-setup para cuidar do contexto do projeto. No modo setup, confirme a raiz, leia o sistema existente, reconcilie os arquivos de contexto sem substituir conteúdo humano, confira a proteção do banco de testes, instale os especialistas detectados e resolva toda pendência do monitor; se o contexto já foi reconciliado nesta conversa, siga o caminho curto. Use os modos stack, rules, database e data-discovery para manter .specsfy/STACK.md, .specsfy/RULES.md e .specsfy/DATABASE.md e para conversar sobre os dados que o produto guarda."

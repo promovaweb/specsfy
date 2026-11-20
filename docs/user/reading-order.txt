@@ -18,7 +18,6 @@ docs/user/skills/specsfy-06-implement.md
 docs/user/skills/specsfy-update-spec.md
 docs/user/skills/specsfy-interviewer.md
 docs/user/skills/specsfy-milestones.md
-docs/user/skills/specsfy-data-discovery.md
 docs/user/cli.md
 docs/user/cli-reference.md
 docs/user/project-context.md

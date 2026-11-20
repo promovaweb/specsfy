@@ -56,8 +56,8 @@ export const captureSteps = [
   ['ele pesquisa termos do pedido em backlogs, specs e documentação', ctx => includes(ctx.search, ['termos derivados do pedido do usuário', '`specs/backlog/*.md`', '`specs/<estado>/*/spec.md`', '`docs/**/*.md`'])],
   ['confirma com o usuário antes de criar uma possível duplicata', ctx => includes(ctx.search, ['possível duplicata', 'confirme com o usuário'])],
   ['preserva referências relevantes no item', ctx => includes(ctx.search, ['Referências relacionadas'])],
-  ['uma ideia de backlog que depende de informações lembradas pelo sistema', ctx => { ctx.data = skill('specsfy-data-discovery'); }],
+  ['uma ideia de backlog que depende de informações lembradas pelo sistema', ctx => { ctx.data = read('skills/specsfy-setup/references/data-discovery.md'); }],
   ['o agente identifica a necessidade de entender essas informações', ctx => { ctx.backlogSkill = skill('specsfy-02-backlog'); }],
-  ['ele transita para specsfy-data-discovery antes de concluir o brief', ctx => includes(normalized(ctx.backlogSkill).toLowerCase(), ['$specsfy-data-discovery', 'retome o backlog com o registro confirmado'])],
+  ['ele transita para specsfy-setup no modo data-discovery antes de concluir o brief', ctx => includes(normalized(ctx.backlogSkill).toLowerCase(), ['`$specsfy-setup` no modo `data-discovery`', 'retome o backlog com o registro confirmado'])],
   ['registra somente respostas confirmadas em .specsfy/DATABASE.md', ctx => includes(normalized(ctx.data).toLowerCase(), ['somente respostas confirmadas', '.specsfy/database.md'])],
 ];

@@ -123,8 +123,8 @@ destes próximos passos:
 
 - manter a entrada na Inbox;
 - usar `$specsfy-02-backlog` para refiná-la ou aprofundá-la;
-- usar `$specsfy-data-discovery` quando a entrada indicar informações que o
-  sistema precisará guardar. Essa conversa posterior registra somente o que
+- usar `$specsfy-setup` no modo `data-discovery` quando a entrada indicar
+  informações que o sistema precisará guardar. Essa conversa posterior registra somente o que
   for confirmado em `.specsfy/DATABASE.md`.
 
 Carregue outra skill apenas se o mesmo pedido também ordenar esse trabalho de

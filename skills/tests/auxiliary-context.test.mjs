@@ -9,10 +9,10 @@ import { ROOT, read, temporary, put, node } from '../../tests/helpers.mjs';
 
 const scripts = {
   setup: 'specsfy-setup/scripts/setup_context.mjs',
-  stack: 'specsfy-aux-stack/scripts/update_stack.mjs',
-  rules: 'specsfy-aux-rules/scripts/add_rule.mjs',
-  database: 'specsfy-aux-database/scripts/update_database.mjs',
-  data: 'specsfy-data-discovery/scripts/registrar_dados_conversados.mjs',
+  stack: 'specsfy-setup/scripts/update_stack.mjs',
+  rules: 'specsfy-setup/scripts/add_rule.mjs',
+  database: 'specsfy-setup/scripts/update_database.mjs',
+  data: 'specsfy-setup/scripts/registrar_dados_conversados.mjs',
   monitor: 'specsfy-setup/scripts/monitor_context.mjs',
 };
 const run = (name, root, ...args) => node(join(ROOT, 'skills', scripts[name]), ['--project', root, ...args]);
@@ -30,7 +30,7 @@ function snapshot(root, directory = '') {
 }
 
 test('entradas de produto encaminham a descoberta dos dados', () => {
-  for (const path of ['specsfy-01-inbox/SKILL.md', 'specsfy-02-backlog/SKILL.md', 'specsfy-milestones/references/mvp.md', 'specsfy-03-specify/SKILL.md']) includes(read(`skills/${path}`), ['$specsfy-data-discovery', 'DATABASE.md']);
+  for (const path of ['specsfy-01-inbox/SKILL.md', 'specsfy-02-backlog/SKILL.md', 'specsfy-milestones/references/mvp.md', 'specsfy-03-specify/SKILL.md']) includes(read(`skills/${path}`).split(/\s+/).join(' '), ['`$specsfy-setup` no modo `data-discovery`', 'DATABASE.md']);
 });
 test('registra dados confirmados sem substituir o conteúdo detectado', t => {
   const root = temporary(t);
@@ -110,7 +110,7 @@ test('monitor exige documentação do sistema ao alterar aplicação e banco', (
 });
 test('skills de entrega exigem os encaminhamentos do monitor de contexto', () => {
   for (const path of ['specsfy-05-tasks/SKILL.md', 'specsfy-06-implement/references/implement.md']) includes(read(`skills/${path}`), ['monitor_context.mjs']);
-  for (const path of ['skills/specsfy-06-implement/references/implement.md', 'skills/Spec.md']) includes(read(path), ['monitor_context.mjs', '$specsfy-aux-stack', '$specsfy-aux-database']);
+  for (const path of ['skills/specsfy-06-implement/references/implement.md', 'skills/Spec.md']) includes(read(path).split(/\s+/).join(' '), ['monitor_context.mjs', '`$specsfy-setup` no modo `stack`', 'modo `database`']);
 });
 test('setup adapta Laravel, Next e Astro preservando regras e instruções locais', t => {
   const variants = [

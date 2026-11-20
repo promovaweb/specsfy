@@ -4,20 +4,20 @@
     "specsfy-02-backlog": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.885521+00:00",
-      "content_sha256": "8137c14b18c2407680425999006da047ed2f365a0db9f53f952e89fc4b380f3f",
-      "updated_at": "2026-11-20T15:11:53.167Z"
+      "content_sha256": "79eb796e09ea8d9f2cf19f82c9ae7683cb79ef85edb88d049e84625cfddd1c0f",
+      "updated_at": "2026-11-20T17:29:42.914Z"
     },
     "specsfy-03-specify": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.886219+00:00",
-      "content_sha256": "76c7fe14f1fa58eec0ed6cb58cc9ca03b169731c649d404e391c334d2fcfd4f3",
-      "updated_at": "2026-11-20T15:11:53.168Z"
+      "content_sha256": "f21e0f6efbd394d3785b5a893c3d5988e041b106b1bd0fe80dc94d1ad6447b37",
+      "updated_at": "2026-11-20T17:29:42.916Z"
     },
     "specsfy-04-validate": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.886960+00:00",
-      "content_sha256": "aaf7e75fc446f13700fdc91ba57bc79686a272ec8323eb4abc6883fbfb8bb54e",
-      "updated_at": "2026-11-20T15:22:56.152Z"
+      "content_sha256": "5a92c290cc35bd61fb7c10db9b57cbbfc812578594eb608030e593bd343e0d43",
+      "updated_at": "2026-11-20T17:29:42.917Z"
     },
     "specsfy-05-tasks": {
       "source": "base",
@@ -136,38 +136,20 @@
     "specsfy-setup": {
       "source": "base",
       "installed_at": "2026-07-27T16:06:43.315970+00:00",
-      "content_sha256": "abade734c4f30e225761ca895cd87719006fb7639c7f506f1875f63e923efc4d",
-      "updated_at": "2026-11-20T15:27:26.969Z"
-    },
-    "specsfy-aux-stack": {
-      "source": "base",
-      "installed_at": "2026-07-27T16:06:43.316311+00:00",
-      "content_sha256": "e9b72a04592bb0ad71e0b09946a625084d0d9fbd945de300c05fa51f3da5ebb9",
-      "updated_at": "2026-11-20T15:11:53.165Z"
-    },
-    "specsfy-aux-rules": {
-      "source": "base",
-      "installed_at": "2026-07-27T16:06:43.316617+00:00",
-      "content_sha256": "50be364d860ca40cf08081545a53c4664ceed0df3e5fea33fda2c49458a6dc3d",
-      "updated_at": "2026-11-20T15:11:53.165Z"
-    },
-    "specsfy-aux-database": {
-      "source": "base",
-      "installed_at": "2026-07-27T16:06:43.316945+00:00",
-      "content_sha256": "b1127022e3e494bc5808b4843f857882ce5fe48222a76a7b6a6f87ff08477969",
-      "updated_at": "2026-11-20T15:11:53.165Z"
+      "content_sha256": "8b65a2aa53c598038cd1e832a14550839212e45df5d2f2c3cc9d79975a99813e",
+      "updated_at": "2026-11-20T17:29:42.913Z"
     },
     "specsfy-documentator": {
       "source": "base",
       "installed_at": "2026-07-27T16:06:43.317488+00:00",
-      "content_sha256": "0fa59bd0c9ff7e1e7d6b0f4b7586912d5bf1c27cd01073a5005c9b658075ba69",
-      "updated_at": "2026-11-20T15:11:53.166Z"
+      "content_sha256": "4a3f8319d88d7fec8512cd583474e7bfedb658df4a5abfa661acbe04486f3290",
+      "updated_at": "2026-11-20T17:29:42.913Z"
     },
     "specsfy-01-inbox": {
       "source": "base",
       "installed_at": "2026-07-28T22:38:58.461526+00:00",
-      "content_sha256": "7d4be53ddae284fedc0d5894338b58df8c652471d6b46da7da6d33af0ccd6496",
-      "updated_at": "2026-11-20T15:11:53.166Z"
+      "content_sha256": "5868edc8128d6519b4d29a94949c1a5ebed966afd700fd27aeeb362711fd16fc",
+      "updated_at": "2026-11-20T17:29:42.914Z"
     },
     "specsfy-update-spec": {
       "source": "base",
@@ -181,27 +163,22 @@
       "content_sha256": "aa1587f7b97c9d9acbc7994e2b028dfa8e1d6d8766c0d838e43f42d613a01525",
       "updated_at": "2026-11-20T15:11:53.172Z"
     },
-    "specsfy-data-discovery": {
-      "source": "base",
-      "installed_at": "2026-11-02T06:06:33.404Z",
-      "content_sha256": "17bbd77ff81ad7a75cf141e8700726dc9e05568a2ced0512142babef5d615485",
-      "updated_at": "2026-11-20T15:15:48.208Z"
-    },
     "specsfy-milestones": {
       "source": "base",
       "installed_at": "2026-11-20T15:15:48.207Z",
-      "content_sha256": "06cd993cfb3efb23c54fecee784d572acc669d553c9d62617f3c905ff85386a5"
+      "content_sha256": "51e6478227bd0765bad6e0074296009bc2635fdc5b3b37139eeb079370447e22",
+      "updated_at": "2026-11-20T17:29:42.919Z"
     },
     "specsfy-06-implement": {
       "source": "base",
       "installed_at": "2026-11-20T15:22:56.149Z",
-      "content_sha256": "22777f296cc521eb5bd64013fcfe4165ce5ef5924a837528c20c15ccde39eefe",
-      "updated_at": "2026-11-20T15:26:32.705Z"
+      "content_sha256": "c3649a017b980aa42d149278b28386ab3b83d730b5b45f72235706af81b6353b",
+      "updated_at": "2026-11-20T17:29:42.918Z"
     }
   },
   "framework": {
     "source": "base",
-    "spec_sha256": "122485415a26fd29bc8fdf4072f43e46886363711741691024c723764ae1045e",
+    "spec_sha256": "91929ff76a1e4db27368c787b37031d40768919f02bbf70293c39f874d101a96",
     "template_sha256": "4a574c6e38d87f4e2486c966a47f9d5c45c1eaf1bb445b73cc7d11a1011509e1",
     "templates_sha256": {
       "Inbox.md": "a598c5ac2fddc936bd5856df6548b989a62c939d3198c3eb887405c074d08a6f",
@@ -217,7 +194,7 @@
       "DESIGNSYSTEM.MD": "37fcf303a5f15597c4d138358c2a3d72f3c95264202eddb84d9a5c81bf12b6de"
     },
     "example_sha256": "8dfa2cf359b80e7ba37de7c75d45b16caca698cf80b02bd61f4225f7f764f525",
-    "agents_sha256": "d7ccce131ce45d83d5512a0cca53d02fb7a6ab827a5a64cd3847870633c1071a",
+    "agents_sha256": "ae65ec833c411bbb97dd23f454572334775da3e8763885e9d199bb1f7cff0fe7",
     "claude_sha256": "ddd02f4166dbe49fce5e0444bd0ab9fac8dabbf47fd9d38c1539a56efc8bec28"
   }
 }

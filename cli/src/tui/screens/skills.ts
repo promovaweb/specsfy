@@ -15,7 +15,7 @@
 import { BoxRenderable, TextRenderable, type CliRenderer, type ColorInput, type Renderable } from "@opentui/core";
 import type { Catalog, CatalogEntryValue } from "../../domain/catalog.ts";
 import { inSync, inventoryDrift } from "../../domain/inventory.ts";
-import { AUXILIARY_SKILLS, DOCUMENTATION_SKILLS, FRAMEWORK_SKILLS } from "../../domain/installer.ts";
+import { DOCUMENTATION_SKILLS, FRAMEWORK_SKILLS } from "../../domain/installer.ts";
 import { selectList, panel, keyValueTable, dim, fit, type SelectItem } from "../components.ts";
 import { glyphs, type Theme } from "../theme.ts";
 import type { Screen } from "../screen.ts";
@@ -32,16 +32,13 @@ export const FRAMEWORK_DESCRIPTIONS: Readonly<Record<string, string>> = {
   "specsfy-05-tasks": "Breaks the work into traceable tasks.",
   "specsfy-06-implement": "TDD from the spec BDD, disciplined execution and delivery evidence.",
   "specsfy-update-spec": "Handles late requests and reopens the affected gates.",
-  "specsfy-setup": "Prepares and reconciles the persistent project context.",
-  "specsfy-aux-stack": "Maps and keeps the observed technical stack.",
-  "specsfy-aux-rules": "Records explicit rules without erasing the current ones.",
-  "specsfy-aux-database": "Keeps the full tabular map of the persistence layer.",
+  "specsfy-setup": "Prepares the project context and keeps stack, rules and data map.",
   "specsfy-documentator": "Rebuilds the complete technical documentation.",
 };
 
 const CATEGORY_LABELS: Readonly<Record<string, string>> = {
   base: "Framework",
-  auxiliary: "Auxiliary",
+  auxiliary: "Context",
   documentation: "Documentation",
   installed: "Other installed",
 };
@@ -64,7 +61,7 @@ export function buildSkillOptions(entries: readonly CatalogEntryValue[], install
   const options: SkillOption[] = FRAMEWORK_SKILLS.map((name) => ({
     name,
     description: FRAMEWORK_DESCRIPTIONS[name] ?? "Specsfy framework skill.",
-    category: (AUXILIARY_SKILLS as readonly string[]).includes(name) || name === "specsfy-setup"
+    category: name === "specsfy-setup"
       ? "auxiliary"
       : (DOCUMENTATION_SKILLS as readonly string[]).includes(name) ? "documentation" : "base",
     installed: installed.has(name),

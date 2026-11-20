@@ -40,8 +40,8 @@ inventada.
 
 Quando o texto indicar que o sistema precisa guardar, consultar, compartilhar
 ou apagar informações, a Inbox registra o sinal sem perguntar. No backlog,
-`$specsfy-data-discovery` conversa sobre essas informações antes de o item ser
-considerado pronto.
+`$specsfy-setup`, no modo `data-discovery`, conversa sobre essas informações
+antes de o item ser considerado pronto.
 
 O texto será versionado no Git, por isso a captura não deve incluir senhas,
 tokens, chaves privadas ou dados pessoais sensíveis. Se o agente detectar um segredo evidente, ele não

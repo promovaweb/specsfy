@@ -139,8 +139,8 @@ conversa e registra o resultado de cada uma na spec da entrega:
 
 1. `specsfy-milestones`, no modo `mvp`, conduz a conversa sobre o MVP e
    define marcos que podem ser demonstrados.
-2. `specsfy-data-discovery` entra quando a conversa revela informações que o
-   sistema precisa guardar.
+2. `specsfy-setup` no modo `data-discovery` entra quando a conversa revela
+   informações que o sistema precisa guardar.
 3. A importação do `MVP.md` gera e refina um backlog por item e pode criar
    specs em `Draft`, todas com `Definition Gate: Pending`.
 4. O modo `sync` de `specsfy-milestones` mantém `specs.md` e os arquivos
@@ -196,13 +196,13 @@ Leia [Mudanças posteriores](update-spec.md) para os detalhes.
 **Caminho:** o agente percorre as etapas abaixo, anuncia cada transição na
 conversa e registra o resultado de cada uma na spec da entrega:
 
-1. `specsfy-data-discovery` pergunta em linguagem simples o que o sistema
-   precisa guardar e registra as respostas confirmadas em
+1. `specsfy-setup` no modo `data-discovery` pergunta em linguagem simples o
+   que o sistema precisa guardar e registra as respostas confirmadas em
    `.specsfy/DATABASE.md`.
 2. `specsfy-05-tasks` inclui uma tarefa `[MIGRATION]` com arquivo versionado.
 3. `specsfy-06-implement` aplica a migration no **banco de teste** e registra
    uma consulta de estado.
-4. `specsfy-aux-database` atualiza o quadro de persistência.
+4. `specsfy-setup` no modo `database` atualiza o quadro de persistência.
 
 **Como solicitar:**
 

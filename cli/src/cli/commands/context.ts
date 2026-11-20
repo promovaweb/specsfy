@@ -2,10 +2,10 @@
  * Project context commands (spec 0005).
  *
  * `context setup|inspect|interface|monitor|stack|rule|database|data|usage`
- * pass their parameters to the scripts of `specsfy-setup`,
- * `specsfy-aux-stack`, `specsfy-aux-rules`, `specsfy-aux-database`,
- * `specsfy-data-discovery` and `specsfy-setup/analyze_context`. The
- * definitions are shared with the MCP tools in `src/mcp/tools/context.ts`.
+ * pass their parameters to the scripts of `specsfy-setup`, the skill that
+ * holds the five context modes (setup, stack, rules, database and
+ * data-discovery). The definitions are shared with the MCP tools in
+ * `src/mcp/tools/context.ts`.
  *
  * `context monitor --check` exits with GATE_FAILED (10) when context
  * documents are pending for the changed paths.
@@ -76,7 +76,7 @@ export const contextStackDef: ScriptCommandDef = {
   name: "stack",
   tool: "context_stack",
   description: "Update the detected stack block in .specsfy/STACK.md, keeping human rows and notes.",
-  script: "specsfy-aux-stack/scripts/update_stack.mjs",
+  script: "specsfy-setup/scripts/update_stack.mjs",
   project: "project-flag",
   effect: "write",
   params: [],
@@ -87,7 +87,7 @@ export const contextRuleDef: ScriptCommandDef = {
   name: "rule",
   tool: "context_rule",
   description: "Append a confirmed rule to a section of .specsfy/RULES.md without changing the rest of the document.",
-  script: "specsfy-aux-rules/scripts/add_rule.mjs",
+  script: "specsfy-setup/scripts/add_rule.mjs",
   project: "project-flag",
   effect: "write",
   params: [
@@ -101,7 +101,7 @@ export const contextDatabaseDef: ScriptCommandDef = {
   name: "database",
   tool: "context_database",
   description: "Update the detected structures block in .specsfy/DATABASE.md from migrations, SQL and Prisma schemas.",
-  script: "specsfy-aux-database/scripts/update_database.mjs",
+  script: "specsfy-setup/scripts/update_database.mjs",
   project: "project-flag",
   effect: "write",
   params: [],
@@ -113,7 +113,7 @@ export const contextDataDef: ScriptCommandDef = {
   tool: "context_data",
   description: "Record information confirmed in conversation in the data map of .specsfy/DATABASE.md, one row per information name.",
   longDescription: "A row with the same --name is replaced. The detected part of the data map is left untouched.",
-  script: "specsfy-data-discovery/scripts/registrar_dados_conversados.mjs",
+  script: "specsfy-setup/scripts/registrar_dados_conversados.mjs",
   project: "project-flag",
   effect: "write",
   params: [

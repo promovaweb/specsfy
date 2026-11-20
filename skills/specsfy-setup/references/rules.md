@@ -1,13 +1,12 @@
----
-name: specsfy-aux-rules
-description: "Ajuda a descobrir, formular e registrar regras duráveis do projeto em .specsfy/RULES.md, sem alterar nem remover regras existentes. Use quando o monitor de contexto apontar revisão de regras, quando o usuário quiser adicionar uma regra, quando uma convenção recorrente precisar virar instrução explícita, ou ao revisar conflitos e duplicatas. Não use para requisitos ou critérios de aceite de uma feature (use specsfy-03-specify) nem para instruções gerais do agente em AGENTS.md."
----
-
 # Manter regras do projeto
 
-Esta skill transforma convenções confirmadas em regras verificáveis em
+Este modo transforma convenções confirmadas em regras verificáveis em
 `.specsfy/RULES.md`. Só entra no arquivo o que a pessoa declarou ou confirmou;
 inferências e sugestões ficam na conversa até serem aceitas.
+
+Referência do modo `rules` de `$specsfy-setup`. Requisitos e condições de
+aceite de uma feature ficam com `$specsfy-03-specify`, e instruções gerais
+do agente ficam em `AGENTS.md`.
 
 ## Pronto quando
 
@@ -19,10 +18,11 @@ inferências e sugestões ficam na conversa até serem aceitas.
 
 ## Preparação obrigatória
 
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Antes de executar este modo, siga o modo `setup` de `$specsfy-setup` na
+raiz do projeto, pelo caminho curto quando o contexto já foi reconciliado
+nesta conversa. Em handoff automático, repita o caminho curto antes desta
+etapa. Reutilize a raiz confirmada na conversa e não prossiga se o setup
+apontar uma pendência.
 
 ## Modo de interação
 
@@ -51,7 +51,7 @@ Antes de formular qualquer pergunta, leia e aplique o
    equivalente:
 
    ```bash
-   node .agents/skills/specsfy-aux-rules/scripts/add_rule.mjs \
+   node .agents/skills/specsfy-setup/scripts/add_rule.mjs \
      --project <raiz> \
      --section "<tema>" \
      --rule "<regra confirmada>"

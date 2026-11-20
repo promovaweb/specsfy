@@ -5,7 +5,8 @@ const includes = (source, terms) => terms.forEach(term => assert.ok(source.inclu
 const normalized = source => source.split(/\s+/).join(' ');
 const skill = name => read(`skills/${name}/SKILL.md`);
 const base = ['specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-implement', 'specsfy-update-spec'];
-const auxiliary = ['specsfy-setup', 'specsfy-aux-stack', 'specsfy-aux-rules', 'specsfy-aux-database'];
+/** Modes of specsfy-setup that each maintain one context file. */
+const contextModes = { stack: 'STACK', rules: 'RULES', database: 'DATABASE' };
 const design = () => read('skills/templates/DESIGNSYSTEM.MD');
 
 const expectations = [
@@ -47,11 +48,11 @@ export const policySteps = [
   ['a política mínima da spec é inspecionada', ctx => { assert.ok(ctx.coverage); ctx.validator = read('skills/specsfy-04-validate/scripts/validate_spec.mjs'); ctx.trace = read('skills/specsfy-06-implement/scripts/check_traceability.mjs'); ctx.framework = read('skills/Spec.md'); ctx.template = read('skills/templates/Spec.md'); ctx.testing = read('docs/develop/context/engineering/testing.md'); }],
   ['template contrato central e guia oficial explicam o mínimo de três', ctx => { for (const source of [ctx.template, ctx.framework, ctx.testing]) assert.ok(source.toLowerCase().includes('três') || source.includes('3')); includes(ctx.template, ['AC-001', 'AC-002', 'AC-003']); }],
   ['os repositórios de skills, CLI e documentação do Specsfy', ctx => { ctx.integrated = true; }],
-  ['o contrato de contexto auxiliar é inspecionado', ctx => { assert.ok(ctx.integrated); ctx.aux = Object.fromEntries(auxiliary.map(name => [name, skill(name)])); ctx.framework = read('skills/Spec.md'); ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); }],
-  ['setup e as três skills auxiliares possuem responsabilidades distintas', ctx => { for (const [name, source] of Object.entries(ctx.aux)) includes(source, ['name: ' + name]); for (const [name, file] of [['stack', 'STACK'], ['rules', 'RULES'], ['database', 'DATABASE']]) includes(ctx.aux['specsfy-aux-' + name], ['.specsfy/' + file + '.md']); }],
+  ['o contrato de contexto auxiliar é inspecionado', ctx => { assert.ok(ctx.integrated); ctx.setup = skill('specsfy-setup'); ctx.aux = Object.fromEntries(Object.keys(contextModes).map(mode => [mode, read(`skills/specsfy-setup/references/${mode}.md`)])); ctx.framework = read('skills/Spec.md'); ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); }],
+  ['setup e as três skills auxiliares possuem responsabilidades distintas', ctx => { includes(ctx.setup, ['name: specsfy-setup']); for (const [mode, file] of Object.entries(contextModes)) { includes(ctx.setup, ['`' + mode + '`']); includes(ctx.aux[mode], ['.specsfy/' + file + '.md']); } }],
   ['o projeto consumidor recebe caminhos canônicos para projeto stack regras e banco', ctx => { includes(ctx.framework, ['PROJECT.md', '.specsfy/STACK.md', '.specsfy/RULES.md', '.specsfy/DATABASE.md']); includes(read('docs/user/project-context.md'), ['$specsfy-setup']); }],
   ['as diretrizes publicáveis dos agentes possuem uma referência sincronizada', () => { const start = '<!-- specsfy:framework:start -->', end = '<!-- specsfy:framework:end -->'; const block = source => { includes(source, [start, end]); return (start + source.split(start)[1].split(end)[0] + end).trim(); }; assert.equal(block(read('skills/AGENTS.md')), block(read('skills/specsfy-setup/references/framework-instructions.md'))); }],
-  ['a instalação reconhece setup e skills auxiliares como parte do framework', ctx => includes(ctx.installer, auxiliary.map(name => '"' + name + '"'))],
+  ['a instalação reconhece setup e skills auxiliares como parte do framework', ctx => includes(ctx.installer, ['"specsfy-setup"'])],
   ['o monitor de contexto publicado pela skill de setup', ctx => { ctx.monitor = read('skills/specsfy-setup/scripts/monitor_context.mjs'); }],
   ['manifests banco ou código da aplicação mudam', ctx => { ctx.workflow = [skill('specsfy-05-tasks'), read('skills/specsfy-06-implement/references/implement.md')]; }],
   ['planejamento implementação e progresso consultam o mesmo monitor', ctx => { for (const source of ctx.workflow) includes(source, ['monitor_context.mjs']); }],
@@ -86,6 +87,6 @@ export const policySteps = [
   ['o instalador e o catálogo de especialistas do Specsfy', ctx => { ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); ctx.catalog = JSON.parse(read('specialists/catalog.json')); ctx.interface = read('skills/templates/Interface.md'); }],
   ['a integração do design system é lida', ctx => { ctx.integration = [ctx.installer, ctx.catalog, ctx.interface]; }],
   ['o especialista de experiência depende do especialista de design system', ctx => assert.ok(ctx.catalog.skills.find(entry => entry.name === 'specsfy-specialist-interface-experience').requires.includes('specsfy-specialist-design-system'))],
-  ['o contrato de setup do Specsfy', ctx => { ctx.setup = skill('specsfy-setup'); }],
+  ['o contrato de setup do Specsfy', ctx => { ctx.setup = skill('specsfy-setup') + read('skills/specsfy-setup/references/setup.md'); }],
   ['a cobertura funcional do setup é lida', ctx => { ctx.setupCoverage = normalized(ctx.setup); }],
 ];

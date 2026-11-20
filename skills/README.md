@@ -21,8 +21,8 @@ está em [`docs/`](../docs/).
 
 Este módulo possui:
 
-- as instruções operacionais das dez skills base, do setup, do
-  documentador e das três auxiliares.
+- as instruções operacionais das nove skills base, do setup com seus cinco
+  modos de contexto e do documentador.
 - os templates de ideia, backlog, spec, tarefas e interface em `templates/`.
 - um documento preenchido e não normativo em `examples/Spec.md`.
 - o MCR-10 e referências dos gates.
@@ -122,12 +122,8 @@ para reconstruir a documentação técnica do sistema existente.
 | [`specsfy-06-implement`](specsfy-06-implement/SKILL.md) | no modo `tests`, usar o BDD da spec para criar TDD e provar RED/GREEN; no modo `implement`, executar tarefas prontas e evidenciar | não executa Gherkin, não inventa comportamento e não trabalha sem RED |
 | [`specsfy-update-spec`](specsfy-update-spec/SKILL.md) | incorporar pedido tardio e reabrir somente os atos afetados | não cria nova spec nem implementa |
 | [`specsfy-milestones`](specsfy-milestones/SKILL.md) | importar o MVP como `M01`, entrevistar a evolução pós-MVP e sincronizar a projeção de milestones | não planeja tarefas ou código, não altera o núcleo sem confirmação e não inventa condição de saída |
-| [`specsfy-data-discovery`](specsfy-data-discovery/SKILL.md) | conversar sobre informações que o produto precisa guardar | não escolhe tecnologia ou implementação |
-| [`specsfy-setup`](specsfy-setup/SKILL.md) | detectar o stack, criar contexto ausente, preparar `DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes | não sobrescreve arquivos de contexto existentes |
+| [`specsfy-setup`](specsfy-setup/SKILL.md) | no modo `setup`, detectar o stack, criar contexto ausente, preparar `DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes; no modo `stack`, manter `.specsfy/STACK.md` a partir de evidência executável; no modo `rules`, ajudar a registrar regras confirmadas em `.specsfy/RULES.md`; no modo `database`, manter `.specsfy/DATABASE.md` após toda mudança persistente; no modo `data-discovery`, conversar sobre informações que o produto precisa guardar | não sobrescreve arquivos de contexto existentes, não inventa nem copia toda dependência, não decide regras pela pessoa, não copia dados ou segredos e não escolhe tecnologia ou implementação |
 | [`specsfy-documentator`](specsfy-documentator/SKILL.md) | reconstruir `docs/` e o inventário `.specsfy/PACKAGES.md` | não inventa decisões, relações, finalidades ou referências |
-| [`specsfy-aux-stack`](specsfy-aux-stack/SKILL.md) | manter `.specsfy/STACK.md` a partir de evidência executável | não inventa nem copia toda dependência |
-| [`specsfy-aux-rules`](specsfy-aux-rules/SKILL.md) | ajudar a registrar regras confirmadas em `.specsfy/RULES.md` | não decide regras pela pessoa |
-| [`specsfy-aux-database`](specsfy-aux-database/SKILL.md) | manter `.specsfy/DATABASE.md` após toda mudança persistente | não copia dados ou segredos |
 <!-- markdownlint-enable MD013 -->
 
 `PROJECT.md`, `INTERFACE.md` e `DESIGNSYSTEM.MD` ficam na raiz do projeto
@@ -291,7 +287,7 @@ node specsfy-04-validate/scripts/verify_repo.mjs . \
 ```
 
 O verificador exige as skills base. Os contratos do catálogo também
-validam o setup, o documentador e as três auxiliares. Especialistas instalados
+validam o setup e o documentador. Especialistas instalados
 são validados sem limitar o tamanho total do catálogo.
 
 ## Publicação

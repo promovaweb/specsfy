@@ -6,11 +6,12 @@ import {join} from 'node:path';
 import {ROOT,read} from './helpers.mjs';
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 test('catálogo, instalador e documentação publicam o mesmo contexto',()=>{
- const names=['specsfy-setup','specsfy-aux-stack','specsfy-aux-rules','specsfy-aux-database'];
+ const modes=['stack','rules','database','data-discovery'];
  const installer=(read('cli/src/domain/installer.ts')+read('skills/inventory.json')),guide=read('docs/user/project-context.md'),framework=read('skills/Spec.md');
- for(const name of names){assert.ok(existsSync(join(ROOT,'skills',name,'SKILL.md')));includes(installer,['"'+name+'"']);includes(guide,['$'+name]);}
+ assert.ok(existsSync(join(ROOT,'skills','specsfy-setup','SKILL.md')));includes(installer,['"specsfy-setup"']);includes(guide,['$specsfy-setup']);
+ for(const mode of modes){assert.ok(existsSync(join(ROOT,'skills','specsfy-setup','references',mode+'.md')),mode);includes(guide,['modo `'+mode+'`']);}
  for(const path of ['PROJECT.md','DESIGNSYSTEM.MD','.specsfy/USER-PROFILE.md','.specsfy/STACK.md','.specsfy/RULES.md','.specsfy/DATABASE.md','.specify/memory/constitution.md','.specsfy/SPECKIT.md']){includes(framework,[path]);includes(guide,[path]);}
- const setup=read('skills/specsfy-setup/SKILL.md'),script=read('skills/specsfy-setup/scripts/setup_context.mjs');
+ const setup=read('skills/specsfy-setup/SKILL.md')+read('skills/specsfy-setup/references/setup.md'),script=read('skills/specsfy-setup/scripts/setup_context.mjs');
  includes(script,['sync_speckit_context.mjs','join(project, "DESIGNSYSTEM.MD")','join(project, ".specsfy", "USER-PROFILE.md")']);
  includes(setup,['Nunca','escrever, mover, renomear ou remover','Nas execuções obrigatórias seguintes']);includes(setup.toLowerCase(),['pergunta novamente','iniciante','experiente']);
  includes(framework,['Antes de iniciar qualquer skill do framework']);includes(guide,['antes de iniciar cada skill']);

@@ -28,5 +28,5 @@ Feature: Captura de ideias no backlog
   Scenario: Descobrir o que o produto precisa guardar antes do brief
     Given uma ideia de backlog que depende de informações lembradas pelo sistema
     When o agente identifica a necessidade de entender essas informações
-    Then ele transita para specsfy-data-discovery antes de concluir o brief
+    Then ele transita para specsfy-setup no modo data-discovery antes de concluir o brief
     And registra somente respostas confirmadas em .specsfy/DATABASE.md

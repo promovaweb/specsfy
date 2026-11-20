@@ -2,8 +2,8 @@
   "schema_version": 1,
   "version": "0.32.1",
   "edition": "v0.32.1",
-  "generated_at": "2026-11-20T15:27:51Z",
-  "source_sha256": "ed19a15b6215b43d44580a882cf8d0d36d7c9d35f9c5816fe37691526b02b36b",
+  "generated_at": "2026-11-20T17:34:36Z",
+  "source_sha256": "9abc6ca3a5860d5497b0a6646e5565f4c100f15630d97681db30d09765a5532a",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -72,7 +72,6 @@
     "docs/user/skills/specsfy-04-validate.md",
     "docs/user/skills/specsfy-05-tasks.md",
     "docs/user/skills/specsfy-06-implement.md",
-    "docs/user/skills/specsfy-data-discovery.md",
     "docs/user/skills/specsfy-interviewer.md",
     "docs/user/skills/specsfy-milestones.md",
     "docs/user/skills/specsfy-update-spec.md",
@@ -155,11 +154,11 @@
   "artifacts": {
     "pdf": {
       "file": "Specsfy-Guia-do-Usuario-v0.32.1.pdf",
-      "sha256": "6d80bb7c08472159cd92b0ce59583f6231f0d3b612c0ee46b43236ba2b86a1c7"
+      "sha256": "56ac2941ed13c3a8e436a4660881da6a3fc94bd9a89a0f608113c5fd1f5bf590"
     },
     "epub": {
       "file": "Specsfy-Guia-do-Usuario-v0.32.1.epub",
-      "sha256": "730b9e1dd1f09e3ebfacfa2ede00297a455fda177e4905adde87a979dafbdba7"
+      "sha256": "d5dec732cabed09a0c295971f5db9d10275b8ef1bdd62001446622a490a07d64"
     }
   }
 }

@@ -64,7 +64,6 @@ const byCategory = (category: SkillCategory): string[] =>
   frameworkSkillNames().filter((name) => EMBEDDED_INVENTORY.skills[name] === category);
 /** Framework skills of this binary's inventory, by category and in install order. */
 export const BASE_SKILLS: readonly string[] = byCategory("base");
-export const AUXILIARY_SKILLS: readonly string[] = byCategory("auxiliary").filter((name) => name !== "specsfy-setup");
 export const DOCUMENTATION_SKILLS: readonly string[] = byCategory("documentation");
 export const FRAMEWORK_SKILLS: readonly string[] = frameworkSkillNames();
 /** Old skill names mapped to their replacement, from the inventory. */

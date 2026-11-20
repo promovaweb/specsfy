@@ -138,17 +138,13 @@ os validadores do framework conferem antes de aprovar o Delivery Gate:
 | `specsfy-update-spec` | algo mudar depois da definição |
 | `specsfy-interviewer` | quiser conversar sobre a spec e só depois avançar |
 | `specsfy-milestones` | for definir o MVP de um produto, planejar a evolução após o MVP ou manter os milestones alinhados |
-| `specsfy-data-discovery` | o sistema precisar guardar informações novas |
 
 Skills de apoio, chamadas pelo próprio fluxo:
 
 | Skill | Papel |
 | --- | --- |
-| `specsfy-setup` | prepara e reconcilia o contexto antes de qualquer skill |
+| `specsfy-setup` | prepara e reconcilia o contexto antes de qualquer skill; também tem os modos `stack`, `rules`, `database` e `data-discovery` |
 | `specsfy-documentator` | reconstrói `docs/` e `.specsfy/PACKAGES.md` após cada implementação |
-| `specsfy-aux-stack` | atualiza `.specsfy/STACK.md` após mudança de tecnologia |
-| `specsfy-aux-rules` | registra diretrizes confirmadas em `.specsfy/RULES.md` |
-| `specsfy-aux-database` | atualiza `.specsfy/DATABASE.md` quando o banco muda |
 
 Aprofunde no índice de [Skills base](skills/README.md).
 

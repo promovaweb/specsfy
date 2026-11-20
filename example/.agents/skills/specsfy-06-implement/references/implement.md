@@ -201,9 +201,9 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
      --project <raiz> --check
    ```
 
-   Faça handoff de stack pendente para `$specsfy-aux-stack`, de persistência
-   para `$specsfy-aux-database` e de regra confirmada para
-   `$specsfy-aux-rules`. Revise `PROJECT.md` em toda mudança de aplicação; sem
+   Faça handoff de stack pendente para `$specsfy-setup` no modo `stack`, de
+   persistência para o modo `database` e de regra confirmada para o modo
+   `rules`. Revise `PROJECT.md` em toda mudança de aplicação; sem
    impacto material em história, finalidade, capacidades ou limites, registre
    a avaliação na tarefa e repita com `--acknowledge-project-no-change`. A
    tarefa só avança quando o monitor deixar de retornar `PENDING`.

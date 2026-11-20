@@ -98,8 +98,8 @@ exigindo autorização específica.
    especificação a refinar.
 8. Se a jornada depender de informações guardadas e `.specsfy/DATABASE.md` não
    explicar o que o produto precisa lembrar, quem usa essas informações ou
-   quando elas deixam de ser necessárias, carregue `$specsfy-data-discovery` e
-   retome esta skill depois do registro confirmado.
+   quando elas deixam de ser necessárias, carregue `$specsfy-setup` no modo
+   `data-discovery` e retome esta skill depois do registro confirmado.
 
 ## Aplicar o MCR-10
 

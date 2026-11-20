@@ -148,8 +148,9 @@ O arquivo da migration precisa existir e os comandos registrados precisam ter
 saída zero; declarar um runner não executa migrations nem comprova que o banco
 foi atualizado. O comentário `specsfy:evidence` deve refletir a execução real.
 
-Ao atualizar a stack, `specsfy-aux-stack` registra a presença dessa configuração
-em `.specsfy/STACK.md` e preserva o conteúdo de `migrations.json`.
+Ao atualizar a stack, `$specsfy-setup` no modo `stack` registra a presença
+dessa configuração em `.specsfy/STACK.md` e preserva o conteúdo de
+`migrations.json`.
 
 ## O que esperar
 

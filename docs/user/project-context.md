@@ -44,9 +44,9 @@ preservado em todas as execuções. A referência publicável das diretrizes viv
 | Arquivo | Conteúdo | Skill mantenedora |
 | --- | --- | --- |
 | `PROJECT.md` | finalidade e capacidades | `$specsfy-setup` cria o modelo |
-| `.specsfy/STACK.md` | stack e evidências | `$specsfy-aux-stack` |
-| `.specsfy/RULES.md` | diretrizes explícitas confirmadas | `$specsfy-aux-rules` |
-| `.specsfy/DATABASE.md` | persistência e relações | `$specsfy-aux-database` |
+| `.specsfy/STACK.md` | stack e evidências | `$specsfy-setup` (modo `stack`) |
+| `.specsfy/RULES.md` | diretrizes explícitas confirmadas | `$specsfy-setup` (modo `rules`) |
+| `.specsfy/DATABASE.md` | persistência e relações | `$specsfy-setup` (modo `database`) |
 | `.specsfy/PACKAGES.md` | pacotes npm e Composer com finalidade | `$specsfy-documentator` |
 | `docs/packages/README.md` | índice dos pacotes Composer diretos e links para fichas de uso | `$specsfy-specialist-laravel-package-manager` |
 | `docs/packages/<vendor>-<nome>.md` | instalação, configuração, uso local e testes do pacote | `$specsfy-specialist-laravel-package-manager` |
@@ -85,10 +85,48 @@ Ao terminar a preparação dos contextos e especialistas, o setup executa
 sistema existente em `docs/` e atualiza `.specsfy/PACKAGES.md`, mesmo quando a
 execução não começou por uma alteração recente no código.
 
-Use `$specsfy-data-discovery` no planejamento quando ainda faltar explicar o
-que o produto precisa guardar, quais papéis consultam cada informação e quando
-ela perde a utilidade. A skill registra as respostas confirmadas em uma
-seção própria de `DATABASE.md`, separada do que o código detectar depois.
+## Conversar sobre os dados
+
+Use `$specsfy-setup` no modo `data-discovery` quando uma jornada depender de
+informações que o sistema precisa guardar, exibir, alterar ou apagar. A
+conversa usa palavras do seu produto e grava em `.specsfy/DATABASE.md` apenas
+o que você confirmar.
+
+### Quando usar
+
+Use no planejamento quando ainda faltar explicar o que o produto precisa
+guardar, quais papéis consultam cada informação e quando ela perde a
+utilidade. A conversa também cabe durante o backlog, depois de uma Inbox,
+durante a descoberta de `MVP.md` ou antes de consolidar uma spec, quando ainda
+não está claro o que cada reserva, cliente, atendimento ou outro item do
+produto precisa guardar.
+
+### Como descrever a tarefa
+
+```text
+Use $specsfy-setup no modo data-discovery para entender o que nosso sistema
+precisa guardar sobre cada reserva, quais papéis consultam essas informações e
+quando elas perdem a utilidade.
+```
+
+### O que esperar
+
+Cada resposta confirmada aparece na seção `Informações a guardar confirmadas`
+de `.specsfy/DATABASE.md`. Ela informa para que a informação serve, o que deve
+ser guardado, o formato sugerido, o que fica ligado, os papéis que a usam e
+quando ela muda ou sai do sistema. A sugestão de formato, como texto curto,
+data, valor em dinheiro ou escolha entre opções, só é gravada depois que você
+confirmar que ela atende ao uso real.
+
+### Erros comuns
+
+- tentar escolher a tecnologia antes de explicar a necessidade do produto;
+- tratar uma suposição como informação confirmada;
+- copiar dados pessoais de clientes, senhas ou chaves para a conversa;
+- pular a conversa quando a jornada depende de informações guardadas.
+
+Volte ao `$specsfy-02-backlog` para concluir o refinamento ou ao
+`$specsfy-03-specify` para consolidar a fonte normativa da entrega.
 
 ## Projeto existente com GitHub Spec Kit
 
@@ -108,13 +146,12 @@ Você pode acrescentar notas próprias fora do bloco
 o bloco delimitado. Se a constituição divergir de `.specsfy/RULES.md`, preserve
 os dois textos e resolva a divergência antes de alterar a feature.
 
-Execute `$specsfy-aux-stack` após alterar frameworks, runtimes, ferramentas
-estruturais ou persistência. Execute `$specsfy-aux-database` toda vez que criar
-ou
-alterar banco, schema, tabela, coleção, model persistente, campo, relação,
-índice ou migration. Use `$specsfy-aux-rules` para formular e acrescentar uma
-diretriz confirmada em `.specsfy/RULES.md` sem duplicar ou apagar as
-anteriores.
+Execute `$specsfy-setup` no modo `stack` após alterar frameworks, runtimes,
+ferramentas estruturais ou persistência. Execute `$specsfy-setup` no modo
+`database` toda vez que criar ou alterar banco, schema, tabela, coleção, model
+persistente, campo, relação, índice ou migration. Use `$specsfy-setup` no modo
+`rules` para formular e acrescentar uma diretriz confirmada em
+`.specsfy/RULES.md` sem duplicar ou apagar as anteriores.
 
 ## Monitoramento durante mudanças
 
@@ -129,12 +166,12 @@ node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
 
 | Sinal observado | Obrigação |
 | --- | --- |
-| manifest, lockfile ou configuração | `$specsfy-aux-stack` revisa `STACK.md` |
+| manifest, lockfile ou configuração | `$specsfy-setup` no modo `stack` revisa `STACK.md` |
 | manifest ou lockfile npm/Composer | `$specsfy-documentator` reconstrói `PACKAGES.md` e `docs/` |
-| schema, model ou migration | `$specsfy-aux-database` revisa `DATABASE.md` |
+| schema, model ou migration | `$specsfy-setup` no modo `database` revisa `DATABASE.md` |
 | código da aplicação | revisar `PROJECT.md` |
 | aplicação ou persistência | `$specsfy-documentator` reconstrói `docs/` e `PACKAGES.md` |
-| instrução ou convenção | `$specsfy-aux-rules` revisa `RULES.md` |
+| instrução ou convenção | `$specsfy-setup` no modo `rules` revisa `RULES.md` |
 
 `PENDING` impede a conclusão da tarefa e do Delivery Gate. Quando uma mudança
 de aplicação não altera história, finalidade, capacidades ou limites, registre
@@ -152,8 +189,8 @@ Veja a topologia e o `--check` no guia de
   iniciais apresentam padrões comuns de interface, CRUD, dashboard e registro
   da conversa. Os arquivos continuam humanos e qualquer conteúdo existente é
   preservado.
-- As auxiliares atualizam apenas blocos detectados delimitados e preservam
-  seções humanas.
+- Os modos `stack`, `rules` e `database` da `$specsfy-setup` atualizam apenas
+  blocos detectados delimitados e preservam seções humanas.
 - Uma nova varredura não autoriza remover silenciosamente uma definição
   humana.
 - `DATABASE.md` usa tabelas Markdown para facilitar mapeamento e comparação.

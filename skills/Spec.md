@@ -107,9 +107,9 @@ para próxima etapa com comentário do ponto onde parou. Na entrega, use
   originais.
   Executar `$specsfy-documentator` quando `PACKAGES.md` estiver ausente ou
   desatualizado.
-- Executar `$specsfy-aux-stack` após mudanças estruturais de tecnologia,
-  `$specsfy-aux-rules` para regras confirmadas e `$specsfy-aux-database` sempre
-  que banco, schema, tabela, campo, relação ou migration mudar.
+- Executar `$specsfy-setup` no modo `stack` após mudanças estruturais de
+  tecnologia, no modo `rules` para regras confirmadas e no modo `database`
+  sempre que banco, schema, tabela, campo, relação ou migration mudar.
 - Toda tarefa que cria ou altera a estrutura do banco inclui uma tarefa
   `[MIGRATION]` com arquivo
   versionado. A implementação aplica a migration no banco de teste e registra
@@ -167,8 +167,9 @@ input → inbox → backlog → spec → validate → tasks → implement (tests
    demonstráveis e no modo `roadmap` para evolução após o MVP aceito. Use
    o modo `sync` para manter relações e a projeção `specs.md` sem
    substituir conteúdo humano.
-12. Use `specsfy-data-discovery` quando uma Inbox, backlog, descoberta de MVP
-    ou spec indicar informações que o produto precisa guardar. A conversa usa
+12. Use `specsfy-setup` no modo `data-discovery` quando uma Inbox, backlog,
+    descoberta de MVP ou spec indicar informações que o produto precisa
+    guardar. A conversa usa
     linguagem cotidiana e registra respostas confirmadas em
     `.specsfy/DATABASE.md`.
 

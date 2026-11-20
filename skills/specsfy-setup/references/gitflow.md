@@ -10,8 +10,8 @@ que conduz o projeto.
   essa escolha de uma tarefa anterior.
 - Ao carregar, registrar a convenção confirmada (branches permanentes,
   prefixos de `feature/`, `release/`, `hotfix/` e política de merge) em
-  `.specsfy/RULES.md` via `$specsfy-aux-rules`, para que o setup não precise
-  perguntar de novo na próxima execução.
+  `.specsfy/RULES.md` pelo modo `rules` de `$specsfy-setup`, para que o
+  setup não precise perguntar de novo na próxima execução.
 - Se a pessoa não mencionar Gitflow nem indicar essa preferência, seguir o
   setup normalmente sem branch model nenhum declarado. A ausência de menção
   não é uma lacuna a resolver por inferência.

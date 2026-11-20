@@ -24,8 +24,8 @@ pipeline fica com o especialista Engenharia de Entrega.
    `git config --get-regexp '^gitflow\.'`.
 3. Define com você os nomes das branches permanentes (`main` e `develop`) e os
    prefixos das branches de vida curta.
-4. Registra a convenção em `.specsfy/RULES.md` por meio do `$specsfy-aux-rules`,
-   com prefixos, destinos e política de merge.
+4. Registra a convenção em `.specsfy/RULES.md` por meio do modo `rules` de
+   `$specsfy-setup`, com prefixos, destinos e política de merge.
 5. Orienta o ciclo de cada tipo de branch, com `merge --no-ff` em todas as
    integrações:
    - `feature/*` parte de `develop` e volta para `develop`

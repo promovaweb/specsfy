@@ -4,6 +4,44 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.33.0] - 2026-11-20
+
+### Alterado
+
+- As skills do framework passam de 19 para 11. O ciclo fica
+  `01-inbox` → `02-backlog` → `03-specify` → `04-validate` →
+  `05-tasks` → `06-implement`, com `specsfy-setup`,
+  `specsfy-update-spec`, `specsfy-interviewer`, `specsfy-milestones` e
+  `specsfy-documentator` ao lado. Nas skills que reúnem mais de um
+  assunto, o `SKILL.md` escolhe o modo pelo pedido e o texto de cada modo
+  fica em `references/<modo>.md`:
+  - `specsfy-setup` ganha os modos `stack`, `rules`, `database` e
+    `data-discovery`, no lugar de `specsfy-aux-stack`,
+    `specsfy-aux-rules`, `specsfy-aux-database` e
+    `specsfy-data-discovery`.
+  - `specsfy-06-implement` reúne `specsfy-06-tdd-bdd` (modo `tests`) e
+    `specsfy-07-implement` (modo `implement`).
+  - `specsfy-milestones` reúne `specsfy-mvp-milestone-interviewer`
+    (modo `mvp`), `specsfy-roadmap-milestone-interviewer` (modo
+    `roadmap`) e `specsfy-milestone-governor` (modo `sync`).
+- Os scripts das skills reunidas mudam de pasta junto com elas; os commands
+  do CLI e as tools MCP continuam com os mesmos nomes.
+
+### Removido
+
+- `specsfy-progress`. O command `specsfy progress` e a tool MCP
+  `project_status` mostram o mesmo progresso. Os scripts dela passam a
+  `specsfy-05-tasks` (`progress.mjs`, `parse_tasks.mjs`) e
+  `specsfy-setup` (`analyze_context.mjs`).
+
+### Migração
+
+- Rode `specsfy update` em cada projeto. O inventário registra os nomes
+  antigos em `renamed` e `retired`: o update instala as skills novas e
+  remove as antigas. Skill antiga com alteração sua é mantida e listada em
+  `kept`; revise e rode `specsfy update --force` para concluir.
+  `specsfy update --check` mostra o plano antes.
+
 ## [0.32.1] - 2026-11-20
 
 ### Corrigido

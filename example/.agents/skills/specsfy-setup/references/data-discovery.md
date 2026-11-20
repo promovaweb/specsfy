@@ -1,8 +1,3 @@
----
-name: specsfy-data-discovery
-description: Conversa em linguagem cotidiana sobre as informações que o produto precisa guardar, sugere uma forma simples de registrar cada uma e grava somente respostas confirmadas em .specsfy/DATABASE.md. Use quando backlog, importação do MVP ou spec dependerem de informações lembradas pelo sistema que ainda estão ausentes ou ambíguas. Não use para mapear o banco já existente no código (specsfy-aux-database), escolher tecnologia ou modelar tabelas.
----
-
 # Descobrir as informações que o sistema precisa guardar
 
 Descubra, com a pessoa e nas palavras dela, o que o sistema precisa lembrar,
@@ -10,12 +5,17 @@ quem usa cada informação e quando ela muda ou deixa de valer. O resultado é u
 registro confirmado em `.specsfy/DATABASE.md` que backlog e spec usam como
 contexto.
 
+Referência do modo `data-discovery` de `$specsfy-setup`. Mapear o banco já
+existente no código é trabalho do modo `database`. Este modo não escolhe
+tecnologia nem modela tabelas.
+
 ## Preparação obrigatória
 
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
+Antes de executar este modo, siga o modo `setup` de `$specsfy-setup` na
+raiz do projeto, pelo caminho curto quando o contexto já foi reconciliado
+nesta conversa. Em handoff automático, repita o caminho curto antes desta
+etapa. Reutilize a raiz confirmada na conversa e não prossiga se o setup
+apontar uma pendência.
 
 ## Modo de interação
 
@@ -106,7 +106,7 @@ Pelo MCP, use a tool `context_data`. Sem o binário instalado, rode o script
 equivalente:
 
 ```bash
-node .agents/skills/specsfy-data-discovery/scripts/\
+node .agents/skills/specsfy-setup/scripts/\
 registrar_dados_conversados.mjs \
   --project <raiz> \
   --nome "<informação do produto>" \
@@ -121,11 +121,11 @@ registrar_dados_conversados.mjs \
 
 Registre somente respostas confirmadas na seção `Informações a guardar
 confirmadas`, separada do que foi observado no código. O trecho detectado
-automaticamente pertence a `$specsfy-aux-database` e fica intocado.
+automaticamente pertence ao modo `database` e fica intocado.
 
 ## Handoffs
 
-| Origem | Quando chamar esta skill |
+| Origem | Quando chamar este modo |
 | --- | --- |
 | `$specsfy-02-backlog` | antes de declarar o brief pronto, se a jornada depender de informações guardadas |
 | `$specsfy-milestones` (modo `mvp`) | para cada informação a guardar ausente ou ambígua em um backlog importado, preservando `MVP.md` como fonte |

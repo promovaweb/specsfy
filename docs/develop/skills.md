@@ -200,8 +200,12 @@ conversacional.
 <!-- markdownlint-disable MD013 -->
 | Modo | Skills |
 | --- | --- |
-| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestones`, `specsfy-data-discovery`, `specsfy-setup`, `specsfy-update-spec` |
-| sem perguntas | `specsfy-01-inbox`, `specsfy-aux-database`, `specsfy-aux-stack`, `specsfy-documentator` |
+| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-implement`, `specsfy-interviewer`, `specsfy-milestones`, `specsfy-setup`, `specsfy-update-spec` |
+| sem perguntas | `specsfy-01-inbox`, `specsfy-documentator` |
+
+A `specsfy-setup` pergunta nos modos `setup`, `rules` e `data-discovery` e não
+pergunta nos modos `stack` e `database`.
+
 <!-- markdownlint-enable MD013 -->
 <!-- markdownlint-enable MD013 -->
 
@@ -233,12 +237,14 @@ backlog lê o trecho importado, aplica
 respostas já declaradas e defaults inequívocos e cobre somente lacunas,
 ambiguidades ou contradições. Ao terminar cada backlog, a skill cria sua spec
 Draft, marca o que não foi respondido como `Pendente` e não implementa código
-nem passa gates. Quando necessário, chama `$specsfy-data-discovery`; depois
-sincroniza milestones, sem sobrescrever arquivos existentes.
+nem passa gates. Quando necessário, chama `$specsfy-setup` no modo
+`data-discovery`; depois sincroniza milestones, sem sobrescrever arquivos
+existentes.
 
-`specsfy-data-discovery` traduz a conversa de produto em informações a guardar
-no `DATABASE.md`. Ela não escolhe estrutura interna; backlog, descoberta de MVP
-e especificação a carregam quando a jornada depender de dados persistidos.
+O modo `data-discovery` de `$specsfy-setup` traduz a conversa de produto em
+informações a guardar no `DATABASE.md`. Ele não escolhe estrutura interna;
+backlog, descoberta de MVP e especificação a carregam quando a jornada
+depender de dados persistidos.
 
 `specsfy-02-backlog` é a responsável exclusiva pelas perguntas de escolha
 material. `specify`, `update-spec` e `validate` fazem handoff para seu ciclo e

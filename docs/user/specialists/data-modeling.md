@@ -24,7 +24,8 @@ especialista não recomenda tecnologia sem ler a stack.
    forem pertinentes.
 4. Compara a proposta com os contratos e as consultas atuais.
 5. Atualiza a seção de banco de dados da spec e encaminha as respostas
-   confirmadas para `$specsfy-aux-database` e `.specsfy/DATABASE.md`.
+   confirmadas para `.specsfy/DATABASE.md` pelo modo `database` de
+   `$specsfy-setup`.
 6. Deriva cenários de criação, leitura, atualização, exclusão, autorização e
    entrada inválida.
 7. Exige uma tarefa `[MIGRATION]` com arquivo versionado para toda mudança no

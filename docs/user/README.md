@@ -94,8 +94,8 @@ original:
 
 ### 4. Aprofunde o fluxo base
 
-O índice de [Skills base](skills/README.md) apresenta o fluxo completo. Leia
-cada etapa nesta ordem:
+O índice de [Skills base](skills/README.md) reúne as 11 skills base. Leia
+cada etapa do fluxo nesta ordem:
 
 1. [Capturar uma entrada](skills/specsfy-01-inbox.md).
 2. [Refinar no backlog](skills/specsfy-02-backlog.md).
@@ -107,13 +107,15 @@ cada etapa nesta ordem:
 7. [Atualizar a especificação](skills/specsfy-update-spec.md).
 8. [Conversar com a spec](skills/specsfy-interviewer.md).
 9. [Cuidar dos milestones](skills/specsfy-milestones.md).
-10. [Descobrir informações a guardar](skills/specsfy-data-discovery.md).
+10. [Descobrir informações a guardar](project-context.md#conversar-sobre-os-dados).
 
 Para consultar o progresso sem alterar nada, leia
 [Ver o progresso](reference.md#ver-o-progresso).
 
 Essas páginas explicam quando usar cada skill, como descrever a tarefa em
 linguagem natural, o resultado esperado, os erros comuns e o próximo passo.
+O item 10 leva ao modo `data-discovery` da `specsfy-setup`, que conversa sobre
+os dados que o sistema precisa guardar.
 Quando uma delas precisar perguntar, você recebe uma pergunta numerada por
 rodada. Ela traz três ou mais opções numeradas,
 `Escrever outra resposta`, `Gere outras opções` e `Avançar` desde o início da

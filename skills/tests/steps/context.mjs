@@ -1,6 +1,6 @@
 /** Executa os contratos BDD de contexto auxiliar e documentação do consumidor. */
 import { assert, temporary, put, text, run, success, includes, join, existsSync, readdirSync } from './helpers.mjs';
-const scripts = { setup: 'specsfy-setup/scripts/setup_context.mjs', stack: 'specsfy-aux-stack/scripts/update_stack.mjs', database: 'specsfy-aux-database/scripts/update_database.mjs', monitor: 'specsfy-setup/scripts/monitor_context.mjs', docs: 'specsfy-documentator/scripts/build_documentation.mjs' };
+const scripts = { setup: 'specsfy-setup/scripts/setup_context.mjs', stack: 'specsfy-setup/scripts/update_stack.mjs', database: 'specsfy-setup/scripts/update_database.mjs', monitor: 'specsfy-setup/scripts/monitor_context.mjs', docs: 'specsfy-documentator/scripts/build_documentation.mjs' };
 const execute = (name, project, ...args) => run(scripts[name], ['--project', project, ...args]);
 const setup = ctx => { ctx.result = execute('setup', ctx.project); success(ctx.result); };
 const docs = ctx => { const result = execute('docs', ctx.project); success(result); ctx.docs = Object.fromEntries(readdirSync(join(ctx.project, 'docs')).filter(file => file.endsWith('.md')).map(file => [file, text(ctx.project, 'docs/' + file)])); };

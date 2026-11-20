@@ -1,8 +1,8 @@
 # Guia de desenvolvimento da metodologia Specsfy
 
 Este `AGENTS.md` governa o módulo `skills/`. Ele contém a metodologia
-executável, as dez skills base, o setup, o documentador e as três skills
-auxiliares. Seus testes e fixtures pertencem a este
+executável, as nove skills base, o setup com seus cinco modos de contexto e
+o documentador. Seus testes e fixtures pertencem a este
 módulo. A raiz do monorepo não instala nem executa estas skills.
 
 Leia também [`Spec.md`](Spec.md), contrato central do framework publicado pelo
@@ -45,8 +45,8 @@ arquivo contém o fluxo, os caminhos canônicos e os gates do framework.
   `PACKAGES.md` estiver ausente ou desatualizado.
 - Execute o monitor de contexto no início, após cada tarefa e antes de concluir
   a entrega; resolva todo resultado `PENDING`.
-- Use as skills `specsfy-aux-*` para manter stack, regras e banco sem apagar
-  conteúdo humano.
+- Use `$specsfy-setup` nos modos `stack`, `rules` e `database` para manter
+  stack, regras e banco sem apagar conteúdo humano.
 - Toda tarefa que cria ou altera a estrutura do banco inclui uma tarefa
   `[MIGRATION]` com arquivo
   versionado. A implementação aplica a migration no banco de teste e consulta
@@ -152,11 +152,8 @@ Draft → Defined → Planned → Implementing → Reviewing → Complete
 | `specsfy-05-tasks` | manter tarefas nas seções 14–15 | criar `tasks.md` ou código |
 | `specsfy-06-implement` | no modo `tests`, usar BDD da spec para criar TDD e provar RED/GREEN; no modo `implement`, executar tarefa pronta e registrar evidência | executar Gherkin, inventar comportamento ou trabalhar sem TDD RED |
 | `specsfy-update-spec` | incorporar pedido tardio e reabrir somente os atos afetados | criar nova spec ou implementar a mudança |
-| `specsfy-setup` | garantir contexto persistente e blocos do framework | sobrescrever arquivos de contexto existentes |
+| `specsfy-setup` | no modo `setup`, garantir contexto persistente e blocos do framework; no modo `stack`, mapear stack com evidência executável; no modo `rules`, registrar regras confirmadas; no modo `database`, manter quadro tabular da persistência; no modo `data-discovery`, conversar sobre as informações que o produto guarda | sobrescrever arquivos de contexto existentes, copiar toda a árvore de dependências, inventar ou decidir regras, copiar registros ou segredos, substituir schemas ou escolher tecnologia |
 | `specsfy-documentator` | reconstruir `docs/` e `.specsfy/PACKAGES.md` a partir do projeto | inventar decisões, relações, finalidades ou URLs |
-| `specsfy-aux-stack` | mapear stack com evidência executável | copiar toda a árvore de dependências |
-| `specsfy-aux-rules` | registrar regras confirmadas | inventar ou decidir regras |
-| `specsfy-aux-database` | manter quadro tabular da persistência | copiar registros, segredos ou substituir schemas |
 <!-- markdownlint-enable MD013 -->
 
 Se duas skills puderem responder ao mesmo gatilho, ajuste `description` e os
