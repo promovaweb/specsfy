@@ -25,10 +25,10 @@
  * images never show the machine of whoever ran the script. The specialist
  * catalog comes from `../specialists/catalog.json`, without network.
  */
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { parseColor, type RGBA } from "@opentui/core";
 import { createTestRenderer } from "@opentui/core/testing";
 import type { CapturedFrame } from "@opentui/core";
@@ -40,7 +40,14 @@ import { defaultServices } from "../src/tui/services.ts";
 import { themes, type Theme } from "../src/tui/theme.ts";
 
 const CLI = resolve(import.meta.dir, "..");
-const EXAMPLE = join(CLI, "tests", "fixtures", "showcase-project");
+const DEMO_SOURCE = join(CLI, "tests", "fixtures", "showcase-project");
+/**
+ * The demo is copied to a short, fixed path before mounting. The header
+ * cuts long paths with "…", and a cut path can no longer be replaced by
+ * SHOWN_PATH; a checkout deep in the file system (CI, a worktree) would
+ * then produce a different frame.
+ */
+const EXAMPLE = join(tmpdir(), "specsfy-showcase", "loja-online");
 const CATALOG = resolve(CLI, "../specialists/catalog.json");
 const OUT = resolve(CLI, "../docs/user/assets/showcase");
 /** Older names used by docs/user/cli.md, the website and the root READMEs. */
@@ -146,10 +153,12 @@ async function capture(shot: Shot, theme: Theme, catalog: Catalog): Promise<{ te
   // The store reads the project and the catalog asynchronously; wait until
   // the frame stops changing.
   let previous = "";
-  for (let stable = 0, round = 0; stable < 5 && round < 200; round++) {
+  // A frame still showing a loading state never counts as stable: on a slow
+  // machine (CI) the catalog can take longer than the stability window.
+  for (let stable = 0, round = 0; stable < 8 && round < 400; round++) {
     await setup.renderOnce();
     const current = setup.captureCharFrame();
-    stable = current === previous ? stable + 1 : 0;
+    stable = current === previous && !/\bloading\b|Loading…/u.test(current) ? stable + 1 : 0;
     previous = current;
     await Bun.sleep(40);
   }
@@ -188,6 +197,9 @@ async function renderImages(pages: Array<[string, string]>): Promise<void> {
 }
 
 const check = process.argv.includes("--check");
+rmSync(dirname(EXAMPLE), { recursive: true, force: true });
+mkdirSync(dirname(EXAMPLE), { recursive: true });
+cpSync(DEMO_SOURCE, EXAMPLE, { recursive: true });
 const home = mkdtempSync(join(tmpdir(), "specsfy-showcase-home-"));
 process.env[HOME_VARIABLE] = home;
 SUBSTITUTIONS.push(
@@ -206,6 +218,7 @@ try {
   }
 } finally {
   rmSync(home, { recursive: true, force: true });
+  rmSync(dirname(EXAMPLE), { recursive: true, force: true });
 }
 
 if (check) {
@@ -216,7 +229,15 @@ if (check) {
   const expected = new Set(results.map(({ name }) => `${name}.txt`));
   const extra = existsSync(FRAMES) ? readdirSync(FRAMES).filter((file) => !expected.has(file)) : [];
   if (stale.length || extra.length) {
-    for (const { name } of stale) console.error(`✗ docs/user/assets/showcase/${name} differs from the TUI`);
+    for (const { name, text } of stale) {
+      console.error(`✗ docs/user/assets/showcase/${name} differs from the TUI`);
+      const file = join(FRAMES, `${name}.txt`);
+      if (!existsSync(file)) continue;
+      const saved = normalize(readFileSync(file, "utf8")).split("\n");
+      const now = normalize(text).split("\n");
+      const line = now.findIndex((value, index) => value !== saved[index]);
+      if (line >= 0) console.error(`  line ${line + 1}\n  saved: ${saved[line] ?? ""}\n  now:   ${now[line]}`);
+    }
     for (const file of extra) console.error(`✗ tests/showcase-frames/${file} has no matching screen`);
     console.error("The showcase is out of date. Run: bun run showcase");
     process.exit(1);
