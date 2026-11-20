@@ -103,7 +103,10 @@ describe("instalador", () => {
     expect(RENAMED_BASE_SKILLS["specsfy-base-discuss"]).toBe(
       "specsfy-02-backlog",
     );
-    expect(Object.keys(RENAMED_BASE_SKILLS)).toHaveLength(11);
+    expect(RENAMED_BASE_SKILLS["specsfy-milestone-governor"]).toBe(
+      "specsfy-milestones",
+    );
+    expect(Object.keys(RENAMED_BASE_SKILLS)).toHaveLength(14);
     expect(BASE_SKILLS).toContain("specsfy-update-spec");
   });
 

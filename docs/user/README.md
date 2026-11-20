@@ -107,10 +107,8 @@ cada etapa nesta ordem:
 8. [Atualizar a especificação](skills/specsfy-update-spec.md).
 9. [Consultar o progresso](skills/specsfy-progress.md).
 10. [Conversar com a spec](skills/specsfy-interviewer.md).
-11. [Entrevistar o MVP](skills/specsfy-mvp-milestone-interviewer.md).
+11. [Cuidar dos milestones](skills/specsfy-milestones.md).
 12. [Descobrir informações a guardar](skills/specsfy-data-discovery.md).
-13. [Planejar o roadmap](skills/specsfy-roadmap-milestone-interviewer.md).
-14. [Governar milestones](skills/specsfy-milestone-governor.md).
 
 Essas páginas explicam quando usar cada skill, como descrever a tarefa em
 linguagem natural, o resultado esperado, os erros comuns e o próximo passo.

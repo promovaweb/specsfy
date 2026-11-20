@@ -3,8 +3,8 @@
  Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
                                                        ▬▬▬▬▬▬▬▬▬▬▬                                                                          
  ╭─ Skills ─────────────────────────────────────────────────╮╭─ Status ───────────────────────────────────────────────────────────────────╮ 
- │ Framework · 14                                          █││ Project    ~/projects/example                                              │ 
- │ > ✓ installed  specsfy-01-inbox                         █││ Installed  37 Specsfy skill(s) in skills-lock.json                         │ 
+ │ Framework · 12                                          █││ Project    ~/projects/example                                              │ 
+ │ > ✓ installed  specsfy-01-inbox                         █││ Installed  35 Specsfy skill(s) in skills-lock.json                         │ 
  │   ✓ installed  specsfy-02-backlog                       █││ Catalog    39 specialist(s)                                                │ 
  │   ✓ installed  specsfy-03-specify                       █││ Inventory  ✓ in sync                                                       │ 
  │   ✓ installed  specsfy-04-validate                      █│╰────────────────────────────────────────────────────────────────────────────╯ 
@@ -13,14 +13,12 @@
  │   ✓ installed  specsfy-07-implement                     █││ State     ✓ installed                                                      │ 
  │   ✓ installed  specsfy-data-discovery                   █││ Category  Framework                                                        │ 
  │   ✓ installed  specsfy-interviewer                      █││ Captures and pre-processes ideas without asking questions.                 │ 
- │   ✓ installed  specsfy-milestone-governor               █││ x removes this skill · u updates every installed skill                     │ 
- │   ✓ installed  specsfy-mvp-milestone-interviewer        █││                                                                            │ 
+ │   ✓ installed  specsfy-milestones                       █││ x removes this skill · u updates every installed skill                     │ 
  │   ✓ installed  specsfy-progress                         █││                                                                            │ 
- │   ✓ installed  specsfy-roadmap-milestone-interviewer    █││                                                                            │ 
  │   ✓ installed  specsfy-update-spec                      █││                                                                            │ 
- │ Auxiliary · 4                                            ││                                                                            │ 
- │   ✓ installed  specsfy-aux-database                      ││                                                                            │ 
- │   ✓ installed  specsfy-aux-rules                         ││                                                                            │ 
+ │ Auxiliary · 4                                           █││                                                                            │ 
+ │   ✓ installed  specsfy-aux-database                     █││                                                                            │ 
+ │   ✓ installed  specsfy-aux-rules                        ▀││                                                                            │ 
  │   ✓ installed  specsfy-aux-stack                         ││                                                                            │ 
  │   ✓ installed  specsfy-setup                             ││                                                                            │ 
  │ Documentation · 1                                        ││                                                                            │ 
@@ -36,5 +34,7 @@
  │   ○ available  specsfy-specialist-data-modeling          ││                                                                            │ 
  │   ✓ installed  specsfy-specialist-postgres               ││                                                                            │ 
  │   ✓ installed  specsfy-specialist-redis                  ││                                                                            │ 
+ │ Design · 7                                               ││                                                                            │ 
+ │   ○ available  specsfy-specialist-design-system          ││                                                                            │ 
  ╰──────────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────────────────────────╯ 
   ↑/↓  skill   i  install   x  remove   u  update all   c  catalog   ←/→  tab   1-9  go   ?  help   q  quit

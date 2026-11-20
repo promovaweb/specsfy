@@ -16,8 +16,8 @@
     "specsfy-04-validate": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.886960+00:00",
-      "content_sha256": "e9bfcd212a720a11cb386f9dcc9f0bd9507e70fc63f3fc755909a8f493c7cff3",
-      "updated_at": "2026-11-20T15:11:53.168Z"
+      "content_sha256": "a1b35f749502256e10a24b76675d5144f8472bb5b1ee1b21d8bd0d6752b8bfe6",
+      "updated_at": "2026-11-20T15:15:48.207Z"
     },
     "specsfy-05-tasks": {
       "source": "base",
@@ -199,34 +199,21 @@
       "content_sha256": "aa1587f7b97c9d9acbc7994e2b028dfa8e1d6d8766c0d838e43f42d613a01525",
       "updated_at": "2026-11-20T15:11:53.172Z"
     },
-    "specsfy-mvp-milestone-interviewer": {
-      "source": "base",
-      "installed_at": "2026-11-02T06:06:33.403Z",
-      "content_sha256": "de658810f72ce27302eca81a78c6661b38ccab1e78b56fb222abed191c9aa069",
-      "updated_at": "2026-11-20T15:11:53.173Z"
-    },
-    "specsfy-roadmap-milestone-interviewer": {
-      "source": "base",
-      "installed_at": "2026-11-02T06:06:33.403Z",
-      "content_sha256": "6c13b13a2a47f5f1de242e648df0cf07e259046d876e4548a60650c8917e6596",
-      "updated_at": "2026-11-20T15:11:53.173Z"
-    },
-    "specsfy-milestone-governor": {
-      "source": "base",
-      "installed_at": "2026-11-02T06:06:33.404Z",
-      "content_sha256": "f073a5963f2f251cdb44100798bff93880dce1c23f74075127835d550cea5369",
-      "updated_at": "2026-11-20T15:11:53.173Z"
-    },
     "specsfy-data-discovery": {
       "source": "base",
       "installed_at": "2026-11-02T06:06:33.404Z",
-      "content_sha256": "6026af3a016675a0320c5d86f21b8d895f4f96f25fd23410dd5c84e94dec5ffc",
-      "updated_at": "2026-11-20T15:11:53.174Z"
+      "content_sha256": "17bbd77ff81ad7a75cf141e8700726dc9e05568a2ced0512142babef5d615485",
+      "updated_at": "2026-11-20T15:15:48.208Z"
+    },
+    "specsfy-milestones": {
+      "source": "base",
+      "installed_at": "2026-11-20T15:15:48.207Z",
+      "content_sha256": "06cd993cfb3efb23c54fecee784d572acc669d553c9d62617f3c905ff85386a5"
     }
   },
   "framework": {
     "source": "base",
-    "spec_sha256": "f8aa2547183d8dc1f05b73dc2a8a23e7f02854ffd930fdfd2a533f76fec5b781",
+    "spec_sha256": "1953083a40a5ad29250790e75967d12a2a15ea6c42a022dde6e992d158b95b1b",
     "template_sha256": "bc98e1529a7433ebe35afed2bfc5fec9c296d18b8ba975ea24318c486456efe2",
     "templates_sha256": {
       "Inbox.md": "a598c5ac2fddc936bd5856df6548b989a62c939d3198c3eb887405c074d08a6f",

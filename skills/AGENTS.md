@@ -1,7 +1,7 @@
 # Guia de desenvolvimento da metodologia Specsfy
 
 Este `AGENTS.md` governa o módulo `skills/`. Ele contém a metodologia
-executável, as quatorze skills base, o setup, o documentador e as três skills
+executável, as doze skills base, o setup, o documentador e as três skills
 auxiliares. Seus testes e fixtures pertencem a este
 módulo. A raiz do monorepo não instala nem executa estas skills.
 

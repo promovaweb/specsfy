@@ -104,7 +104,7 @@ encaminhar.
 
 ## Sessões de descoberta do MVP
 
-`$specsfy-mvp-milestone-interviewer` pode usar Inboxes para capturar respostas
+O modo `mvp` de `$specsfy-milestones` pode usar Inboxes para capturar respostas
 novas durante a conversa. Isso não se aplica à importação de `MVP.md`: nela a
 skill cria `M01` e seleciona somente requisitos de desenvolvimento para gerar
 backlog e spec Draft diretamente. Os temas de negócio e produto permanecem no

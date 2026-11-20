@@ -200,7 +200,7 @@ conversacional.
 <!-- markdownlint-disable MD013 -->
 | Modo | Skills |
 | --- | --- |
-| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-tdd-bdd`, `specsfy-07-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestone-governor`, `specsfy-mvp-milestone-interviewer`, `specsfy-data-discovery`, `specsfy-roadmap-milestone-interviewer`, `specsfy-setup`, `specsfy-update-spec` |
+| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-tdd-bdd`, `specsfy-07-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestones`, `specsfy-data-discovery`, `specsfy-setup`, `specsfy-update-spec` |
 | sem perguntas | `specsfy-01-inbox`, `specsfy-aux-database`, `specsfy-aux-stack`, `specsfy-documentator`, `specsfy-progress` |
 <!-- markdownlint-enable MD013 -->
 <!-- markdownlint-enable MD013 -->
@@ -222,7 +222,7 @@ suas próprias pré-condições.
 qualquer handoff, não pergunta e apenas sugere a próxima etapa. Esse limite
 impede que uma anotação simples se transforme em refinamento implícito.
 
-`specsfy-mvp-milestone-interviewer` combina conversa e captura: ele lê
+O modo `mvp` de `specsfy-milestones` combina conversa e captura: ele lê
 `MVP.md` e `BRAND.md` na raiz do consumidor e, quando o consumidor é um
 submódulo Git sem os arquivos locais, na raiz do superprojeto. O arquivo local
 tem prioridade. Ele importa `MVP.md` como `M01`, classifica o que representa

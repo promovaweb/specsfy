@@ -1,25 +1,11 @@
----
-name: specsfy-roadmap-milestone-interviewer
-description: Entrevista a pessoa responsável sobre a evolução do produto depois do MVP aceito, propõe milestones pós-MVP com objetivo, condição de saída e dependências e vincula specs e backlog sem reabrir em silêncio o núcleo acordado. Use quando o MVP já foi aceito e a pessoa quer planejar as próximas etapas. Não use para definir o MVP inicial (specsfy-mvp-milestone-interviewer), conferir vínculos existentes (specsfy-milestone-governor), executar tarefas ou mudar spec concluída (specsfy-update-spec).
----
-
 # Entrevistar a evolução depois do MVP
 
 Transforme o que a pessoa aprendeu e planeja depois do MVP em uma sequência de
 marcos demonstráveis, com dependências claras, sem alterar o que já foi aceito.
 
-## Preparação obrigatória
-
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
-
-## Modo de interação
-
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+Referência do modo `roadmap` de `$specsfy-milestones`. A preparação
+obrigatória com `$specsfy-setup` e o modo de interação `perguntas` estão no
+`SKILL.md` e valem para este modo.
 
 ## Pronto quando
 
@@ -74,3 +60,6 @@ capacidades que devem entrar no backlog.
 - Não mudar o MVP sem confirmação explícita.
 - Não usar percentual de tarefas como condição de conclusão do marco.
 - Não criar tarefas técnicas nem implementar código.
+- Definir o MVP inicial pertence ao modo `mvp` ([mvp.md](mvp.md)); conferir
+  vínculos existentes, ao modo `sync` ([sync.md](sync.md)); mudar spec
+  concluída, a `$specsfy-update-spec`.

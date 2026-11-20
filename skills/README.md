@@ -21,7 +21,7 @@ está em [`docs/`](../docs/).
 
 Este módulo possui:
 
-- as instruções operacionais das quatorze skills base, do setup, do
+- as instruções operacionais das doze skills base, do setup, do
   documentador e das três auxiliares.
 - os templates de ideia, backlog, spec, tarefas e interface em `templates/`.
 - um documento preenchido e não normativo em `examples/Spec.md`.
@@ -123,10 +123,8 @@ para reconstruir a documentação técnica do sistema existente.
 | [`specsfy-07-implement`](specsfy-07-implement/SKILL.md) | executar tarefas prontas e evidenciar | não trabalha sem RED |
 | [`specsfy-update-spec`](specsfy-update-spec/SKILL.md) | incorporar pedido tardio e reabrir somente os atos afetados | não cria nova spec nem implementa |
 | [`specsfy-progress`](specsfy-progress/SKILL.md) | projetar o estado global | não altera gates ou checkboxes |
-| [`specsfy-mvp-milestone-interviewer`](specsfy-mvp-milestone-interviewer/SKILL.md) | entrevistar e definir o MVP por milestones | não planeja tarefas ou código |
+| [`specsfy-milestones`](specsfy-milestones/SKILL.md) | importar o MVP como `M01`, entrevistar a evolução pós-MVP e sincronizar a projeção de milestones | não planeja tarefas ou código, não altera o núcleo sem confirmação e não inventa condição de saída |
 | [`specsfy-data-discovery`](specsfy-data-discovery/SKILL.md) | conversar sobre informações que o produto precisa guardar | não escolhe tecnologia ou implementação |
-| [`specsfy-roadmap-milestone-interviewer`](specsfy-roadmap-milestone-interviewer/SKILL.md) | entrevistar a evolução pós-MVP | não altera o núcleo sem confirmação |
-| [`specsfy-milestone-governor`](specsfy-milestone-governor/SKILL.md) | sincronizar a projeção de milestones | não inventa condição de saída |
 | [`specsfy-setup`](specsfy-setup/SKILL.md) | detectar o stack, criar contexto ausente, preparar `DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes | não sobrescreve arquivos de contexto existentes |
 | [`specsfy-documentator`](specsfy-documentator/SKILL.md) | reconstruir `docs/` e o inventário `.specsfy/PACKAGES.md` | não inventa decisões, relações, finalidades ou referências |
 | [`specsfy-aux-stack`](specsfy-aux-stack/SKILL.md) | manter `.specsfy/STACK.md` a partir de evidência executável | não inventa nem copia toda dependência |

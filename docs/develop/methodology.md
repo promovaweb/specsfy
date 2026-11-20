@@ -74,7 +74,7 @@ input → specs/inbox/ → specs/backlog/
 refinamento dialogado. Ambas mantêm proveniência, mas só `spec.md` governa o
 comportamento; a captura sai de `specs/inbox/` para `processed/` na validação.
 
-Na descoberta de MVP, `specsfy-mvp-milestone-interviewer` preserva `MVP.md`
+Na descoberta de MVP, o modo `mvp` de `specsfy-milestones` preserva `MVP.md`
 como fonte de negócio e produto. Ele procura `MVP.md` e `BRAND.md` na raiz do
 consumidor. Se o consumidor for um submódulo Git e os arquivos locais estiverem
 ausentes, consulta a raiz do superprojeto uma única vez. `MVP.md` cria a

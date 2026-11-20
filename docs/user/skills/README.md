@@ -57,10 +57,8 @@ qualquer pergunta para uma etapa conversacional.
 | incorporar mudança posterior | [`specsfy-update-spec`](specsfy-update-spec.md) | spec atualizada e gates reabertos |
 | consultar o estado | [`specsfy-progress`](specsfy-progress.md) | relatório somente leitura |
 | conversar conforme a fase | [`specsfy-interviewer`](specsfy-interviewer.md) | respostas confirmadas e Effort recalibrado |
-| definir o MVP e seus marcos | [`specsfy-mvp-milestone-interviewer`](specsfy-mvp-milestone-interviewer.md) | milestones aprováveis do MVP |
+| definir o MVP, planejar a evolução e manter a projeção | [`specsfy-milestones`](specsfy-milestones.md) | milestones do MVP e pós-MVP, `specs.md` e progresso derivado |
 | descobrir o que o sistema precisa guardar | [`specsfy-data-discovery`](specsfy-data-discovery.md) | respostas confirmadas em `DATABASE.md` |
-| planejar a evolução | [`specsfy-roadmap-milestone-interviewer`](specsfy-roadmap-milestone-interviewer.md) | milestones pós-MVP |
-| manter a projeção | [`specsfy-milestone-governor`](specsfy-milestone-governor.md) | `specs.md` e progresso derivado |
 
 ## Encontre a skill pelo estado do trabalho
 
@@ -85,10 +83,9 @@ Quando uma lacuna puder alterar a próxima etapa, chame
 `specsfy-interviewer`. Ele conversa com a spec sem substituir a skill que
 valida, planeja, implementa ou conclui.
 
-Para planejar um produto inteiro, comece pelo
-`specsfy-mvp-milestone-interviewer` e, depois do aceite do MVP, use o
-`specsfy-roadmap-milestone-interviewer`. O `specsfy-milestone-governor` mantém
-o painel derivado de specs e backlog, detalhado no guia
+Para planejar um produto inteiro, comece pelo modo `mvp` de
+`specsfy-milestones` e, depois do aceite do MVP, use o modo `roadmap`. O modo
+`sync` mantém o painel derivado de specs e backlog, detalhado no guia
 [Milestones](../milestones.md) com arquivos, relações e sincronização.
 
 Quando uma conversa revelar informações que o sistema precisa guardar, use

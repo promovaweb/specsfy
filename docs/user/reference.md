@@ -139,9 +139,7 @@ os validadores do framework conferem antes de aprovar o Delivery Gate:
 | `specsfy-update-spec` | algo mudar depois da definição |
 | `specsfy-progress` | quiser consultar o estado sem alterar nada |
 | `specsfy-interviewer` | quiser conversar sobre a spec e só depois avançar |
-| `specsfy-mvp-milestone-interviewer` | for definir o MVP de um produto |
-| `specsfy-roadmap-milestone-interviewer` | for planejar a evolução após o MVP |
-| `specsfy-milestone-governor` | precisar manter os milestones alinhados |
+| `specsfy-milestones` | for definir o MVP de um produto, planejar a evolução após o MVP ou manter os milestones alinhados |
 | `specsfy-data-discovery` | o sistema precisar guardar informações novas |
 
 Skills de apoio, chamadas pelo próprio fluxo:

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Milestones"
+  short_description: "Importa o MVP, planeja e sincroniza marcos"
+  default_prompt: "Use $specsfy-milestones para trabalhar com os milestones do projeto: no modo mvp, importar o MVP.md como M01, gerar backlog e spec Draft somente para requisitos de desenvolvimento e entrevistar cada backlog importado; no modo roadmap, entrevistar a evolução depois do MVP aceito e propor milestones com objetivo, condição de saída e dependências, sem alterar o núcleo do MVP sem confirmação explícita; no modo sync, sincronizar os milestones com specs e backlog, apontar vínculos ausentes ou incoerentes e sugerir ajustes que só serão aplicados após confirmação."

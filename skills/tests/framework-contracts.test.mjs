@@ -5,7 +5,7 @@ import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, read } from '../../tests/helpers.mjs';
 
-const questioning = ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-tdd-bdd','specsfy-07-implement','specsfy-aux-rules','specsfy-interviewer','specsfy-milestone-governor','specsfy-mvp-milestone-interviewer','specsfy-roadmap-milestone-interviewer','specsfy-setup','specsfy-update-spec','specsfy-data-discovery'];
+const questioning = ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-tdd-bdd','specsfy-07-implement','specsfy-aux-rules','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec','specsfy-data-discovery'];
 const silent = ['specsfy-01-inbox','specsfy-aux-database','specsfy-aux-stack','specsfy-documentator','specsfy-progress'];
 const names = readdirSync(join(ROOT, 'skills')).filter(name => existsSync(join(ROOT, 'skills', name, 'SKILL.md')));
 const source = path => read('skills/' + path);

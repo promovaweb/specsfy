@@ -214,7 +214,7 @@ node .agents/skills/specsfy-04-validate/scripts/verify_repo.mjs . \
   de arquivos; o digest cobre comandos, limites e os arquivos da política.
 - `--self-test` executa canários em diretório temporário e não produz binding
   probatório.
-- O contrato do catálogo exige as quatorze skills base, `specsfy-setup`,
+- O contrato do catálogo exige as doze skills base, `specsfy-setup`,
   `specsfy-documentator` e as três `specsfy-aux-*`. Ele também valida cada
   `specsfy-specialist-*` instalada, sem impor um total máximo de especialistas.
 - O Gherkin BDD é referência exclusiva da `spec.md`, e o enforcement não

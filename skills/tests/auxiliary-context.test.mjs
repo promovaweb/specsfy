@@ -30,7 +30,7 @@ function snapshot(root, directory = '') {
 }
 
 test('entradas de produto encaminham a descoberta dos dados', () => {
-  for (const name of ['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-mvp-milestone-interviewer', 'specsfy-03-specify']) includes(read(`skills/${name}/SKILL.md`), ['$specsfy-data-discovery', 'DATABASE.md']);
+  for (const path of ['specsfy-01-inbox/SKILL.md', 'specsfy-02-backlog/SKILL.md', 'specsfy-milestones/references/mvp.md', 'specsfy-03-specify/SKILL.md']) includes(read(`skills/${path}`), ['$specsfy-data-discovery', 'DATABASE.md']);
 });
 test('registra dados confirmados sem substituir o conteúdo detectado', t => {
   const root = temporary(t);

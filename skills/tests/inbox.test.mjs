@@ -5,7 +5,7 @@ import { readFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, basename, dirname } from 'node:path';
 import { ROOT, read, temporary, put, node } from '../../tests/helpers.mjs';
 const script = join(ROOT, 'skills/specsfy-01-inbox/scripts/capturar_inbox.mjs');
-const importer = join(ROOT, 'skills/specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs');
+const importer = join(ROOT, 'skills/specsfy-milestones/scripts/importar_mvp.mjs');
 const template = read('skills/templates/Inbox.md');
 const includes = (text, terms) => { for (const term of terms) assert.ok(text.includes(term), term); };
 function fixture(t) { const root = temporary(t); put(root, '.specsfy/templates/Inbox.md', template); return root; }
@@ -48,10 +48,10 @@ test('captura registra sessão, turno e fontes da conversa', t => {
   includes(content,['DESC-20260820-produto','| Turno da conversa | 2 |','`MVP.md`: presente e consultado.','`BRAND.md`: presente e consultado.']);
 });
 test('entrevista do MVP consulta contexto e preserva milestone confirmada', () => {
-  const source = read('skills/specsfy-mvp-milestone-interviewer/SKILL.md');
+  const source = read('skills/specsfy-milestones/references/mvp.md');
   const normalized = source.split(/\s+/).join(' ').toLowerCase();
   includes(normalized,['`mvp.md`','`brand.md`','fila ordenada de backlogs','`specs/milestones/m01.md`','milestone 1.0','não sobrescreva a milestone 1.0','texto integral da opção escolhida','informação a guardar ausente ou ambígua','superprojeto']);
-  includes(source,['$specsfy-01-inbox','$specsfy-02-backlog','$specsfy-data-discovery','$specsfy-milestone-governor','$specsfy-03-specify','Português do Brasil','--show-superproject-working-tree']);
+  includes(source,['$specsfy-01-inbox','$specsfy-02-backlog','$specsfy-data-discovery','$specsfy-milestones','$specsfy-03-specify','Português do Brasil','--show-superproject-working-tree']);
 });
 test('MVP gera milestone e backlogs entrevistáveis sem Inbox', t => {
   const root = temporary(t);

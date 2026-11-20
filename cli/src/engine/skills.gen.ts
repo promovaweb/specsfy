@@ -69,45 +69,44 @@ import f61 from "../../../skills/specsfy-documentator/references/documentation-s
 import f62 from "../../../skills/specsfy-documentator/scripts/build_documentation.mjs" with { type: "text" };
 import f63 from "../../../skills/specsfy-interviewer/SKILL.md" with { type: "text" };
 import f64 from "../../../skills/specsfy-interviewer/agents/openai.yaml" with { type: "text" };
-import f65 from "../../../skills/specsfy-milestone-governor/SKILL.md" with { type: "text" };
-import f66 from "../../../skills/specsfy-milestone-governor/agents/openai.yaml" with { type: "text" };
-import f67 from "../../../skills/specsfy-mvp-milestone-interviewer/SKILL.md" with { type: "text" };
-import f68 from "../../../skills/specsfy-mvp-milestone-interviewer/agents/openai.yaml" with { type: "text" };
-import f69 from "../../../skills/specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs" with { type: "text" };
-import f70 from "../../../skills/specsfy-progress/SKILL.md" with { type: "text" };
-import f71 from "../../../skills/specsfy-progress/agents/openai.yaml" with { type: "text" };
-import f72 from "../../../skills/specsfy-progress/references/specialists.md" with { type: "text" };
-import f73 from "../../../skills/specsfy-progress/scripts/analyze_context.mjs" with { type: "text" };
-import f74 from "../../../skills/specsfy-progress/scripts/parse_tasks.mjs" with { type: "text" };
-import f75 from "../../../skills/specsfy-progress/scripts/progress.mjs" with { type: "text" };
-import f76 from "../../../skills/specsfy-roadmap-milestone-interviewer/SKILL.md" with { type: "text" };
-import f77 from "../../../skills/specsfy-roadmap-milestone-interviewer/agents/openai.yaml" with { type: "text" };
-import f78 from "../../../skills/specsfy-setup/SKILL.md" with { type: "text" };
-import f79 from "../../../skills/specsfy-setup/agents/openai.yaml" with { type: "text" };
-import f80 from "../../../skills/specsfy-setup/references/framework-instructions.md" with { type: "text" };
-import f81 from "../../../skills/specsfy-setup/references/gitflow.md" with { type: "text" };
-import f82 from "../../../skills/specsfy-setup/references/github-spec-kit.md" with { type: "text" };
-import f83 from "../../../skills/specsfy-setup/scripts/check_database_safety.mjs" with { type: "text" };
-import f84 from "../../../skills/specsfy-setup/scripts/inspect_interface.mjs" with { type: "text" };
-import f85 from "../../../skills/specsfy-setup/scripts/inspect_project.mjs" with { type: "text" };
-import f86 from "../../../skills/specsfy-setup/scripts/monitor_context.mjs" with { type: "text" };
-import f87 from "../../../skills/specsfy-setup/scripts/setup_context.mjs" with { type: "text" };
-import f88 from "../../../skills/specsfy-setup/scripts/sync_speckit_context.mjs" with { type: "text" };
-import f89 from "../../../skills/specsfy-update-spec/SKILL.md" with { type: "text" };
-import f90 from "../../../skills/specsfy-update-spec/agents/openai.yaml" with { type: "text" };
-import f91 from "../../../skills/specsfy-update-spec/references/change-classification.md" with { type: "text" };
-import f92 from "../../../skills/specsfy-update-spec/scripts/analyze_change.mjs" with { type: "text" };
-import f93 from "../../../skills/templates/Backlog.md" with { type: "text" };
-import f94 from "../../../skills/templates/DESIGNSYSTEM.MD" with { type: "text" };
-import f95 from "../../../skills/templates/Database.md" with { type: "text" };
-import f96 from "../../../skills/templates/Inbox.md" with { type: "text" };
-import f97 from "../../../skills/templates/Interface.md" with { type: "text" };
-import f98 from "../../../skills/templates/Project.md" with { type: "text" };
-import f99 from "../../../skills/templates/Rules.md" with { type: "text" };
-import f100 from "../../../skills/templates/Spec.md" with { type: "text" };
-import f101 from "../../../skills/templates/Stack.md" with { type: "text" };
-import f102 from "../../../skills/templates/Tasks.md" with { type: "text" };
-import f103 from "../../../skills/templates/UserProfile.md" with { type: "text" };
+import f65 from "../../../skills/specsfy-milestones/SKILL.md" with { type: "text" };
+import f66 from "../../../skills/specsfy-milestones/agents/openai.yaml" with { type: "text" };
+import f67 from "../../../skills/specsfy-milestones/references/mvp.md" with { type: "text" };
+import f68 from "../../../skills/specsfy-milestones/references/roadmap.md" with { type: "text" };
+import f69 from "../../../skills/specsfy-milestones/references/sync.md" with { type: "text" };
+import f70 from "../../../skills/specsfy-milestones/scripts/importar_mvp.mjs" with { type: "text" };
+import f71 from "../../../skills/specsfy-progress/SKILL.md" with { type: "text" };
+import f72 from "../../../skills/specsfy-progress/agents/openai.yaml" with { type: "text" };
+import f73 from "../../../skills/specsfy-progress/references/specialists.md" with { type: "text" };
+import f74 from "../../../skills/specsfy-progress/scripts/analyze_context.mjs" with { type: "text" };
+import f75 from "../../../skills/specsfy-progress/scripts/parse_tasks.mjs" with { type: "text" };
+import f76 from "../../../skills/specsfy-progress/scripts/progress.mjs" with { type: "text" };
+import f77 from "../../../skills/specsfy-setup/SKILL.md" with { type: "text" };
+import f78 from "../../../skills/specsfy-setup/agents/openai.yaml" with { type: "text" };
+import f79 from "../../../skills/specsfy-setup/references/framework-instructions.md" with { type: "text" };
+import f80 from "../../../skills/specsfy-setup/references/gitflow.md" with { type: "text" };
+import f81 from "../../../skills/specsfy-setup/references/github-spec-kit.md" with { type: "text" };
+import f82 from "../../../skills/specsfy-setup/scripts/check_database_safety.mjs" with { type: "text" };
+import f83 from "../../../skills/specsfy-setup/scripts/inspect_interface.mjs" with { type: "text" };
+import f84 from "../../../skills/specsfy-setup/scripts/inspect_project.mjs" with { type: "text" };
+import f85 from "../../../skills/specsfy-setup/scripts/monitor_context.mjs" with { type: "text" };
+import f86 from "../../../skills/specsfy-setup/scripts/setup_context.mjs" with { type: "text" };
+import f87 from "../../../skills/specsfy-setup/scripts/sync_speckit_context.mjs" with { type: "text" };
+import f88 from "../../../skills/specsfy-update-spec/SKILL.md" with { type: "text" };
+import f89 from "../../../skills/specsfy-update-spec/agents/openai.yaml" with { type: "text" };
+import f90 from "../../../skills/specsfy-update-spec/references/change-classification.md" with { type: "text" };
+import f91 from "../../../skills/specsfy-update-spec/scripts/analyze_change.mjs" with { type: "text" };
+import f92 from "../../../skills/templates/Backlog.md" with { type: "text" };
+import f93 from "../../../skills/templates/DESIGNSYSTEM.MD" with { type: "text" };
+import f94 from "../../../skills/templates/Database.md" with { type: "text" };
+import f95 from "../../../skills/templates/Inbox.md" with { type: "text" };
+import f96 from "../../../skills/templates/Interface.md" with { type: "text" };
+import f97 from "../../../skills/templates/Project.md" with { type: "text" };
+import f98 from "../../../skills/templates/Rules.md" with { type: "text" };
+import f99 from "../../../skills/templates/Spec.md" with { type: "text" };
+import f100 from "../../../skills/templates/Stack.md" with { type: "text" };
+import f101 from "../../../skills/templates/Tasks.md" with { type: "text" };
+import f102 from "../../../skills/templates/UserProfile.md" with { type: "text" };
 
 /** Relative path inside `skills/` mapped to the file contents. */
 export const SKILL_FILES: Readonly<Record<string, string>> = {
@@ -176,43 +175,42 @@ export const SKILL_FILES: Readonly<Record<string, string>> = {
   "specsfy-documentator/scripts/build_documentation.mjs": f62,
   "specsfy-interviewer/SKILL.md": f63,
   "specsfy-interviewer/agents/openai.yaml": f64,
-  "specsfy-milestone-governor/SKILL.md": f65,
-  "specsfy-milestone-governor/agents/openai.yaml": f66,
-  "specsfy-mvp-milestone-interviewer/SKILL.md": f67,
-  "specsfy-mvp-milestone-interviewer/agents/openai.yaml": f68,
-  "specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs": f69,
-  "specsfy-progress/SKILL.md": f70,
-  "specsfy-progress/agents/openai.yaml": f71,
-  "specsfy-progress/references/specialists.md": f72,
-  "specsfy-progress/scripts/analyze_context.mjs": f73,
-  "specsfy-progress/scripts/parse_tasks.mjs": f74,
-  "specsfy-progress/scripts/progress.mjs": f75,
-  "specsfy-roadmap-milestone-interviewer/SKILL.md": f76,
-  "specsfy-roadmap-milestone-interviewer/agents/openai.yaml": f77,
-  "specsfy-setup/SKILL.md": f78,
-  "specsfy-setup/agents/openai.yaml": f79,
-  "specsfy-setup/references/framework-instructions.md": f80,
-  "specsfy-setup/references/gitflow.md": f81,
-  "specsfy-setup/references/github-spec-kit.md": f82,
-  "specsfy-setup/scripts/check_database_safety.mjs": f83,
-  "specsfy-setup/scripts/inspect_interface.mjs": f84,
-  "specsfy-setup/scripts/inspect_project.mjs": f85,
-  "specsfy-setup/scripts/monitor_context.mjs": f86,
-  "specsfy-setup/scripts/setup_context.mjs": f87,
-  "specsfy-setup/scripts/sync_speckit_context.mjs": f88,
-  "specsfy-update-spec/SKILL.md": f89,
-  "specsfy-update-spec/agents/openai.yaml": f90,
-  "specsfy-update-spec/references/change-classification.md": f91,
-  "specsfy-update-spec/scripts/analyze_change.mjs": f92,
-  "templates/Backlog.md": f93,
-  "templates/DESIGNSYSTEM.MD": f94,
-  "templates/Database.md": f95,
-  "templates/Inbox.md": f96,
-  "templates/Interface.md": f97,
-  "templates/Project.md": f98,
-  "templates/Rules.md": f99,
-  "templates/Spec.md": f100,
-  "templates/Stack.md": f101,
-  "templates/Tasks.md": f102,
-  "templates/UserProfile.md": f103,
+  "specsfy-milestones/SKILL.md": f65,
+  "specsfy-milestones/agents/openai.yaml": f66,
+  "specsfy-milestones/references/mvp.md": f67,
+  "specsfy-milestones/references/roadmap.md": f68,
+  "specsfy-milestones/references/sync.md": f69,
+  "specsfy-milestones/scripts/importar_mvp.mjs": f70,
+  "specsfy-progress/SKILL.md": f71,
+  "specsfy-progress/agents/openai.yaml": f72,
+  "specsfy-progress/references/specialists.md": f73,
+  "specsfy-progress/scripts/analyze_context.mjs": f74,
+  "specsfy-progress/scripts/parse_tasks.mjs": f75,
+  "specsfy-progress/scripts/progress.mjs": f76,
+  "specsfy-setup/SKILL.md": f77,
+  "specsfy-setup/agents/openai.yaml": f78,
+  "specsfy-setup/references/framework-instructions.md": f79,
+  "specsfy-setup/references/gitflow.md": f80,
+  "specsfy-setup/references/github-spec-kit.md": f81,
+  "specsfy-setup/scripts/check_database_safety.mjs": f82,
+  "specsfy-setup/scripts/inspect_interface.mjs": f83,
+  "specsfy-setup/scripts/inspect_project.mjs": f84,
+  "specsfy-setup/scripts/monitor_context.mjs": f85,
+  "specsfy-setup/scripts/setup_context.mjs": f86,
+  "specsfy-setup/scripts/sync_speckit_context.mjs": f87,
+  "specsfy-update-spec/SKILL.md": f88,
+  "specsfy-update-spec/agents/openai.yaml": f89,
+  "specsfy-update-spec/references/change-classification.md": f90,
+  "specsfy-update-spec/scripts/analyze_change.mjs": f91,
+  "templates/Backlog.md": f92,
+  "templates/DESIGNSYSTEM.MD": f93,
+  "templates/Database.md": f94,
+  "templates/Inbox.md": f95,
+  "templates/Interface.md": f96,
+  "templates/Project.md": f97,
+  "templates/Rules.md": f98,
+  "templates/Spec.md": f99,
+  "templates/Stack.md": f100,
+  "templates/Tasks.md": f101,
+  "templates/UserProfile.md": f102,
 };

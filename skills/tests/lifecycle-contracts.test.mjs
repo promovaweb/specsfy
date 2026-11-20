@@ -58,14 +58,14 @@ test('analisador reabre somente os atos afetados pela alteração', t => {
 const verify = join(ROOT, 'skills/specsfy-04-validate/scripts/verify_repo.mjs');
 test('verify_repo aceita catálogo base junto com especialistas', t => {
   const root = temporary(t);
-  const names = ['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-update-spec', 'specsfy-progress', 'specsfy-interviewer', 'specsfy-mvp-milestone-interviewer', 'specsfy-roadmap-milestone-interviewer', 'specsfy-milestone-governor', 'specsfy-data-discovery', 'specsfy-specialist-example-0', 'specsfy-specialist-example-1', 'specsfy-setup', 'specsfy-documentator', 'specsfy-aux-stack', 'specsfy-aux-rules', 'specsfy-aux-database'];
+  const names = ['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-update-spec', 'specsfy-progress', 'specsfy-interviewer', 'specsfy-milestones', 'specsfy-data-discovery', 'specsfy-specialist-example-0', 'specsfy-specialist-example-1', 'specsfy-setup', 'specsfy-documentator', 'specsfy-aux-stack', 'specsfy-aux-rules', 'specsfy-aux-database'];
   for (const name of names) {
     put(root, `.agents/skills/${name}/SKILL.md`, `---\nname: ${name}\ndescription: Skill de teste.\n---\n`);
     put(root, `.agents/skills/${name}/agents/openai.yaml`, 'interface:\n  display_name: Test\n');
   }
   const result = JSON.parse(node(verify, [root, '--json']).stdout).checks[0];
   assert.equal(result.status, 'passed', result.detail);
-  assert.equal(result.detail, '21 skills válidas');
+  assert.equal(result.detail, '19 skills válidas');
 });
 test('verify_repo aceita catálogo do checkout fonte', () => {
   const result = JSON.parse(node(verify, [join(ROOT, 'skills'), '--json']).stdout).checks.at(-1);

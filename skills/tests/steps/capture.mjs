@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { assert, temporary, put, read, text, skill, run, success, includes, normalized, section, paths, join, existsSync, readdirSync } from './helpers.mjs';
 
 const templates = ['Inbox.md', 'Backlog.md', 'Spec.md', 'Tasks.md', 'Project.md', 'Stack.md', 'Rules.md', 'Database.md', 'UserProfile.md'];
-const mvp = ctx => { ctx.mvpSkill = skill('specsfy-mvp-milestone-interviewer'); };
+const mvp = ctx => { ctx.mvpSkill = read('skills/specsfy-milestones/references/mvp.md'); };
 const git = (cwd, ...args) => success(spawnSync('git', args, { cwd, encoding: 'utf8' }));
 export const captureSteps = [
   ['o contrato central e as skills de inbox, backlog, especificação e validação', ctx => { ctx.contract = read('skills/Spec.md'); ctx.lifecycle = Object.fromEntries(['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate'].map(name => [name, skill(name)])); }],
@@ -28,7 +28,7 @@ export const captureSteps = [
   ['.specsfy/templates contém Inbox.md, Backlog.md, Spec.md, Tasks.md, Project.md, Stack.md, Rules.md, Database.md e UserProfile.md', ctx => { assert.deepEqual(readdirSync(join(ctx.project, '.specsfy/templates'), { withFileTypes: true }).filter(entry => entry.isFile()).map(entry => entry.name).sort(), [...templates].sort()); for (const name of templates) assert.ok(ctx.changed.includes(join(ctx.project, '.specsfy/templates', name))); }],
   ['cria .specsfy/templates/custom sem gerenciar seu conteúdo', ctx => { const custom = join(ctx.project, '.specsfy/templates/custom'); assert.ok(existsSync(custom)); assert.ok(!ctx.changed.includes(custom)); }],
   ['um projeto consumidor com MVP.md e BRAND.md na raiz', ctx => { ctx.project = temporary(ctx.t); put(ctx.project, 'MVP.md', '# Produto\n\n## Cadastro de clientes\n\nO sistema deve permitir cadastrar clientes.\n'); put(ctx.project, 'BRAND.md', '# Marca\n\nLinguagem clara para equipes de atendimento.\n'); mvp(ctx); }],
-  ['o entrevistador de MVP inicia a descoberta', ctx => { ctx.result = run('specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs', ['--root', ctx.project]); success(ctx.result); ctx.imported = JSON.parse(ctx.result.stdout); }],
+  ['o entrevistador de MVP inicia a descoberta', ctx => { ctx.result = run('specsfy-milestones/scripts/importar_mvp.mjs', ['--root', ctx.project]); success(ctx.result); ctx.imported = JSON.parse(ctx.result.stdout); }],
   ['ele importa MVP.md como a Milestone 1.0 sem sobrescrever uma existente', ctx => { includes(text(ctx.project, 'specs/milestones/M01.md'), ['# Milestone 1.0']); includes(ctx.mvpSkill.toLowerCase(), ['não sobrescreva a milestone 1.0']); }],
   ['cria backlog e spec Draft apenas para cada requisito de desenvolvimento', ctx => { assert.ok(ctx.imported.items.length); assert.ok(!existsSync(join(ctx.project, 'specs/inbox'))); for (const item of ctx.imported.items) for (const name of ['backlog', 'spec']) assert.ok(item[name] && existsSync(join(ctx.project, item[name]))); }],
   ['entrevista cada backlog antes de qualquer promoção', ctx => { includes(normalized(ctx.mvpSkill).toLowerCase(), ['entrevistar cada backlog', 'somente avança quando cada etapa tiver resultado confirmado']); for (const item of ctx.imported.items) if (item.backlog) includes(text(ctx.project, item.backlog), ['$specsfy-02-backlog']); }],

@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {existsSync,readFileSync,readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {ROOT,temporary,put,node} from '../../tests/helpers.mjs';
-const importer=join(ROOT,'skills/specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs');
+const importer=join(ROOT,'skills/specsfy-milestones/scripts/importar_mvp.mjs');
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 function run(t,text){const root=temporary(t);put(root,'MVP.md',text);const result=node(importer,['--root',root]);assert.equal(result.status,0,result.stderr);const output=JSON.parse(result.stdout);return {root,output,read:path=>readFileSync(join(root,path),'utf8')};}
 function counts(root,n){

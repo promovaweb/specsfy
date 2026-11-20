@@ -1,26 +1,12 @@
----
-name: specsfy-milestone-governor
-description: Projeta o estado dos milestones a partir de specs e backlog com specsfy milestones sync, aponta vínculos ausentes ou incoerentes, sugere ajustes confirmáveis e atualiza somente os blocos derivados. Use para conferir progresso e vínculos dos marcos, depois de importar o MVP ou quando specs mudarem de estado. Não use para descobrir o MVP (specsfy-mvp-milestone-interviewer), planejar evolução pós-MVP (specsfy-roadmap-milestone-interviewer), inventar objetivos ou concluir marcos sem validação humana.
----
-
 # Governar milestones a partir das fontes do projeto
 
 Mantenha o mapa de milestones coerente com o que specs e backlog realmente
 dizem. Cada artefato tem um papel: o marco descreve um estado demonstrável, a
 spec define uma capacidade e o backlog registra trabalho ainda refinável.
 
-## Preparação obrigatória
-
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
-
-## Modo de interação
-
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+Referência do modo `sync` de `$specsfy-milestones`. A preparação
+obrigatória com `$specsfy-setup` e o modo de interação `perguntas` estão no
+`SKILL.md` e valem para este modo.
 
 ## Pronto quando
 
@@ -56,8 +42,8 @@ Depois da projeção, procure:
 
 Para cada achado, explique a sugestão, o material que a sustenta e o efeito no
 mapa. Peça confirmação antes de mudar relações estruturais. Falta de descoberta
-do MVP vai para `$specsfy-mvp-milestone-interviewer`; evolução posterior, para
-`$specsfy-roadmap-milestone-interviewer`.
+do MVP vai para o modo `mvp` ([mvp.md](mvp.md)); evolução posterior, para o
+modo `roadmap` ([roadmap.md](roadmap.md)).
 
 ## Concluir um marco
 
@@ -71,3 +57,4 @@ substitui essa confirmação.
 - Não alterar texto humano fora dos blocos gerados.
 - Não mover specs nem editar gates, tarefas ou código.
 - Não usar lista de tarefas fechadas como aceite do milestone.
+- Não inventar objetivos nem concluir marcos sem validação humana.

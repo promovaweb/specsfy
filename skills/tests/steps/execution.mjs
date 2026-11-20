@@ -51,7 +51,7 @@ export const executionSteps = [
   ['um projeto com .specsfy/migrations.json', ctx => { ctx.migration = 'stack'; }],
   ['a stack é atualizada duas vezes', ctx => { assert.equal(ctx.migration, 'stack'); migrationCheck(ctx, '^#52: stack registra'); }],
   ['STACK.md registra o runner e a segunda execução não altera os arquivos', ctx => assert.equal(ctx.migrationChecked, true)],
-  ...['uma skill base concluiu sua responsabilidade', 'uma etapa posterior encontra uma pendência de uma etapa anterior', 'uma transição automática exige uma ação sensível', 'as quatorze skills base instaladas'].map(step => [step, loadContract]),
+  ...['uma skill base concluiu sua responsabilidade', 'uma etapa posterior encontra uma pendência de uma etapa anterior', 'uma transição automática exige uma ação sensível', 'as doze skills base instaladas'].map(step => [step, loadContract]),
   ...['ela identifica a próxima etapa responsável', 'ela identifica a skill responsável pela correção', 'a skill responsável é carregada', 'o estado canônico exige outra responsabilidade'].map(step => [step, evaluate]),
   ['anuncia a transição, o motivo e a pendência ou resultado esperado', ctx => includes(ctx.contract, ['Transição automática:', 'motivo', 'Pendência detectada:'])],
   ['carrega automaticamente a skill de destino sem pedir confirmação', ctx => includes(ctx.contract, ['sem pedir confirmação', 'carregue imediatamente a skill de destino'])],

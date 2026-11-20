@@ -23,7 +23,7 @@ export const milestonesImportMvpDef: ScriptCommandDef = {
   longDescription:
     "Reads MVP.md from the project or its Git superproject. Business context stays in MVP.md; gaps stay pending and no gate is passed. " +
     "Returns the milestone path and the created items.",
-  script: "specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs",
+  script: "specsfy-milestones/scripts/importar_mvp.mjs",
   project: "root-flag",
   effect: "write",
   params: [],

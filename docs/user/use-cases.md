@@ -134,15 +134,15 @@ demonstráveis antes de escrever código.
 **Caminho:** o agente percorre as etapas abaixo, anuncia cada transição na
 conversa e registra o resultado de cada uma na spec da entrega:
 
-1. `specsfy-mvp-milestone-interviewer` conduz a conversa sobre o MVP e
+1. `specsfy-milestones`, no modo `mvp`, conduz a conversa sobre o MVP e
    define marcos que podem ser demonstrados.
 2. `specsfy-data-discovery` entra quando a conversa revela informações que o
    sistema precisa guardar.
 3. A importação do `MVP.md` gera e refina um backlog por item e pode criar
    specs em `Draft`, todas com `Definition Gate: Pending`.
-4. `specsfy-milestone-governor` mantém `specs.md` e os arquivos
+4. O modo `sync` de `specsfy-milestones` mantém `specs.md` e os arquivos
    `specs/milestones/MNN.md` alinhados com specs e backlog.
-5. Após o MVP, `specsfy-roadmap-milestone-interviewer` planeja a evolução.
+5. Após o MVP, o modo `roadmap` de `specsfy-milestones` planeja a evolução.
 
 **Como solicitar:**
 

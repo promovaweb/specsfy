@@ -19,7 +19,7 @@
     "specsfy-04-validate": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "7e19c1c69fe7a878e3f263e72694eb55ae604da2dcd47446e257c449345e11e4"
+      "computedHash": "8648bbafacef87c67d702142a5d647a8d201e82e40743881f1df6bd6a3d10ca1"
     },
     "specsfy-05-tasks": {
       "source": "../skills",
@@ -54,7 +54,7 @@
     "specsfy-data-discovery": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "32e4b392132ef647efd231b764909a2c19fab1f83656d65f68d44425b01897b2"
+      "computedHash": "31b985b9f27f63e8d55579e1c5efe733d76401ac9e501fdb721f7749da416571"
     },
     "specsfy-documentator": {
       "source": "../skills",
@@ -66,25 +66,15 @@
       "sourceType": "local",
       "computedHash": "0eaadd1f6765075d239de86badfebadffb031fb105794a21b91e0ce32848fd67"
     },
-    "specsfy-milestone-governor": {
+    "specsfy-milestones": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "08009d30cc2e3366e9c04af7ae9b0f4f1e85a8356dbe7749c391a26d332652ae"
-    },
-    "specsfy-mvp-milestone-interviewer": {
-      "source": "../skills",
-      "sourceType": "local",
-      "computedHash": "b91c378a788d4dd90866d2de31a9f6cf1f32d2e730fd1ce8f25234c81946c596"
+      "computedHash": "9f741ed3fb7cb905f556f527b5ec3372e1d906e27c445821a67edd5e44b238d3"
     },
     "specsfy-progress": {
       "source": "../skills",
       "sourceType": "local",
       "computedHash": "d0a35c49942862f1ec22c81d6e251d6d6a2f657eb487df6741b95c023df6c3e4"
-    },
-    "specsfy-roadmap-milestone-interviewer": {
-      "source": "../skills",
-      "sourceType": "local",
-      "computedHash": "39eed0c10c068a654d9622f04dc946f5fd176952a2b97cdab58c10c01ec33b50"
     },
     "specsfy-setup": {
       "source": "../skills",

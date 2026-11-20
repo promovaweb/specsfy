@@ -16,9 +16,7 @@
     "specsfy-update-spec": "base",
     "specsfy-progress": "base",
     "specsfy-interviewer": "base",
-    "specsfy-mvp-milestone-interviewer": "base",
-    "specsfy-roadmap-milestone-interviewer": "base",
-    "specsfy-milestone-governor": "base",
+    "specsfy-milestones": "base",
     "specsfy-data-discovery": "base"
   },
   "renamed": {
@@ -32,7 +30,10 @@
     "specsfy-base-implement": "specsfy-07-implement",
     "specsfy-base-update-spec": "specsfy-update-spec",
     "specsfy-base-progress": "specsfy-progress",
-    "specsfy-base-discuss": "specsfy-02-backlog"
+    "specsfy-base-discuss": "specsfy-02-backlog",
+    "specsfy-mvp-milestone-interviewer": "specsfy-milestones",
+    "specsfy-roadmap-milestone-interviewer": "specsfy-milestones",
+    "specsfy-milestone-governor": "specsfy-milestones"
   },
   "retired": []
 }

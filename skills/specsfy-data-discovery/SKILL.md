@@ -128,7 +128,7 @@ automaticamente pertence a `$specsfy-aux-database` e fica intocado.
 | Origem | Quando chamar esta skill |
 | --- | --- |
 | `$specsfy-02-backlog` | antes de declarar o brief pronto, se a jornada depender de informações guardadas |
-| `$specsfy-mvp-milestone-interviewer` | para cada informação a guardar ausente ou ambígua em um backlog importado, preservando `MVP.md` como fonte |
+| `$specsfy-milestones` (modo `mvp`) | para cada informação a guardar ausente ou ambígua em um backlog importado, preservando `MVP.md` como fonte |
 | `$specsfy-03-specify` | quando a fonte de dados não explicar o que a jornada precisa lembrar ou quem consulta cada informação |
 | `$specsfy-01-inbox` | nunca chama: a Inbox não pergunta, só preserva sinais para esta etapa |
 

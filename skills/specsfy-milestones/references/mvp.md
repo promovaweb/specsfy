@@ -1,28 +1,14 @@
----
-name: specsfy-mvp-milestone-interviewer
-description: Importa MVP.md como a milestone 1.0, cria backlog e spec Draft somente para requisitos de desenvolvimento, mantém o contexto de negócio apenas na fonte e orquestra a entrevista de cada backlog importado. Use quando o projeto tiver um MVP.md a transformar em M01, backlogs e specs Draft. Não use para evolução depois do MVP aceito (specsfy-roadmap-milestone-interviewer), para conferir vínculos de marcos (specsfy-milestone-governor), para implementar ou para aprovar gates.
----
-
 # Explorar o MVP com requisitos de desenvolvimento
 
-Esta skill orquestra a entrada do MVP. Ela importa `MVP.md` como a milestone
+Este modo orquestra a entrada do MVP. Ele importa `MVP.md` como a milestone
 1.0, seleciona somente requisitos de desenvolvimento e cria um backlog
 candidato para cada um. O contexto de negócio permanece no arquivo de origem.
 Em seguida, carrega as skills responsáveis para entrevistar cada backlog e
 somente avança quando cada etapa tiver resultado confirmado.
 
-## Preparação obrigatória
-
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
-
-## Modo de interação
-
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`.
+Referência do modo `mvp` de `$specsfy-milestones`. A preparação
+obrigatória com `$specsfy-setup` e o modo de interação `perguntas` estão no
+`SKILL.md` e valem para este modo.
 
 ## Pronto quando
 
@@ -32,8 +18,8 @@ Antes de formular qualquer pergunta, leia e aplique o
   `Definition Gate: Pending`.
 - Nenhum tema contextual gerou backlog, spec ou Inbox.
 - `specsfy milestones sync --project <raiz>` rodou, com a tool `milestones_sync`
-  quando o agente usar MCP, e
-  `$specsfy-milestone-governor` conferiu os vínculos de `M01`.
+  quando o agente usar MCP, e o modo `sync` de `$specsfy-milestones`
+  ([sync.md](sync.md)) conferiu os vínculos de `M01`.
 - O relato final lista sessão, backlogs, specs, respostas confirmadas e pontos
   `Pendente`.
 
@@ -62,8 +48,7 @@ Antes de formular qualquer pergunta, leia e aplique o
    o script equivalente:
 
    ```bash
-   node \
-     .agents/skills/specsfy-mvp-milestone-interviewer/scripts/importar_mvp.mjs \
+   node .agents/skills/specsfy-milestones/scripts/importar_mvp.mjs \
      --root <raiz>
    ```
 
@@ -132,7 +117,7 @@ Para cada item da fila, em sequência e sem pular responsabilidades. O objetivo
 é entrevistar cada backlog antes de qualquer promoção:
 
 1. Anuncie
-   `Transição automática: $specsfy-mvp-milestone-interviewer → $specsfy-02-backlog — motivo: entrevistar o backlog derivado do MVP — resultado esperado: backlog refinado com respostas confirmadas`
+   `Transição automática: $specsfy-milestones → $specsfy-02-backlog — motivo: entrevistar o backlog derivado do MVP — resultado esperado: backlog refinado com respostas confirmadas`
    e carregue `$specsfy-02-backlog` com o caminho do backlog candidato.
 2. Use primeiro os registros do MVP que acompanham o backlog para preencher o
    que já foi declarado. A entrevista adaptativa cobre só lacunas,
@@ -140,7 +125,7 @@ Para cada item da fila, em sequência e sem pular responsabilidades. O objetivo
 3. Se houver informação a guardar ausente ou ambígua, anuncie a transição para
    `$specsfy-data-discovery`, conclua a entrevista de dados e retome o backlog
    com `.specsfy/DATABASE.md` como contexto.
-4. Ao terminar o refinamento do backlog, retome esta skill, registre a situação
+4. Ao terminar o refinamento do backlog, retome este modo, registre a situação
    do item na síntese da sessão e carregue `$specsfy-03-specify` para criar a
    spec Draft baseada nele. A seção 10 mantém a área de menus e navegação
    principal: use o que o MVP declarar e marque `Pendente` quando faltar. Não
@@ -150,8 +135,8 @@ Para cada item da fila, em sequência e sem pular responsabilidades. O objetivo
 Quando a fila terminar, confirme que cada tema desenvolvível tem backlog e spec
 Draft e que nenhum tema contextual gerou artefato. Execute
 `specsfy milestones sync --project <raiz>`, com a tool `milestones_sync` pelo
-MCP, e carregue
-`$specsfy-milestone-governor` para conferir vínculos e progresso de `M01`. A
+MCP, e siga o modo `sync` de `$specsfy-milestones` ([sync.md](sync.md)) para
+conferir vínculos e progresso de `M01`. A
 geração automática de Drafts não autoriza implementação nem validação final.
 
 ## Conduzir uma conversa adaptativa
@@ -235,4 +220,7 @@ gate ficam para outra etapa autorizada.
 - Não pule a entrevista de nenhum backlog gerado pelo importador.
 - Não implemente código durante a importação nem marque gate como Passed.
 - Não trate Inbox como fonte normativa.
-- Não use o entrevistador de roadmap para ampliar o MVP sem confirmação.
+- Não use o modo `roadmap` para ampliar o MVP sem confirmação.
+- Evolução depois do MVP aceito pertence ao modo `roadmap`
+  ([roadmap.md](roadmap.md)); conferência de vínculos de marcos, ao modo
+  `sync` ([sync.md](sync.md)). Este modo não implementa nem aprova gates.

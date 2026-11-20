@@ -39,11 +39,12 @@ uma confirmação humana da condição de saída.
 
 ## Entrevistas e responsabilidades
 
-- `specsfy-mvp-milestone-interviewer`: descobre o MVP até haver jornada,
-  limites e marcos aprováveis.
-- `specsfy-roadmap-milestone-interviewer`: organiza a evolução posterior sem
-  reabrir o núcleo aceito sem confirmação.
-- `specsfy-milestone-governor`: mantém a projeção e sugere relações ausentes.
+A skill `specsfy-milestones` concentra as três responsabilidades em modos:
+
+- modo `mvp`: descobre o MVP até haver jornada, limites e marcos aprováveis.
+- modo `roadmap`: organiza a evolução posterior sem reabrir o núcleo aceito
+  sem confirmação.
+- modo `sync`: mantém a projeção e sugere relações ausentes.
 
 Os entrevistadores não implementam código nem aprovam gates. Mudança em uma
 spec existente segue para `specsfy-update-spec`.

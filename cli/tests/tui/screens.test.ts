@@ -32,7 +32,7 @@ describe("example project", () => {
     backlog: ["Backlog · 2", "Inbox · 0", "BACKLOG-0001"],
     gates: ["No gates are registered in this build.", "0006-produtos"],
     tests: ["Not run in this session.", "No output yet."],
-    skills: ["Framework · 14", "✓ installed", "specsfy-01-inbox", "Catalog", "1 specialist(s)"],
+    skills: ["Framework · 12", "✓ installed", "specsfy-01-inbox", "Catalog", "1 specialist(s)"],
     about: ["Credits", "OpenTUI"],
   };
 

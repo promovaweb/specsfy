@@ -293,26 +293,26 @@ describe("update reconciles the project with the inventory", () => {
 // A rename always points to a current skill, so the older name follows it.
       delete inventory.renamed["specsfy-base-progress"];
       inventory.retired.push("specsfy-progress", "specsfy-base-progress");
-      inventory.renamed["specsfy-milestone-governor"] = "specsfy-new-thing";
-      delete inventory.skills["specsfy-milestone-governor"];
+      inventory.renamed["specsfy-interviewer"] = "specsfy-new-thing";
+      delete inventory.skills["specsfy-interviewer"];
     }, "retire, rename and add");
     const check = await run(["update", "--check", "--latest", "--project", project]);
     expect(check.code).toBe(ExitCode.GATE_FAILED);
     expect(check.json!.data.plan).toMatchObject({
       install: ["specsfy-new-thing"],
       retire: ["specsfy-progress"],
-      rename: [{ from: "specsfy-milestone-governor", to: "specsfy-new-thing" }],
+      rename: [{ from: "specsfy-interviewer", to: "specsfy-new-thing" }],
     });
     const r = await run(["update", "--latest", "--project", project]);
     expect(r.code).toBe(0);
     expect(r.json!.data.updated).toEqual(expect.arrayContaining([
       ".agents/skills/specsfy-new-thing",
       ".agents/skills/specsfy-progress",
-      ".agents/skills/specsfy-milestone-governor",
+      ".agents/skills/specsfy-interviewer",
     ]));
     expect(existsSync(skill("specsfy-new-thing"))).toBe(true);
     expect(existsSync(skill("specsfy-progress"))).toBe(false);
-    expect(existsSync(skill("specsfy-milestone-governor"))).toBe(false);
+    expect(existsSync(skill("specsfy-interviewer"))).toBe(false);
     const names = Object.keys(readJsonFile(join(project, "skills-lock.json")).skills);
     expect(names).toContain("specsfy-new-thing");
     expect(names).not.toContain("specsfy-progress");

@@ -161,10 +161,10 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
 9. Use `specsfy-progress` somente para projetar o estado existente.
 10. Use `specsfy-interviewer` para conversar com a spec nas fases `draft`,
     `defined`, `planned`, `in-progress` e `review`, antes da próxima skill.
-11. Use `specsfy-mvp-milestone-interviewer` para definir o MVP por estados
-   demonstráveis e `specsfy-roadmap-milestone-interviewer` para evolução após
-   o MVP aceito. Use `specsfy-milestone-governor` para manter relações e a
-   projeção `specs.md` sem substituir conteúdo humano.
+11. Use `specsfy-milestones` no modo `mvp` para definir o MVP por estados
+   demonstráveis e no modo `roadmap` para evolução após o MVP aceito. Use
+   o modo `sync` para manter relações e a projeção `specs.md` sem
+   substituir conteúdo humano.
 12. Use `specsfy-data-discovery` quando uma Inbox, backlog, descoberta de MVP
     ou spec indicar informações que o produto precisa guardar. A conversa usa
     linguagem cotidiana e registra respostas confirmadas em
