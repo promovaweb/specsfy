@@ -235,8 +235,10 @@ function releaseSite() {
       'schemaVersion: "1.0.0"',
       `id: "${id}"`,
       `slug: specsfy-docs-${version.replaceAll(".", "")}`,
-      `title: "Docs do Specsfy na versão ${version}"`,
-      `summary: A documentação pública do Specsfy em /docs/specsfy/ passa a refletir a versão ${version}, com o ebook e as imagens do guia publicados no R2.`,
+      // Text values go through JSON.stringify: a ": " inside a plain YAML
+      // scalar breaks the frontmatter.
+      `title: ${JSON.stringify(`Docs do Specsfy na versão ${version}`)}`,
+      `summary: ${JSON.stringify(`A documentação pública do Specsfy em /docs/specsfy/ passa a refletir a versão ${version}, com o ebook e as imagens do guia publicados no R2.`)}`,
       "status: done",
       `createdAt: "${now}"`,
       `updatedAt: "${now}"`,
@@ -250,7 +252,7 @@ function releaseSite() {
       "tags:",
       "  - specsfy",
       "  - docs",
-      `source: Publicação da Specsfy ${version} pelo scripts/release.mjs do Specsfy (regra do Luiz de 20/11/2026: tudo sincronizado a cada atualização).`,
+      `source: ${JSON.stringify(`Publicação da Specsfy ${version} pelo scripts/release.mjs do Specsfy (regra do Luiz de 20/11/2026: tudo sincronizado a cada atualização).`)}`,
       "priority: medium",
       "---",
       "",
@@ -265,6 +267,16 @@ function releaseSite() {
       "- [x] Release do website criada; conferência em produção pelo npm run site:specsfy:check {#sd03}",
       "",
     ].join("\n"));
+    // The website lists only valid sitespecs; refuse to commit a broken one.
+    const listed = spawnSync("astrofy", ["sitespec", "list", "--json"], { cwd: worktree, encoding: "utf8" });
+    if (listed.status === 0) {
+      const parsed = JSON.parse(listed.stdout);
+      const errors = (parsed.data ?? parsed).errors ?? [];
+      if (errors.length) {
+        console.error(`✗ invalid sitespec: ${JSON.stringify(errors)}`);
+        process.exit(1);
+      }
+    } else console.log("! astrofy not found; the sitespec was not validated");
     const pkg = JSON.parse(readFileSync(join(worktree, "package.json"), "utf8"));
     const [major, minor, patch] = pkg.version.split(".").map(Number);
     const next = `${major}.${minor}.${patch + 1}`;
