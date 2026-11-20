@@ -13,10 +13,11 @@ As skills base dividem o método por responsabilidade. Você pode chamar uma
 delas pelo nome ou explicar o resultado esperado. O agente lê o estado da spec,
 seleciona a etapa responsável e anuncia cada transição necessária.
 
-O framework tem 11 skills base: `specsfy-setup`, `specsfy-documentator`,
-`specsfy-01-inbox`, `specsfy-02-backlog`, `specsfy-03-specify`,
-`specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-implement`,
-`specsfy-update-spec`, `specsfy-interviewer` e `specsfy-milestones`.
+O framework tem 11 skills, nove delas base: `specsfy-setup`,
+`specsfy-documentator`, `specsfy-01-inbox`, `specsfy-02-backlog`,
+`specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`,
+`specsfy-06-implement`, `specsfy-update-spec`, `specsfy-interviewer` e
+`specsfy-milestones`.
 
 ## Nomes exibidos
 

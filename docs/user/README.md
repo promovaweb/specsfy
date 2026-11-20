@@ -94,8 +94,8 @@ original:
 
 ### 4. Aprofunde o fluxo base
 
-O índice de [Skills base](skills/README.md) reúne as 11 skills base. Leia
-cada etapa do fluxo nesta ordem:
+O índice de [Skills base](skills/README.md) reúne as 11 skills do framework.
+Leia cada etapa do fluxo nesta ordem:
 
 1. [Capturar uma entrada](skills/specsfy-01-inbox.md).
 2. [Refinar no backlog](skills/specsfy-02-backlog.md).
