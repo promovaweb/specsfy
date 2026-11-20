@@ -4,6 +4,40 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.34.0] - 2026-11-20
+
+### Adicionado
+
+- Filtro `/` nas listas da TUI (Specs, Backlog, Gates e Skills): o texto
+  digitado filtra pelo rótulo, sem diferenciar maiúsculas nem acentos, e o
+  título da lista mostra a consulta. Enter mantém o filtro, Esc limpa, e as
+  teclas globais não disparam enquanto se digita.
+- `bun run smoke`, último passo do `bun run validate`: roda o binário
+  compilado sem rede (`--version`, `--skill`, `mcp --list`, `doctor`,
+  `install` a partir do próprio repositório e `update --check`), para pegar
+  antes da tag uma falha que só aparece no binário, como a da 0.32.0.
+- `scripts/release.mjs` (`npm run release -- X.Y.Z`): prepara a versão,
+  os arquivos gerados, o ebook, o showcase e roda todas as validações; com
+  `--publish`, commita, cria a tag, espera o CI, confere os binários e
+  publica o wrapper npm.
+- Projeto de demonstração do showcase em `cli/tests/fixtures/showcase-project/`
+  (`bun run demo:build`), uma loja online com specs em todos os estados,
+  backlog e inbox. Os prints de `docs/user/assets/showcase/` passam a usá-lo.
+
+### Alterado
+
+- Abas da TUI com largura igual e título centralizado, ajustadas à largura do
+  terminal; a aba ativa é marcada só pelo fundo, sem a linha de sublinhado.
+- Overview: as specs abertas vêm antes das concluídas (estado Completed) e o
+  gráfico de gates por spec diz "1 spec" no singular; o guia mostra os dois
+  primeiros próximos passos sem cortar o texto.
+
+### Corrigido
+
+- Os testes do ciclo de vida copiavam o `example/` inteiro, com
+  `node_modules` e `vendor`, e às vezes estouravam o tempo do
+  `beforeAll`. A cópia deixa essas pastas de fora.
+
 ## [0.33.1] - 2026-11-20
 
 ### Corrigido
