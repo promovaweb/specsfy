@@ -4,6 +4,17 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.33.1] - 2026-11-20
+
+### Corrigido
+
+- `specsfy-05-tasks` recupera, na seção `Ver o progresso`, as regras que
+  saíram com a `specsfy-progress`: pendência `PENDING` do monitor de
+  contexto e `docs/` ausente ou desatualizado também impedem o avanço, e o
+  agente encaminha pelo estado observado (`specsfy-update-spec`,
+  `specsfy-02-backlog`, `specsfy-03-specify` ou a próxima skill que o
+  progresso indicar).
+
 ## [0.33.0] - 2026-11-20
 
 ### Alterado
