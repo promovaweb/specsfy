@@ -74,7 +74,7 @@ function render(template, values) {
   let result = template;
   for (const [token, value] of Object.entries(values)) {
     if (!result.includes(token)) fail(`token obrigatório ausente: ${token}`);
-    result = result.replaceAll(token, value);
+    result = result.replaceAll(token, () => value);
   }
   const unresolved = [...new Set(result.match(/\{\{[A-Z0-9_]+\}\}/gu) ?? [])];
   if (unresolved.length) fail(`tokens não preenchidos: ${unresolved.join(", ")}`);

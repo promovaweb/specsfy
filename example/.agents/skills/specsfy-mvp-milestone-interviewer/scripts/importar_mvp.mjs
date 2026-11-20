@@ -251,7 +251,7 @@ async function run(script, args) {
 
 function replaceOnce(content, needle, value) {
   if (!content.includes(needle)) return content;
-  return content.replace(needle, value);
+  return content.replace(needle, () => value);
 }
 
 function automaticAnswers(defaults) {
@@ -278,20 +278,20 @@ function renderDraftSpec(content, title, backlogPath, fields, defaults) {
   let rendered = content
     .replaceAll("| Milestones | |", "| Milestones | M01 |")
     .replaceAll("| Interface para pessoas | A definir |", "| Interface para pessoas | Pendente: o MVP não informa se há interface para pessoas. |")
-    .replaceAll("[Dor observável e contexto.]", problem)
-    .replaceAll("[Mudança percebida pelo usuário ou negócio.]", result)
-    .replaceAll("[Capacidade incluída.]", idea)
+    .replaceAll("[Dor observável e contexto.]", () => problem)
+    .replaceAll("[Mudança percebida pelo usuário ou negócio.]", () => result)
+    .replaceAll("[Capacidade incluída.]", () => idea)
     .replaceAll("[Limite explícito.]", "O MVP não declarou limite adicional; manter o escopo deste tema.")
-    .replaceAll("[Ator]", actor)
-    .replaceAll("[Menu principal e menus secundários, seus itens, destinos ou rotas, permissões e comportamento responsivo. Se não houver menu, declare como a pessoa chega às telas e por que a navegação direta é suficiente.]", menu)
+    .replaceAll("[Ator]", () => actor)
+    .replaceAll("[Menu principal e menus secundários, seus itens, destinos ou rotas, permissões e comportamento responsivo. Se não houver menu, declare como a pessoa chega às telas e por que a navegação direta é suficiente.]", () => menu)
     .replaceAll("[objetivo, permissões ou responsabilidade]", "Executa ou recebe o resultado descrito no MVP; permissões a confirmar.")
-    .replaceAll("[título]", title)
-    .replaceAll("[capacidade]", idea)
-    .replaceAll("[valor]", result)
-    .replaceAll("[capacidade observável]", title)
+    .replaceAll("[título]", () => title)
+    .replaceAll("[capacidade]", () => idea)
+    .replaceAll("[valor]", () => result)
+    .replaceAll("[capacidade observável]", () => title)
     .replaceAll("[estado inicial]", "O tema do MVP está disponível para ser executado.")
-    .replaceAll("[ação]", idea)
-    .replaceAll("[resultado observável]", result)
+    .replaceAll("[ação]", () => idea)
+    .replaceAll("[resultado observável]", () => result)
     .replaceAll("[contexto alternativo]", "O fluxo recebe os dados previstos no tema do MVP.")
     .replaceAll("[regra observável]", "O sistema preserva o resultado descrito no MVP.")
     .replaceAll("[condição de falha ou limite]", "Uma informação necessária ainda não está declarada no MVP.")
@@ -390,7 +390,7 @@ async function main() {
     const completedBacklog = await readFile(backlog, "utf8");
     await writeFile(backlog, completedBacklog
       .replace("| Status | Captured |", "| Status | Promoted |")
-      .replace("| Spec promovida | Nenhuma |", `| Spec promovida | \`${relative(root, specPath)}\` |`), "utf8");
+      .replace("| Spec promovida | Nenhuma |", () => `| Spec promovida | \`${relative(root, specPath)}\` |`), "utf8");
     created.push({
       title,
       backlog: backlogRelative,
