@@ -40,15 +40,18 @@ describe("filter mode", () => {
       await tui.press("/");
       for (const key of "0006") await tui.press(key);
       let frame = await tui.waitFor("Specs · /0006");
-      expect(frame).toContain("0006-produtos");
-      expect(frame).not.toContain("0001-diretorio-global-usuarios");
+      // Only the list column counts: the Markdown preview of the previously
+      // selected spec loads asynchronously and may still name it for a moment.
+      const listRows = (text: string) => text.split("\n").map((line) => line.slice(0, 48)).join("\n");
+      expect(listRows(frame)).toContain("0006-produtos");
+      expect(listRows(frame)).not.toContain("0001-diretorio-global-usuarios");
       expect(frame).toContain("Specsfy");
       await tui.press("RETURN");
       frame = tui.frame();
       expect(frame).toContain("Specs · /0006");
       await tui.press("/");
       await tui.press("ESCAPE");
-      frame = await tui.waitFor("0001-diretorio-global-usuarios");
+      frame = await tui.waitFor(/│ [ >] 0001-diretorio-global-usuarios/);
       expect(frame).not.toContain("· /0006");
     } finally {
       await tui.close();
