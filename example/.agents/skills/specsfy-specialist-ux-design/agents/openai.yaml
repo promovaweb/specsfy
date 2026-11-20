@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Design de UX"
+  display_name: "Specsfy - Especialista - Design de UX"
   short_description: "Fluxos úteis, compreensíveis e validados"
   default_prompt: "Use $specsfy-specialist-ux-design para orientar esta tarefa com padrões e validação especializados."

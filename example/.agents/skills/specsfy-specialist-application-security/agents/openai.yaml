@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Segurança"
+  display_name: "Specsfy - Especialista - Segurança de aplicações"
   short_description: "Ameaças, controles e testes de segurança"
   default_prompt: "Use $specsfy-specialist-application-security para orientar esta tarefa com padrões e validação especializados."

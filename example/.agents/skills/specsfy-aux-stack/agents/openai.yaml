@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Stack Auxiliar"
   short_description: "Monitora e mantém o stack técnico do projeto"
-  default_prompt: "Use $specsfy-aux-stack para monitorar o stack e atualizar .specsfy/STACK.md sem perder dados existentes."
+  default_prompt: "Use $specsfy-aux-stack para atualizar .specsfy/STACK.md a partir dos manifests e configurações, citando a fonte de cada linha e sem perder dados existentes."

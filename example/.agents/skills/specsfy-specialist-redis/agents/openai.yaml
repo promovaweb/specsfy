@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Redis"
+  display_name: "Specsfy - Especialista - Redis"
   short_description: "Redis resiliente para cache, filas e locks"
   default_prompt: "Use $specsfy-specialist-redis para orientar esta tarefa com padrões e validação especializados."

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Docker Swarm"
+  display_name: "Specsfy - Especialista - Docker Swarm"
   short_description: "Stacks Swarm com rollout e recuperação"
   default_prompt: "Use $specsfy-specialist-docker-swarm para orientar esta tarefa com padrões e validação especializados."

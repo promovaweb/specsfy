@@ -4,187 +4,187 @@
     "specsfy-01-inbox": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "8c5be3d053bb0027414191781767c0695a20e6b4ee31d4325c4be2754e795e2d"
+      "computedHash": "68b3f09ad834f8eb262fceb22bd5a13969dc43af372c3f3319a8f7e4f08e3d16"
     },
     "specsfy-02-backlog": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "3a387e431d2c3063c8f1524e74c913df0faef6bae43c60692ec4fd34ddae97b0"
+      "computedHash": "74222507874ff9cf2fa3b1d6bc668975364e5d3d6d663668c575acc14206ad88"
     },
     "specsfy-03-specify": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "f9d741d72a934de327e209acee9ed2da1893e8eb759e529e7ae26af18d885c82"
+      "computedHash": "395dcfe3c1b5607fed79d8de2d288b3a4bd4fdeaf8f723e24e2d69135de90a7e"
     },
     "specsfy-04-validate": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "0dd7dd7743292632195058fcb6276d1db6c68b4b2f3f8802eb1d7470ededca04"
+      "computedHash": "7e19c1c69fe7a878e3f263e72694eb55ae604da2dcd47446e257c449345e11e4"
     },
     "specsfy-05-tasks": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "ddc416c7d7a5dec436aca823d339469b40586b5a734f76205f47b3217c7cca79"
+      "computedHash": "8275869f1ee7c4a05b3759f399e5b32623caca7af23c6cd7f742559138f4fa2d"
     },
     "specsfy-06-tdd-bdd": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "117f34fb3b2e1011b29089a71fa887ae816404538db54b57083d1d3e2d9b891f"
+      "computedHash": "dacfc49489713082ab191ff30e321686c0635fd4a9fde32598346c1cb2d93988"
     },
     "specsfy-07-implement": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "ac16fa2b7d1617c0932b08827c36ed7ee3700c70c375a8c038d3441ceabe38f3"
+      "computedHash": "ef3d03c1449f20880586dc8d902354f2be740e40e01b97f24b58cee1f2b49909"
     },
     "specsfy-aux-database": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "17059a4288008dae98adb2d1e21177e56a770b10f5183fdee871a48546b61897"
+      "computedHash": "9a186866b232627698e859e58ea5fd7af65458d7f024ff9656422b17f9157550"
     },
     "specsfy-aux-rules": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "858b9f778a10e19dd1bb76fc17496f7822bf735b1fa3422f0bfe1cd031715772"
+      "computedHash": "695ed7dfb4f2a11ff6ac5846561a4b8fef82ce058b12d14d95d385ca38321e95"
     },
     "specsfy-aux-stack": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "6003d780af349a608e1efe64ca494914d8a112e9aa5ca27c2c37f62a24f4352d"
+      "computedHash": "95fb819ed07b342274a825165f4af1ec423aa779bf560379aed2dfca30345044"
     },
     "specsfy-data-discovery": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "6519b7fee099658fd73adaf28db363769f808c29f08cfae8ff4df3add7d2009f"
+      "computedHash": "32e4b392132ef647efd231b764909a2c19fab1f83656d65f68d44425b01897b2"
     },
     "specsfy-documentator": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "ce211c9ed303676adab7c234def3c704d1ba2652516e474c8e378f5407529035"
+      "computedHash": "715d99234feb5d796fb746b98135b0ab6af54a8205dfe31974d24a4cf7138b9b"
     },
     "specsfy-interviewer": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "c915e43b62afc1a12abbd3c2cde8d5639f62ee51a362ab24907a5dfb6a0a0e4e"
+      "computedHash": "0eaadd1f6765075d239de86badfebadffb031fb105794a21b91e0ce32848fd67"
     },
     "specsfy-milestone-governor": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "139ebd7f1e680de9a1cf1d02d8dd4752c8b19ae774edf147a16cef1defb9ebbf"
+      "computedHash": "08009d30cc2e3366e9c04af7ae9b0f4f1e85a8356dbe7749c391a26d332652ae"
     },
     "specsfy-mvp-milestone-interviewer": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "cf67334eeaeba5b589f845549d5b277b30341535afeb91a93fd93b29146da089"
+      "computedHash": "b91c378a788d4dd90866d2de31a9f6cf1f32d2e730fd1ce8f25234c81946c596"
     },
     "specsfy-progress": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "29f2650e51c2c10a00a6090fdd04b67d5182dadc4ca8eda06ddffb0a8289768a"
+      "computedHash": "d0a35c49942862f1ec22c81d6e251d6d6a2f657eb487df6741b95c023df6c3e4"
     },
     "specsfy-roadmap-milestone-interviewer": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "aa0cb76a46c3c7c887163641d4be51f4c0d51694df73ca65fff91e7770a793ce"
+      "computedHash": "39eed0c10c068a654d9622f04dc946f5fd176952a2b97cdab58c10c01ec33b50"
     },
     "specsfy-setup": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "077a4b1473d444a542effad0f3faa2f706e466a7cfc277e496244c0252943194"
+      "computedHash": "5866b82002786e022bedc7ceaa5082392b7325342390ba9059640032ab5652b9"
     },
     "specsfy-specialist-application-security": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "2b4a9d431b04d3627871ca645c177399651556e18a3c297bfa3bdf9ca0bef86e"
+      "computedHash": "38af0a90f6a573a9f3e87d3b4487d756587929ab8bf9728f4796c525e1f88abd"
     },
     "specsfy-specialist-code-review": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "0018add55b68784e13bd94b206ee38cfc0d86ba7f29939e459071ef7a13fb53a"
+      "computedHash": "5486836da37055d12faa52ee87343ac9637ad5f2110b74a377d1a5d44e801db1"
     },
     "specsfy-specialist-debugging": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "e7bfba30c8d1c53bd048a033de5b7659f5a3e1738c8d93226a95351ebb9e1131"
+      "computedHash": "dadc2052d384ea358c7426c8e3fb198c3852c90984f9abbdc5920440dc69117a"
     },
     "specsfy-specialist-docker-swarm": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "bc27db1e2db9de4639dfae137a01ce0d6f8c972d1afff85f00970c73dc22169b"
+      "computedHash": "56f21ac64f03925f2e2ee1611db9434fc7c0cbd90c8d1e5bcb10b189ff5b440a"
     },
     "specsfy-specialist-domain-modeling": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "38a3623a74c99d3144a919e88d57471e54d0d31b736287d36851cb49eedbeb30"
+      "computedHash": "fadc2841f63c982644ec14e58707437547ffe8f3a52a40434f6f7f9896480c86"
     },
     "specsfy-specialist-laravel": {
-      "source": "../../specsfy-install-7aj4hjok/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "be96b0b5f4663bf4b8763145e583e5843cc532585ff1869c4758e56eeeee4817"
+      "computedHash": "474649707b66bb6058895e191b0408f471952b291549dd0caa6a3f9c7ec677ae"
     },
     "specsfy-specialist-merge-conflict-resolution": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "34491a5d77f435b53316b7e6c17d00a12d3de49150a88d10b0241d5f646746e5"
+      "computedHash": "6394337bbb1cc9b7eb6c47d4cf035c1227bd5cec77ef9867ccecd7e8a66be77a"
     },
     "specsfy-specialist-performance-engineering": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "6342967758c250f6a2354abe0c604a02ba2140fc2eb57ad7bf1004e34c90ebd8"
+      "computedHash": "4323a11bbc9c5d3f54d207fbb53420d8c280a4df827aa35c4e2192f87ae7b4a1"
     },
     "specsfy-specialist-postgres": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "ff6490ab03fb9abeb922c4d54576d52134e0f431d85046827f1111478653ddf7"
+      "computedHash": "72b1f0c27de8b1129f226ecb47cadcab84aa14c36d881457b0ca7c55a881b312"
     },
     "specsfy-specialist-prototyping": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "2eb3bfe88a003abd13b0538905c55fdcf456752e34a30c798635ac2f4d2de29c"
+      "computedHash": "9251f839c8c7460a4545ee294a8a8fa03d9040e8229e6171d9af60985d69b871"
     },
     "specsfy-specialist-redis": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "33db517f3710a3a561742c77ba478be3092c192903c2b4270520db1ae56b6053"
+      "computedHash": "5075240b2a1b76ada1a64d7695454ab828fc65a96466d1595e368d990a966bfe"
     },
     "specsfy-specialist-shadcn-ui": {
-      "source": "../../specsfy-install-7aj4hjok/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "b067cad57ff99f0a5470f8b412bae9d0b2830a66d55ea857ebef4fd0bf24c61c"
+      "computedHash": "094454cd0576fe7a5da02b5eaad52d73c57ef6ae0aa5d4abc365b7dc4dc9d444"
     },
     "specsfy-specialist-software-architecture": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "44a01b951f81bfcfa82e7cbd65c9004f8e5b809d34a29114b26d2ec7471867a8"
+      "computedHash": "3dbe72ddb2bdac695339d24cc22074eed4fc7f61c80973f285e03bb41237c3eb"
     },
     "specsfy-specialist-technical-research": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "64235ba00a0f8b2560c2ccd9374c95f73931f3b6944e41f615a7035edbd0ec12"
+      "computedHash": "fa53ab0fb2340e7b51c8ec2b2e6b953b8ba1f4a3c0310466e8f520c2763639f3"
     },
     "specsfy-specialist-ui-design": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "0c49238dde64d1808a1b8505d335c7de12f52b88bd227003df23363af300d641"
+      "computedHash": "e818ed5672bb5d9a7d4925a1a3d6ea40cdf7905314b258726516bc14c3e3ed8e"
     },
     "specsfy-specialist-ux-design": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "9a140b36179293c75a33aa55de03d92628a13fb35fc4885a411af9328aa8611a"
+      "computedHash": "f935b033fa03ebbd0edd5d46d8edabe64e804847185daf3252cf5f52b679a62b"
     },
     "specsfy-specialist-web-accessibility": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "a57fc707a93dd2add1b28b757b03c88b1a9ae550d5c50a1c4effad49412bacb6"
+      "computedHash": "57dcb5f53e0fae6cc3edf471411657ec544588e8d60fabb9b9f6aaf1ebd42656"
     },
     "specsfy-specialist-web-api-design": {
-      "source": "../../specsfy-install-t1w0alfe/checkout",
+      "source": "../specialists",
       "sourceType": "local",
-      "computedHash": "7e6fea6f6114c257e441425bd32fb32079bbd4deb311b6643d634ad2c2ba3ac8"
+      "computedHash": "629afab2a91b8e62f6295f076e0e7ae10404587a96a780f429b780710f8db555"
     },
     "specsfy-update-spec": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "fbdb306a11c4dae1759ad5f28cad5270844f16bc1d1a5015698cc4b69731589a"
+      "computedHash": "65e1abdb6b0139c83469c4497d65ce401cc6f23bcab4405f65ff160d1ebd7d6a"
     }
   }
 }

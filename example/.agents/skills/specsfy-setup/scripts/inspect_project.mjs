@@ -22,7 +22,8 @@ function add(group, path) {
   if (!groups[group].includes(path)) groups[group].push(path);
 }
 
-async function classify(path) {
+/** Classifica pelo caminho normalizado com `/` e lê o arquivo pelo caminho real do disco. */
+async function classify(path, target = join(project, path)) {
   const lower = path.toLowerCase();
   const parts = lower.split("/");
   const name = parts.at(-1) ?? "";
@@ -38,7 +39,7 @@ async function classify(path) {
   const source = /\.(astro|cjs|go|js|jsx|mjs|php|py|rb|rs|svelte|ts|tsx|vue)$/.test(lower);
   if (source && parts.some((part) => ["src", "app", "server", "lib", "packages"].includes(part)) && !groups.tests.includes(path) && !groups.persistence.includes(path)) {
     add("application", path);
-    if (/<Route\b|createBrowserRouter\s*\(|Route::/.test(await readFile(join(project, path), "utf8"))) add("routes", path);
+    if (/<Route\b|createBrowserRouter\s*\(|Route::/.test(await readFile(target, "utf8"))) add("routes", path);
   }
 }
 
@@ -48,7 +49,7 @@ async function walk(directory) {
     if (ignored.has(entry.name) || entry.name.startsWith("venv_")) continue;
     const target = join(directory, entry.name);
     if (entry.isDirectory()) await walk(target);
-    else if (textExtensions.has(extension(entry.name)) || entry.name === "Gemfile") await classify(relative(project, target).replaceAll("\\", "/"));
+    else if (textExtensions.has(extension(entry.name)) || entry.name === "Gemfile") await classify(relative(project, target).replaceAll("\\", "/"), target);
   }
 }
 

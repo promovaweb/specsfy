@@ -51,20 +51,28 @@ draft → defined → planned → in-progress → review → completed
 Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
-Use `specsfy transition <id> <pasta>` para transições adjacentes. O comando
-move todo o pacote e atualiza `Status`. Use `specsfy migrate` uma única vez
+Use `specsfy specs transition <id> <pasta>` para transições adjacentes. O comando
+move todo o pacote e atualiza `Status`. Use `specsfy specs migrate` uma única vez
 para mover o layout anterior `specs/specs/` para as pastas atuais.
 
 Toda spec tem `Effort` de 1 a 10, `Effort updated at` e `Effort rationale` no
 metadado. A pontuação estima a capacidade de raciocínio e execução necessária,
 não prazo: 1–2 usa perfil `light`, 3–6 `standard`, 7–8 `high` e 9–10
-`maximum`. Atualize-a com `specsfy effort <id> <1-10> --reason "<motivo>"`
+`maximum`. Atualize-a com `specsfy specs effort <id> <1-10> --reason "<motivo>"`
 sempre que a descoberta, o plano ou a execução trouxer informação material.
 
 `ClickUp Task` pode vincular a spec a uma tarefa externa. Quando houver skills
 `clickupfy-*` instaladas, a skill responsável delega a sincronização da pasta e
 do Effort. O estado local continua canônico quando a integração estiver ausente
 ou pendente.
+
+O status remoto segue o trabalho real do agente, não a pasta da spec. Tarefa
+que nenhum agente começou fica no status de próxima etapa da lista
+(`proxima etapa` no ClickUp da Promovaweb, `To Do` em listas padrão, ou o
+mapeamento configurado pelo projeto). `em andamento` (`In Progress`) vale só
+enquanto um agente executa a tarefa; ao parar sem concluir, a tarefa volta
+para próxima etapa com comentário do ponto onde parou. Na entrega, use
+`revisar` (`In Review`). `pronto` e `concluido` exigem ordem humana.
 
 ## Contexto persistente do projeto
 
@@ -336,6 +344,31 @@ Pergunta 1. <pergunta>
 6. Avançar
 ```
 
+## Compatibilidade entre agentes
+
+As skills seguem o formato aberto `SKILL.md` e funcionam no Codex e em outros
+agentes da OpenAI, no Claude Code e em qualquer agente que leia
+`.agents/skills/`. As instruções descrevem o resultado esperado e a ordem das
+etapas, não a ferramenta de um fornecedor.
+
+- `$<nome>` identifica uma skill. Carregar ou chamar `$<nome>` significa ler e
+  seguir `.agents/skills/<nome>/SKILL.md` no agente em uso: menção `$<nome>` no
+  Codex, ferramenta Skill ou `/<nome>` no Claude Code, leitura direta do
+  arquivo nos demais.
+- Caminhos de script como `.agents/skills/<skill>/scripts/<script>.mjs` são
+  relativos à raiz do projeto e rodam com Node.js 22 ou superior. Quando a
+  skill citar `scripts/<script>.mjs` sem prefixo, o caminho parte do diretório
+  da própria skill.
+- Faça em paralelo as leituras e consultas independentes entre si, como
+  contexto persistente, spec e código relacionado. Execute em sequência tudo o
+  que depende de um resultado anterior, como gates, testes e transições.
+- Trate a saída dos scripts como fonte de verdade sobre o estado. Não declare
+  `SAFE`, `PASS`, gate aprovado ou teste verde sem a saída correspondente.
+- Seja literal com formatos fixos: anúncios de transição, rótulos de gate,
+  marcadores `SPECSFY:` e tabelas de cabeçalho são lidos por scripts.
+- Relate o que foi feito e o que falta em texto curto. Não repita a skill nem
+  transcreva arquivos inteiros na resposta.
+
 ## Orquestração conversacional
 
 Trate o fluxo como uma conversa contínua, não como uma lista de comandos que a
@@ -421,7 +454,7 @@ restritas aos registros do caso.
 Estado canônico:
 
 ```text
-Draft → Defined → Planned → Implementing → Complete
+Draft → Defined → Planned → Implementing → Reviewing → Complete
 ```
 
 Mudança de comportamento reabre os Atos I–III. Mudança apenas de plano reabre

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Prototipação"
+  display_name: "Specsfy - Especialista - Prototipação"
   short_description: "Protótipos focados em reduzir incerteza"
   default_prompt: "Use $specsfy-specialist-prototyping para orientar esta tarefa com padrões e validação especializados."

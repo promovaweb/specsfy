@@ -48,6 +48,13 @@ Registre na seção 13:
 Valide com:
 
 ```bash
+specsfy gate findings <spec>
+```
+
+Pelo MCP, use a tool `gate_findings`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
 node .agents/skills/specsfy-04-validate/scripts/review_findings.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md
 ```

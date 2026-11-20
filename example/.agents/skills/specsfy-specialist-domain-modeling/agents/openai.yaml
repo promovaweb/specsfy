@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Modelagem de Domínio"
+  display_name: "Specsfy - Especialista - Modelagem de domínio"
   short_description: "Linguagem, invariantes e boundaries de domínio"
   default_prompt: "Use $specsfy-specialist-domain-modeling para orientar esta tarefa com padrões e validação especializados."

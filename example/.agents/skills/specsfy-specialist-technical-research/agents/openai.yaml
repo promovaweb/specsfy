@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Pesquisa Técnica"
+  display_name: "Specsfy - Especialista - Pesquisa técnica"
   short_description: "Pesquisa rastreável em fontes primárias"
   default_prompt: "Use $specsfy-specialist-technical-research para orientar esta tarefa com padrões e validação especializados."

@@ -58,5 +58,5 @@
 - Não existem `plan.md`, `research.md`, `data-model.md`, `tasks.md` ou checklists paralelos.
 - Gates e evidências vivem na seção 13 de `spec.md`.
 - Tarefas e progresso vivem na seção 14 do mesmo arquivo.
-- Os estados seguem `Draft → Defined → Planned → Implementing → Complete`;
+- Os estados seguem `Draft → Defined → Planned → Implementing → Reviewing → Complete`;
   nenhum gate posterior permanece aprovado quando sua entrada é reaberta.

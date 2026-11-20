@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Design de UI"
+  display_name: "Specsfy - Especialista - Design de UI"
   short_description: "Interfaces e dashboards claros e consistentes"
   default_prompt: "Use $specsfy-specialist-ui-design para orientar esta tarefa com padrões e validação especializados."

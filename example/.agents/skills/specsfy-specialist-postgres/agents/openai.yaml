@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · PostgreSQL"
+  display_name: "Specsfy - Especialista - PostgreSQL"
   short_description: "PostgreSQL correto, rápido e recuperável"
   default_prompt: "Use $specsfy-specialist-postgres para orientar esta tarefa com padrões e validação especializados."

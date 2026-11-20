@@ -30,6 +30,7 @@
     "opencli:check": "bun run scripts/check-opencli.ts",
     "showcase": "bun run scripts/showcase.ts",
     "showcase:check": "bun run scripts/showcase.ts --check",
+    "example:sync": "bun run scripts/sync-example.ts",
     "skills:install": "npx -y skills add https://github.com/promovaweb/termfy -y -a universal -a claude-code -a codex -a opencode -a cursor -a gemini-cli",
     "skills:update": "npx -y skills update -y -p",
     "skills:check": "bun run scripts/check-skills.ts",

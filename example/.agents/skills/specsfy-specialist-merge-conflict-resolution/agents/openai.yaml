@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Conflitos Git"
+  display_name: "Specsfy - Especialista - Resolução de conflitos Git"
   short_description: "Conflitos resolvidos pela intenção dos lados"
   default_prompt: "Use $specsfy-specialist-merge-conflict-resolution para orientar esta tarefa com padrões e validação especializados."

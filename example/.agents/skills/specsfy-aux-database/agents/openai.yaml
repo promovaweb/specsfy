@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Banco de Dados Auxiliar"
   short_description: "Monitora e mantém a documentação do banco"
-  default_prompt: "Use $specsfy-aux-database para monitorar persistência e atualizar .specsfy/DATABASE.md após mudanças de dados."
+  default_prompt: "Use $specsfy-aux-database para atualizar .specsfy/DATABASE.md depois de mudanças de dados, conferindo o mapa contra schemas, migrations e models sem expor credenciais."

@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · shadcn/ui"
+  display_name: "Specsfy - Especialista - shadcn/ui"
   short_description: "shadcn/ui para aplicações e dashboards"
   default_prompt: "Use $specsfy-specialist-shadcn-ui para orientar esta tarefa com padrões e validação especializados."

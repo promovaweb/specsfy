@@ -1,4 +1,4 @@
 interface:
-  display_name: "Specsfy · Acessibilidade Web"
+  display_name: "Specsfy - Especialista - Acessibilidade Web"
   short_description: "WCAG, semântica, teclado e foco"
   default_prompt: "Use $specsfy-specialist-web-accessibility para orientar esta tarefa com padrões e validação especializados."
