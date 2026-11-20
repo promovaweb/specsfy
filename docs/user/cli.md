@@ -51,9 +51,10 @@ specsfy upgrade
 specsfy upgrade --check
 ```
 
-`specsfy update` atualiza skills, templates e blocos gerenciados do projeto.
-`specsfy upgrade` consulta a release publicada e substitui o executável em uso.
-`--check` apenas informa se existe versão nova.
+`specsfy update` deixa o projeto igual ao inventário do framework: instala as
+skills que faltam, atualiza as que mudaram e remove as renomeadas e as
+aposentadas. Alteração sua é mantida, salvo com `--force`; `--check` só mostra o
+plano. Depois de um `specsfy upgrade`, rode `specsfy update` em cada projeto.
 
 ## Skills e especialistas
 

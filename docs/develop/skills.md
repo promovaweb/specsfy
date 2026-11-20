@@ -315,8 +315,11 @@ o trabalho para a raiz Git do Hub.
 3. altere `SKILL.md`, scripts, referências ou assets do owner.
 4. sincronize fixtures instaladas quando o teste exigir.
 5. execute a suíte do módulo.
-6. rode `quick_validate.py`.
+6. rode `npm run validate:skills`.
 7. atualize a página de usuário e este contexto quando a interface mudar.
+8. ao criar, renomear ou remover uma skill, atualize `skills/inventory.json`
+   (`skills`, `renamed` ou `retired`); o `specsfy update` migra os projetos por
+   ele.
 
 ## Inventário de pacotes do consumidor
 

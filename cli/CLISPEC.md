@@ -84,14 +84,14 @@ CI pelo `--json`.
 | `milestones sync` | Rebuild the progress of specs/milestones/ and the index in specs.md from the specs and backlog. | `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `milestones import-mvp` | Import the development requirements of MVP.md as backlog items, Draft specs and milestone M01. | `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `docs build` | Rebuild the project documentation in docs/ and .specsfy/PACKAGES.md; --check only verifies it is up to date. | `--check`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
-| `install` | Install the Specsfy framework in the project: base skills, .specsfy/ and the managed blocks of AGENTS.md and CLAUDE.md. | `--detected`, `--specialist <name>`, `--force`, `--project <dir>` | ver `--skill reference` | 4, 5, 6, 7 | `github.token` |
-| `update` | Update the installed Specsfy skills, framework files and specialists that have no local changes. | `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7 | `github.token` |
+| `install` | Install the Specsfy framework in the project: base skills, .specsfy/ and the managed blocks of AGENTS.md and CLAUDE.md. | `--detected`, `--specialist <name>`, `--latest`, `--force`, `--project <dir>` | ver `--skill reference` | 4, 5, 6, 7 | `github.token` |
+| `update` | Bring the Specsfy skills of the project to the framework inventory: install missing, update changed, remove renamed and retired. | `--check`, `--latest`, `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7, 10 | `github.token` |
 | `upgrade` | Upgrade the specsfy binary to the latest GitHub Release; --check only reports the versions. | `--check` | ver `--skill reference` | 5, 7 | `github.token` |
 | `skills list` | List the specialist catalog of the framework repository. | n/a | ver `--skill reference` | 4, 5 | `github.token` |
 | `skills detect` | Detect the specialists that match the project's files and dependencies. | `--project <dir>` | ver `--skill reference` | 4, 5, 6 | `github.token` |
 | `skills install` | Install specialists from the catalog, with their requirements. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 4, 5, 6, 7 | `github.token` |
 | `skills remove` | Remove Specsfy skills from the project; skills outside the Specsfy namespace are refused. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 6, 7 | `github.token` |
-| `skills update` | Update every installed Specsfy skill; same as the top-level update. | `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7 | `github.token` |
+| `skills update` | Bring the Specsfy skills of the project to the framework inventory; same as the top-level update. | `--check`, `--latest`, `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7, 10 | `github.token` |
 | `scripts list` | List the framework scripts embedded in the binary. | n/a | ver `--skill reference` | n/a | n/a |
 | `scripts run` | Run an embedded framework script by name, passing the remaining arguments unchanged. | `<script>`, `[args]`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `about` | identidade, runtime e créditos | n/a | ver `--skill reference` | n/a | n/a |
@@ -181,7 +181,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | tool | `skills_list` | List the specialist catalog of the framework repository. | `read` |
 | tool | `skills_detect` | Detect the specialists that match the project. | `read` |
 | tool | `framework_install` | Install the Specsfy framework in the project. | `write` |
-| tool | `framework_update` | Update the installed Specsfy skills. | `write` |
+| tool | `framework_update` | Bring the Specsfy skills of the project to the framework inventory. | `write` |
 | tool | `skills_install` | Install specialists with their requirements. | `write` |
 | tool | `skills_remove` | Remove Specsfy skills from the project. | `write` |
 | tool | `update_check` | Compare the running version with the latest release. | `read` |
@@ -230,6 +230,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | 0012 | Tema do terminal na TUI | done |
 | 0013 | Showcase da TUI | done |
 | 0014 | Overview com estatísticas das specs | done |
+| 0015 | Update pelo inventário de skills | done |
 
 ## Notes
 
@@ -269,3 +270,4 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 - 2026-11-20: spec 0012 (Tema do terminal na TUI) closed.
 - 2026-11-20: spec 0013 (Showcase da TUI) closed.
 - 2026-11-20: spec 0014 (Overview com estatísticas das specs) closed.
+- 2026-11-20: spec 0015 (Update pelo inventário de skills) closed.

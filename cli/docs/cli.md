@@ -206,13 +206,20 @@ consulta a versão publicada. `skills` gerencia os especialistas do catálogo.
 | Command | Função | Options principais |
 | --- | --- | --- |
 | `install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | `--detected`, `--specialist <name>`, `--force`, `--project <dir>` |
-| `update` | Atualiza as skills instaladas que continuam intactas. | `--force`, `--project <dir>` |
+| `update` | Deixa as skills do projeto iguais ao inventário do framework: instala as que faltam, atualiza as que mudaram e remove as renomeadas e as aposentadas. | `--check`, `--latest`, `--force`, `--project <dir>` |
 | `upgrade` | Troca o executável pela última versão publicada. | `--check` |
 | `skills list` | Lista as skills instaladas e as disponíveis no catálogo. | `--project <dir>` |
 | `skills detect` | Detecta os agentes e skills presentes no projeto. | `--project <dir>` |
 | `skills install` | Instala um ou mais especialistas. | `<names>`, `--project <dir>` |
 | `skills remove` | Remove especialistas instalados. | `<names>`, `--project <dir>` |
-| `skills update` | Atualiza os especialistas instalados. | `--project <dir>` |
+| `skills update` | Igual ao `update` do nível principal. | `--check`, `--latest`, `--force`, `--project <dir>` |
+
+`update` reconcilia o projeto com `skills/inventory.json` do framework, lido
+da tag `v<versão>` do binário (`--latest` usa a branch padrão). O `--json`
+devolve `in_sync`, `updated` e o `plan`, com `install`, `update`, `rename`,
+`retire`, `files`, `current` e `kept` (skills com alteração local, mantidas
+sem `--force`). `--check` não escreve nada e sai com 10 quando há diferença.
+Projeto sem o framework não é alterado. `install` aceita o mesmo `--latest`.
 
 Este grupo pertence às specs 0002 (instalação e skills) e 0011 (upgrade do
 binário). Quando uma versão ainda não trouxer um dos commands, o `--help`
@@ -257,7 +264,9 @@ cofre, versão e plataforma. Cada linha usa ✓, ! ou ✗. Em JSON, `data` cont�
 `{ checks, ok }`; cada check tem `name`, `status` e `detail`. Ausência de TTY
 ou de arquivos ainda não criados gera `warn`. Uma verificação com `fail`
 produz exit code 3; as demais retornam 0. O diagnóstico não cria arquivos nem
-mostra segredos.
+mostra segredos. Com `--project`, o check `inventory` compara os nomes do
+`skills-lock.json` com o inventário de skills do binário e avisa quando falta
+skill ou sobra nome renomeado ou aposentado.
 
 `{{bin}} completion <shell>` imprime o script em stdout. O argument `shell`
 aceita `bash`, `zsh` ou `fish`; subcommands, options locais e globais e

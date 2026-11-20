@@ -56,7 +56,8 @@ confira o hash no `SHA256SUMS` e coloque-o em um diretório do `PATH`. O script
 ## Prepare o projeto consumidor
 
 Abra a raiz do repositório que receberá a metodologia. Não execute a instalação
-dentro do monorepo oficial do Specsfy, que não é um projeto consumidor:
+dentro do monorepo oficial do Specsfy: o CLI reconhece essa raiz e recusa a
+operação.
 
 ```bash
 cd caminho/do/projeto
@@ -157,11 +158,14 @@ specsfy --version
 Pelo npm, o `specsfy upgrade` atualiza o pacote global com o npm. Na
 instalação pelo arquivo de `get.specsfy.dev`, ele troca o próprio lançador; no
 executável avulso, baixa o da plataforma, confere o `SHA256SUMS` e se
-substitui. Para atualizar
-as skills já instaladas, execute `specsfy update`. O CLI compara os
-fingerprints e preserva os arquivos customizados:
+substitui. Depois de trocar o
+binário, execute `specsfy update` em cada projeto. Ele compara o projeto com o
+inventário de skills daquela versão: instala as skills base novas, atualiza as
+que mudaram e remove as renomeadas e as aposentadas. Arquivos com alteração
+sua são mantidos:
 
 ```bash
+specsfy update --check --project .   # só mostra o que mudaria
 specsfy update --project .
 ```
 

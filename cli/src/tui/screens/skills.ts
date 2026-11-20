@@ -14,6 +14,7 @@
  */
 import { BoxRenderable, TextRenderable, type CliRenderer, type ColorInput, type Renderable } from "@opentui/core";
 import type { Catalog, CatalogEntryValue } from "../../domain/catalog.ts";
+import { inSync, inventoryDrift } from "../../domain/inventory.ts";
 import { AUXILIARY_SKILLS, DOCUMENTATION_SKILLS, FRAMEWORK_SKILLS } from "../../domain/installer.ts";
 import { selectList, panel, keyValueTable, dim, fit, type SelectItem } from "../components.ts";
 import { glyphs, type Theme } from "../theme.ts";
@@ -220,11 +221,19 @@ export function createSkillsScreen(store: ProjectStore): Screen {
           ? `${entries.length} specialist(s)`
           : catalog.status === "loading" ? `${glyphs.running} loading`
             : catalog.status === "error" ? `unavailable: ${catalog.message}` : "not loaded (c loads it)";
+        const drift = inventoryDrift(installed);
+        const driftCount = drift.missing.length + drift.renamed.length + drift.retired.length;
+        const inventoryRow: [string, string, ColorInput] | undefined = !drift.framework
+          ? undefined
+          : inSync(drift)
+            ? ["Inventory", `${glyphs.ok} in sync`, theme.ok]
+            : ["Inventory", `${glyphs.warn} ${driftCount} to fix (u updates)`, theme.warn];
         const lines: Renderable[] = [
           keyValueTable(renderer, theme, [
             ["Project", store.project, theme.textStrong],
             ["Installed", `${[...installed].filter(isSpecsfySkill).length} Specsfy skill(s) in skills-lock.json`],
             ["Catalog", catalogValue, catalog.status === "error" ? theme.warn : theme.text],
+            ...(inventoryRow ? [inventoryRow] : []),
           ]),
         ];
         if (lockError) lines.push(new TextRenderable(renderer, { content: `${glyphs.warn} ${lockError}`, fg: theme.warn, wrapMode: "word" }));

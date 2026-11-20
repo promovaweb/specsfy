@@ -20,7 +20,7 @@ import { gateDefinitions } from "../cli/commands/gates.ts";
 import { executeScriptCommand, type ScriptCommandDef } from "../engine/script-command.ts";
 import { runProjectTests, type TestRun } from "../domain/project-testing.ts";
 import { Catalog } from "../domain/catalog.ts";
-import { FRAMEWORK_SKILLS, SkillInstaller } from "../domain/installer.ts";
+import { FRAMEWORK_SKILLS, releaseRef, SkillInstaller } from "../domain/installer.ts";
 import { readSkillsLock, skillsLockFingerprint } from "../domain/skill-lock.ts";
 import { specsFingerprint } from "../domain/progress.ts";
 import { backlogsFingerprint } from "../domain/backlog.ts";
@@ -88,7 +88,7 @@ async function installSkills(project: string, names: string[], catalog?: Catalog
   const framework = new Set<string>(FRAMEWORK_SKILLS);
   const base = names.filter((name) => framework.has(name));
   const specialists = names.filter((name) => name.startsWith("specsfy-specialist-"));
-  const installer = await SkillInstaller.create(project);
+  const installer = await SkillInstaller.create(project, false, { ref: releaseRef() });
   const changed: string[] = [];
   if (base.length) changed.push(...(await installer.installBaseSelection(base)));
   if (specialists.length) {
@@ -121,7 +121,7 @@ export function defaultServices(): TuiServices {
     loadCatalog: () => Catalog.fetch(),
     installSkills,
     removeSkills: async (project, names) => (await SkillInstaller.create(project)).remove(names),
-    updateSkills: async (project) => (await SkillInstaller.create(project)).updateAll(),
+    updateSkills: async (project) => (await SkillInstaller.create(project, false, { ref: releaseRef() })).updateAll(),
   };
 }
 

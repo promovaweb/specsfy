@@ -16,7 +16,7 @@ import { HOME_VARIABLE, MASTER_KEY_VARIABLE } from "../../src/config/paths.ts";
 import { ExitCode } from "../../src/app/exit-codes.ts";
 import { AppError } from "../../src/app/errors.ts";
 import { manifest } from "../../src/app/manifest.ts";
-import { FRAMEWORK_SKILLS } from "../../src/domain/installer.ts";
+import { FRAMEWORK_SKILLS, skillDigest } from "../../src/domain/installer.ts";
 import { frameworkTopLevelCommands, skillsCommands } from "../../src/cli/commands/framework.ts";
 import { registerFrameworkTools } from "../../src/mcp/tools/framework.ts";
 import type { Catalog as McpCatalog } from "../../src/mcp/server.ts";
@@ -130,7 +130,9 @@ describe("install and update", () => {
   test("update reports nothing to change", async () => {
     const r = await run(["update", "--project", project]);
     expect(r.code).toBe(0);
-    expect(r.json!.data).toEqual({ project, updated: [] });
+    expect(r.json!.data).toMatchObject({ project, check: false, in_sync: true, updated: [] });
+    expect(r.json!.data.plan).toMatchObject({ framework: true, install: [], update: [], rename: [], retire: [], kept: [], files: [] });
+    expect(r.json!.data.plan.current).toEqual([...FRAMEWORK_SKILLS]);
   }, 60_000);
 
   test("skills remove of a skill outside Specsfy exits with 2", async () => {
@@ -172,6 +174,160 @@ describe("install and update", () => {
     const r = await run(["install", "--project", join(root, "missing")]);
     expect(r.code).toBe(ExitCode.NOT_FOUND);
   });
+});
+
+describe("update reconciles the project with the inventory", () => {
+  let project: string;
+  const skill = (name: string) => join(project, ".agents", "skills", name);
+  const readJsonFile = (path: string) => JSON.parse(readFileSync(path, "utf8"));
+  /** Plants a skill folder the way an older Specsfy left it; `tracked` records its digest. */
+  async function plant(name: string, tracked: boolean) {
+    mkdirSync(skill(name), { recursive: true });
+    writeFileSync(join(skill(name), "SKILL.md"), `---\nname: ${name}\ndescription: old\n---\n`);
+    const official = join(project, "skills-lock.json");
+    const lock = readJsonFile(official);
+    lock.skills[name] = { source: "old", sourceType: "local" };
+    writeFileSync(official, JSON.stringify(lock));
+    if (!tracked) return;
+    const internal = join(project, ".specsfy", "skills-lock.json");
+    const own = readJsonFile(internal);
+    own.skills[name] = { source: "base", content_sha256: await skillDigest(skill(name)) };
+    writeFileSync(internal, JSON.stringify(own));
+  }
+  /** Rewrites the inventory of the fixture repository and commits. */
+  function editInventory(change: (inventory: any) => void, message: string) {
+    const path = join(repository, "skills", "inventory.json");
+    const inventory = readJsonFile(path);
+    change(inventory);
+    writeFileSync(path, JSON.stringify(inventory, null, 2));
+    git(repository, "commit", "-qam", message);
+  }
+
+  beforeAll(async () => {
+    project = join(root, "reconcile");
+    mkdirSync(project);
+    expect((await run(["install", "--project", project])).code).toBe(0);
+  }, 60_000);
+
+  test("a project without the framework is left alone", async () => {
+    const empty = join(root, "no-framework");
+    mkdirSync(empty);
+    const r = await run(["update", "--project", empty]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.plan.framework).toBe(false);
+    expect(r.json!.data.updated).toEqual([]);
+    expect(existsSync(join(empty, ".agents"))).toBe(false);
+    expect(existsSync(join(empty, ".specsfy"))).toBe(false);
+  }, 60_000);
+
+  test("--check reports a missing framework skill with exit 10 and writes nothing", async () => {
+    expect((await run(["skills", "remove", "specsfy-progress", "--project", project])).code).toBe(0);
+    const before = snapshot(project);
+    const r = await run(["update", "--check", "--project", project]);
+    expect(r.code).toBe(ExitCode.GATE_FAILED);
+    expect(r.json!.data).toMatchObject({ check: true, in_sync: false, updated: [] });
+    expect(r.json!.data.plan.install).toEqual(["specsfy-progress"]);
+    expect(snapshot(project)).toEqual(before);
+  }, 60_000);
+
+  test("update installs the missing framework skill", async () => {
+    const r = await run(["update", "--project", project]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.updated).toEqual([".agents/skills/specsfy-progress"]);
+    expect(existsSync(join(skill("specsfy-progress"), "SKILL.md"))).toBe(true);
+    expect((await run(["update", "--check", "--project", project])).code).toBe(0);
+  }, 60_000);
+
+  test("a renamed skill is removed, and kept when it has local changes", async () => {
+    await plant("specsfy-base-idea", true);
+    await plant("specsfy-base-discuss", false);
+    const r = await run(["update", "--project", project]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.plan.rename).toEqual([{ from: "specsfy-base-idea", to: "specsfy-01-inbox" }]);
+    expect(r.json!.data.plan.kept.map((k: { name: string }) => k.name)).toEqual(["specsfy-base-discuss"]);
+    expect(existsSync(skill("specsfy-base-idea"))).toBe(false);
+    expect(existsSync(skill("specsfy-base-discuss"))).toBe(true);
+    expect(Object.keys(readJsonFile(join(project, "skills-lock.json")).skills)).not.toContain("specsfy-base-idea");
+    const forced = await run(["update", "--force", "--project", project]);
+    expect(forced.json!.data.plan.rename).toEqual([{ from: "specsfy-base-discuss", to: "specsfy-02-backlog" }]);
+    expect(existsSync(skill("specsfy-base-discuss"))).toBe(false);
+  }, 60_000);
+
+  test("the tag of the binary is used, and --latest follows the default branch", async () => {
+    git(repository, "tag", `v${manifest.version}`);
+    const source = join(repository, "skills", "specsfy-01-inbox", "SKILL.md");
+    writeFileSync(source, `${readFileSync(source, "utf8")}\nNew line on main.\n`);
+    git(repository, "commit", "-qam", "change after the tag");
+    const pinned = await run(["update", "--check", "--project", project]);
+    expect(pinned.code).toBe(0);
+    const latest = await run(["update", "--check", "--latest", "--project", project]);
+    expect(latest.code).toBe(ExitCode.GATE_FAILED);
+    expect(latest.json!.data.plan.update).toEqual(["specsfy-01-inbox"]);
+    const applied = await run(["update", "--latest", "--project", project]);
+    expect(applied.json!.data.updated).toEqual([".agents/skills/specsfy-01-inbox"]);
+    expect(readFileSync(join(skill("specsfy-01-inbox"), "SKILL.md"), "utf8")).toContain("New line on main.");
+  }, 60_000);
+
+  test("a changed skill with local edits is kept until --force", async () => {
+    const source = join(repository, "skills", "specsfy-02-backlog", "SKILL.md");
+    writeFileSync(source, `${readFileSync(source, "utf8")}\nSource change.\n`);
+    git(repository, "commit", "-qam", "change backlog");
+    const local = join(skill("specsfy-02-backlog"), "SKILL.md");
+    writeFileSync(local, `${readFileSync(local, "utf8")}\nMy local note.\n`);
+    const r = await run(["update", "--latest", "--project", project]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.plan.kept).toEqual([{ name: "specsfy-02-backlog", reason: "has local changes; use --force to replace" }]);
+    expect(readFileSync(local, "utf8")).toContain("My local note.");
+    const forced = await run(["update", "--latest", "--force", "--project", project]);
+    expect(forced.json!.data.updated).toEqual([".agents/skills/specsfy-02-backlog"]);
+    expect(readFileSync(local, "utf8")).toContain("Source change.");
+  }, 60_000);
+
+  test("a retired skill is removed and a new framework skill is installed", async () => {
+    mkdirSync(join(repository, "skills", "specsfy-new-thing"));
+    writeFileSync(join(repository, "skills", "specsfy-new-thing", "SKILL.md"), "---\nname: specsfy-new-thing\ndescription: New\n---\n");
+    git(repository, "add", ".");
+    editInventory((inventory) => {
+      delete inventory.skills["specsfy-progress"];
+      inventory.skills["specsfy-new-thing"] = "base";
+// A rename always points to a current skill, so the older name follows it.
+      delete inventory.renamed["specsfy-base-progress"];
+      inventory.retired.push("specsfy-progress", "specsfy-base-progress");
+      inventory.renamed["specsfy-milestone-governor"] = "specsfy-new-thing";
+      delete inventory.skills["specsfy-milestone-governor"];
+    }, "retire, rename and add");
+    const check = await run(["update", "--check", "--latest", "--project", project]);
+    expect(check.code).toBe(ExitCode.GATE_FAILED);
+    expect(check.json!.data.plan).toMatchObject({
+      install: ["specsfy-new-thing"],
+      retire: ["specsfy-progress"],
+      rename: [{ from: "specsfy-milestone-governor", to: "specsfy-new-thing" }],
+    });
+    const r = await run(["update", "--latest", "--project", project]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.updated).toEqual(expect.arrayContaining([
+      ".agents/skills/specsfy-new-thing",
+      ".agents/skills/specsfy-progress",
+      ".agents/skills/specsfy-milestone-governor",
+    ]));
+    expect(existsSync(skill("specsfy-new-thing"))).toBe(true);
+    expect(existsSync(skill("specsfy-progress"))).toBe(false);
+    expect(existsSync(skill("specsfy-milestone-governor"))).toBe(false);
+    const names = Object.keys(readJsonFile(join(project, "skills-lock.json")).skills);
+    expect(names).toContain("specsfy-new-thing");
+    expect(names).not.toContain("specsfy-progress");
+    expect((await run(["update", "--check", "--latest", "--project", project])).code).toBe(0);
+  }, 60_000);
+
+  test("the text report names every action", async () => {
+    expect((await run(["skills", "remove", "specsfy-05-tasks", "--project", project])).code).toBe(0);
+    const env: Record<string, string> = { ...(process.env as Record<string, string>), [HOME_VARIABLE]: home, NO_COLOR: "1", SPECSFY_SKILLS_CLI: process.env.SPECSFY_TEST_STUB!, SPECSFY_SKILLS_LOG: log };
+    const proc = Bun.spawn(["bun", "run", "src/main.ts", "update", "--check", "--latest", "--project", project], { cwd: CLI, env, stdout: "pipe", stderr: "pipe" });
+    const stdout = await new Response(proc.stdout).text();
+    expect(await proc.exited).toBe(ExitCode.GATE_FAILED);
+    expect(stdout).toContain("would install  specsfy-05-tasks");
+    expect(stdout).toContain('Run "specsfy update" to apply.');
+  }, 60_000);
 });
 
 describe("upgrade", () => {

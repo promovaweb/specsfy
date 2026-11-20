@@ -26,7 +26,7 @@ ou `skills-lock.json`.
 | `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `r` recarrega |
 | `gates` | Executa os gates do framework na spec selecionada e mostra a saída. | `↑/↓` muda a spec, `Enter` roda os gates, `PgUp/PgDn` rola |
 | `tests` | Executa a suíte do projeto pelo mesmo caminho do command `test`. | `Enter` roda os testes, `PgUp/PgDn` rola |
-| `skills` | Skills instaladas e disponíveis no catálogo, com detalhe e estado. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` baixa o catálogo de novo; toda ação pede `y` para confirmar |
+| `skills` | Skills instaladas e disponíveis no catálogo, com detalhe, estado e a linha `Inventory`, que avisa quando as skills do projeto diferem do inventário do binário. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` baixa o catálogo de novo; toda ação pede `y` para confirmar |
 | `about` | Identidade e runtime do binário, projeto, licença, créditos e padrões seguidos. | nenhuma própria |
 
 Cada screen declara o campo `keys`, que monta a barra inferior. As teclas

@@ -164,7 +164,7 @@ Aprofunde no índice de [Skills base](skills/README.md).
 | `specsfy --skill` | imprime a documentação embutida do framework |
 | `specsfy install --project .` | instala skills, templates e blocos gerenciados |
 | `specsfy doctor --project .` | confere runtime, terminal, configuração, Git e token do GitHub |
-| `specsfy update` | atualiza skills, templates e blocos gerenciados do projeto |
+| `specsfy update` | deixa skills, templates e blocos gerenciados iguais ao inventário do framework |
 | `specsfy upgrade` | substitui o próprio binário pela última release |
 | `specsfy skills list` | lista o catálogo do framework e dos especialistas |
 | `specsfy skills detect` | recomenda especialistas pela stack |

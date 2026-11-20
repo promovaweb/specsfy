@@ -48,7 +48,10 @@ files.forEach((file, index) => {
 lines.push("", "/** Relative path inside `skills/` mapped to the file contents. */");
 lines.push("export const SKILL_FILES: Readonly<Record<string, string>> = {");
 files.forEach((file, index) => {
-  lines.push(`  ${JSON.stringify(relative(skillsRoot, file).split("\\").join("/"))}: f${index},`);
+  // TypeScript types a .json import as an object even with `type: "text"`;
+  // at runtime Bun delivers the text, so the cast only fixes the type.
+  const value = file.endsWith(".json") ? `f${index} as unknown as string` : `f${index}`;
+  lines.push(`  ${JSON.stringify(relative(skillsRoot, file).split("\\").join("/"))}: ${value},`);
 });
 lines.push("};", "");
 const content = lines.join("\n");

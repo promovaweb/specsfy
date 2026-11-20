@@ -1,9 +1,9 @@
- ▌ Specsfy v0.31.1  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.32.0  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
  Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
                                                                   ▬▬▬▬▬▬▬▬▬▬▬                                                               
  ╭─ Binary ─────────────────────────────────────────────────────────────────────╮╭─ Project ──────────────────────────────────────────────╮ 
- │ Specsfy  v0.31.1                                                             ││ Author      Promovaweb                                 │ 
+ │ Specsfy  v0.32.0                                                             ││ Author      Promovaweb                                 │ 
  │ Install the Specsfy framework, run the spec lifecycle and its gates, and     ││ License     AGPL-3.0-only                              │ 
  │ serve them to agents over MCP.                                               ││ Site        https://promovaweb.com/docs/specsfy/cli/   │ 
  │                                                                              ││ Repository  https://github.com/promovaweb/specsfy      │ 

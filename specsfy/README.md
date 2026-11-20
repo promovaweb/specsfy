@@ -55,7 +55,7 @@ Veja as demais telas e comandos no [guia do CLI](../docs/user/cli.md).
 - um projeto existente ou recém-criado no qual o Specsfy será aplicado.
 
 O monorepo [`promovaweb/specsfy`](https://github.com/promovaweb/specsfy) não é
-um projeto consumidor. Não instale o framework nessa raiz.
+um projeto consumidor. O CLI recusa instalar o framework nessa raiz.
 
 ## Instalação passo a passo
 

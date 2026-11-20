@@ -38,56 +38,39 @@ import {
   installedSkillNames,
 } from "./skill-lock.ts";
 import { processInvocation, resolveSkillsCommand } from "./prerequisites.ts";
+import {
+  EMBEDDED_INVENTORY,
+  frameworkSkillNames,
+  readInventory,
+  type Inventory,
+  type SkillCategory,
+} from "./inventory.ts";
 import { AppError, error as appError } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
+import { manifest } from "../app/manifest.ts";
 
 const execFileAsync = promisify(execFile);
+
+/** Tag of the framework repository that matches this binary. */
+export function releaseRef(): string {
+  return `v${manifest.version}`;
+}
 
 export const MONOREPO_REPOSITORY =
   "https://github.com/promovaweb/specsfy.git";
 export const BASE_DIRECTORY = "skills";
 export const SPECIALISTS_DIRECTORY = "specialists";
-export const BASE_SKILLS = [
-  "specsfy-01-inbox",
-  "specsfy-02-backlog",
-  "specsfy-03-specify",
-  "specsfy-04-validate",
-  "specsfy-05-tasks",
-  "specsfy-06-tdd-bdd",
-  "specsfy-07-implement",
-  "specsfy-update-spec",
-  "specsfy-progress",
-  "specsfy-interviewer",
-  "specsfy-mvp-milestone-interviewer",
-  "specsfy-roadmap-milestone-interviewer",
-  "specsfy-milestone-governor",
-  "specsfy-data-discovery",
-] as const;
-export const AUXILIARY_SKILLS = [
-  "specsfy-aux-stack",
-  "specsfy-aux-rules",
-  "specsfy-aux-database",
-] as const;
-export const DOCUMENTATION_SKILLS = ["specsfy-documentator"] as const;
-export const FRAMEWORK_SKILLS = [
-  "specsfy-setup",
-  ...AUXILIARY_SKILLS,
-  ...DOCUMENTATION_SKILLS,
-  ...BASE_SKILLS,
-] as const;
-export const RENAMED_BASE_SKILLS: Readonly<Record<string, string>> = {
-  "specsfy-base-idea": "specsfy-01-inbox",
-  "specsfy-base-backlog": "specsfy-02-backlog",
-  "specsfy-base-interview": "specsfy-02-backlog",
-  "specsfy-base-specify": "specsfy-03-specify",
-  "specsfy-base-validate": "specsfy-04-validate",
-  "specsfy-base-tasks": "specsfy-05-tasks",
-  "specsfy-base-tdd-bdd": "specsfy-06-tdd-bdd",
-  "specsfy-base-implement": "specsfy-07-implement",
-  "specsfy-base-update-spec": "specsfy-update-spec",
-  "specsfy-base-progress": "specsfy-progress",
-  "specsfy-base-discuss": "specsfy-02-backlog",
-};
+const byCategory = (category: SkillCategory): string[] =>
+  frameworkSkillNames().filter((name) => EMBEDDED_INVENTORY.skills[name] === category);
+/** Framework skills of this binary's inventory, by category and in install order. */
+export const BASE_SKILLS: readonly string[] = byCategory("base");
+export const AUXILIARY_SKILLS: readonly string[] = byCategory("auxiliary").filter((name) => name !== "specsfy-setup");
+export const DOCUMENTATION_SKILLS: readonly string[] = byCategory("documentation");
+export const FRAMEWORK_SKILLS: readonly string[] = frameworkSkillNames();
+/** Old skill names mapped to their replacement, from the inventory. */
+export const RENAMED_BASE_SKILLS: Readonly<Record<string, string>> = EMBEDDED_INVENTORY.renamed;
+/** Skills removed from the framework without a replacement. */
+export const RETIRED_SKILLS: readonly string[] = EMBEDDED_INVENTORY.retired;
 
 const FRAMEWORK_START = "<!-- specsfy:framework:start -->";
 const FRAMEWORK_END = "<!-- specsfy:framework:end -->";
@@ -138,6 +121,7 @@ export function isSpecsfySkillName(name: string): boolean {
   return (
     (FRAMEWORK_SKILLS as readonly string[]).includes(name) ||
     name in RENAMED_BASE_SKILLS ||
+    RETIRED_SKILLS.includes(name) ||
     name.startsWith("specsfy-aux-") ||
     name.startsWith("specsfy-specialist-")
   );
@@ -149,6 +133,43 @@ export interface InstallerOptions {
   repository?: string;
   /** Agent targets for `skills add` (setting `skills.agents`); `universal` is always included. */
   agents?: readonly string[] | string;
+  /**
+   * Git tag or branch to install from, usually `v<version>` of the binary so
+   * skills and inventory match it. When the repository has no such ref the
+   * default branch is used. Undefined always uses the default branch.
+   */
+  ref?: string;
+}
+
+/** One skill the update leaves untouched, with the reason. */
+export interface KeptSkill {
+  name: string;
+  reason: string;
+}
+
+/** What `update` does, or would do, to bring a project to the inventory. */
+export interface UpdatePlan {
+  /** False when the project has no framework skill; `install` comes first. */
+  framework: boolean;
+  /** Framework skills missing from the project. */
+  install: string[];
+  /** Installed skills whose content differs from the source. */
+  update: string[];
+  /** Installed skills replaced by another one: the old folder is removed. */
+  rename: Array<{ from: string; to: string }>;
+  /** Installed skills retired from the framework: removed. */
+  retire: string[];
+  /** Skills left as they are: local changes without --force, or no source. */
+  kept: KeptSkill[];
+  /** Framework files (.specsfy/, AGENTS.md and CLAUDE.md blocks) to rewrite. */
+  files: string[];
+  /** Skills already equal to the source. */
+  current: string[];
+}
+
+/** True when a plan has nothing to change. */
+export function planInSync(plan: UpdatePlan): boolean {
+  return !plan.install.length && !plan.update.length && !plan.rename.length && !plan.retire.length && !plan.files.length;
 }
 
 /** Normalizes the agent list: trimmed, unique, always starting with `universal`. */
@@ -164,12 +185,14 @@ export class SkillInstaller {
   readonly force: boolean;
   readonly repository: string;
   readonly agents: readonly string[];
+  readonly ref: string | undefined;
 
   private constructor(project: string, force: boolean, options: InstallerOptions) {
     this.project = resolvePath(project);
     this.force = force;
     this.repository = options.repository?.trim() || MONOREPO_REPOSITORY;
     this.agents = normalizeAgents(options.agents);
+    this.ref = options.ref?.trim() || undefined;
   }
 
   /** Validates the target and creates the official lock before returning the installer. */
@@ -196,6 +219,7 @@ export class SkillInstaller {
       this.repository,
       BASE_DIRECTORY,
       (checkout) => this.installBaseFromCheckout(checkout, names),
+      this.ref,
     );
   }
 
@@ -224,7 +248,7 @@ export class SkillInstaller {
   }
 
   /** Publishes rules, templates, example and managed blocks. */
-  async installFrameworkFromCheckout(checkout: string): Promise<string[]> {
+  async installFrameworkFromCheckout(checkout: string, write = true): Promise<string[]> {
     const sourceSpec = join(checkout, "Spec.md");
     const sourceExample = join(checkout, "examples", "Spec.md");
     const sourceAgents = join(checkout, "AGENTS.md");
@@ -316,6 +340,7 @@ export class SkillInstaller {
         await planManagedFile(target, templates[name], recorded, this.force),
       ]);
     }
+    if (!write) return plans.filter(([, content]) => content !== undefined).map(([target]) => target);
     const changed: string[] = [];
     for (const [target, content] of plans) {
       if (content === undefined) continue;
@@ -356,19 +381,118 @@ export class SkillInstaller {
     );
   }
 
-  /** Updates every Specsfy skill already registered. */
+  /** Brings the project to the inventory and returns the paths changed. */
   async updateAll(): Promise<string[]> {
-    const installed = await installedSkillNames(this.project);
-    const base = [...FRAMEWORK_SKILLS].filter((name) => installed.has(name)).sort();
-    const specialists = [...installed]
-      .filter((name) => name.startsWith("specsfy-specialist-"))
-      .sort();
-    const changed: string[] = [];
-    if (base.length) changed.push(...(await this.installBaseSelection(base)));
-    if (specialists.length) {
-      changed.push(...(await this.installSpecialists(specialists)));
+    return (await this.reconcile()).changed;
+  }
+
+  /**
+   * Reconciles the project with the inventory of the source: installs the
+   * framework skills that are missing, updates the ones that changed,
+   * removes renamed and retired ones and updates the installed specialists.
+   * A skill with local changes is kept unless the installer was created
+   * with force. With `check` nothing is written and only the plan returns.
+   */
+  async reconcile(check = false): Promise<{ plan: UpdatePlan; changed: string[] }> {
+    return withRepositoryCheckout(this.repository, undefined, (root) => this.reconcileFromCheckout(root, check), this.ref);
+  }
+
+  /** Same as `reconcile`, from a local copy of the framework repository. */
+  async reconcileFromCheckout(root: string, check = false): Promise<{ plan: UpdatePlan; changed: string[] }> {
+    const skillsDirectory = join(root, BASE_DIRECTORY);
+    const specialistsDirectory = join(root, SPECIALISTS_DIRECTORY);
+    const inventory = await readInventory(skillsDirectory);
+    const plan = await this.planUpdate(inventory, skillsDirectory, specialistsDirectory);
+    if (check || planInSync(plan)) return { plan, changed: [] };
+    const isSpecialist = (name: string) => name.startsWith("specsfy-specialist-");
+    const write = [...plan.install, ...plan.update];
+    const base = write.filter((name) => !isSpecialist(name));
+    const specialists = write.filter(isSpecialist);
+    const remove = [...plan.rename.map(({ from }) => from), ...plan.retire];
+    const skillPath = (name: string) => join(this.project, ".agents", "skills", name);
+    const changed = await withInstallationRollback([
+      join(this.project, ".specsfy"),
+      join(this.project, "AGENTS.md"),
+      join(this.project, "CLAUDE.md"),
+      join(this.project, "skills-lock.json"),
+      ...[...write, ...remove].map(skillPath),
+    ], async () => {
+      const paths: string[] = [];
+      if (plan.framework && plan.files.length) paths.push(...(await this.installFrameworkFromCheckout(skillsDirectory)));
+      if (base.length) paths.push(...(await this.installFromCheckout(skillsDirectory, base, "base")));
+      if (specialists.length) paths.push(...(await this.installFromCheckout(specialistsDirectory, specialists, "specialists")));
+      if (remove.length) paths.push(...(await this.removeLegacyBase(remove.map((name) => [name, skillPath(name)]))));
+      return paths;
+    });
+    return { plan, changed };
+  }
+
+  /** Compares the project with an inventory and its source, without writing. */
+  private async planUpdate(inventory: Inventory, skillsDirectory: string, specialistsDirectory: string): Promise<UpdatePlan> {
+    const plan: UpdatePlan = { framework: false, install: [], update: [], rename: [], retire: [], kept: [], files: [], current: [] };
+    const lock = await this.readLock();
+    const registered = await installedSkillNames(this.project);
+    const skillPath = (name: string) => join(this.project, ".agents", "skills", name);
+    const present = async (name: string) => registered.has(name) || (await pathExists(skillPath(name)));
+    /** True when the folder differs from what the installer last wrote. */
+    const modified = async (name: string) =>
+      (await pathExists(skillPath(name))) && lock.skills[name]?.content_sha256 !== (await skillDigest(skillPath(name)));
+    const classify = async (name: string, sourceDirectory: string) => {
+      const source = join(sourceDirectory, name);
+      if (!(await isFile(join(source, "SKILL.md")))) {
+        plan.kept.push({ name, reason: "not found in the framework source" });
+        return;
+      }
+      if (!(await pathExists(skillPath(name)))) return void plan.install.push(name);
+      if ((await skillDigest(source)) === (await skillDigest(skillPath(name)))) return void plan.current.push(name);
+      if (!this.force && (await modified(name))) {
+        plan.kept.push({ name, reason: "has local changes; use --force to replace" });
+        return;
+      }
+      plan.update.push(name);
+    };
+
+    const current = frameworkSkillNames(inventory);
+    const old = [...Object.keys(inventory.renamed), ...inventory.retired];
+    for (const name of [...current, ...old]) {
+      if (await present(name)) plan.framework = true;
     }
-    return changed;
+    const wanted = new Set<string>();
+    if (plan.framework) {
+      for (const name of current) wanted.add(name);
+      for (const [from, to] of Object.entries(inventory.renamed)) {
+        if (!(await present(from))) continue;
+        if (!this.force && (await modified(from))) {
+          plan.kept.push({ name: from, reason: `renamed to ${to} and has local changes; use --force to remove` });
+          continue;
+        }
+        plan.rename.push({ from, to });
+        wanted.add(to);
+      }
+      for (const name of inventory.retired) {
+        if (!(await present(name))) continue;
+        if (!this.force && (await modified(name))) {
+          plan.kept.push({ name, reason: "retired and has local changes; use --force to remove" });
+          continue;
+        }
+        plan.retire.push(name);
+      }
+    }
+    for (const name of [...registered].sort()) {
+      if (name.startsWith("specsfy-specialist-") && !(name in inventory.renamed) && !inventory.retired.includes(name)) wanted.add(name);
+    }
+    for (const name of wanted) {
+      await classify(name, name.startsWith("specsfy-specialist-") ? specialistsDirectory : skillsDirectory);
+    }
+    if (plan.framework) {
+      try {
+        plan.files = await this.installFrameworkFromCheckout(skillsDirectory, false);
+      } catch (error) {
+        if (!(error instanceof AppError)) throw error;
+        plan.kept.push({ name: "framework files", reason: error.message });
+      }
+    }
+    return plan;
   }
 
   /** Clones a temporary source and installs the requested skills. */
@@ -380,6 +504,7 @@ export class SkillInstaller {
   ): Promise<string[]> {
     return withRepositoryCheckout(repository, directory, (checkout) =>
       this.installFromCheckout(checkout, names, sourceName),
+      this.ref,
     );
   }
 
@@ -548,7 +673,7 @@ export class SkillInstaller {
   private async legacyBaseTargets(): Promise<Array<[string, string]>> {
     const lock = await this.readLock();
     const targets: Array<[string, string]> = [];
-    for (const name of Object.keys(RENAMED_BASE_SKILLS)) {
+    for (const name of [...Object.keys(RENAMED_BASE_SKILLS), ...RETIRED_SKILLS]) {
       const target = join(this.project, ".agents", "skills", name);
       if (!(await pathExists(target))) continue;
       if (
@@ -556,7 +681,7 @@ export class SkillInstaller {
         lock.skills[name]?.content_sha256 !== (await skillDigest(target))
       ) {
         throw fail(
-          `${target} was renamed and has local changes; keep them ` +
+          `${target} was renamed or retired and has local changes; keep them ` +
             "or use --force to remove it after installing the replacement",
         );
       }
@@ -614,18 +739,24 @@ async function withRepositoryCheckout<T>(
   repository: string,
   directory: string | undefined,
   action: (checkout: string) => Promise<T>,
+  ref?: string,
 ): Promise<T> {
   const temporary = await mkdtemp(join(tmpdir(), "specsfy-install-"));
   const checkout = join(temporary, "checkout");
   try {
     try {
-      await execFileAsync("git", [
-        "clone",
-        "--depth",
-        "1",
-        repository,
-        checkout,
-      ]);
+      let pinned = false;
+      if (ref) {
+        try {
+          await execFileAsync("git", ["clone", "--depth", "1", "--branch", ref, repository, checkout]);
+          pinned = true;
+        } catch {
+          // The repository has no such tag or branch (a custom repository or
+          // an unreleased build): fall back to the default branch.
+          await rm(checkout, { recursive: true, force: true });
+        }
+      }
+      if (!pinned) await execFileAsync("git", ["clone", "--depth", "1", repository, checkout]);
     } catch (error) {
       const detail =
         error && typeof error === "object" && "stderr" in error

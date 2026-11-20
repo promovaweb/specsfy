@@ -72,8 +72,13 @@ preferências do usuário. Consulte todos os recursos no [guia do CLI](cli.md).
 ## Atualize sem perder customizações
 
 ```bash
+specsfy update --check --project .
 specsfy update --project .
 ```
+
+`--check` lista o que seria instalado, atualizado ou removido sem escrever
+nada, e sai com código `10` quando o projeto difere do inventário. Serve para
+conferir no CI.
 
 O CLI usa fingerprints para distinguir conteúdo gerenciado intacto de
 customização local. Uma diferença local faz a atualização ou a remoção ser

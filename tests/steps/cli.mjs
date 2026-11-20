@@ -23,10 +23,10 @@ export const cliSteps = [
   ['a versão mais recente vem da última GitHub Release do repositório', ctx => includes(ctx.updater, ['api.github.com/repos/promovaweb/specsfy/releases/latest'])],
   ['o binário avulso confere o SHA256SUMS antes de trocar o executável', ctx => includes(ctx.updater, ['SHA256SUMS'])],
   ['a instalação pelo npm é atualizada pelo pacote oficial', ctx => includes(ctx.updater, ['NPM_PACKAGE_NAME = "@promovaweb/specsfy"'])],
-  ['a implementação da aba Skills do CLI', ctx => { ctx.tui = read('cli/src/tui/screens/skills.ts'); ctx.services = read('cli/src/tui/services.ts'); ctx.app = read('cli/src/cli/commands/framework.ts'); ctx.installer = read('cli/src/domain/installer.ts'); }],
+  ['a implementação da aba Skills do CLI', ctx => { ctx.tui = read('cli/src/tui/screens/skills.ts'); ctx.services = read('cli/src/tui/services.ts'); ctx.app = read('cli/src/cli/commands/framework.ts'); ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); }],
   ['o contrato de apresentação é inspecionado', ctx => assert.ok(ctx.tui)],
   ['as skills aparecem por categoria com o estado instalado ou disponível em texto', ctx => includes(ctx.tui, ['grouped by category', 'installed or available'])],
   ['instalar, remover e atualizar pedem confirmação antes de alterar arquivos', ctx => includes(ctx.tui, ['{ key: "i", action: "install" }', '{ key: "x", action: "remove" }', 'Every action asks for confirmation first'])],
   ['a aba oferece uma ação para atualizar todas as skills instaladas', ctx => { includes(ctx.tui, ['{ key: "u", action: "update all" }']); includes(ctx.services, ['.updateAll()']); }],
-  ['o CLI oferece a atualização não interativa equivalente', ctx => { includes(ctx.app, ['name: "update"', '.updateAll()']); includes(ctx.installer, ['async updateAll()']); }],
+  ['o CLI oferece a atualização não interativa equivalente', ctx => { includes(ctx.app, ['name: "update"', '.reconcile(check)']); includes(ctx.installer, ['async updateAll()', 'async reconcile(check = false)', 'readInventory(']); }],
 ];

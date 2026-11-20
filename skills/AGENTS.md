@@ -195,7 +195,11 @@ specsfy-<NN>-<nome>/
 2. Use specs somente como fixtures temporárias quando o comportamento exigir.
 3. Execute ambos e registre RED causado pelo comportamento ausente.
 4. Para skill nova, use o padrão dos diretórios vizinhos e publique
-   `SKILL.md`, `agents/openai.yaml` e as referências necessárias.
+   `SKILL.md`, `agents/openai.yaml` e as referências necessárias. Acrescente
+   o nome em `inventory.json`, na chave `skills`, com a categoria. Ao
+   renomear, mova o nome antigo para `renamed`, apontando para a skill
+   atual; ao remover sem substituta, mova para `retired`. O `specsfy update`
+   usa esse arquivo para migrar os projetos.
 
 5. Faça a menor alteração que satisfaz o contrato.
 6. Execute testes focais, refatore e repita a regressão desta raiz.

@@ -74,13 +74,20 @@ export function registerFrameworkTools({ server, catalog }: Registrar): void {
     annotations: write,
   }, (input) => respond(() => installFramework(input.project, { detected: input.detected, specialists: input.specialists, force: input.force })));
 
-  catalog.tools.push({ name: "framework_update", description: "Update the installed Specsfy skills." });
+  catalog.tools.push({ name: "framework_update", description: "Bring the Specsfy skills of the project to the framework inventory." });
   server.registerTool("framework_update", {
     title: "Update Specsfy skills",
-    description: "Update every installed Specsfy skill, framework file and specialist without local changes. Returns the updated paths.",
-    inputSchema: { force, project },
+    description:
+      "Reconcile the project with the framework inventory: install missing framework skills, update changed ones, remove renamed and retired skills " +
+      "and update installed specialists. Skills with local changes are kept unless force is true. With check, nothing is written. Returns the plan and the changed paths.",
+    inputSchema: {
+      check: z.boolean().optional().describe("Only compute the plan, without writing."),
+      latest: z.boolean().optional().describe("Use the default branch of the framework repository instead of the tag of this binary."),
+      force,
+      project,
+    },
     annotations: write,
-  }, (input) => respond(() => updateFramework(input.project, { force: input.force })));
+  }, (input) => respond(() => updateFramework(input.project, { force: input.force, check: input.check, latest: input.latest })));
 
   catalog.tools.push({ name: "skills_install", description: "Install specialists with their requirements." });
   server.registerTool("skills_install", {

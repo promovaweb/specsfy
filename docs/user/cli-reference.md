@@ -55,13 +55,13 @@ specsfy install --project . --detected --force --json
 
 | Comando | O que faz |
 | --- | --- |
-| `specsfy update` | Atualiza skills, templates e blocos gerenciados do projeto. Skills externas e arquivos de `.specsfy/templates/custom/` permanecem intactos. `--force` substitui conteúdo gerenciado alterado e `--json` informa os caminhos modificados. |
+| `specsfy update` | Deixa o projeto igual ao inventário do framework (`skills/inventory.json`): instala as skills base que faltam, atualiza as que mudaram, remove as renomeadas e as aposentadas e atualiza os especialistas instalados, templates e blocos gerenciados. As skills vêm da tag da versão do binário; `--latest` usa a branch padrão. Skill com alteração local é mantida e listada em `kept`; `--force` a substitui. `--check` só mostra o plano e sai com código `10` quando há diferença. Skills externas, `.specsfy/templates/custom/` e projetos sem o framework ficam intactos. |
 | `specsfy upgrade` | Consulta a última release e substitui o próprio binário em uso. `--check` apenas informa se existe versão nova. O projeto não é alterado. |
 | `specsfy skills list` | Lista o catálogo do framework e dos especialistas. `--json` entrega objetos estruturados. A leitura usa a credencial `github.token`. |
 | `specsfy skills detect` | Compara o projeto com os sinais de detecção do catálogo e retorna as skills recomendadas. O comando apenas consulta, sem instalar arquivos. |
 | `specsfy skills install` | Materializa as skills nomeadas no projeto. Não instala o catálogo inteiro. |
 | `specsfy skills remove` | Remove somente as skills nomeadas e preserva skills externas. Conteúdo local divergente impede a remoção, a menos que `--force` seja informado. |
-| `specsfy skills update` | Atualiza as skills Specsfy já instaladas. `--force` substitui conteúdo gerenciado alterado e `--json` retorna os caminhos. Skills externas e templates personalizados permanecem intactos. |
+| `specsfy skills update` | Igual a `specsfy update`, com as mesmas opções. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
 

@@ -21,6 +21,7 @@ import { resolveGithubToken } from "../../domain/github.ts";
 import { dailyUpdateCheck } from "../../domain/updater.ts";
 import { projectOption } from "../../engine/script-command.ts";
 import { frameworkProject } from "./framework.ts";
+import { inSync, inventoryDrift } from "../../domain/inventory.ts";
 import type { Command } from "../registry.ts";
 
 export interface DoctorCheck {
@@ -87,6 +88,16 @@ export async function collectProjectChecks(project: string, options: ProjectChec
       const lock = await readSkillsLock(project);
       const count = Object.keys(lock.skills).length;
       add("lock", "ok", `${LOCK_FILENAME} lists ${count} skill${count === 1 ? "" : "s"}`);
+      const drift = inventoryDrift(Object.keys(lock.skills));
+      if (drift.framework) {
+        const parts = [
+          drift.missing.length ? `${drift.missing.length} missing` : "",
+          drift.renamed.length ? `${drift.renamed.length} renamed` : "",
+          drift.retired.length ? `${drift.retired.length} retired` : "",
+        ].filter(Boolean);
+        if (inSync(drift)) add("inventory", "ok", `skills match the inventory of ${manifest.bin} ${manifest.version}`);
+        else add("inventory", "warn", `${parts.join(", ")}; run "${manifest.bin} update"`);
+      }
     } catch (e) {
       add("lock", "fail", e instanceof Error ? e.message : String(e));
     }
@@ -111,7 +122,7 @@ export async function collectProjectChecks(project: string, options: ProjectChec
 export const doctorCommand: Command = {
   name: "doctor",
   description: "Check runtime, terminal, settings, key source and vault readability without changing files; --project adds the project checks.",
-  options: [{ ...projectOption, description: "Also check this project: Git, skills CLI, skills-lock.json, GitHub token and the daily release check." }],
+  options: [{ ...projectOption, description: "Also check this project: Git, skills CLI, skills-lock.json, the skills inventory, GitHub token and the daily release check." }],
   exitCodes: [ExitCode.CONFIG, ExitCode.NOT_FOUND],
   run: async (ctx) => {
     const data = collectDoctorChecks();

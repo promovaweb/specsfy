@@ -26,7 +26,7 @@ test('fontes não referenciam a distribuição antiga em múltiplos repositório
  scan(ROOT);assert.deepEqual(violations,[]);
 });
 test('CLI usa os endpoints de distribuição do monorepo',()=>{
- includes(read('cli/src/domain/installer.ts'),['https://github.com/promovaweb/specsfy.git','BASE_DIRECTORY = "skills"','SPECIALISTS_DIRECTORY = "specialists"']);
+ includes((read('cli/src/domain/installer.ts')+read('skills/inventory.json')),['https://github.com/promovaweb/specsfy.git','BASE_DIRECTORY = "skills"','SPECIALISTS_DIRECTORY = "specialists"']);
  includes(read('cli/src/domain/catalog.ts'),['https://api.github.com/repos/','CATALOG_PATH = "specialists/catalog.json"','?ref=main','application/vnd.github.raw+json']);
  includes(read('cli/src/domain/updater.ts'),['api.github.com/repos/promovaweb/specsfy/releases/latest','https://github.com/promovaweb/specsfy/releases/download']);
  includes(read('cli/package.json'),['"url": "git+https://github.com/promovaweb/specsfy.git"']);

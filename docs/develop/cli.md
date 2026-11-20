@@ -136,8 +136,18 @@ runner conhecido recebe `NOT_FOUND`. O command `test`, a tool MCP
 
 ## Atualização
 
-`specsfy update` atualiza as skills Specsfy registradas no projeto que não
-têm mudança local. `specsfy skills update` usa a mesma função.
+`specsfy update` reconcilia o projeto com `skills/inventory.json`, a lista
+única de skills do framework, nomes trocados (`renamed`) e skills aposentadas
+(`retired`). `SkillInstaller.reconcile()` clona o repositório na tag `v<versão>`
+do binário (ou na branch padrão com `--latest` ou sem essa tag), lê o
+inventário do clone e monta um `UpdatePlan`: instala as skills que faltam,
+atualiza as que mudaram, remove nomes antigos e atualiza os especialistas
+instalados, sempre pelo CLI `skills`. Skill com mudança local entra em `kept`
+sem `--force`. `--check` devolve só o plano. O binário embute o inventário da
+própria versão (`src/domain/inventory.ts`), usado sem rede por `doctor` e pela
+aba Skills. Um `renamed` aponta sempre para uma skill atual: ao renomear de
+novo, atualize as entradas antigas. `specsfy skills update` usa a mesma
+função.
 
 `specsfy upgrade` compara a versão em execução com a última GitHub Release de
 `promovaweb/specsfy` e troca a instalação conforme a origem detectada em

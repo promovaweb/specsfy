@@ -1,4 +1,4 @@
- ▌ Specsfy v0.31.1  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.32.0  │  ~/projects/example                                                                             linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
  Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
                                                        ▬▬▬▬▬▬▬▬▬▬▬                                                                          
@@ -6,14 +6,14 @@
  │ Framework · 14                                          █││ Project    ~/projects/example                                              │ 
  │ > ✓ installed  specsfy-01-inbox                         █││ Installed  37 Specsfy skill(s) in skills-lock.json                         │ 
  │   ✓ installed  specsfy-02-backlog                       █││ Catalog    39 specialist(s)                                                │ 
- │   ✓ installed  specsfy-03-specify                       █│╰────────────────────────────────────────────────────────────────────────────╯ 
- │   ✓ installed  specsfy-04-validate                      █│╭─ Detail ───────────────────────────────────────────────────────────────────╮ 
- │   ✓ installed  specsfy-05-tasks                         █││ Skill     specsfy-01-inbox                                                 │ 
- │   ✓ installed  specsfy-06-tdd-bdd                       █││ State     ✓ installed                                                      │ 
- │   ✓ installed  specsfy-07-implement                     █││ Category  Framework                                                        │ 
- │   ✓ installed  specsfy-data-discovery                   █││ Captures and pre-processes ideas without asking questions.                 │ 
- │   ✓ installed  specsfy-interviewer                      █││ x removes this skill · u updates every installed skill                     │ 
- │   ✓ installed  specsfy-milestone-governor               █││                                                                            │ 
+ │   ✓ installed  specsfy-03-specify                       █││ Inventory  ✓ in sync                                                       │ 
+ │   ✓ installed  specsfy-04-validate                      █│╰────────────────────────────────────────────────────────────────────────────╯ 
+ │   ✓ installed  specsfy-05-tasks                         █│╭─ Detail ───────────────────────────────────────────────────────────────────╮ 
+ │   ✓ installed  specsfy-06-tdd-bdd                       █││ Skill     specsfy-01-inbox                                                 │ 
+ │   ✓ installed  specsfy-07-implement                     █││ State     ✓ installed                                                      │ 
+ │   ✓ installed  specsfy-data-discovery                   █││ Category  Framework                                                        │ 
+ │   ✓ installed  specsfy-interviewer                      █││ Captures and pre-processes ideas without asking questions.                 │ 
+ │   ✓ installed  specsfy-milestone-governor               █││ x removes this skill · u updates every installed skill                     │ 
  │   ✓ installed  specsfy-mvp-milestone-interviewer        █││                                                                            │ 
  │   ✓ installed  specsfy-progress                         █││                                                                            │ 
  │   ✓ installed  specsfy-roadmap-milestone-interviewer    █││                                                                            │ 

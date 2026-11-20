@@ -23,7 +23,7 @@ import { readSettings, getPath } from "../../config/settings.ts";
 import { resolveProject } from "../../core/project.ts";
 import { projectOption } from "../../engine/script-command.ts";
 import { Catalog, DEFAULT_REPOSITORY, type CatalogEntryValue } from "../../domain/catalog.ts";
-import { FRAMEWORK_SKILLS, isSpecsfySkillName, SkillInstaller } from "../../domain/installer.ts";
+import { FRAMEWORK_SKILLS, isSpecsfySkillName, planInSync, releaseRef, SkillInstaller, type UpdatePlan } from "../../domain/installer.ts";
 import { assertPrerequisites, checkPrerequisites } from "../../domain/prerequisites.ts";
 import { compareVersions, upgrade, type UpgradeResult } from "../../domain/updater.ts";
 import { color } from "../format.ts";
@@ -59,10 +59,14 @@ export function splitNames(value: unknown): string[] {
   return [...new Set(items.map((item) => item.trim()).filter(Boolean))];
 }
 
-async function installer(project: string, force: boolean): Promise<SkillInstaller> {
+/**
+ * Installer bound to the settings. Skills come from the tag of this binary,
+ * so they match its inventory; `latest` uses the default branch instead.
+ */
+async function installer(project: string, force: boolean, latest = false): Promise<SkillInstaller> {
   assertPrerequisites(await checkPrerequisites(project), ["git", "skills", "project"]);
   const { repository, agents } = frameworkSettings();
-  return SkillInstaller.create(project, force, { repository, agents });
+  return SkillInstaller.create(project, force, { repository, agents, ref: latest ? undefined : releaseRef() });
 }
 
 const rel = (project: string, paths: string[]) => paths.map((path) => relative(project, path) || ".");
@@ -92,14 +96,14 @@ export interface InstallData {
 /** Installs the framework and, optionally, specialists. */
 export async function installFramework(
   projectOptionValue: string | boolean | undefined,
-  options: { detected?: boolean; specialists?: string[]; force?: boolean },
+  options: { detected?: boolean; specialists?: string[]; force?: boolean; latest?: boolean },
 ): Promise<InstallData> {
   const project = frameworkProject(projectOptionValue);
   const requested = splitNames(options.specialists ?? []);
   for (const name of requested) {
     if (!name.startsWith("specsfy-specialist-")) throw error.usage(`specialist skills must use the specsfy-specialist- prefix: ${name}`, { name });
   }
-  const target = await installer(project, Boolean(options.force));
+  const target = await installer(project, Boolean(options.force), Boolean(options.latest));
   const changed = await target.installBase();
   let specialists: string[] = [];
   if (options.detected || requested.length) {
@@ -117,15 +121,31 @@ export async function installFramework(
 /** Data of `update` and `skills update`. */
 export interface UpdateData {
   project: string;
-  /** Files and skill folders rewritten, relative to the project. */
+  /** True when only the plan was computed (`--check`). */
+  check: boolean;
+  /** True when the project matches the inventory and the source. */
+  in_sync: boolean;
+  /** Files and skill folders written or removed, relative to the project. */
   updated: string[];
+  /** What separated the project from the inventory. */
+  plan: UpdatePlan;
 }
 
-/** Updates every Specsfy skill already registered in the project. */
-export async function updateFramework(projectOptionValue: string | boolean | undefined, options: { force?: boolean }): Promise<UpdateData> {
+/**
+ * Reconciles the project with the skills inventory: installs the framework
+ * skills that are missing, updates the changed ones, removes renamed and
+ * retired ones and updates the installed specialists.
+ */
+export async function updateFramework(
+  projectOptionValue: string | boolean | undefined,
+  options: { force?: boolean; check?: boolean; latest?: boolean },
+): Promise<UpdateData> {
   const project = frameworkProject(projectOptionValue);
-  const target = await installer(project, Boolean(options.force));
-  return { project, updated: rel(project, await target.updateAll()) };
+  const target = await installer(project, Boolean(options.force), Boolean(options.latest));
+  const check = Boolean(options.check);
+  const { plan, changed } = await target.reconcile(check);
+  const relativeFiles = { ...plan, files: rel(project, plan.files) };
+  return { project, check, in_sync: planInSync(plan), updated: rel(project, changed), plan: relativeFiles };
 }
 
 /** Lists the specialist catalog. */
@@ -180,6 +200,8 @@ export async function upgradeBinary(check: boolean): Promise<UpgradeResult> {
   return upgrade(manifest.version, { check });
 }
 
+const checkOption = { name: "--check", description: "Only report what would change; exit code 10 when the project differs from the inventory." };
+const latestOption = { name: "--latest", description: "Use the default branch of the framework repository instead of the tag of this binary." };
 const forceOption = { name: "--force", description: "Replace managed files and skills that have local changes." };
 
 const pathsText = (paths: string[], empty: string) => () => (paths.length ? paths.join("\n") : empty);
@@ -198,6 +220,7 @@ const installCommand: Command = {
   options: [
     { name: "--detected", description: "Also install the specialists detected from the project's files and dependencies." },
     { name: "--specialist", argument: { name: "name" }, description: "Specialist to install with its requirements. Comma-separated list." },
+    latestOption,
     forceOption,
     projectOption,
   ],
@@ -208,22 +231,56 @@ const installCommand: Command = {
       detected: Boolean(ctx.options.detected),
       specialists: splitNames(ctx.options.specialist),
       force: Boolean(ctx.options.force),
+      latest: Boolean(ctx.options.latest),
     });
     return { data, text: pathsText(data.installed, "Specsfy is already installed and up to date.") };
   },
 };
 
+/** Human report of an update plan, one line per action. */
+export function planText(data: UpdateData): string {
+  const { plan } = data;
+  if (!plan.framework && !plan.update.length && !plan.kept.length) {
+    return plan.current.length ? "Specsfy skills are already up to date." : `No Specsfy framework in this project. Run "${bin} install".`;
+  }
+  const verb = data.check
+    ? { install: "would install", update: "would update", rename: "would remove", retire: "would remove", file: "would write" }
+    : { install: "installed", update: "updated", rename: "removed", retire: "removed", file: "wrote" };
+  const lines = [
+    ...plan.install.map((name) => `${verb.install}  ${name}`),
+    ...plan.update.map((name) => `${verb.update}  ${name}`),
+    ...plan.rename.map(({ from, to }) => `${verb.rename}  ${from} (replaced by ${to})`),
+    ...plan.retire.map((name) => `${verb.retire}  ${name} (retired)`),
+    ...plan.files.map((path) => `${verb.file}  ${path}`),
+    ...plan.kept.map(({ name, reason }) => color.dim(`kept  ${name}: ${reason}`)),
+  ];
+  if (data.in_sync) lines.push(plan.kept.length ? "Nothing else to update." : "Specsfy skills are already up to date.");
+  else if (data.check) lines.push(`Run "${bin} update" to apply.`);
+  return lines.join("\n");
+}
+
+
 const updateRun = async (ctx: Context) => {
-  const data = await updateFramework(ctx.options.project, { force: Boolean(ctx.options.force) });
-  return { data, text: pathsText(data.updated, "Specsfy skills are already up to date.") };
+  const data = await updateFramework(ctx.options.project, {
+    force: Boolean(ctx.options.force),
+    check: Boolean(ctx.options.check),
+    latest: Boolean(ctx.options.latest),
+  });
+  return { data, text: planText(data), code: data.check && !data.in_sync ? ExitCode.GATE_FAILED : ExitCode.SUCCESS };
 };
+
+const updateLongDescription =
+  "Reconciles the project with skills/inventory.json of the framework: installs the framework skills that are missing, updates the ones that changed, " +
+  "removes renamed and retired skills and updates the installed specialists, through the official skills CLI. Skills come from the tag of this binary " +
+  "(--latest uses the default branch). A skill with local changes is kept and reported unless --force is given. A project without the framework is left alone.";
 
 const updateCommand: Command = {
   name: "update",
-  description: "Update the installed Specsfy skills, framework files and specialists that have no local changes.",
-  options: [forceOption, projectOption],
-  exitCodes: [ExitCode.NETWORK_OR_API, ExitCode.NOT_FOUND, ExitCode.PERMISSION],
-  examples: [`${bin} update`, `${bin} update --force --json`],
+  description: "Bring the Specsfy skills of the project to the framework inventory: install missing, update changed, remove renamed and retired.",
+  longDescription: updateLongDescription,
+  options: [checkOption, latestOption, forceOption, projectOption],
+  exitCodes: [ExitCode.GATE_FAILED, ExitCode.NETWORK_OR_API, ExitCode.NOT_FOUND, ExitCode.PERMISSION],
+  examples: [`${bin} update`, `${bin} update --check`, `${bin} update --force --json`],
   run: updateRun,
 };
 
@@ -239,11 +296,13 @@ const upgradeCommand: Command = {
   run: async (ctx: Context) => {
     const result = await upgradeBinary(Boolean(ctx.options.check));
     const data = { current: result.current, latest: result.latest, upgraded: result.upgraded };
-    const text = result.upgraded
+    const base = result.upgraded
       ? `Upgraded ${bin} ${result.current} → ${result.latest}${result.method === "npm" ? " through npm" : result.path ? ` at ${result.path}` : ""}.`
       : compareVersions(result.latest, result.current) <= 0
         ? `${bin} ${result.current} is up to date.`
         : `${bin} ${result.latest} is available (running ${result.current}). Run "${bin} upgrade".`;
+    // After replacing the binary the skills of each project may be behind.
+    const text = result.upgraded ? `${base}\nRun "${bin} update" in each project to bring its skills to the new inventory.` : base;
     return { data, text };
   },
 };
@@ -301,9 +360,10 @@ const skillsRemove: Command = {
 
 const skillsUpdate: Command = {
   name: "update",
-  description: "Update every installed Specsfy skill; same as the top-level update.",
-  options: [forceOption, projectOption],
-  exitCodes: [ExitCode.NETWORK_OR_API, ExitCode.NOT_FOUND, ExitCode.PERMISSION],
+  description: "Bring the Specsfy skills of the project to the framework inventory; same as the top-level update.",
+  longDescription: updateLongDescription,
+  options: [checkOption, latestOption, forceOption, projectOption],
+  exitCodes: [ExitCode.GATE_FAILED, ExitCode.NETWORK_OR_API, ExitCode.NOT_FOUND, ExitCode.PERMISSION],
   examples: [`${bin} skills update`],
   run: updateRun,
 };

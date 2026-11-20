@@ -121,7 +121,7 @@ grava apenas quando uma option pede.
 | `skills_list` | Lista as skills instaladas e as disponíveis no catálogo. | só lê |
 | `skills_detect` | Detecta os agentes e skills presentes no projeto. | só lê |
 | `framework_install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | altera |
-| `framework_update` | Atualiza as skills instaladas que continuam intactas. | altera |
+| `framework_update` | Deixa as skills do projeto iguais ao inventário do framework; `check` devolve só o plano. | altera |
 | `skills_install` | Instala um ou mais especialistas do catálogo. | altera |
 | `skills_remove` | Remove especialistas instalados. | altera |
 | `update_check` | Consulta a última versão publicada do binário, sem trocar o executável. | só lê |
