@@ -4,6 +4,19 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.34.1] - 2026-11-20
+
+### Corrigido
+
+- O `showcase:check` falhava fora da máquina que gerou os prints: num
+  caminho longo (CI, worktree), o cabeçalho da TUI cortava o caminho do
+  projeto antes da troca por `~/projects/loja-online`. O projeto de
+  demonstração passa a ser montado num caminho curto e fixo, a captura espera
+  o fim de qualquer carregamento e a verificação mostra a primeira linha
+  diferente. A 0.34.0 não teve binários publicados por causa dessa falha;
+  esta é a primeira versão com o filtro `/`, as abas novas, o smoke do
+  binário, o script de release e o projeto de demonstração.
+
 ## [0.34.0] - 2026-11-20
 
 ### Adicionado
