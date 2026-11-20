@@ -15,13 +15,13 @@ test('contrato e guias publicam a mesma política de handoff',()=>{
   includes(read('docs/develop/context/flows/README.md'),['avanço','retorno','retomada','automaticamente','mesma conversa']);
 });
 test('skills base aplicam transição e retomada na mesma conversa',()=>{
-  for(const name of ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-tdd-bdd','specsfy-07-implement','specsfy-update-spec','specsfy-progress']){
+  for(const name of ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-update-spec']){
     const content=skill(name);includes(content,['## Orquestrar a conversa','Transição automática:','Pendência detectada:']);
     includes(normalize(content),['Retomada automática:','sem pedir confirmação','carregue imediatamente a skill de destino','mesma conversa']);
   }
 });
 test('mudança tardia usa uma entrada pública e executável',()=>{
-  for(const text of [skill('specsfy-07-implement'),read('docs/user/advanced-usage.md'),read('specsfy/README.md')])includes(text,['$specsfy-update-spec']);
+  for(const text of [skill('specsfy-06-implement'),read('docs/user/advanced-usage.md'),read('specsfy/README.md')])includes(text,['$specsfy-update-spec']);
   includes(skill('specsfy-update-spec'),['esqueceu','reabr']);
 });
 test('ciclo do backlog é consistente com os guias públicos',()=>{
@@ -57,7 +57,7 @@ test('ebook consome ordem mantida pelo guia de usuário',()=>{
 });
 test('documentador está instalado e recebe handoff após implementação',()=>{
   includes((read('cli/src/domain/installer.ts')+read('skills/inventory.json')),['"specsfy-documentator"']);
-  includes(skill('specsfy-07-implement'),['$specsfy-documentator','Depois de cada tarefa']);
+  includes(read('skills/specsfy-06-implement/references/implement.md'),['$specsfy-documentator','Depois de cada tarefa']);
   includes(read('skills/Spec.md'),['$specsfy-documentator']);
 });
 test('documentador publica contrato de reconstrução completa',()=>{

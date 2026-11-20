@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-const verifier = fileURLToPath(new URL('../specsfy-07-implement/scripts/verify_evidence.mjs', import.meta.url));
+const verifier = fileURLToPath(new URL('../specsfy-06-implement/scripts/verify_evidence.mjs', import.meta.url));
 const custom = {
   apply: ['^node scripts/migrate\\.mjs apply$'],
   status: ['^node scripts/migrate\\.mjs status$'],

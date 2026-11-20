@@ -231,12 +231,10 @@ detecção está em `specialists/catalog.json` no repositório do Specsfy.
 - `specsfy-03-specify` registra requisitos e atributos de qualidade.
 - `specsfy-04-validate` seleciona lentes de revisão.
 - `specsfy-05-tasks` usa checklists técnicos para decompor trabalho.
-- `specsfy-06-tdd-bdd` preserva RED/GREEN.
-- `specsfy-07-implement` executa de acordo com a stack.
+- `specsfy-06-implement` preserva RED/GREEN no modo `tests` e executa de
+  acordo com a stack no modo `implement`.
 - `specsfy-update-spec` revisa requisitos e atributos de qualidade
   afetados por uma mudança posterior.
-- `specsfy-progress` identifica a orientação técnica aplicável e executa a
-  transição automática.
 
 A presença de um especialista não aprova nenhum gate do Specsfy, porque o Plan
 Gate continua exigindo um RED válido e o Delivery Gate continua dependendo dos

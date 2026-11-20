@@ -1,14 +1,19 @@
----
-name: specsfy-07-implement
-description: "Executa as tarefas da seção `14. Tarefas` de `spec.md` da feature em ordem de dependência, escreve o código de produção a partir de testes TDD em RED, registra a comprovação na própria spec e fecha o Delivery Gate. Use quando o usuário pedir para implementar, executar, continuar a próxima tarefa pronta ou concluir uma feature já planejada, ou quando uma transição automática iniciar ou retomar a entrega. Não use para apenas criar testes (use specsfy-06-tdd-bdd), apenas decompor tarefas (use specsfy-05-tasks) ou mudar o comportamento acordado (use specsfy-update-spec)."
----
-
 # Implementar as tarefas e criar o código
 
-Esta skill transforma um plano aprovado em código funcionando. Cada tarefa da
+Este modo transforma um plano aprovado em código funcionando. Cada tarefa da
 seção 14 passa por `RED → GREEN → REFACTOR`, e spec, testes, código,
 comprovação e checkboxes continuam coerentes entre si durante todo o trabalho.
 A spec é a fonte única: tudo o que for decidido ou comprovado volta para ela.
+
+Referência do modo `implement` de `$specsfy-06-implement`. A preparação
+obrigatória com `$specsfy-setup`, o modo de interação `perguntas` e os
+anúncios de handoff e de troca de modo estão no `SKILL.md` e valem para este
+modo. Pergunte somente o que a spec e o projeto não respondem, como o runner
+de testes em projeto Node.
+
+Este modo não serve para apenas criar testes (use o modo `tests`), apenas
+decompor tarefas (use `$specsfy-05-tasks`) ou mudar o comportamento acordado
+(use `$specsfy-update-spec`).
 
 ## Pronto quando
 
@@ -19,37 +24,6 @@ A spec é a fonte única: tudo o que for decidido ou comprovado volta para ela.
   Definition of Done aponta para comprovação atual.
 - `specsfy context monitor --check` e `specsfy docs build --check` passam.
 - `Delivery Gate: Passed`, `Status: Reviewing` e a spec está em `review/`.
-
-## Preparação obrigatória
-
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
-
-## Modo de interação
-
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`. Pergunte somente o
-que a spec e o projeto não respondem, como o runner de testes em projeto Node.
-
-## Orquestrar a conversa
-
-Siga a seção `Orquestração conversacional` de `.specsfy/Spec.md`. Resumo:
-
-- Pendência dentro do escopo: anuncie
-  `Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva.
-- Troca de responsabilidade: anuncie `Transição automática:
-  $specsfy-07-implement → $<destino> — motivo: <motivo> — resultado esperado:
-  <resultado>` e carregue imediatamente a skill de destino, sem pedir
-  confirmação nem repetir o comando. Continue na mesma conversa.
-- Correção concluída: anuncie `Retomada automática: $<destino> →
-  $specsfy-07-implement — pendência resolvida: <resultado>` e retome.
-
-Reavalie o estado depois de cada handoff para não entrar em ciclo. O handoff
-dispensa confirmação; ações sensíveis continuam exigindo autorização
-específica.
 
 ## Proteção obrigatória do banco
 
@@ -130,7 +104,7 @@ são sequenciais.
    Se o gate falhar por tarefa, predecessor TDD ou RED ausente em um plano
    antes aprovado, anuncie a pendência e retorne automaticamente para
    `$specsfy-05-tasks` sem alterar produção. Essa skill reabre o Ato II, chama
-   TDD/BDD e devolve a entrega depois de validar o plano. Para outra falha,
+   o modo `tests` e devolve a entrega depois de validar o plano. Para outra falha,
    carregue a skill responsável pelo gate.
 4. Se `Interface para pessoas` for `Sim`, confira a interface antes de
    programar (seção abaixo).
@@ -158,7 +132,7 @@ são sequenciais.
    equivalente:
 
    ```bash
-   node .agents/skills/specsfy-07-implement/scripts/next_task.mjs \
+   node .agents/skills/specsfy-06-implement/scripts/next_task.mjs \
      <raiz>/specs/<estado>/<NNNN>-<slug>/spec.md
    ```
 
@@ -191,14 +165,15 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
 
 1. **PREP.** Confirme ID, tipo, referências, dependências, arquivos e
    resultado verificável. Marque `PREP`.
-2. **Teste (`[TEST]`).** Siga `$specsfy-06-tdd-bdd`: use o Gherkin da spec
+2. **Teste (`[TEST]`).** Troque para o modo `tests`, leia
+   [tests.md](tests.md) e siga o passo `cycle`: use o Gherkin da spec
    como referência para desenhar o teste TDD, adicione os marcadores
    `SPECSFY:` e observe RED válido. Não crie nem execute `.feature`. Em PHP,
    use Pest; em Node, somente o runner confirmado pelo usuário.
 3. **Pré-condição de código (`[CODE]`).** Confirme que o predecessor TDD está
    concluído para os mesmos IDs, com RED registrado na seção 11. Sem isso, não
    altere produção: anuncie a pendência e retorne automaticamente para
-   `$specsfy-05-tasks`, que reabre o plano, chama `$specsfy-06-tdd-bdd` e
+   `$specsfy-05-tasks`, que reabre o plano, chama o modo `tests` desta skill e
    devolve a entrega após o novo `Plan Gate: Passed`.
 4. **GREEN.** Escreva a menor mudança de produção que deixa o teste verde.
    - Interface: implemente a tela, os menus, o formulário e a interação
@@ -233,7 +208,7 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
    a avaliação na tarefa e repita com `--acknowledge-project-no-change`. A
    tarefa só avança quando o monitor deixar de retornar `PENDING`.
 6. **Documentação.** Depois de cada tarefa `[CODE]`, anuncie
-   `Transição automática: $specsfy-07-implement → $specsfy-documentator —
+   `Transição automática: $specsfy-06-implement → $specsfy-documentator —
    motivo: implementação alterou o sistema — resultado esperado: docs/
    reconstruído e atual` e carregue `$specsfy-documentator`. Retome quando o
    `--check` da documentação passar.
@@ -256,7 +231,7 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
     script equivalente:
 
     ```bash
-    node .agents/skills/specsfy-07-implement/scripts/verify_evidence.mjs \
+    node .agents/skills/specsfy-06-implement/scripts/verify_evidence.mjs \
       specs/<estado>/<NNNN>-<slug>/spec.md . --task TNNN
     ```
 
@@ -285,7 +260,8 @@ Pare quando a implementação exigir comportamento não descrito, contradizer um
 `AC` ou mudar interface pública, dados, segurança ou fora de escopo. Anuncie a
 pendência e carregue automaticamente `$specsfy-update-spec`. Ela preserva o
 pedido, decide se precisa refinar com a pessoa, atualiza a fonte normativa,
-reabre somente os gates afetados e percorre validação, tarefas e TDD/BDD.
+reabre somente os gates afetados e percorre validação, tarefas e o modo
+`tests`.
 Retome com os gates novamente aprovados, nesta ordem de atualização:
 
 ```text
@@ -310,7 +286,7 @@ Quando todas as tarefas da seção 14 estiverem marcadas, execute em sequência:
    equivalente:
 
    ```bash
-   node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs \
+   node .agents/skills/specsfy-06-implement/scripts/check_traceability.mjs \
      specs/<estado>/<NNNN>-<slug>/spec.md .
    ```
 
@@ -349,26 +325,26 @@ Pelo MCP, use a tool `delivery_render`. Sem o binário instalado, rode o script
 equivalente:
 
 ```bash
-node .agents/skills/specsfy-07-implement/scripts/render_delivery.mjs \
+node .agents/skills/specsfy-06-implement/scripts/render_delivery.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md --format markdown
 ```
 
 Use `--preview` enquanto a entrega estiver aberta. O script escreve somente em
 stdout; publicar o texto em PR, commit ou ferramenta externa exige pedido
-explícito. Leia `references/completion-gates.md` para a lista completa do
-fechamento.
+explícito. Leia [completion-gates.md](completion-gates.md) para a lista
+completa do fechamento.
 
 ## Relatar
 
 Informe em texto curto: tarefas concluídas, arquivos alterados, comandos e
 resultados, cobertura de IDs, falhas preexistentes e a próxima tarefa pronta
-ou o gate final. Ao final, anuncie e carregue automaticamente
-`$specsfy-progress` para conferir a visão global. Em falha, anuncie a
-pendência, carregue a skill responsável quando necessário e deixe a tarefa
-aberta até a correção.
+ou o gate final. Ao final, rode `specsfy progress --project <raiz>` (pelo
+MCP, a tool `project_status`) para conferir a visão global e inclua o
+resultado no relato. Em falha, anuncie a pendência, carregue a skill
+responsável quando necessário e deixe a tarefa aberta até a correção.
 
 ## Especialistas sob demanda
 
-Leia [references/specialists.md](references/specialists.md) antes de executar
+Leia [specialists-implement.md](specialists-implement.md) antes de executar
 uma tarefa cuja tecnologia ou consequência de falha não esteja coberta pelo
 contexto local. Instale somente com autorização no projeto consumidor.

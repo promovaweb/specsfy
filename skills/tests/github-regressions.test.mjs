@@ -117,9 +117,9 @@ test('#11 e #21 / PR #40: a spec só recebe marcadores dos testes declarados, in
   const marker = '// SPECSFY: US-001 FR-001 NFR-001 AC-001\n';
   put(root, 'tests/a.test.mjs', marker.repeat(2)); put(root, 'tests/a.test.cjs', marker);
   const arguments_ = [spec, root, '--json'];
-  const before = JSON.parse(run(script('specsfy-06-tdd-bdd', 'check_traceability'), arguments_, root).stdout);
+  const before = JSON.parse(run(script('specsfy-06-implement', 'check_traceability'), arguments_, root).stdout);
   put(root, 'tests/b.test.ts', marker.repeat(3) + '// SPECSFY: FR-999\n');
-  const result = run(script('specsfy-06-tdd-bdd', 'check_traceability'), arguments_, root);
+  const result = run(script('specsfy-06-implement', 'check_traceability'), arguments_, root);
   const after = JSON.parse(result.stdout);
   assert.equal(result.status, 0, result.stdout);
   assert.equal(after.files_scanned, 2);
@@ -194,7 +194,7 @@ test('PR #9: arquivo local é aceito e caminho externo é recusado', (t) => {
   const record = {task:'T001', refs:['FR-001'], files:['src/service.ts'], commands:[{run:'npm test', exit:0}]};
   const content = (item) => '| Evidence Contract | 1 |\n- **FR-001**: Responder.\n- [x] T001 [CODE] Implementar src/service.ts — Refs: FR-001 — Depends: none\n<!-- specsfy:evidence ' + JSON.stringify(item) + ' -->\n';
   const spec = put(root, 'spec.md', content(record));
-  const verifier = script('specsfy-07-implement', 'verify_evidence');
+  const verifier = script('specsfy-06-implement', 'verify_evidence');
   assert.equal(run(verifier,[spec,root,'--json'],root).status,0);
   put(root, 'spec.md', content({...record, files:['../externo.ts']}));
   assert.equal(run(verifier,[spec,root,'--json'],root).status,1);
@@ -231,7 +231,7 @@ test('PR #40: um caminho declarado não inclui outro arquivo com o mesmo sufixo'
   const spec = put(root,'spec.md','- **FR-001**: Responder.\n- [x] T001 [TEST] [TDD] Caso em project/tests/a.test.ts — Refs: FR-001 — Depends: none\n');
   put(root,'project/tests/a.test.ts','// SPECSFY: FR-001\n'.repeat(3));
   put(root,'tests/a.test.ts','// SPECSFY: FR-999\n');
-  const result = run(script('specsfy-06-tdd-bdd','check_traceability'),[spec,root,'--json'],root);
+  const result = run(script('specsfy-06-implement','check_traceability'),[spec,root,'--json'],root);
   assert.equal(result.status,0,result.stdout+result.stderr);
   assert.deepEqual(JSON.parse(result.stdout).files,['project/tests/a.test.ts']);
 });
@@ -261,7 +261,7 @@ test('#43: aceitação lê comando com pipe escapado sem deslocar a evidência',
     '| FR-001 | AC-001 | Integração | `npm test \\| tee saida.log` | Passed em 2026-11-20 |', '',
     '### 13. Tarefas', '',
   ].join('\n'));
-  const result = run(script('specsfy-06-tdd-bdd', 'verify_acceptance'), [spec, root, '--json'], root);
+  const result = run(script('specsfy-06-implement', 'verify_acceptance'), [spec, root, '--json'], root);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.results['AC-001'].command, '`npm test \\| tee saida.log`');

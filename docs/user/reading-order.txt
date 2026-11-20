@@ -14,10 +14,8 @@ docs/user/skills/specsfy-02-backlog.md
 docs/user/skills/specsfy-03-specify.md
 docs/user/skills/specsfy-04-validate.md
 docs/user/skills/specsfy-05-tasks.md
-docs/user/skills/specsfy-06-tdd-bdd.md
-docs/user/skills/specsfy-07-implement.md
+docs/user/skills/specsfy-06-implement.md
 docs/user/skills/specsfy-update-spec.md
-docs/user/skills/specsfy-progress.md
 docs/user/skills/specsfy-interviewer.md
 docs/user/skills/specsfy-milestones.md
 docs/user/skills/specsfy-data-discovery.md

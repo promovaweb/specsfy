@@ -5,8 +5,8 @@ import { readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ROOT, read } from '../../tests/helpers.mjs';
 
-const questioning = ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-tdd-bdd','specsfy-07-implement','specsfy-aux-rules','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec','specsfy-data-discovery'];
-const silent = ['specsfy-01-inbox','specsfy-aux-database','specsfy-aux-stack','specsfy-documentator','specsfy-progress'];
+const questioning = ['specsfy-02-backlog','specsfy-03-specify','specsfy-04-validate','specsfy-05-tasks','specsfy-06-implement','specsfy-aux-rules','specsfy-interviewer','specsfy-milestones','specsfy-setup','specsfy-update-spec','specsfy-data-discovery'];
+const silent = ['specsfy-01-inbox','specsfy-aux-database','specsfy-aux-stack','specsfy-documentator'];
 const names = readdirSync(join(ROOT, 'skills')).filter(name => existsSync(join(ROOT, 'skills', name, 'SKILL.md')));
 const source = path => read('skills/' + path);
 const includes = (text, terms) => { for (const term of terms) assert.ok(text.includes(term), term); };
@@ -45,7 +45,7 @@ test('todas as skills operacionais carregam setup no início e no handoff', () =
   for (const name of names.filter(name => name !== 'specsfy-setup')) includes(source(name + '/SKILL.md'), ['## Preparação obrigatória', 'Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup`', 'Em handoff automático, carregue-o de novo']);
 });
 test('contrato de testes deriva da stack do consumidor', () => {
-  const tdd = source('specsfy-06-tdd-bdd/SKILL.md');
+  const tdd = source('specsfy-06-implement/references/tests.md');
   includes(tdd, ['PHP', 'Pest', 'Node', 'Vitest', 'SPECSFY:', 'referência']);
   assert.ok(!tdd.includes('Cucumber.js'));
   assert.ok(!source('specsfy-05-tasks/SKILL.md').includes('[BDD]'));
@@ -64,9 +64,9 @@ test('nome no frontmatter coincide com pasta e prompt OpenAI', () => {
     assert.ok(source(name+'/agents/openai.yaml').includes('$'+name),name);
   }
 });
-test('nomes exibidos das sete skills centrais preservam numeração', () => {
-  const central=names.filter(name=>/^specsfy-0[1-7]-/.test(name)).sort();
-  assert.equal(central.length,7);
+test('nomes exibidos das seis skills centrais preservam numeração', () => {
+  const central=names.filter(name=>/^specsfy-0[1-6]-/.test(name)).sort();
+  assert.equal(central.length,6);
   central.forEach((name,index)=>assert.ok(source(name+'/agents/openai.yaml').includes(`display_name: "Specsfy - ${String(index+1).padStart(2,'0')} - `),name));
 });
 test('guia de usuário explica as respostas e o encerramento de área', () => {

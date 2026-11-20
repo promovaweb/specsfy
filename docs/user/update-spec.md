@@ -49,7 +49,7 @@ as etapas invalidadas e retorna à implementação somente depois das novas
 provas:
 
 ```text
-mudança posterior → update-spec → validate ou tasks → TDD/BDD → implement
+mudança posterior → update-spec → validate ou tasks → implement (tests → implement)
                                ↘ backlog, se faltar uma definição
 ```
 
@@ -79,7 +79,7 @@ depois de existir novo RED válido e os gates necessários voltarem a `Passed`.
 - capturar uma ideia ainda superficial.
 - editar código quando a spec continua correta.
 
-Depois da atualização, consulte
-[`specsfy-progress`](skills/specsfy-progress.md) para conferir o
+Depois da atualização, rode `specsfy progress`, descrito em
+[Ver o progresso](reference.md#ver-o-progresso), para conferir o
 estado geral, com a spec atualizada como única fonte normativa do
 projeto.

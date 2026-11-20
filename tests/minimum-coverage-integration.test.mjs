@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {join} from 'node:path';
 import {ROOT,temporary,put,node,read} from './helpers.mjs';
 const validate=join(ROOT,'skills/specsfy-04-validate/scripts/validate_spec.mjs');
-const trace=join(ROOT,'skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs');
+const trace=join(ROOT,'skills/specsfy-06-implement/scripts/check_traceability.mjs');
 test('Definition Gate distingue três ACs de dois ACs por item',t=>{
  const root=temporary(t),covers='US-001, FR-001, NFR-001';
  const valid='#### US-001 — História\n'+['AC-001','AC-002','AC-003'].map(id=>`#### ${id} — Exemplo\n\n**Cobre**: ${covers}\n`).join('')+'- **FR-001**: Requisito.\n- **NFR-001**: Qualidade. **Verificação**: teste.\n';

@@ -68,6 +68,6 @@ test('rastreabilidade ignora cópias do repositório em .claude/worktrees', t =>
   const spec = put(root, 'specs/specs/0001-example/spec.md', '#### US-001 — Example\n#### AC-001 — Example\n- **FR-001**: Example.\n');
   put(root, 'tests/example.test.mjs', '// SPECSFY: US-001 FR-001 AC-001\n');
   put(root, '.claude/worktrees/outra/tests/example.test.mjs', '// SPECSFY: US-001 FR-001 AC-001\n');
-  const payload = JSON.parse(node(script('specsfy-06-tdd-bdd', 'check_traceability'), [spec, root, '--json']).stdout);
+  const payload = JSON.parse(node(script('specsfy-06-implement', 'check_traceability'), [spec, root, '--json']).stdout);
   assert.ok(!JSON.stringify(payload).includes('.claude'), JSON.stringify(payload));
 });

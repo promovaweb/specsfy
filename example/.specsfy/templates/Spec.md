@@ -346,7 +346,7 @@ tests/
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Pending
-- **Comando**: `node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md .`
+- **Comando**: `node .agents/skills/specsfy-06-implement/scripts/check_traceability.mjs specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/spec.md .`
 - **Achados**: [Pending.]
 
 ### 14. Tarefas

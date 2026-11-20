@@ -71,10 +71,13 @@ conversa e registra o resultado de cada uma na spec da entrega:
 2. `specsfy-03-specify` cria a `spec.md` com o problema, o resultado esperado
    e cenários BDD que descrevem o comportamento correto.
 3. `specsfy-04-validate` aprova o Definition Gate.
-4. `specsfy-05-tasks` planeja a correção e chama `specsfy-06-tdd-bdd`.
-5. `specsfy-06-tdd-bdd` cria o teste e observa o **RED**: o teste precisa
-   falhar porque o defeito existe, não por erro de sintaxe ou ambiente.
-6. `specsfy-07-implement` corrige, obtém o **GREEN** e roda a regressão.
+4. `specsfy-05-tasks` planeja a correção e chama `specsfy-06-implement` no
+   modo `tests`.
+5. `specsfy-06-implement`, no modo `tests`, cria o teste e observa o **RED**:
+   o teste precisa falhar porque o defeito existe, não por erro de sintaxe ou
+   ambiente.
+6. `specsfy-06-implement`, no modo `implement`, corrige, obtém o **GREEN** e
+   roda a regressão.
 
 **Como solicitar:**
 
@@ -197,7 +200,7 @@ conversa e registra o resultado de cada uma na spec da entrega:
    precisa guardar e registra as respostas confirmadas em
    `.specsfy/DATABASE.md`.
 2. `specsfy-05-tasks` inclui uma tarefa `[MIGRATION]` com arquivo versionado.
-3. `specsfy-07-implement` aplica a migration no **banco de teste** e registra
+3. `specsfy-06-implement` aplica a migration no **banco de teste** e registra
    uma consulta de estado.
 4. `specsfy-aux-database` atualiza o quadro de persistência.
 
@@ -255,7 +258,7 @@ Leia [Informações permanentes do projeto](project-context.md) e
 **Situação:** há várias specs em estados diferentes e você quer saber o que
 está pronto, o que está parado por dependência e qual é o próximo trabalho.
 
-**Caminho:** `specsfy-progress` na conversa ou o CLI no terminal. Os dois
+**Caminho:** peça o progresso na conversa ou rode o CLI no terminal. Os dois
 apenas leem as specs, os milestones e o backlog, sem alterar nenhum arquivo do
 projeto.
 
@@ -303,7 +306,7 @@ Continue a spec 0005 de onde parou.
 ```
 
 **O que esperar:** um anúncio como
-`Transição automática: $specsfy-progress → $specsfy-07-implement` com o motivo
+`Transição automática: $specsfy-05-tasks → $specsfy-06-implement` com o motivo
 e o resultado esperado, seguido do trabalho na mesma conversa. Se a mesma
 pendência se repetir sem mudança observável, o agente para e relata o impasse
 em vez de girar em círculo.

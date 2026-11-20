@@ -150,7 +150,7 @@ Skills principais:
 
 ```text
 specsfy-05-tasks
-specsfy-06-tdd-bdd (modo prepare)
+specsfy-06-implement (modo tests, passo prepare)
 ```
 
 Saída:
@@ -171,7 +171,7 @@ Cada tarefa executa:
 RED → GREEN → REFACTOR
 ```
 
-`specsfy-07-implement` exige predecessoras TDD e gates válidos. Depois do
+`specsfy-06-implement`, no modo `implement`, exige predecessoras TDD e gates válidos. Depois do
 GREEN focal, executa regressão proporcional ao risco, atualiza evidências e
 aciona `specsfy-documentator` quando código ou persistência mudam.
 
@@ -226,7 +226,7 @@ para ações sensíveis como push, deploy, exclusão ou alteração externa.
 
 ## Projeções
 
-CLI, TUI e `specsfy-progress` projetam o estado observado nas specs. Eles
+CLI, TUI e a tool MCP `project_status` projetam o estado observado nas specs. Eles
 não mantêm uma fonte paralela de progresso e não podem aprovar gates.
 
 Milestones são estados demonstráveis de produto e ficam em

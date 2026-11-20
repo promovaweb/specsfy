@@ -235,7 +235,7 @@ const scriptsRun: Command = {
   ],
   options: [projectOption],
   exitCodes: [ExitCode.NOT_FOUND],
-  examples: [`${bin} scripts run specsfy-progress/progress -- . --json`],
+  examples: [`${bin} scripts run specsfy-05-tasks/progress -- . --json`],
   run: async (ctx) => {
     const [name, ...args] = ctx.args;
     const script = name!.includes("/scripts/") ? name! : `${name!.replace(/\/(?=[^/]+$)/, "/scripts/")}${name!.endsWith(".mjs") ? "" : ".mjs"}`;

@@ -71,7 +71,7 @@ Durante os três atos, as etapas são bidirecionais:
 
 <!-- markdownlint-disable MD013 -->
 ```text
-inbox → backlog → specify ↔ validate → tasks ↔ tdd-bdd → implement → documentator ↔ progress
+inbox → backlog → specify ↔ validate → tasks ↔ implement (tests ↔ implement) → documentator
                          ↑       ↑            ↑
                          └──── update-spec ───┘
 ```
@@ -91,9 +91,10 @@ implementação recente.
 
 Pedido surgido depois da definição retorna a `update-spec`. A skill chama
 `backlog` quando faltar decisão, `validate` quando mudar comportamento e
-`tasks` quando mudar somente o plano. Teste ou RED ausente chama `tdd-bdd` com
-o plano pendente. Se o plano já estava aprovado, `tasks` reabre o Ato II antes
-de chamar `tdd-bdd`. Depois da correção, a etapa que detectou a pendência é
+`tasks` quando mudar somente o plano. Teste ou RED ausente chama o modo
+`tests` de `implement` com o plano pendente. Se o plano já estava aprovado,
+`tasks` reabre o Ato II antes de chamar esse modo. O progresso sai do command
+`specsfy progress`, sem skill própria. Depois da correção, a etapa que detectou a pendência é
 retomada automaticamente. Handoffs não autorizam instalação, deploy, publicação
 ou ação destrutiva, que continuam exigindo autorização específica.
 

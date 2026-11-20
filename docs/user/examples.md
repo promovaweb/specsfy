@@ -188,7 +188,7 @@ Specsfy não cria arquivos `.feature`: a prova executável é o teste TDD.
 
 ## 7. O teste com rastreabilidade
 
-`specsfy-06-tdd-bdd` transforma cada cenário em testes do runner do projeto.
+`specsfy-06-implement`, no modo `tests`, transforma cada cenário em testes do runner do projeto.
 Cada caso recebe um marcador `SPECSFY:` com os IDs que ele comprova. Em um
 projeto PHP, com Pest:
 

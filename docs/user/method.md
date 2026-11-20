@@ -317,8 +317,8 @@ teste, tarefa e evidência:
 - os gates mostram quais etapas foram realmente comprovadas.
 - a documentação reflete o sistema implementado.
 
-Para consultar esse estado sem alterar arquivos, use
-[`specsfy-progress`](skills/specsfy-progress.md).
+Para consultar esse estado sem alterar arquivos, rode `specsfy progress`,
+descrito em [Ver o progresso](reference.md#ver-o-progresso).
 
 ## Limites do método
 

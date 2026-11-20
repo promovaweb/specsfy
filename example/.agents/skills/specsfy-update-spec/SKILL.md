@@ -1,6 +1,6 @@
 ---
 name: specsfy-update-spec
-description: "Incorpora à spec existente um pedido que surgiu depois da definição, invalida somente os gates afetados e coordena a retomada do fluxo. Use quando o usuário esqueceu algo ou quer adicionar, remover, corrigir ou mudar um pedido em uma spec existente que já foi definida, planejada, está sendo implementada ou foi concluída, e quando uma transição automática detectar mudança tardia de comportamento, escopo, aceite, dados, segurança ou plano. Não cria spec nova nem implementa: para criar a spec inicial use specsfy-03-specify, para decidir uma ambiguidade use specsfy-02-backlog e para implementar use specsfy-07-implement."
+description: "Incorpora à spec existente um pedido que surgiu depois da definição, invalida somente os gates afetados e coordena a retomada do fluxo. Use quando o usuário esqueceu algo ou quer adicionar, remover, corrigir ou mudar um pedido em uma spec existente que já foi definida, planejada, está sendo implementada ou foi concluída, e quando uma transição automática detectar mudança tardia de comportamento, escopo, aceite, dados, segurança ou plano. Não cria spec nova nem implementa: para criar a spec inicial use specsfy-03-specify, para decidir uma ambiguidade use specsfy-02-backlog e para implementar use specsfy-06-implement."
 ---
 
 # Atualizar uma especificação existente
@@ -72,7 +72,7 @@ pedido puder alterar comportamento, plano ou fronteira entre specs.
 
 | Tipo de pedido | O que fazer |
 | --- | --- |
-| correção interna reversível sem efeito observável | não altere a spec; registre a avaliação na evidência da tarefa e retome `$specsfy-07-implement` |
+| correção interna reversível sem efeito observável | não altere a spec; registre a avaliação na evidência da tarefa e retome `$specsfy-06-implement` no modo `implement` |
 | esclarecimento editorial sem mudança de significado | preserve os gates e altere somente a redação necessária |
 | mudança de comportamento, aceite, escopo, dados, segurança ou interface | reabra desde o Ato I |
 | mudança somente de solução, tarefas ou estratégia de testes | reabra desde o Ato II |
@@ -169,13 +169,14 @@ node .agents/skills/specsfy-04-validate/scripts/validate_spec.mjs \
 ## Retomar o fluxo
 
 - Mudança desde o Ato I: carregue `$specsfy-04-validate` e depois percorra
-  tarefas, TDD/BDD e a etapa que originou a mudança. Se o refinamento do
-  backlog terminou por `avançar`, não faça esse handoff na mesma retomada:
-  relate as lacunas e encerre com os gates pendentes.
+  tarefas, o modo `tests` de `$specsfy-06-implement` e a etapa que originou a
+  mudança. Se o refinamento do backlog terminou por `avançar`, não faça esse
+  handoff na mesma retomada: relate as lacunas e encerre com os gates
+  pendentes.
 - Mudança somente do Ato II: carregue `$specsfy-05-tasks`, que reconcilia o
-  plano, chama `$specsfy-06-tdd-bdd` e retoma a origem.
-- Mudança detectada durante a implementação: retome `$specsfy-07-implement`
-  somente depois de Definition e Plan Gate voltarem a `Passed` e existir RED
+  plano, chama `$specsfy-06-implement` no modo `tests` e retoma a origem.
+- Mudança detectada durante a implementação: retome `$specsfy-06-implement`
+  no modo `implement` somente depois de Definition e Plan Gate voltarem a `Passed` e existir RED
   válido para o comportamento novo ou alterado.
 - Mudança detectada depois de `Complete`: percorra novamente os atos
   invalidados e só restaure `Complete` com Delivery Gate e DoD comprovados.

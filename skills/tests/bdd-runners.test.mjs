@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { join } from 'node:path';
 import { ROOT, temporary, put, node } from '../../tests/helpers.mjs';
 
-const trace = join(ROOT, 'skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs');
+const trace = join(ROOT, 'skills/specsfy-06-implement/scripts/check_traceability.mjs');
 const tasks = join(ROOT, 'skills/specsfy-05-tasks/scripts/validate_tasks.mjs');
 const header = '| Campo | Valor |\n| --- | --- |\n| Formato | Specsfy/2.0 |\n| Status | Defined |\n| Definition Gate | Passed |\n| Plan Gate | Pending |\n#### US-001 — Exemplo\n#### AC-001 — Exemplo\n#### AC-002 — Limite\n#### AC-003 — Falha\n- **FR-001**: Exemplo.\n- **NFR-001**: Exemplo. **Verificação**: Pest.\n### 14. Tarefas\n';
 const checklist = '  - [ ] **PREP**: Confirmar baseline.\n  - [ ] **EXECUTE**: Produzir teste.\n  - [ ] **VERIFY**: Observar RED.\n  - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia; Não aplicável porque a tarefa só produz teste.\n  - [ ] **EVIDENCE**: Registrar resultado.\n  - [ ] **IMPROVE**: Revisar aprendizado.\n';

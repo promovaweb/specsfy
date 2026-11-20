@@ -47,7 +47,7 @@ describe("read commands", () => {
   });
 
   test("scripts run passes arguments to the embedded script", async () => {
-    const { code, stdout } = await run(["scripts", "run", "specsfy-progress/progress", "--project", example, "--json", "--", example, "--json"]);
+    const { code, stdout } = await run(["scripts", "run", "specsfy-05-tasks/progress", "--project", example, "--json", "--", example, "--json"]);
     expect(code).toBe(0);
     expect(JSON.parse(stdout).data.result.summary.total_specs).toBe(6);
   });

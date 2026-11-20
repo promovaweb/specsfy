@@ -19,22 +19,17 @@
     "specsfy-04-validate": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "8648bbafacef87c67d702142a5d647a8d201e82e40743881f1df6bd6a3d10ca1"
+      "computedHash": "c87ce2440ad3f12daaac438ecc32bceb44ddfa97e4740990c20197d9aa909fff"
     },
     "specsfy-05-tasks": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "8275869f1ee7c4a05b3759f399e5b32623caca7af23c6cd7f742559138f4fa2d"
+      "computedHash": "8b32d2e1f3875f7f26777c20209aefe249643bfb1d276bf65ef8653a9ac5a7d6"
     },
-    "specsfy-06-tdd-bdd": {
+    "specsfy-06-implement": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "dacfc49489713082ab191ff30e321686c0635fd4a9fde32598346c1cb2d93988"
-    },
-    "specsfy-07-implement": {
-      "source": "../skills",
-      "sourceType": "local",
-      "computedHash": "ef3d03c1449f20880586dc8d902354f2be740e40e01b97f24b58cee1f2b49909"
+      "computedHash": "fb4bfdf1bbdfcf0f28dcc7ba9abb271d682d7cf92baf54f2d07586cf9782bd35"
     },
     "specsfy-aux-database": {
       "source": "../skills",
@@ -71,15 +66,10 @@
       "sourceType": "local",
       "computedHash": "9f741ed3fb7cb905f556f527b5ec3372e1d906e27c445821a67edd5e44b238d3"
     },
-    "specsfy-progress": {
-      "source": "../skills",
-      "sourceType": "local",
-      "computedHash": "d0a35c49942862f1ec22c81d6e251d6d6a2f657eb487df6741b95c023df6c3e4"
-    },
     "specsfy-setup": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "5866b82002786e022bedc7ceaa5082392b7325342390ba9059640032ab5652b9"
+      "computedHash": "b1894eed39ef50e2e130f073ffca83caf86f7e0a990775c0a69502b2ddaf5bac"
     },
     "specsfy-specialist-application-security": {
       "source": "../specialists",
@@ -174,7 +164,7 @@
     "specsfy-update-spec": {
       "source": "../skills",
       "sourceType": "local",
-      "computedHash": "65e1abdb6b0139c83469c4497d65ce401cc6f23bcab4405f65ff160d1ebd7d6a"
+      "computedHash": "23b7951e29a2bb54fbb0a81661a7e51d60e3dc46cdf8286f6b3101460e1d5e46"
     }
   }
 }

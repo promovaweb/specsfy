@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {join} from 'node:path';
 import {ROOT,temporary,put,node} from '../../tests/helpers.mjs';
 const validate=join(ROOT,'skills/specsfy-04-validate/scripts/validate_spec.mjs');
-const trace=join(ROOT,'skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs');
+const trace=join(ROOT,'skills/specsfy-06-implement/scripts/check_traceability.mjs');
 function acceptance(id,covers){return `#### ${id} — Contexto ${id}\n\n**Cobre**: ${covers}\n\n\`\`\`gherkin\n${covers.split(', ').map(item=>'@'+item).join(' ')} @${id}\nFeature: Cobertura contextual\n\n  Scenario: Exemplo ${id}\n    Given um estado conhecido\n    When uma ação acontece\n    Then um resultado é observado\n\`\`\`\n`;}
 function errors(t,text){const root=temporary(t),spec=put(root,'spec.md',text);return JSON.parse(node(validate,[spec,'--allow-draft','--json']).stdout).errors;}
 test('história exige três cenários BDD distintos',t=>{

@@ -235,12 +235,12 @@ Resultado:
 2 tarefas preparadas.
 ```
 
-### 6. Prepare a verificação — `$specsfy-06-tdd-bdd`
+### 6. Prepare a verificação — `$specsfy-06-implement` no modo `tests`
 
 Envie:
 
 ```text
-Use $specsfy-06-tdd-bdd em specs/<estado>/0001-pagina-boas-vindas/spec.md
+Use $specsfy-06-implement no modo tests em specs/<estado>/0001-pagina-boas-vindas/spec.md
 para preparar a verificação.
 ```
 
@@ -250,12 +250,12 @@ Resultado:
 Verificação preparada.
 ```
 
-### 7. Implemente — `$specsfy-07-implement`
+### 7. Implemente — `$specsfy-06-implement` no modo `implement`
 
 Envie:
 
 ```text
-Use $specsfy-07-implement em specs/<estado>/0001-pagina-boas-vindas/spec.md
+Use $specsfy-06-implement em specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
 Resultado:
@@ -286,12 +286,12 @@ Implementação atualizada.
 
 A mudança continua na mesma spec e volta apenas às etapas necessárias.
 
-### 9. Veja o progresso — `$specsfy-progress`
+### 9. Veja o progresso — `specsfy progress`
 
 Envie:
 
 ```text
-Use $specsfy-progress para mostrar o resultado final.
+Rode specsfy progress e mostre o resultado final.
 ```
 
 Resultado:

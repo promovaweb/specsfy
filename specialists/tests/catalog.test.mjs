@@ -96,7 +96,7 @@ test('gerenciador de pacotes Laravel publica o contrato de contexto', () => {
   assert.ok(entry(name).detect.files.includes('artisan'));
   assert.ok(entry(name).detect.dependencies.includes('laravel/framework'));
   includes(content(name), ['URL do GitHub', 'composer.json', 'composer.lock', 'composer require', 'docs/packages/README.md', 'docs/packages/', '.specsfy/PACKAGES.md', 'pacotes já instalados']);
-  for (const skill of ['specsfy-03-specify', 'specsfy-07-implement']) includes(read(`skills/${skill}/SKILL.md`), [name]);
+  for (const path of ['specsfy-03-specify/SKILL.md', 'specsfy-06-implement/references/implement.md']) includes(read(`skills/${path}`), [name]);
 });
 
 /** Percorre arquivos reais sem seguir links para bibliotecas externas. */

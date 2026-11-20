@@ -73,6 +73,7 @@ iniciar outra vez o mesmo ciclo nessa retomada.
 
 ## Próximo passo
 
-A própria skill encaminha para a etapa reaberta. Depois da atualização, use o
-[`specsfy-progress`](specsfy-progress.md) para revisar o estado geral de todas
-as specs do projeto.
+A própria skill encaminha para a etapa reaberta. Depois da atualização, rode
+`specsfy progress`, descrito em
+[Ver o progresso](../reference.md#ver-o-progresso), para revisar o estado
+geral de todas as specs do projeto.

@@ -1,7 +1,7 @@
 # Guia de desenvolvimento da metodologia Specsfy
 
 Este `AGENTS.md` governa o módulo `skills/`. Ele contém a metodologia
-executável, as doze skills base, o setup, o documentador e as três skills
+executável, as dez skills base, o setup, o documentador e as três skills
 auxiliares. Seus testes e fixtures pertencem a este
 módulo. A raiz do monorepo não instala nem executa estas skills.
 
@@ -118,7 +118,8 @@ da spec para escrever TDD e observar RED antes de alterar a implementação. O a
 termina com
 `Plan Gate: Passed`.
 
-Skills: `specsfy-05-tasks` e `specsfy-06-tdd-bdd` no modo `prepare`.
+Skills: `specsfy-05-tasks` e `specsfy-06-implement` no modo `tests`, passo
+`prepare`.
 
 ### Ato III — Entregar e validar
 
@@ -126,9 +127,9 @@ Executar cada tarefa no ciclo `RED → GREEN → REFACTOR`, rodar aceite, regres
 e rastreabilidade e registrar evidência. O ato termina com
 `Delivery Gate: Passed` e `Status: Complete`.
 
-Skills: `specsfy-07-implement`, `specsfy-06-tdd-bdd`,
-`specsfy-update-spec`, `specsfy-documentator` e
-`specsfy-progress`.
+Skills: `specsfy-06-implement` nos modos `implement` e `tests`,
+`specsfy-update-spec` e `specsfy-documentator`. O progresso sai do command
+`specsfy progress` e da tool MCP `project_status`.
 
 Mudança de comportamento reabre os Atos I–III. Mudança de plano reabre os Atos
 II–III.
@@ -148,11 +149,9 @@ Draft → Defined → Planned → Implementing → Reviewing → Complete
 | `specsfy-02-backlog` | refinar entradas, registrar backlog e descobrir decisões | criar spec, tarefas ou código |
 | `specsfy-03-specify` | consolidar `spec.md` e research | implementar ou criar backlog externo |
 | `specsfy-04-validate` | auditar prontidão da definição | decidir requisitos |
-| `specsfy-06-tdd-bdd` | usar BDD da spec para criar TDD e provar RED/GREEN | executar Gherkin ou inventar comportamento |
 | `specsfy-05-tasks` | manter tarefas nas seções 14–15 | criar `tasks.md` ou código |
-| `specsfy-07-implement` | executar tarefa pronta e registrar evidência | trabalhar sem TDD RED |
+| `specsfy-06-implement` | no modo `tests`, usar BDD da spec para criar TDD e provar RED/GREEN; no modo `implement`, executar tarefa pronta e registrar evidência | executar Gherkin, inventar comportamento ou trabalhar sem TDD RED |
 | `specsfy-update-spec` | incorporar pedido tardio e reabrir somente os atos afetados | criar nova spec ou implementar a mudança |
-| `specsfy-progress` | projetar estado global sem escrita | alterar gates ou checkboxes |
 | `specsfy-setup` | garantir contexto persistente e blocos do framework | sobrescrever arquivos de contexto existentes |
 | `specsfy-documentator` | reconstruir `docs/` e `.specsfy/PACKAGES.md` a partir do projeto | inventar decisões, relações, finalidades ou URLs |
 | `specsfy-aux-stack` | mapear stack com evidência executável | copiar toda a árvore de dependências |

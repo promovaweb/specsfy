@@ -1,21 +1,50 @@
-# Entregar código com `specsfy-07-implement`
+# Testar e entregar código com `specsfy-06-implement`
 
-Esta skill executa as tarefas aprovadas da spec em ordem. Ela altera produção
-somente quando existe um plano válido e um teste focal em RED.
+Esta skill é a etapa 06 do ciclo e tem dois modos. No modo `tests`, ela usa os
+cenários da spec para criar testes executáveis e mantém a rastreabilidade
+entre o comportamento descrito e a prova no código. No modo `implement`, ela
+executa as tarefas aprovadas da spec em ordem e altera produção somente quando
+existe um plano válido e um teste focal em RED.
 
 ## Quando usar
 
-Use para implementar a próxima tarefa pronta, continuar uma entrega ou concluir
-uma feature planejada. Não use para pular definição, planejamento ou testes.
+Use o modo `tests` para preparar o RED que autoriza a implementação, executar
+um ciclo RED–GREEN–REFACTOR ou verificar testes e rastreabilidade.
 
-Quando uma autorização ou escolha for necessária, a skill apresenta exatamente
-uma pergunta numerada. Ela contém três ou mais respostas sugeridas, `Escrever
-outra resposta`, `Gere outras opções` e `Avançar` desde a primeira rodada.
+Use o modo `implement` para implementar a próxima tarefa pronta, continuar uma
+entrega ou concluir uma feature planejada. Não use para pular definição,
+planejamento ou testes.
+
+A skill identifica o modo pelo pedido e pelo estado da spec. A passagem de um
+modo para o outro acontece na mesma conversa, com o aviso `Troca de modo`,
+sem carregar outra skill.
+
+Se precisar escolher runner, comando, caso focal ou receber uma autorização,
+a skill apresenta exatamente uma pergunta numerada. Ela contém três ou mais
+respostas sugeridas, `Escrever outra resposta`, `Gere outras opções` e
+`Avançar` desde a primeira rodada.
 
 ## Como descrever a tarefa
 
+Para preparar o próximo teste focal e produzir a prova de RED, peça o modo
+`tests` no passo `prepare`:
+
 ```text
-Use $specsfy-07-implement para executar a próxima tarefa pronta de
+Use $specsfy-06-implement no modo tests, passo prepare, para
+specs/<estado>/0004-recuperar-senha/spec.md.
+```
+
+Para conferir os testes e a rastreabilidade de uma entrega existente, peça o
+passo `verify`:
+
+```text
+Use $specsfy-06-implement no modo tests, passo verify, na spec 0004.
+```
+
+Para executar o plano, peça o modo `implement`:
+
+```text
+Use $specsfy-06-implement para executar a próxima tarefa pronta de
 specs/<estado>/0004-recuperar-senha/spec.md.
 ```
 
@@ -27,6 +56,30 @@ Implemente T003 da spec 0004 e valide a regressão.
 ```
 
 ## Exemplo passo a passo
+
+### Modo `tests`
+
+1. A skill seleciona a próxima condição de aceite.
+2. Encontra o runner real do projeto.
+3. Em Laravel, exige `.env.testing` com destino explícito e separado do `.env`.
+4. Confere o comando com `check_database_safety.mjs`. Se o resultado não for
+   `SAFE`, não executa nenhum teste.
+5. Cria um teste com marcador de rastreabilidade.
+6. Executa somente o teste focal.
+7. Confirma:
+
+```text
+RED válido: o teste falhou porque a recuperação ainda não foi implementada.
+Caso: TDD-AC-001
+```
+
+Depois da implementação, a skill repete o teste focal e executa a regressão
+para confirmar que o comportamento ficou GREEN sem quebrar o restante.
+
+O bloco Gherkin da spec é uma referência legível. A prova automatizada fica na
+suíte normal do projeto, não em um arquivo `.feature` nem em uma segunda suíte.
+
+### Modo `implement`
 
 1. A skill confirma Definition Gate e Plan Gate aprovados.
 2. Para uma interface, confere as telas, menus, formulário, ações e estados definidos.
@@ -100,6 +153,16 @@ em `.specsfy/STACK.md` e preserva o conteúdo de `migrations.json`.
 
 ## O que esperar
 
+No modo `tests`:
+
+- caso de teste ligado a uma condição de aceite da spec.
+- comando e resultado registrados.
+- distinção entre falha esperada e problema de ambiente.
+- cobertura de sucesso, regra de negócio e limite.
+- regressão depois do GREEN.
+
+No modo `implement`:
+
 - uma tarefa por vez.
 - mudanças limitadas ao escopo aprovado.
 - testes focais e regressão.
@@ -107,6 +170,18 @@ em `.specsfy/STACK.md` e preserva o conteúdo de `migrations.json`.
 - status e checkboxes comprovados por evidência.
 
 ## Erros comuns
+
+No modo `tests`:
+
+- chamar erro de configuração de RED.
+- escrever produção no passo `prepare`.
+- criar testes que não correspondem às condições de aceite.
+- considerar o Gherkin sozinho como teste executado.
+- aprovar o plano sem prova focal.
+- executar teste para descobrir se a conexão está correta.
+- recriar ou limpar todo o banco para preparar a suíte.
+
+No modo `implement`:
 
 - implementar com gate pendente.
 - aceitar um RED causado por dependência ausente.
@@ -120,6 +195,12 @@ em `.specsfy/STACK.md` e preserva o conteúdo de `migrations.json`.
 
 ## Próximo passo
 
-Continue com a próxima tarefa ou consulte
-[`specsfy-progress`](specsfy-progress.md). Uma necessidade nova segue pelo
-[`specsfy-update-spec`](specsfy-update-spec.md), que atualiza a mesma spec.
+Com RED válido e tarefa pronta, a skill segue para o modo `implement`. Para
+apenas reorganizar as tarefas da spec, volte ao
+[`specsfy-05-tasks`](specsfy-05-tasks.md) sem alterar o código.
+
+Depois de uma tarefa entregue, continue com a próxima ou veja o estado geral
+com `specsfy progress`, descrito em
+[Ver o progresso](../reference.md#ver-o-progresso). Uma necessidade nova segue
+pelo [`specsfy-update-spec`](specsfy-update-spec.md), que atualiza a mesma
+spec.

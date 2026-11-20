@@ -1,29 +1,20 @@
----
-name: specsfy-06-tdd-bdd
-description: "Usa o Gherkin de referência da spec para escrever testes TDD executáveis, provar RED antes da implementação, conduzir RED-GREEN-REFACTOR e auditar a rastreabilidade entre spec.md e testes nas seções 11 a 13. Use quando o usuário pedir TDD, BDD, testes derivados da especificação, rastreabilidade ou um ciclo RED-GREEN-REFACTOR, e quando uma transição automática pedir materialização, RED ou verificação de testes. Não executa Gherkin nem arquivos .feature e não inventa comportamento. O plano de tarefas fica com specsfy-05-tasks e as tarefas de produção da seção 14 com specsfy-07-implement."
----
-
-# Executar TDD orientado pelo BDD da especificação
+# Escrever os testes TDD a partir do BDD da especificação
 
 O Gherkin da spec ajuda a pessoa e o agente a entender contexto, ação e
-resultado, mas ele próprio não é uma suíte de testes. Esta skill converte esse
+resultado, mas ele próprio não é uma suíte de testes. Este modo converte esse
 comportamento em testes TDD executáveis, observa a falha antes do código e
 registra evidência rastreável na mesma `spec.md`. Sem RED observado, não há
 prova de que o teste protege o requisito.
 
-## Preparação obrigatória
+Referência do modo `tests` de `$specsfy-06-implement`. A preparação
+obrigatória com `$specsfy-setup`, o modo de interação `perguntas` e os
+anúncios de handoff e de troca de modo estão no `SKILL.md` e valem para este
+modo. A pergunta típica deste modo é qual runner adotar em projeto Node sem
+PHP.
 
-Antes de executar esta skill, carregue obrigatoriamente `$specsfy-setup` na
-raiz do projeto. Em handoff automático, carregue-o de novo antes desta etapa.
-Reutilize a raiz confirmada na conversa e não prossiga se o setup apontar uma
-pendência.
-
-## Modo de interação
-
-Modo de interação: `perguntas`.
-Antes de formular qualquer pergunta, leia e aplique o
-`Contrato de perguntas numeradas` de `.specsfy/Spec.md`. A pergunta típica
-desta skill é qual runner adotar em projeto Node sem PHP.
+Este modo não executa Gherkin nem arquivos `.feature` e não inventa
+comportamento. O plano de tarefas fica com `$specsfy-05-tasks` e as tarefas
+de produção da seção 14 ficam com o modo `implement`.
 
 ## Pronto quando
 
@@ -69,38 +60,26 @@ de `.specsfy/Spec.md` e inclui `migrate:fresh`, `migrate:refresh`,
 prefira `DatabaseTransactions` e factories que criem somente os registros
 usados pelo caso.
 
-## Orquestrar a conversa
+## Escolher o passo
 
-Ao concluir esta etapa ou detectar trabalho de outra etapa, anuncie
-`Pendência detectada: <descrição> — ação: resolvendo nesta etapa` e resolva-a
-quando pertencer ao próprio escopo. Quando houver troca de responsabilidade,
-anuncie `Transição automática: $specsfy-06-tdd-bdd → $<destino> — motivo:
-<motivo> — resultado esperado: <resultado>` e carregue imediatamente a skill de
-destino, sem pedir confirmação nem repetir o comando. Continue na mesma
-conversa. Depois de uma correção necessária a esta etapa, anuncie `Retomada
-automática: $<destino> → $specsfy-06-tdd-bdd — pendência resolvida:
-<resultado>` e retome-a imediatamente. Reavalie o estado após cada handoff para
-evitar ciclos. Não peça confirmação para o handoff; ações sensíveis continuam
-exigindo autorização específica.
+O modo `tests` tem três passos. Cada um responde a um momento da entrega.
 
-## Escolher o modo
-
-| Modo | Uso | Escreve produção? |
+| Passo | Uso | Escreve produção? |
 | --- | --- | --- |
 | `prepare` | antes da implementação, cria o próximo teste e prova RED | não |
 | `cycle` | executa RED → GREEN → REFACTOR para uma fatia escolhida | sim, o mínimo |
 | `verify` | executa suítes e audita rastreabilidade | não |
 
-Se o usuário não indicar o modo, use `prepare` quando a seção 14 ainda não
+Se o usuário não indicar o passo, use `prepare` quando a seção 14 ainda não
 estiver em execução e `cycle` quando houver uma tarefa ativa.
 
 ## Preparar
 
 Leia em paralelo `specs/<estado>/<NNNN>-<slug>/spec.md`, os testes existentes,
-a configuração do projeto e `references/test-levels.md`. Depois:
+a configuração do projeto e [test-levels.md](test-levels.md). Depois:
 
-1. Exija `Formato: Specsfy/2.0` e `Definition Gate: Passed`. No modo
-   `prepare`, use `Status: Defined` e `Plan Gate: Pending`; nos modos `cycle`
+1. Exija `Formato: Specsfy/2.0` e `Definition Gate: Passed`. No passo
+   `prepare`, use `Status: Defined` e `Plan Gate: Pending`; nos passos `cycle`
    e `verify`, use `Status: Planned` ou `Implementing`.
 2. Selecione uma fatia vertical pequena: um `AC` Gherkin e seus `FR/NFR`.
 3. Resolva o runner de testes pela stack antes de escrever testes:
@@ -114,7 +93,7 @@ a configuração do projeto e `references/test-levels.md`. Depois:
      decisão reproduzível.
 4. Confira o ambiente e o comando com `specsfy gate database`. Se o estado
    não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
-5. Escolha com `references/test-levels.md` o nível mais baixo que ainda prova o
+5. Escolha com [test-levels.md](test-levels.md) o nível mais baixo que ainda prova o
    comportamento.
 
 ## Usar o BDD para escrever TDD
@@ -159,14 +138,14 @@ a configuração do projeto e `references/test-levels.md`. Depois:
 
 Registre o RED observado na tabela `Evidência RED-GREEN-REFACTOR`.
 
-No modo `prepare`, pare após o RED válido, registre a evidência e conclua o
+No passo `prepare`, pare após o RED válido, registre a evidência e conclua o
 checklist da tarefa `[TEST]` correspondente. Deixe `Plan Gate` como está:
 anuncie e retorne automaticamente para `$specsfy-05-tasks`, que valida todos
 os predecessores antes de promover a spec para `Planned`.
 
 ### GREEN
 
-No modo `cycle`, escreva o mínimo de código de produção que satisfaça o
+No passo `cycle`, escreva o mínimo de código de produção que satisfaça o
 cenário. Execute primeiro o teste focal e depois a suíte relacionada. Só
 generalize quando um exemplo exigir. Atualize a mesma linha de evidência com o
 GREEN observado.
@@ -209,7 +188,7 @@ Pelo MCP, use a tool `gate_trace`. Sem o binário instalado, rode o script
 equivalente:
 
 ```bash
-node .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
+node .agents/skills/specsfy-06-implement/scripts/check_traceability.mjs specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
 - Trate como gap cada feature, `US`, `FR` ou `NFR` com menos de três casos TDD
@@ -241,7 +220,7 @@ Pelo MCP, use a tool `gate_acceptance`. Sem o binário instalado, rode o script
 equivalente:
 
 ```bash
-node .agents/skills/specsfy-06-tdd-bdd/scripts/verify_acceptance.mjs \
+node .agents/skills/specsfy-06-implement/scripts/verify_acceptance.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md .
 ```
 
@@ -259,6 +238,6 @@ rastreabilidade.
 
 ## Especialistas sob demanda
 
-Leia [references/specialists.md](references/specialists.md) quando o runner, a
+Leia [specialists-tests.md](specialists-tests.md) quando o runner, a
 fronteira ou o oráculo de teste for específico de uma tecnologia. O
-especialista complementa; esta skill preserva RED/GREEN e rastreabilidade.
+especialista complementa; este modo preserva RED/GREEN e rastreabilidade.

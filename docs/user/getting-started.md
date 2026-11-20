@@ -165,10 +165,10 @@ dependências e liga cada tarefa aos requisitos correspondentes. Ela não cria
 
 ## Prove que o teste detecta a ausência da página
 
-Use `$specsfy-06-tdd-bdd` no modo de preparação:
+Use `$specsfy-06-implement` no modo `tests`, passo de preparação:
 
 ```text
-Use $specsfy-06-tdd-bdd em
+Use $specsfy-06-implement no modo tests em
 specs/<estado>/0001-pagina-boas-vindas/spec.md para preparar o TDD.
 ```
 
@@ -187,10 +187,10 @@ coerentes, o `Plan Gate` pode chegar a `Passed`.
 ## Implemente e valide
 
 Com os gates de definição e plano aprovados, use
-`$specsfy-07-implement`:
+`$specsfy-06-implement` no modo `implement`:
 
 ```text
-Use $specsfy-07-implement em
+Use $specsfy-06-implement em
 specs/<estado>/0001-pagina-boas-vindas/spec.md
 ```
 
@@ -225,8 +225,8 @@ o nome deve ter no máximo 80 caracteres.
 
 Essa skill preserva a nova instrução, atualiza a `spec.md` e invalida somente
 as provas afetadas. Como o limite muda comportamento, o fluxo reabre desde o
-Ato I e percorre validação, tarefas e TDD/BDD antes de retomar o
-`$specsfy-07-implement`. A skill de atualização não altera código de
+Ato I e percorre validação, tarefas e o modo `tests` antes de retomar o modo
+`implement` de `$specsfy-06-implement`. A skill de atualização não altera código de
 produção automaticamente.
 
 Uma alteração restrita ao plano técnico reabre os Atos II e III. Uma correção
@@ -235,10 +235,10 @@ todos os casos, o histórico continua na mesma spec.
 
 ## Consulte o estado final
 
-Use `$specsfy-progress` para projetar o estado sem editar arquivos:
+Peça ao agente o progresso para projetar o estado sem editar arquivos:
 
 ```text
-Use $specsfy-progress para mostrar o resultado final.
+Rode specsfy progress e mostre o resultado final.
 ```
 
 O relatório mostra specs, gates, tarefas, checklists, pendências e o próximo

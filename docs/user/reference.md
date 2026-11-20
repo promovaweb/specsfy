@@ -134,10 +134,8 @@ os validadores do framework conferem antes de aprovar o Delivery Gate:
 | `specsfy-03-specify` | quiser criar a spec de uma entrega |
 | `specsfy-04-validate` | precisar aprovar a definição |
 | `specsfy-05-tasks` | precisar planejar as tarefas |
-| `specsfy-06-tdd-bdd` | precisar preparar ou verificar testes |
-| `specsfy-07-implement` | for implementar a entrega |
+| `specsfy-06-implement` | precisar preparar ou verificar testes (modo `tests`) ou for implementar a entrega (modo `implement`) |
 | `specsfy-update-spec` | algo mudar depois da definição |
-| `specsfy-progress` | quiser consultar o estado sem alterar nada |
 | `specsfy-interviewer` | quiser conversar sobre a spec e só depois avançar |
 | `specsfy-milestones` | for definir o MVP de um produto, planejar a evolução após o MVP ou manter os milestones alinhados |
 | `specsfy-data-discovery` | o sistema precisar guardar informações novas |
@@ -189,6 +187,37 @@ Aprofunde no índice de [Skills base](skills/README.md).
 Quase todos aceitam `--project <caminho>` e `--json`. O
 `specsfy <comando> --help` mostra as opções de cada comando do CLI. A lista completa, com
 os códigos de saída, está na [Referência dos comandos](cli-reference.md).
+
+## Ver o progresso
+
+O progresso sai do CLI e da tool MCP `project_status`. Os dois leem
+`specs/<estado>/*/spec.md`, calculam o estado a partir de gates e checkboxes
+e não alteram nada.
+
+```text
+specsfy progress --project .
+specsfy progress --project . --spec 0004 --json
+specsfy progress --project . --watch
+```
+
+Na conversa, peça ao agente para rodar `specsfy progress` e resumir o
+resultado: specs por estado, gates pendentes, tarefas concluídas, falhas que
+impedem o avanço e o próximo trabalho pronto.
+
+O relatório separa os itens vinculados às tarefas dos outros checkboxes. O
+percentual usa a tarefa e seus itens canônicos; anotações soltas ficam no
+total de outros checkboxes e exemplos dentro de blocos de código são
+ignorados. Sem itens de tarefa, o percentual vem dos três gates.
+
+Itens como `PREP` ou `VERIFY` fora de uma tarefa aparecem com o número da
+linha. No JSON, consulte `orphan_checklist_lines` por spec e
+`orphan_checklist_items` no resumo. Para corrigir, peça a
+`$specsfy-update-spec` que confira as linhas indicadas: texto que repete uma
+tarefa concluída vira anotação sem checkbox, e trabalho ainda necessário
+volta ao planejamento da spec.
+
+O progresso mostra onde o projeto está e não autoriza implementar. Não mantenha
+um segundo arquivo de progresso nem altere checkboxes durante a consulta.
 
 ## Mensagens de transição
 

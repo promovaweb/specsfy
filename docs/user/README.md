@@ -102,13 +102,15 @@ cada etapa nesta ordem:
 3. [Criar a especificação](skills/specsfy-03-specify.md).
 4. [Validar a definição](skills/specsfy-04-validate.md).
 5. [Preparar as tarefas](skills/specsfy-05-tasks.md).
-6. [Preparar TDD e BDD](skills/specsfy-06-tdd-bdd.md).
-7. [Implementar](skills/specsfy-07-implement.md).
-8. [Atualizar a especificação](skills/specsfy-update-spec.md).
-9. [Consultar o progresso](skills/specsfy-progress.md).
-10. [Conversar com a spec](skills/specsfy-interviewer.md).
-11. [Cuidar dos milestones](skills/specsfy-milestones.md).
-12. [Descobrir informações a guardar](skills/specsfy-data-discovery.md).
+6. [Preparar os testes e implementar](skills/specsfy-06-implement.md), nos
+   modos `tests` e `implement`.
+7. [Atualizar a especificação](skills/specsfy-update-spec.md).
+8. [Conversar com a spec](skills/specsfy-interviewer.md).
+9. [Cuidar dos milestones](skills/specsfy-milestones.md).
+10. [Descobrir informações a guardar](skills/specsfy-data-discovery.md).
+
+Para consultar o progresso sem alterar nada, leia
+[Ver o progresso](reference.md#ver-o-progresso).
 
 Essas páginas explicam quando usar cada skill, como descrever a tarefa em
 linguagem natural, o resultado esperado, os erros comuns e o próximo passo.

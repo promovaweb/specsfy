@@ -35,7 +35,7 @@ export function nextSteps(overview: ProjectOverview): string[] {
     if (steps.length >= 5) break;
     if (spec.definition_gate !== "Passed") steps.push(`Validate ${spec.slug} with $specsfy-04-validate`);
     else if (spec.plan_gate !== "Passed") steps.push(`Plan the tasks of ${spec.slug} with $specsfy-05-tasks`);
-    else if (spec.delivery_gate !== "Passed" || spec.pending_tasks > 0) steps.push(`Implement ${spec.slug} with $specsfy-07-implement`);
+    else if (spec.delivery_gate !== "Passed" || spec.pending_tasks > 0) steps.push(`Implement ${spec.slug} with $specsfy-06-implement`);
   }
   if (!steps.length) steps.push("Every spec has passed its gates. Capture the next idea with $specsfy-01-inbox");
   return steps.slice(0, 5);

@@ -598,7 +598,7 @@ tests/features/product_management.feature
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Pending
-- **Comando**: `python3 .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.py specs/specs/0006-produtos/spec.md .`
+- **Comando**: `python3 .agents/skills/specsfy-06-implement/scripts/check_traceability.py specs/specs/0006-produtos/spec.md .`
 - **Achados**: implementação e evidências ainda não iniciadas.
 
 ### 14. Tarefas

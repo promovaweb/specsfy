@@ -139,7 +139,7 @@ export const taskNextDef: ScriptCommandDef = {
   tool: "task_next",
   description: "Show the next ready task of a spec, with its next checklist item; --all lists every ready task.",
   longDescription: "Exit code 1 means every open task is blocked by dependencies; 2 means the spec is not ready for implementation (gates, Status or task format).",
-  script: "specsfy-07-implement/scripts/next_task.mjs",
+  script: "specsfy-06-implement/scripts/next_task.mjs",
   project: "cwd",
   json: true,
   effect: "read",
@@ -158,7 +158,7 @@ export const deliveryRenderDef: ScriptCommandDef = {
   longDescription:
     "Without --preview the summary requires Delivery Gate Passed and no open task. With --json and no --format, the CLI asks the script for JSON. " +
     "Over MCP, pass format json for structured data.",
-  script: "specsfy-07-implement/scripts/render_delivery.mjs",
+  script: "specsfy-06-implement/scripts/render_delivery.mjs",
   project: "cwd",
   effect: "read",
   params: [

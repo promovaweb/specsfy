@@ -106,7 +106,7 @@ for (const destructive of [false, true]) {
   });
 }
 test('skills centrais aplicam a proteção de banco', () => {
-  for (const name of ['specsfy-setup','specsfy-05-tasks','specsfy-06-tdd-bdd','specsfy-07-implement']) assert.ok(read(`skills/${name}/SKILL.md`).includes('check_database_safety.mjs'), name);
+  for (const name of ['specsfy-setup','specsfy-05-tasks','specsfy-06-implement']) assert.ok(read(`skills/${name}/SKILL.md`).includes('check_database_safety.mjs'), name);
   const specialist = read('specialists/specsfy-specialist-laravel/SKILL.md');
   for (const term of ['.env.testing', 'DatabaseTransactions']) assert.ok(specialist.includes(term));
   assert.ok(!specialist.includes('RefreshDatabase'));

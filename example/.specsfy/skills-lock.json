@@ -16,32 +16,14 @@
     "specsfy-04-validate": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.886960+00:00",
-      "content_sha256": "a1b35f749502256e10a24b76675d5144f8472bb5b1ee1b21d8bd0d6752b8bfe6",
-      "updated_at": "2026-11-20T15:15:48.207Z"
+      "content_sha256": "aaf7e75fc446f13700fdc91ba57bc79686a272ec8323eb4abc6883fbfb8bb54e",
+      "updated_at": "2026-11-20T15:22:56.152Z"
     },
     "specsfy-05-tasks": {
       "source": "base",
       "installed_at": "2026-07-25T14:46:05.887557+00:00",
-      "content_sha256": "a04ab2afb96e29217773a3ecf87d135debafe4305e6c7cadfb65865810010e79",
-      "updated_at": "2026-11-20T15:11:53.169Z"
-    },
-    "specsfy-06-tdd-bdd": {
-      "source": "base",
-      "installed_at": "2026-07-25T14:46:05.888159+00:00",
-      "content_sha256": "874e1d3a9bff6848c324c332a773cac252fe416a368980e37bcc2a95bce322b2",
-      "updated_at": "2026-11-20T15:11:53.170Z"
-    },
-    "specsfy-07-implement": {
-      "source": "base",
-      "installed_at": "2026-07-25T14:46:05.888843+00:00",
-      "content_sha256": "c1b252f366ae89cc90bf2e7e12c32bb3e90ccc60dcfb0537d5d39bf7f814c7da",
-      "updated_at": "2026-11-20T15:11:53.171Z"
-    },
-    "specsfy-progress": {
-      "source": "base",
-      "installed_at": "2026-07-25T14:46:05.889408+00:00",
-      "content_sha256": "9c93050e419d66d1769783b0d178304d4af9992edcb00e5fa785c4f1613a3a4c",
-      "updated_at": "2026-11-20T15:11:53.172Z"
+      "content_sha256": "e1be72a784c69f9cfdddee4c0dc592bc219333358f88e7ae792965cd0f8da41f",
+      "updated_at": "2026-11-20T15:27:26.972Z"
     },
     "specsfy-specialist-laravel": {
       "source": "specialists",
@@ -154,8 +136,8 @@
     "specsfy-setup": {
       "source": "base",
       "installed_at": "2026-07-27T16:06:43.315970+00:00",
-      "content_sha256": "a61bc9891ef55de9bbe7a3602c2f48bd0d3c66c7a8dbe4be3a7c693b98a9209d",
-      "updated_at": "2026-11-20T15:11:53.164Z"
+      "content_sha256": "abade734c4f30e225761ca895cd87719006fb7639c7f506f1875f63e923efc4d",
+      "updated_at": "2026-11-20T15:27:26.969Z"
     },
     "specsfy-aux-stack": {
       "source": "base",
@@ -190,8 +172,8 @@
     "specsfy-update-spec": {
       "source": "base",
       "installed_at": "2026-07-28T22:38:58.466104+00:00",
-      "content_sha256": "2720131a46313ee14ae73809282fed2060096df920701a5f6c97c66eab0f0ae3",
-      "updated_at": "2026-11-20T15:11:53.171Z"
+      "content_sha256": "a13485f00ae54c4b6795ac7b32c68f261c1077045b6b91288905bd4f7eae0b26",
+      "updated_at": "2026-11-20T15:25:18.055Z"
     },
     "specsfy-interviewer": {
       "source": "base",
@@ -209,16 +191,22 @@
       "source": "base",
       "installed_at": "2026-11-20T15:15:48.207Z",
       "content_sha256": "06cd993cfb3efb23c54fecee784d572acc669d553c9d62617f3c905ff85386a5"
+    },
+    "specsfy-06-implement": {
+      "source": "base",
+      "installed_at": "2026-11-20T15:22:56.149Z",
+      "content_sha256": "22777f296cc521eb5bd64013fcfe4165ce5ef5924a837528c20c15ccde39eefe",
+      "updated_at": "2026-11-20T15:26:32.705Z"
     }
   },
   "framework": {
     "source": "base",
-    "spec_sha256": "1953083a40a5ad29250790e75967d12a2a15ea6c42a022dde6e992d158b95b1b",
-    "template_sha256": "bc98e1529a7433ebe35afed2bfc5fec9c296d18b8ba975ea24318c486456efe2",
+    "spec_sha256": "122485415a26fd29bc8fdf4072f43e46886363711741691024c723764ae1045e",
+    "template_sha256": "4a574c6e38d87f4e2486c966a47f9d5c45c1eaf1bb445b73cc7d11a1011509e1",
     "templates_sha256": {
       "Inbox.md": "a598c5ac2fddc936bd5856df6548b989a62c939d3198c3eb887405c074d08a6f",
       "Backlog.md": "d3a354ce702cf29ae2900f77125710093bb6d8a12e3a68b01af139703ce3c92d",
-      "Spec.md": "bc98e1529a7433ebe35afed2bfc5fec9c296d18b8ba975ea24318c486456efe2",
+      "Spec.md": "4a574c6e38d87f4e2486c966a47f9d5c45c1eaf1bb445b73cc7d11a1011509e1",
       "Tasks.md": "422e405586ea0d079fb6efd0ec58c6ebea8d6da89dd7b19428f97c31e8b0f7d2",
       "Project.md": "13a1d10d8cac322ce2dc26931696e99b4586d6c7265f4beb7adf77d315aeda1c",
       "Stack.md": "15e716554aabd183a18dd1752fcb1b57e931ef285d398e1ac6ee9c33571e476d",

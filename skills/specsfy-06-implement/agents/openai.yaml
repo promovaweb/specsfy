@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - 06 - Testar e implementar"
+  short_description: "Cria o TDD da spec e executa as tarefas com comprovação"
+  default_prompt: "Use $specsfy-06-implement em specs/<estado>/<NNNN>-<slug>/spec.md: no modo tests, leia o Gherkin de referência, crie testes TDD rastreáveis, prove RED e conduza RED-GREEN-REFACTOR sem executar .feature; no modo implement, execute a próxima tarefa pronta da seção 14, confirme RED, escreva a menor mudança até GREEN, faça a revisão visual e registre a comprovação na spec. Orquestre transições automáticas com anúncio, execução e retomada na mesma conversa."

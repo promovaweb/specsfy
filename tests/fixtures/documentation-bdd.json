@@ -5,10 +5,10 @@
     "### 3. Crie a especificação — `$specsfy-03-specify`",
     "### 4. Confira a especificação — `$specsfy-04-validate`",
     "### 5. Divida o trabalho — `$specsfy-05-tasks`",
-    "### 6. Prepare a verificação — `$specsfy-06-tdd-bdd`",
-    "### 7. Implemente — `$specsfy-07-implement`",
+    "### 6. Prepare a verificação — `$specsfy-06-implement` no modo `tests`",
+    "### 7. Implemente — `$specsfy-06-implement` no modo `implement`",
     "### 8. Altere a especificação — `$specsfy-update-spec`",
-    "### 9. Veja o progresso — `$specsfy-progress`"
+    "### 9. Veja o progresso — `specsfy progress`"
   ],
   "basic_journey": [
     "## Capture uma entrada",
@@ -27,10 +27,8 @@
     "$specsfy-03-specify",
     "$specsfy-04-validate",
     "$specsfy-05-tasks",
-    "$specsfy-06-tdd-bdd",
-    "$specsfy-07-implement",
-    "$specsfy-update-spec",
-    "$specsfy-progress"
+    "$specsfy-06-implement",
+    "$specsfy-update-spec"
   ],
   "public_basics": [
     "get.specsfy.dev",
@@ -70,8 +68,8 @@
     "#### Especificar a partir do backlog",
     "Use $specsfy-04-validate em specs/<estado>/0001-pagina-boas-vindas/spec.md",
     "Use $specsfy-05-tasks em specs/<estado>/0001-pagina-boas-vindas/spec.md",
-    "Use $specsfy-06-tdd-bdd em specs/<estado>/0001-pagina-boas-vindas/spec.md",
-    "Use $specsfy-07-implement em specs/<estado>/0001-pagina-boas-vindas/spec.md"
+    "Use $specsfy-06-implement no modo tests em specs/<estado>/0001-pagina-boas-vindas/spec.md",
+    "Use $specsfy-06-implement em specs/<estado>/0001-pagina-boas-vindas/spec.md"
   ],
   "cli_tips": [
     "## Dicas para usar o CLI",

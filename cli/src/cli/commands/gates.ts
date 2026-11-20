@@ -84,7 +84,7 @@ export const gateDefinitions: ScriptCommandDef[] = [
     tool: "gate_trace",
     description: "Check traceability between the spec IDs and the test markers.",
     longDescription: "Looks for SPECSFY: or @ID markers in the test files declared by [TEST] [TDD] tasks (or in the whole project, for legacy specs) and requires the minimum number of test cases per ID. --full-chain also requires a task and an evidence record per ID.",
-    script: "specsfy-06-tdd-bdd/scripts/check_traceability.mjs",
+    script: "specsfy-06-implement/scripts/check_traceability.mjs",
     project: "after-spec",
     params: [
       specParam,
@@ -102,7 +102,7 @@ export const gateDefinitions: ScriptCommandDef[] = [
     tool: "gate_acceptance",
     description: "Verify that every acceptance criterion (AC) of a spec has a passing result.",
     longDescription: "Reads the acceptance results recorded in the spec and, with --attestation, checks the AC coverage attested by verify.",
-    script: "specsfy-06-tdd-bdd/scripts/verify_acceptance.mjs",
+    script: "specsfy-06-implement/scripts/verify_acceptance.mjs",
     project: "after-spec",
     params: [specParam, attestationParam],
     json: true,
@@ -115,7 +115,7 @@ export const gateDefinitions: ScriptCommandDef[] = [
     tool: "gate_evidence",
     description: "Verify the material evidence of the tasks of a spec (Evidence Contract 1).",
     longDescription: "Checks the specsfy:evidence records of each task: files, commands and migrations. Specs without Evidence Contract pass in legacy mode. --delivery also refuses planned migrations still open; --attestation binds the check to a verify attestation of the current commit.",
-    script: "specsfy-07-implement/scripts/verify_evidence.mjs",
+    script: "specsfy-06-implement/scripts/verify_evidence.mjs",
     project: "after-spec",
     params: [
       specParam,

@@ -23,7 +23,7 @@ test('CRUD reutiliza componentes e expõe ações de linha',()=>{
  includes(template.toLowerCase(),['PageHeader','reutiliz','component','DataGrid','largura total','ID','detalhe','editar','apagar'].map(term=>term.toLowerCase()));
 });
 test('implementação exige revisão visual mesmo sem solicitação',()=>{
- const text=['skills/Spec.md','skills/templates/Tasks.md','skills/specsfy-07-implement/SKILL.md'].map(read).join('\n');
+ const text=['skills/Spec.md','skills/templates/Tasks.md','skills/specsfy-06-implement/references/implement.md'].map(read).join('\n');
  includes(text,['Revisão visual obrigatória','mesmo sem pedido','bordas','espaçamentos','margens','padding','tipografia']);
 });
 test('formulários de criação e edição usam seções e duas colunas',()=>{

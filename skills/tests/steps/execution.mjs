@@ -6,7 +6,7 @@ import { assert, temporary, read, text, skill, run, success, includes, normalize
 
 const initialize = (cwd, title, root) => run('specsfy-03-specify/scripts/iniciar_spec.mjs', ['--title', title, ...(root ? ['--root', root] : [])], { cwd });
 const empty = ctx => { ctx.project = temporary(ctx.t); assert.ok(!existsSync(join(ctx.project, 'specs'))); };
-const loadContract = ctx => { ctx.contract = normalized([read('skills/Spec.md'), ...['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-update-spec', 'specsfy-progress'].map(skill)].join('\n')); };
+const loadContract = ctx => { ctx.contract = normalized([read('skills/Spec.md'), ...['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-implement', 'specsfy-update-spec'].map(skill)].join('\n')); };
 const evaluate = ctx => assert.ok(ctx.contract);
 const migrationCheck = (ctx, pattern) => { runContract('skills/tests/migration-runner.test.mjs', pattern); ctx.migrationChecked = true; };
 
@@ -38,7 +38,7 @@ export const executionSteps = [
   ['o agente tenta iniciar uma spec com título sem caracteres alfanuméricos', ctx => { ctx.result = initialize(ctx.project, '!!!'); }],
   ['o comando termina com erro acionável', ctx => { assert.notEqual(ctx.result.status, 0); includes(ctx.result.stderr.toLowerCase(), ['erro:']); }],
   ['nenhum spec.md parcial é criado', ctx => assert.deepEqual(paths(ctx.project).filter(path => path.endsWith('/spec.md') || path === 'spec.md'), [])],
-  ['os validadores de tarefas e comprovação do Specsfy', ctx => { ctx.tasks = read('skills/specsfy-05-tasks/scripts/validate_tasks.mjs'); ctx.evidence = read('skills/specsfy-07-implement/scripts/verify_evidence.mjs'); }],
+  ['os validadores de tarefas e comprovação do Specsfy', ctx => { ctx.tasks = read('skills/specsfy-05-tasks/scripts/validate_tasks.mjs'); ctx.evidence = read('skills/specsfy-06-implement/scripts/verify_evidence.mjs'); }],
   ['o contrato de migrations planejadas é inspecionado', ctx => { ctx.migrationContract = ctx.tasks + '\n' + ctx.evidence; }],
   ['toda alteração estrutural do banco exige uma tarefa MIGRATION', ctx => includes(ctx.tasks, ['SCHEMA_CHANGE_TASK', 'sem uma tarefa [MIGRATION]', 'MIGRATION_PATH'])],
   ['a conclusão exige arquivo aplicação e consulta de estado', ctx => includes(ctx.evidence, ['migration planejada ainda não foi concluída', 'migration não aparece nos arquivos produzidos', 'comando de aplicação da migration ausente', 'comando de conferência da migration ausente'])],
@@ -51,16 +51,16 @@ export const executionSteps = [
   ['um projeto com .specsfy/migrations.json', ctx => { ctx.migration = 'stack'; }],
   ['a stack é atualizada duas vezes', ctx => { assert.equal(ctx.migration, 'stack'); migrationCheck(ctx, '^#52: stack registra'); }],
   ['STACK.md registra o runner e a segunda execução não altera os arquivos', ctx => assert.equal(ctx.migrationChecked, true)],
-  ...['uma skill base concluiu sua responsabilidade', 'uma etapa posterior encontra uma pendência de uma etapa anterior', 'uma transição automática exige uma ação sensível', 'as doze skills base instaladas'].map(step => [step, loadContract]),
+  ...['uma skill base concluiu sua responsabilidade', 'uma etapa posterior encontra uma pendência de uma etapa anterior', 'uma transição automática exige uma ação sensível', 'as dez skills base instaladas'].map(step => [step, loadContract]),
   ...['ela identifica a próxima etapa responsável', 'ela identifica a skill responsável pela correção', 'a skill responsável é carregada', 'o estado canônico exige outra responsabilidade'].map(step => [step, evaluate]),
   ['anuncia a transição, o motivo e a pendência ou resultado esperado', ctx => includes(ctx.contract, ['Transição automática:', 'motivo', 'Pendência detectada:'])],
   ['carrega automaticamente a skill de destino sem pedir confirmação', ctx => includes(ctx.contract, ['sem pedir confirmação', 'carregue imediatamente a skill de destino'])],
   ['continua na mesma conversa sem pedir o comando novamente', ctx => includes(ctx.contract, ['mesma conversa', 'não peça que a pessoa repita o comando'])],
   ['anuncia a pendência e executa o retorno', ctx => includes(ctx.contract, ['Pendência detectada:', 'retorno'])],
   ['após a correção retoma automaticamente a etapa que detectou a pendência', ctx => includes(ctx.contract, ['Retomada automática:'])],
-  ['a cadeia principal chama inbox, backlog, specify, validate, tasks, tdd-bdd, implement e progress', ctx => includes(ctx.contract, ['specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-progress'].map(name => '$' + name))],
-  ['mudança tardia chama update-spec automaticamente', () => includes(normalized(skill('specsfy-07-implement')), ['carregue automaticamente `$specsfy-update-spec`'])],
-  ['ausência de especificação chama specify automaticamente', () => includes(normalized(skill('specsfy-progress')), ['carregue automaticamente `$specsfy-update-spec`'])],
+  ['a cadeia principal chama inbox, backlog, specify, validate, tasks e implement', ctx => includes(ctx.contract, ['specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-implement'].map(name => '$' + name))],
+  ['mudança tardia chama update-spec automaticamente', () => includes(normalized(skill('specsfy-06-implement')), ['carregue automaticamente `$specsfy-update-spec`'])],
+  ['a troca entre testes e implementação acontece dentro da mesma skill', () => includes(normalized(skill('specsfy-06-implement')), ['Troca de modo:', 'sem carregar outra', 'sem pedir confirmação'])],
   ['o handoff não pede confirmação', ctx => includes(ctx.contract.toLowerCase(), ['não peça confirmação para o handoff'])],
   ['a ação sensível continua exigindo autorização específica', ctx => includes(ctx.contract, ['autorização específica'])],
 ];

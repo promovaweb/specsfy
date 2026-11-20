@@ -307,6 +307,26 @@ registre essa avaliação nas fontes da tarefa e repita com
 `--acknowledge-rules-no-change` com a mesma disciplina. O reconhecimento serve
 para registrar uma avaliação, não para ocultar mudança documental real.
 
+## Custo de contexto de uma spec
+
+Para estimar quanto contexto uma spec consome, rode:
+
+```bash
+specsfy context usage <spec> --json
+```
+
+Pelo MCP, use a tool `context_usage`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
+node .agents/skills/specsfy-setup/scripts/analyze_context.mjs \
+  specs/<estado>/<NNNN>-<slug>/spec.md --json
+```
+
+Sem `--usage-json`, o custo sai rotulado `estimated` e descreve a
+heurística. Só métricas fornecidas explicitamente são `measured`; não
+apresente estimativa como uso real.
+
 ## Stack e especialistas instalados pelo setup
 
 Depois de ler a stack:

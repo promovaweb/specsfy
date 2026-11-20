@@ -3,24 +3,22 @@
  Overview   Specs      Backlog    Gates      Tests      Skills     About                                                                    
                                                        ▬▬▬▬▬▬▬▬▬▬▬                                                                          
  ╭─ Skills ─────────────────────────────────────────────────╮╭─ Status ───────────────────────────────────────────────────────────────────╮ 
- │ Framework · 12                                          █││ Project    ~/projects/example                                              │ 
- │ > ✓ installed  specsfy-01-inbox                         █││ Installed  35 Specsfy skill(s) in skills-lock.json                         │ 
+ │ Framework · 10                                          █││ Project    ~/projects/example                                              │ 
+ │ > ✓ installed  specsfy-01-inbox                         █││ Installed  33 Specsfy skill(s) in skills-lock.json                         │ 
  │   ✓ installed  specsfy-02-backlog                       █││ Catalog    39 specialist(s)                                                │ 
  │   ✓ installed  specsfy-03-specify                       █││ Inventory  ✓ in sync                                                       │ 
  │   ✓ installed  specsfy-04-validate                      █│╰────────────────────────────────────────────────────────────────────────────╯ 
  │   ✓ installed  specsfy-05-tasks                         █│╭─ Detail ───────────────────────────────────────────────────────────────────╮ 
- │   ✓ installed  specsfy-06-tdd-bdd                       █││ Skill     specsfy-01-inbox                                                 │ 
- │   ✓ installed  specsfy-07-implement                     █││ State     ✓ installed                                                      │ 
- │   ✓ installed  specsfy-data-discovery                   █││ Category  Framework                                                        │ 
- │   ✓ installed  specsfy-interviewer                      █││ Captures and pre-processes ideas without asking questions.                 │ 
- │   ✓ installed  specsfy-milestones                       █││ x removes this skill · u updates every installed skill                     │ 
- │   ✓ installed  specsfy-progress                         █││                                                                            │ 
- │   ✓ installed  specsfy-update-spec                      █││                                                                            │ 
+ │   ✓ installed  specsfy-06-implement                     █││ Skill     specsfy-01-inbox                                                 │ 
+ │   ✓ installed  specsfy-data-discovery                   █││ State     ✓ installed                                                      │ 
+ │   ✓ installed  specsfy-interviewer                      █││ Category  Framework                                                        │ 
+ │   ✓ installed  specsfy-milestones                       █││ Captures and pre-processes ideas without asking questions.                 │ 
+ │   ✓ installed  specsfy-update-spec                      █││ x removes this skill · u updates every installed skill                     │ 
  │ Auxiliary · 4                                           █││                                                                            │ 
  │   ✓ installed  specsfy-aux-database                     █││                                                                            │ 
- │   ✓ installed  specsfy-aux-rules                        ▀││                                                                            │ 
- │   ✓ installed  specsfy-aux-stack                         ││                                                                            │ 
- │   ✓ installed  specsfy-setup                             ││                                                                            │ 
+ │   ✓ installed  specsfy-aux-rules                        █││                                                                            │ 
+ │   ✓ installed  specsfy-aux-stack                        █││                                                                            │ 
+ │   ✓ installed  specsfy-setup                            █││                                                                            │ 
  │ Documentation · 1                                        ││                                                                            │ 
  │   ✓ installed  specsfy-documentator                      ││                                                                            │ 
  │ Architecture · 2                                         ││                                                                            │ 
@@ -36,5 +34,7 @@
  │   ✓ installed  specsfy-specialist-redis                  ││                                                                            │ 
  │ Design · 7                                               ││                                                                            │ 
  │   ○ available  specsfy-specialist-design-system          ││                                                                            │ 
+ │   ○ available  specsfy-specialist-interface-experience   ││                                                                            │ 
+ │   ○ available  specsfy-specialist-react-ui-components    ││                                                                            │ 
  ╰──────────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────────────────────────╯ 
   ↑/↓  skill   i  install   x  remove   u  update all   c  catalog   ←/→  tab   1-9  go   ?  help   q  quit

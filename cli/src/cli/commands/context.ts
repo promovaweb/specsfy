@@ -4,7 +4,7 @@
  * `context setup|inspect|interface|monitor|stack|rule|database|data|usage`
  * pass their parameters to the scripts of `specsfy-setup`,
  * `specsfy-aux-stack`, `specsfy-aux-rules`, `specsfy-aux-database`,
- * `specsfy-data-discovery` and `specsfy-progress/analyze_context`. The
+ * `specsfy-data-discovery` and `specsfy-setup/analyze_context`. The
  * definitions are shared with the MCP tools in `src/mcp/tools/context.ts`.
  *
  * `context monitor --check` exits with GATE_FAILED (10) when context
@@ -133,7 +133,7 @@ export const contextUsageDef: ScriptCommandDef = {
   name: "usage",
   tool: "context_usage",
   description: "Estimate the context size of a spec by section, or ingest measured token usage from a JSON file.",
-  script: "specsfy-progress/scripts/analyze_context.mjs",
+  script: "specsfy-setup/scripts/analyze_context.mjs",
   project: "cwd",
   json: true,
   effect: "read",

@@ -23,5 +23,5 @@ test('referência e AGENTS publicam blocos idênticos',()=>{
 test('skills de execução compartilham o monitor de contexto',()=>{
  const source=read('skills/specsfy-setup/scripts/monitor_context.mjs');
  includes(source,['.specsfy/STACK.md','.specsfy/RULES.md','.specsfy/DATABASE.md','.specsfy/USER-PROFILE.md','PROJECT.md']);
- for(const name of ['specsfy-05-tasks','specsfy-07-implement','specsfy-progress'])includes(read(`skills/${name}/SKILL.md`),['monitor_context.mjs']);
+ for(const path of ['specsfy-05-tasks/SKILL.md','specsfy-06-implement/references/implement.md'])includes(read(`skills/${path}`),['monitor_context.mjs']);
 });

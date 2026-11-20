@@ -37,7 +37,7 @@ conforme o alcance da escolha.
 
 Execute `$specsfy-documentator` livremente para documentar um sistema legado ou
 atualizar sua visão técnica. Depois de cada tarefa de código concluída por
-`$specsfy-07-implement`, a transição para o documentador é obrigatória. A
+`$specsfy-06-implement`, a transição para o documentador é obrigatória. A
 implementação só continua quando `docs/` representar o código atual.
 
 A skill lê o código completo e as fontes que descrevem a aplicação. Isso inclui

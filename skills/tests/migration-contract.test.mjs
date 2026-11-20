@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { ROOT, temporary, put, node } from '../../tests/helpers.mjs';
 
 const tasks = join(ROOT, 'skills/specsfy-05-tasks/scripts/validate_tasks.mjs');
-const evidence = join(ROOT, 'skills/specsfy-07-implement/scripts/verify_evidence.mjs');
+const evidence = join(ROOT, 'skills/specsfy-06-implement/scripts/verify_evidence.mjs');
 const checklist = ['PREP', 'EXECUTE', 'VERIFY', 'VISUAL', 'EVIDENCE', 'IMPROVE'].map(label => `  - [ ] **${label}**: Conferir contrato.\n`).join('');
 const base = '| Formato | Specsfy/2.0 |\n| Status | Defined |\n| Definition Gate | Passed |\n| Plan Gate | Pending |\n#### US-001 — Cadastro\n#### AC-001 — Criação\n#### AC-002 — Validação\n#### AC-003 — Falha\n- **FR-001**: Persistir cliente.\n- **NFR-001**: Manter integridade.\n### 14. Tarefas\n';
 

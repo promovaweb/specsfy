@@ -1,6 +1,6 @@
 ---
 name: specsfy-05-tasks
-description: "Decompõe uma spec aprovada em tarefas pequenas, ordenadas e rastreáveis nas seções 14 e 15 da própria spec.md e conduz o Plan Gate. Use quando o usuário quiser quebrar a especificação em tarefas, preencher ou atualizar a seção 14. Tarefas, ordenar dependências, planejar fatias verticais ou preparar a execução, e quando uma transição automática pedir planejamento, replanejamento ou retomada após RED. Edita somente o plano dentro da fonte única: não cria tasks.md, não escreve código e não marca trabalho como concluído. Testes e RED ficam com specsfy-06-tdd-bdd e a execução com specsfy-07-implement."
+description: "Decompõe uma spec aprovada em tarefas pequenas, ordenadas e rastreáveis nas seções 14 e 15 da própria spec.md e conduz o Plan Gate. Use quando o usuário quiser quebrar a especificação em tarefas, preencher ou atualizar a seção 14. Tarefas, ordenar dependências, planejar fatias verticais ou preparar a execução, e quando uma transição automática pedir planejamento, replanejamento ou retomada após RED. Edita somente o plano dentro da fonte única: não cria tasks.md, não escreve código e não marca trabalho como concluído. Testes, RED e a execução ficam com specsfy-06-implement, nos modos tests e implement."
 ---
 
 # Quebrar a especificação em tarefas
@@ -34,7 +34,7 @@ desta skill é qual runner de testes adotar em projeto Node sem PHP.
 - `Plan Gate: Passed`, `Status: Planned` e `Gate do Ato II — Plano` estão
   registrados, e `specsfy specs transition <id> planned`, equivalente a
   `specsfy specs transition <id> planned`, foi executado;
-- `$specsfy-07-implement` foi carregada.
+- `$specsfy-06-implement` foi carregada no modo `implement`.
 
 ## Proteção do banco no plano
 
@@ -267,9 +267,9 @@ tarefa concluída sem evidence.
 ### Fechar o Plan Gate
 
 Quando a estrutura passar ainda com `Plan Gate: Pending`, chame
-automaticamente `$specsfy-06-tdd-bdd` no modo `prepare`. Ele usa o BDD da spec
-para materializar o predecessor TDD, observa RED e conclui somente essa tarefa
-de teste. Ao retomar esta skill, siga em ordem:
+automaticamente `$specsfy-06-implement` no modo `tests`, passo `prepare`. Ele
+usa o BDD da spec para materializar o predecessor TDD, observa RED e conclui
+somente essa tarefa de teste. Ao retomar esta skill, siga em ordem:
 
 1. execute novamente o validador com `--allow-draft`;
 2. altere `Plan Gate` para `Passed` e defina `Status: Planned`;
@@ -291,8 +291,37 @@ justificativa.
 
 Informe a contagem total e por tipo, o caminho crítico, as oportunidades
 `[P]` e a cobertura de IDs. Quando o gate passar, anuncie e carregue
-automaticamente `$specsfy-07-implement`. O plano vive somente na spec, sem
-`tasks.md`.
+automaticamente `$specsfy-06-implement` no modo `implement`. O plano vive
+somente na spec, sem `tasks.md`.
+
+## Ver o progresso
+
+O progresso de todas as specs é uma projeção de `specs/<estado>/*/spec.md`,
+calculada sem escrever nada. Rode:
+
+```bash
+specsfy progress --project <raiz>
+specsfy progress --project <raiz> --spec <spec> --json
+```
+
+Pelo MCP, use a tool `project_status`. Sem o binário instalado, rode o script
+equivalente:
+
+```bash
+node .agents/skills/specsfy-05-tasks/scripts/progress.mjs <raiz> --json
+```
+
+- O relatório traz os denominadores de specs, gates, tarefas e itens de
+  checklist, o ato atual, a próxima skill responsável e o próximo par
+  `TNNN/ITEM` pronto.
+- Conte somente `spec.md` dentro de `specs/<estado>/`. Capturas em
+  `specs/inbox/`, itens em `specs/backlog/` e arquivos de `research/` não
+  entram no progresso normativo. Sem nenhuma spec, o código de saída é 2.
+- Um gate `In Progress` isolado não é falha. Gate `Failed`, checklist
+  incoerente e dependência sem caminho pronto impedem o avanço.
+- Não edite specs, checkboxes, testes ou código durante a consulta e não
+  deduza progresso de commits, arquivos soltos ou memória da conversa. Para
+  mudar estado, carregue a skill responsável.
 
 ## Especialistas sob demanda
 

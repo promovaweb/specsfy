@@ -221,20 +221,20 @@ describe("update reconciles the project with the inventory", () => {
   }, 60_000);
 
   test("--check reports a missing framework skill with exit 10 and writes nothing", async () => {
-    expect((await run(["skills", "remove", "specsfy-progress", "--project", project])).code).toBe(0);
+    expect((await run(["skills", "remove", "specsfy-update-spec", "--project", project])).code).toBe(0);
     const before = snapshot(project);
     const r = await run(["update", "--check", "--project", project]);
     expect(r.code).toBe(ExitCode.GATE_FAILED);
     expect(r.json!.data).toMatchObject({ check: true, in_sync: false, updated: [] });
-    expect(r.json!.data.plan.install).toEqual(["specsfy-progress"]);
+    expect(r.json!.data.plan.install).toEqual(["specsfy-update-spec"]);
     expect(snapshot(project)).toEqual(before);
   }, 60_000);
 
   test("update installs the missing framework skill", async () => {
     const r = await run(["update", "--project", project]);
     expect(r.code).toBe(0);
-    expect(r.json!.data.updated).toEqual([".agents/skills/specsfy-progress"]);
-    expect(existsSync(join(skill("specsfy-progress"), "SKILL.md"))).toBe(true);
+    expect(r.json!.data.updated).toEqual([".agents/skills/specsfy-update-spec"]);
+    expect(existsSync(join(skill("specsfy-update-spec"), "SKILL.md"))).toBe(true);
     expect((await run(["update", "--check", "--project", project])).code).toBe(0);
   }, 60_000);
 
@@ -288,11 +288,11 @@ describe("update reconciles the project with the inventory", () => {
     writeFileSync(join(repository, "skills", "specsfy-new-thing", "SKILL.md"), "---\nname: specsfy-new-thing\ndescription: New\n---\n");
     git(repository, "add", ".");
     editInventory((inventory) => {
-      delete inventory.skills["specsfy-progress"];
+      delete inventory.skills["specsfy-update-spec"];
       inventory.skills["specsfy-new-thing"] = "base";
 // A rename always points to a current skill, so the older name follows it.
-      delete inventory.renamed["specsfy-base-progress"];
-      inventory.retired.push("specsfy-progress", "specsfy-base-progress");
+      delete inventory.renamed["specsfy-base-update-spec"];
+      inventory.retired.push("specsfy-update-spec", "specsfy-base-update-spec");
       inventory.renamed["specsfy-interviewer"] = "specsfy-new-thing";
       delete inventory.skills["specsfy-interviewer"];
     }, "retire, rename and add");
@@ -300,22 +300,22 @@ describe("update reconciles the project with the inventory", () => {
     expect(check.code).toBe(ExitCode.GATE_FAILED);
     expect(check.json!.data.plan).toMatchObject({
       install: ["specsfy-new-thing"],
-      retire: ["specsfy-progress"],
+      retire: ["specsfy-update-spec"],
       rename: [{ from: "specsfy-interviewer", to: "specsfy-new-thing" }],
     });
     const r = await run(["update", "--latest", "--project", project]);
     expect(r.code).toBe(0);
     expect(r.json!.data.updated).toEqual(expect.arrayContaining([
       ".agents/skills/specsfy-new-thing",
-      ".agents/skills/specsfy-progress",
+      ".agents/skills/specsfy-update-spec",
       ".agents/skills/specsfy-interviewer",
     ]));
     expect(existsSync(skill("specsfy-new-thing"))).toBe(true);
-    expect(existsSync(skill("specsfy-progress"))).toBe(false);
+    expect(existsSync(skill("specsfy-update-spec"))).toBe(false);
     expect(existsSync(skill("specsfy-interviewer"))).toBe(false);
     const names = Object.keys(readJsonFile(join(project, "skills-lock.json")).skills);
     expect(names).toContain("specsfy-new-thing");
-    expect(names).not.toContain("specsfy-progress");
+    expect(names).not.toContain("specsfy-update-spec");
     expect((await run(["update", "--check", "--latest", "--project", project])).code).toBe(0);
   }, 60_000);
 

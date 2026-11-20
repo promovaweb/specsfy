@@ -21,7 +21,7 @@ está em [`docs/`](../docs/).
 
 Este módulo possui:
 
-- as instruções operacionais das doze skills base, do setup, do
+- as instruções operacionais das dez skills base, do setup, do
   documentador e das três auxiliares.
 - os templates de ideia, backlog, spec, tarefas e interface em `templates/`.
 - um documento preenchido e não normativo em `examples/Spec.md`.
@@ -88,7 +88,7 @@ termina ou encontra uma pendência de outra etapa, a skill atual:
 O protocolo também vale para retornos. Pedido tardio entra por
 `specsfy-update-spec`. Mudança de comportamento reabre definição e
 validação, mudança de plano retorna às tarefas e ausência de teste ou RED chama
-TDD/BDD. O handoff é automático, mas não autoriza instalação, deploy,
+o modo `tests` de `specsfy-06-implement`. O handoff é automático, mas não autoriza instalação, deploy,
 publicação ou ação destrutiva, que continuam exigindo autorização específica.
 
 Toda decisão material ausente é tratada por `specsfy-02-backlog`. A skill
@@ -119,10 +119,8 @@ para reconstruir a documentação técnica do sistema existente.
 | [`specsfy-03-specify`](specsfy-03-specify/SKILL.md) | promover decisões para `spec.md` e research | não implementa nem captura ideia vaga |
 | [`specsfy-04-validate`](specsfy-04-validate/SKILL.md) | auditar o Definition Gate | não decide requisitos |
 | [`specsfy-05-tasks`](specsfy-05-tasks/SKILL.md) | manter tarefas nas seções 14–15 | não cria `tasks.md` nem código |
-| [`specsfy-06-tdd-bdd`](specsfy-06-tdd-bdd/SKILL.md) | usar o BDD da spec para criar TDD e provar RED/GREEN | não executa Gherkin nem inventa comportamento |
-| [`specsfy-07-implement`](specsfy-07-implement/SKILL.md) | executar tarefas prontas e evidenciar | não trabalha sem RED |
+| [`specsfy-06-implement`](specsfy-06-implement/SKILL.md) | no modo `tests`, usar o BDD da spec para criar TDD e provar RED/GREEN; no modo `implement`, executar tarefas prontas e evidenciar | não executa Gherkin, não inventa comportamento e não trabalha sem RED |
 | [`specsfy-update-spec`](specsfy-update-spec/SKILL.md) | incorporar pedido tardio e reabrir somente os atos afetados | não cria nova spec nem implementa |
-| [`specsfy-progress`](specsfy-progress/SKILL.md) | projetar o estado global | não altera gates ou checkboxes |
 | [`specsfy-milestones`](specsfy-milestones/SKILL.md) | importar o MVP como `M01`, entrevistar a evolução pós-MVP e sincronizar a projeção de milestones | não planeja tarefas ou código, não altera o núcleo sem confirmação e não inventa condição de saída |
 | [`specsfy-data-discovery`](specsfy-data-discovery/SKILL.md) | conversar sobre informações que o produto precisa guardar | não escolhe tecnologia ou implementação |
 | [`specsfy-setup`](specsfy-setup/SKILL.md) | detectar o stack, criar contexto ausente, preparar `DESIGNSYSTEM.MD`, manter o perfil de interação e reconciliar blocos de agentes | não sobrescreve arquivos de contexto existentes |
@@ -172,9 +170,9 @@ development sem instalar outro runtime ou criar fontes paralelas:
 | --- | --- |
 | Gates de qualidade | `specsfy-04-validate` |
 | Proteção de CI | `specsfy-04-validate` |
-| Verificação de tarefas | `specsfy-07-implement` |
-| Revisão visual da interface | `specsfy-07-implement` e especialistas de interface |
-| Rastreabilidade da spec | `specsfy-06-tdd-bdd` |
+| Verificação de tarefas | `specsfy-06-implement` |
+| Revisão visual da interface | `specsfy-06-implement` e especialistas de interface |
+| Rastreabilidade da spec | `specsfy-06-implement`, modo `tests` |
 | Carregamento de referências da spec | `specsfy-03-specify` |
 | Estrutura de pesquisa | `specsfy-03-specify` |
 | Análise de cenários hipotéticos | `specsfy-update-spec` |
@@ -182,9 +180,9 @@ development sem instalar outro runtime ou criar fontes paralelas:
 | Crítica da spec | `specsfy-04-validate` |
 | Proteção arquitetural | `specsfy-04-validate` |
 | Revisão de segurança | `specsfy-04-validate` |
-| Testes de qualidade | `specsfy-06-tdd-bdd` |
-| Análise de consumo de tokens | `specsfy-progress` |
-| Integração com PR | `specsfy-07-implement` |
+| Testes de qualidade | `specsfy-06-implement`, modo `tests` |
+| Análise de consumo de tokens | command `specsfy context usage` |
+| Integração com PR | `specsfy-06-implement` |
 <!-- markdownlint-enable MD013 -->
 
 ## Especialistas sob demanda

@@ -48,14 +48,14 @@ test('skills base exigem descoberta e entrega da interface', () => {
     'specsfy-03-specify': ['Interface para pessoas: Sim', 'menus e navegação principal'],
     'specsfy-04-validate': ['menus e navegação principal'],
     'specsfy-05-tasks': ['telas, menus e navegação principal', 'menus e navegação principal'],
-    'specsfy-07-implement': ['menus e navegação principal', 'CRUD somente como API'],
   };
   for (const [name, terms] of Object.entries(contracts)) includes(skill(name), terms);
+  includes(read('skills/specsfy-06-implement/references/implement.md'), ['menus e navegação principal', 'CRUD somente como API']);
 });
 test('trabalho em tela exige o especialista de componentes antes de JSX', () => {
   const marker = '$specsfy-specialist-react-ui-components';
-  for (const text of [skill('specsfy-05-tasks'), skill('specsfy-07-implement'), read('skills/templates/Tasks.md'), specialist('interface-experience')]) includes(text, [marker]);
-  includes(skill('specsfy-07-implement'), ['antes de escrever JSX ou TSX', 'não implemente a tela']);
+  for (const text of [skill('specsfy-05-tasks'), read('skills/specsfy-06-implement/references/implement.md'), read('skills/templates/Tasks.md'), specialist('interface-experience')]) includes(text, [marker]);
+  includes(read('skills/specsfy-06-implement/references/implement.md'), ['antes de escrever JSX ou TSX', 'não implemente a tela']);
 });
 test('spec com telas exige fase de interface no plano de tarefas', t => {
   const root = temporary(t), script = join(ROOT, 'skills/specsfy-05-tasks/scripts/validate_interface_tasks.mjs');

@@ -118,7 +118,7 @@ describe("embedded scripts", () => {
   });
 
   test("runScript executes a script with the binary runtime", async () => {
-    const run = await runScript("specsfy-progress/scripts/progress.mjs", [example, "--json"], { cwd: example });
+    const run = await runScript("specsfy-05-tasks/scripts/progress.mjs", [example, "--json"], { cwd: example });
     expect(run.code).toBe(0);
     expect((run.json as { summary: { total_specs: number } }).summary.total_specs).toBe(6);
   });

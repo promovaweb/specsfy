@@ -127,5 +127,5 @@ test('usa a lista fixa como reserva quando o projeto não está no Git', t => {
 
 test('skill documental é independente e obrigatória após implementação', () => {
   includes(read('skills/specsfy-documentator/SKILL.md'), ['código existente', 'build_documentation.mjs']);
-  for (const path of ['skills/specsfy-07-implement/SKILL.md', 'skills/Spec.md']) includes(read(path), ['$specsfy-documentator']);
+  for (const path of ['skills/specsfy-06-implement/references/implement.md', 'skills/Spec.md']) includes(read(path), ['$specsfy-documentator']);
 });

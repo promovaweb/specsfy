@@ -75,7 +75,7 @@ export const documentationSteps = [
   ['a instalação inclui a skill de documentação', ctx => includes(ctx.installer, ['"specsfy-documentator"'])],
   ['a skill cobre arquitetura aplicação banco fluxos testes frontend pacotes integrações e decisões', ctx => includes(ctx.documentator, ['arquitetura', 'aplicação', 'banco', 'fluxos', 'testes', 'frontend', 'pacotes', 'integrações', 'decisões'])],
   ['a documentação oficial explica a projeção reconstruível no consumidor', ctx => includes(ctx.guide, ['<projeto>/docs/', 'reconstrói'])],
-  ['o fluxo de implementação e monitoramento do Specsfy', ctx => { ctx.implementation = read('skills/specsfy-07-implement/SKILL.md'); ctx.monitor = read('skills/specsfy-setup/scripts/monitor_context.mjs'); ctx.builder = read('skills/specsfy-documentator/scripts/build_documentation.mjs'); }],
+  ['o fluxo de implementação e monitoramento do Specsfy', ctx => { ctx.implementation = read('skills/specsfy-06-implement/references/implement.md'); ctx.monitor = read('skills/specsfy-setup/scripts/monitor_context.mjs'); ctx.builder = read('skills/specsfy-documentator/scripts/build_documentation.mjs'); }],
   ['aplicação ou persistência muda', ctx => assert.ok(ctx.implementation)],
   ['a implementação faz handoff obrigatório para o documentador', ctx => includes(ctx.implementation, ['$specsfy-documentator', 'Depois de cada tarefa `[CODE]`'])],
   ['o monitor bloqueia entrega sem mudança em docs', ctx => includes(ctx.monitor, ['documentation_review_required', 'specsfy-documentator'])],

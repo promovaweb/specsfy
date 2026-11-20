@@ -3554,7 +3554,7 @@
               }
             ],
             "examples": [
-              "specsfy scripts run specsfy-progress/progress -- . --json"
+              "specsfy scripts run specsfy-05-tasks/progress -- . --json"
             ],
             "exitCodes": [
               {

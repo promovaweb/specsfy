@@ -272,7 +272,7 @@ tests/features/directory_user_search.feature
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-06-tdd-bdd/scripts/check_traceability.py specs/specs/0002-busca-paginacao-usuarios/spec.md . --full-chain`
+- **Comando**: `python3 -B .agents/skills/specsfy-06-implement/scripts/check_traceability.py specs/specs/0002-busca-paginacao-usuarios/spec.md . --full-chain`
 - **Achados**: rastreabilidade 4/4; QA passou; regressão, checks e build verdes.
 
 ### 14. Tarefas

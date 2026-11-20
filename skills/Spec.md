@@ -133,7 +133,7 @@ para próxima etapa com comentário do ponto onde parou. Na entrega, use
 
 <!-- markdownlint-disable MD013 -->
 ```text
-input → inbox → backlog → spec → validate → tasks → TDD/BDD → implement → documentator → progress
+input → inbox → backlog → spec → validate → tasks → implement (tests → implement) → documentator → progress
                                       ↑ update-spec ← mudança tardia
 ```
 <!-- markdownlint-enable MD013 -->
@@ -149,16 +149,18 @@ input → inbox → backlog → spec → validate → tasks → TDD/BDD → impl
 4. Use `specsfy-04-validate` para comprovar a definição. Com o Definition
    Gate aprovado, ela também retira da fila ativa as capturas de
    `specs/inbox/` integralmente cobertas pela spec.
-5. Use `specsfy-05-tasks` e `specsfy-06-tdd-bdd` para planejar, derivar
-   testes TDD do BDD de referência e observar RED válido.
-6. Use `specsfy-07-implement` para entregar em RED → GREEN → REFACTOR.
+5. Use `specsfy-05-tasks` para planejar e `specsfy-06-implement` no modo
+   `tests` para derivar testes TDD do BDD de referência e observar RED válido.
+6. Use `specsfy-06-implement` no modo `implement` para entregar em
+   RED → GREEN → REFACTOR.
 7. Use `specsfy-update-spec` quando a pessoa quiser adicionar, remover,
    corrigir ou mudar algo depois de a spec já ter sido definida. A skill
    incorpora o pedido na fonte normativa e reabre somente os atos afetados.
 8. Use `specsfy-documentator` para reconstruir `docs/` e
    `.specsfy/PACKAGES.md` a partir do sistema existente após cada implementação
    ou por acionamento livre.
-9. Use `specsfy-progress` somente para projetar o estado existente.
+9. Use o command `specsfy progress` ou a tool MCP `project_status` somente
+   para projetar o estado existente.
 10. Use `specsfy-interviewer` para conversar com a spec nas fases `draft`,
     `defined`, `planned`, `in-progress` e `review`, antes da próxima skill.
 11. Use `specsfy-milestones` no modo `mvp` para definir o MVP por estados
@@ -396,9 +398,9 @@ definição retorna para `$specsfy-update-spec`, que chama
 `$specsfy-02-backlog` quando faltar decisão, `$specsfy-04-validate` após
 mudança de comportamento e `$specsfy-05-tasks` após mudança somente de plano.
 Teste ou RED ausente chama
-`$specsfy-06-tdd-bdd` quando `Plan Gate` estiver `Pending`; se o Plan Gate já
-estiver `Passed`, retorne primeiro para `$specsfy-05-tasks`, que reabre o Ato
-II e chama TDD/BDD automaticamente. Depois de uma correção, retome
+`$specsfy-06-implement` no modo `tests` quando `Plan Gate` estiver `Pending`;
+se o Plan Gate já estiver `Passed`, retorne primeiro para `$specsfy-05-tasks`,
+que reabre o Ato II e chama o modo `tests` automaticamente. Depois de uma correção, retome
 automaticamente a etapa que a detectou.
 
 Não peça confirmação para o handoff. Se faltar uma decisão material que somente

@@ -4,7 +4,7 @@ import { read } from '../helpers.mjs';
 const includes = (source, terms) => terms.forEach(term => assert.ok(source.includes(term), term));
 const normalized = source => source.split(/\s+/).join(' ');
 const skill = name => read(`skills/${name}/SKILL.md`);
-const base = ['specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-update-spec', 'specsfy-progress'];
+const base = ['specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-implement', 'specsfy-update-spec'];
 const auxiliary = ['specsfy-setup', 'specsfy-aux-stack', 'specsfy-aux-rules', 'specsfy-aux-database'];
 const design = () => read('skills/templates/DESIGNSYSTEM.MD');
 
@@ -44,7 +44,7 @@ const expectations = [
 export const policySteps = [
   ...expectations.map(([step, key, terms]) => [step, ctx => { includes(step.startsWith('comandos que zeram') ? ctx[key].toLowerCase() : ctx[key], terms); if (step.startsWith('o Definition Gate')) includes(ctx.framework, ['**Cobre**']); }]),
   ['os contratos de cobertura de skills e documentação', ctx => { ctx.coverage = true; }],
-  ['a política mínima da spec é inspecionada', ctx => { assert.ok(ctx.coverage); ctx.validator = read('skills/specsfy-04-validate/scripts/validate_spec.mjs'); ctx.trace = read('skills/specsfy-06-tdd-bdd/scripts/check_traceability.mjs'); ctx.framework = read('skills/Spec.md'); ctx.template = read('skills/templates/Spec.md'); ctx.testing = read('docs/develop/context/engineering/testing.md'); }],
+  ['a política mínima da spec é inspecionada', ctx => { assert.ok(ctx.coverage); ctx.validator = read('skills/specsfy-04-validate/scripts/validate_spec.mjs'); ctx.trace = read('skills/specsfy-06-implement/scripts/check_traceability.mjs'); ctx.framework = read('skills/Spec.md'); ctx.template = read('skills/templates/Spec.md'); ctx.testing = read('docs/develop/context/engineering/testing.md'); }],
   ['template contrato central e guia oficial explicam o mínimo de três', ctx => { for (const source of [ctx.template, ctx.framework, ctx.testing]) assert.ok(source.toLowerCase().includes('três') || source.includes('3')); includes(ctx.template, ['AC-001', 'AC-002', 'AC-003']); }],
   ['os repositórios de skills, CLI e documentação do Specsfy', ctx => { ctx.integrated = true; }],
   ['o contrato de contexto auxiliar é inspecionado', ctx => { assert.ok(ctx.integrated); ctx.aux = Object.fromEntries(auxiliary.map(name => [name, skill(name)])); ctx.framework = read('skills/Spec.md'); ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); }],
@@ -53,17 +53,17 @@ export const policySteps = [
   ['as diretrizes publicáveis dos agentes possuem uma referência sincronizada', () => { const start = '<!-- specsfy:framework:start -->', end = '<!-- specsfy:framework:end -->'; const block = source => { includes(source, [start, end]); return (start + source.split(start)[1].split(end)[0] + end).trim(); }; assert.equal(block(read('skills/AGENTS.md')), block(read('skills/specsfy-setup/references/framework-instructions.md'))); }],
   ['a instalação reconhece setup e skills auxiliares como parte do framework', ctx => includes(ctx.installer, auxiliary.map(name => '"' + name + '"'))],
   ['o monitor de contexto publicado pela skill de setup', ctx => { ctx.monitor = read('skills/specsfy-setup/scripts/monitor_context.mjs'); }],
-  ['manifests banco ou código da aplicação mudam', ctx => { ctx.workflow = ['specsfy-05-tasks', 'specsfy-07-implement', 'specsfy-progress'].map(skill); }],
+  ['manifests banco ou código da aplicação mudam', ctx => { ctx.workflow = [skill('specsfy-05-tasks'), read('skills/specsfy-06-implement/references/implement.md')]; }],
   ['planejamento implementação e progresso consultam o mesmo monitor', ctx => { for (const source of ctx.workflow) includes(source, ['monitor_context.mjs']); }],
-  ['os contratos de setup, testes, tarefas e implementação do Specsfy', ctx => { ctx.database = ['specsfy-setup', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement'].map(skill).join('\n'); ctx.laravel = read('specialists/specsfy-specialist-laravel/SKILL.md'); }],
+  ['os contratos de setup, testes, tarefas e implementação do Specsfy', ctx => { ctx.database = ['specsfy-setup', 'specsfy-05-tasks', 'specsfy-06-implement'].map(skill).join('\n'); ctx.laravel = read('specialists/specsfy-specialist-laravel/SKILL.md'); }],
   ['a proteção do banco é inspecionada', ctx => { ctx.protection = normalized(ctx.database); }],
   ['RefreshDatabase e DatabaseMigrations não são usados', ctx => { for (const name of ['RefreshDatabase', 'DatabaseMigrations']) assert.ok(!ctx.laravel.includes(name)); includes(ctx.laravel, ['DatabaseTransactions']); }],
   ['o contrato executável e a documentação oficial do Specsfy', ctx => { ctx.framework = read('skills/Spec.md'); ctx.skillsReadme = read('skills/README.md'); ctx.docs = read('docs/user/README.md'); ctx.flow = read('docs/develop/context/flows/README.md'); ctx.skills = base.map(skill); }],
   ['uma etapa conclui ou detecta pendência de outra responsabilidade', ctx => includes(ctx.framework, ['Pendência detectada:'])],
-  ['as skills posteriores à captura anunciam e executam a transição automaticamente', ctx => { assert.equal(ctx.skills.length, 8); for (const source of ctx.skills) { includes(source, ['Transição automática:']); includes(normalized(source), ['carregue imediatamente a skill de destino']); } }],
+  ['as skills posteriores à captura anunciam e executam a transição automaticamente', ctx => { assert.equal(ctx.skills.length, 6); for (const source of ctx.skills) { includes(source, ['Transição automática:']); includes(normalized(source), ['carregue imediatamente a skill de destino']); } }],
   ['o fluxo documenta avanço, retorno e retomada automáticos', ctx => includes(normalized(ctx.flow), ['avanço', 'retorno', 'retomada', 'automaticamente'])],
   ['a etapa escolhida continua na mesma conversa sem confirmação', ctx => { includes(ctx.skillsReadme, ['## Orquestração conversacional']); includes(ctx.docs, ['## Conversa contínua entre etapas']); includes(normalized(ctx.framework), ['mesma conversa', 'sem pedir confirmação']); }],
-  ['mudança tardia usa uma entrada pública e executável', () => { for (const source of [skill('specsfy-07-implement'), read('specsfy/README.md')]) includes(source, ['$specsfy-update-spec']); includes(skill('specsfy-update-spec'), ['esqueceu']); }],
+  ['mudança tardia usa uma entrada pública e executável', () => { for (const source of [skill('specsfy-06-implement'), read('specsfy/README.md')]) includes(source, ['$specsfy-update-spec']); includes(skill('specsfy-update-spec'), ['esqueceu']); }],
   ['o contrato do refinamento do backlog e do método MCR-10', ctx => { ctx.backlog = skill('specsfy-02-backlog'); ctx.mcr = read('skills/specsfy-03-specify/references/mcr-10.md'); }],
   ['a pessoa responde uma pergunta do refinamento do backlog', ctx => includes(ctx.backlog, ['## Conduzir a descoberta adaptativa'])],
   ['o refinamento do backlog reavalia o contexto acumulado com as novas respostas', ctx => { for (const source of [ctx.backlog, ctx.mcr]) includes(normalized(source), ['contexto acumulado e as novas respostas']); }],
@@ -76,7 +76,7 @@ export const policySteps = [
   ['os padrões comuns de interface são lidos', ctx => { ctx.common = ctx.template; }],
   ['o contrato de interação do DataGrid do Specsfy', ctx => { ctx.datagrid = design() + read('specialists/specsfy-specialist-react-ui-components/assets/components/data-display/table.tsx'); }],
   ['a navegação da lista é lida', ctx => { ctx.row = ctx.datagrid; }],
-  ['o contrato de implementação visual do Specsfy', ctx => { ctx.visualContract = read('skills/Spec.md') + read('skills/templates/Tasks.md') + skill('specsfy-07-implement'); }],
+  ['o contrato de implementação visual do Specsfy', ctx => { ctx.visualContract = read('skills/Spec.md') + read('skills/templates/Tasks.md') + read('skills/specsfy-06-implement/references/implement.md'); }],
   ['a revisão de desenvolvimento é lida', ctx => { ctx.visual = ctx.visualContract; }],
   ['o contrato de navegação contextual do Specsfy', ctx => { ctx.navigation = design() + read('skills/templates/Interface.md') + read('example/resources/js/layouts/app-layout.tsx'); ctx.breadcrumbs = read('example/resources/js/components/breadcrumbs.tsx'); ctx.primitive = read('example/resources/js/components/ui/breadcrumb.tsx'); }],
   ['o breadcrumb global é lido', ctx => { ctx.breadcrumb = ctx.navigation; }],

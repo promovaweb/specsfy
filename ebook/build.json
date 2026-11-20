@@ -2,8 +2,8 @@
   "schema_version": 1,
   "version": "0.32.1",
   "edition": "v0.32.1",
-  "generated_at": "2026-11-20T15:16:20Z",
-  "source_sha256": "e8af92e482e9b4c3314f403497d48d970a717a87c2b1c1ea6de9d33e4d808ac1",
+  "generated_at": "2026-11-20T15:27:51Z",
+  "source_sha256": "ed19a15b6215b43d44580a882cf8d0d36d7c9d35f9c5816fe37691526b02b36b",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -71,12 +71,10 @@
     "docs/user/skills/specsfy-03-specify.md",
     "docs/user/skills/specsfy-04-validate.md",
     "docs/user/skills/specsfy-05-tasks.md",
-    "docs/user/skills/specsfy-06-tdd-bdd.md",
-    "docs/user/skills/specsfy-07-implement.md",
+    "docs/user/skills/specsfy-06-implement.md",
     "docs/user/skills/specsfy-data-discovery.md",
     "docs/user/skills/specsfy-interviewer.md",
     "docs/user/skills/specsfy-milestones.md",
-    "docs/user/skills/specsfy-progress.md",
     "docs/user/skills/specsfy-update-spec.md",
     "docs/user/specialists.md",
     "docs/user/specialists/ansible.md",
@@ -157,11 +155,11 @@
   "artifacts": {
     "pdf": {
       "file": "Specsfy-Guia-do-Usuario-v0.32.1.pdf",
-      "sha256": "9a31da0eb63e8a48815d18fc2941c7f0a5a21c6dc3f85f2429f8bd0c6e732968"
+      "sha256": "6d80bb7c08472159cd92b0ce59583f6231f0d3b612c0ee46b43236ba2b86a1c7"
     },
     "epub": {
       "file": "Specsfy-Guia-do-Usuario-v0.32.1.epub",
-      "sha256": "d6fa84cf68a6012ed01acff66081855f9620789f52a33175a0657cff4d66fbfd"
+      "sha256": "730b9e1dd1f09e3ebfacfa2ede00297a455fda177e4905adde87a979dafbdba7"
     }
   }
 }

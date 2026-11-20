@@ -74,8 +74,8 @@ Em projetos React, o `PREP` de cada tarefa carrega
 especialista estiver ausente, o fluxo retorna ao setup para instalar a skill
 detectada antes de liberar o código da tela.
 
-Depois de registrar as tarefas, a skill chama `specsfy-06-tdd-bdd` para
-materializar os testes. O Plan Gate só pode ser aprovado quando todos os
+Depois de registrar as tarefas, a skill chama `specsfy-06-implement` no modo
+`tests` para materializar os testes. O Plan Gate só pode ser aprovado quando todos os
 predecessores exigidos possuem RED válido.
 
 ## O que esperar
@@ -97,5 +97,5 @@ predecessores exigidos possuem RED válido.
 
 ## Próximo passo
 
-Use [`specsfy-06-tdd-bdd`](specsfy-06-tdd-bdd.md) em modo `prepare` para
-materializar o próximo teste e observar RED.
+Use [`specsfy-06-implement`](specsfy-06-implement.md) no modo `tests`, passo
+`prepare`, para materializar o próximo teste e observar RED.

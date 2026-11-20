@@ -109,8 +109,8 @@ test('monitor exige documentação do sistema ao alterar aplicação e banco', (
   successful(monitor(...args, 'docs/application.md', 'docs/database.md'));
 });
 test('skills de entrega exigem os encaminhamentos do monitor de contexto', () => {
-  for (const name of ['specsfy-05-tasks', 'specsfy-07-implement', 'specsfy-progress']) includes(read(`skills/${name}/SKILL.md`), ['monitor_context.mjs']);
-  for (const path of ['skills/specsfy-07-implement/SKILL.md', 'skills/Spec.md']) includes(read(path), ['monitor_context.mjs', '$specsfy-aux-stack', '$specsfy-aux-database']);
+  for (const path of ['specsfy-05-tasks/SKILL.md', 'specsfy-06-implement/references/implement.md']) includes(read(`skills/${path}`), ['monitor_context.mjs']);
+  for (const path of ['skills/specsfy-06-implement/references/implement.md', 'skills/Spec.md']) includes(read(path), ['monitor_context.mjs', '$specsfy-aux-stack', '$specsfy-aux-database']);
 });
 test('setup adapta Laravel, Next e Astro preservando regras e instruções locais', t => {
   const variants = [

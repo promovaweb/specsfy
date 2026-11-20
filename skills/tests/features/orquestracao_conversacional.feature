@@ -17,11 +17,11 @@ Feature: Orquestração conversacional das etapas
     And após a correção retoma automaticamente a etapa que detectou a pendência
 
   Scenario: Rotear a cadeia principal e os retornos críticos
-    Given as doze skills base instaladas
+    Given as dez skills base instaladas
     When o estado canônico exige outra responsabilidade
-    Then a cadeia principal chama inbox, backlog, specify, validate, tasks, tdd-bdd, implement e progress
+    Then a cadeia principal chama inbox, backlog, specify, validate, tasks e implement
     And mudança tardia chama update-spec automaticamente
-    And ausência de especificação chama specify automaticamente
+    And a troca entre testes e implementação acontece dentro da mesma skill
 
   Scenario: Separar handoff de autorização sensível
     Given uma transição automática exige uma ação sensível

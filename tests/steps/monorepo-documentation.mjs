@@ -7,7 +7,7 @@ const local = '.agents/skills/specsfy-monorepo-documentator';
 const includes = (source, terms) => terms.forEach(term => assert.ok(source.includes(term), term));
 const expected = JSON.parse(read('tests/fixtures/documentation-bdd.json'));
 const screenshots = [['cli-dash.png', 'Dashboard Home'], ['cli-backlogs.png', 'Backlogs'], ['cli-specs.png', 'Specs'], ['cli-skills.png', 'Skills']];
-const base = ['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-tdd-bdd', 'specsfy-07-implement', 'specsfy-update-spec', 'specsfy-progress'];
+const base = ['specsfy-01-inbox', 'specsfy-02-backlog', 'specsfy-03-specify', 'specsfy-04-validate', 'specsfy-05-tasks', 'specsfy-06-implement', 'specsfy-update-spec'];
 export const monorepoDocumentationSteps = [
   ['a skill de documentação do monorepo', ctx => { ctx.skillPath = join(ROOT, local, 'SKILL.md'); ctx.claudePath = join(ROOT, '.claude/skills/specsfy-monorepo-documentator'); }],
   ['sua identidade e fronteiras são inspecionadas', ctx => { ctx.skill = read(local + '/SKILL.md'); ctx.collector = read(local + '/scripts/collect-monorepo-evidence.mjs'); ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); }],

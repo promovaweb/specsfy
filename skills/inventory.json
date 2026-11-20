@@ -11,10 +11,8 @@
     "specsfy-03-specify": "base",
     "specsfy-04-validate": "base",
     "specsfy-05-tasks": "base",
-    "specsfy-06-tdd-bdd": "base",
-    "specsfy-07-implement": "base",
+    "specsfy-06-implement": "base",
     "specsfy-update-spec": "base",
-    "specsfy-progress": "base",
     "specsfy-interviewer": "base",
     "specsfy-milestones": "base",
     "specsfy-data-discovery": "base"
@@ -26,14 +24,18 @@
     "specsfy-base-specify": "specsfy-03-specify",
     "specsfy-base-validate": "specsfy-04-validate",
     "specsfy-base-tasks": "specsfy-05-tasks",
-    "specsfy-base-tdd-bdd": "specsfy-06-tdd-bdd",
-    "specsfy-base-implement": "specsfy-07-implement",
+    "specsfy-base-tdd-bdd": "specsfy-06-implement",
+    "specsfy-base-implement": "specsfy-06-implement",
     "specsfy-base-update-spec": "specsfy-update-spec",
-    "specsfy-base-progress": "specsfy-progress",
     "specsfy-base-discuss": "specsfy-02-backlog",
     "specsfy-mvp-milestone-interviewer": "specsfy-milestones",
     "specsfy-roadmap-milestone-interviewer": "specsfy-milestones",
-    "specsfy-milestone-governor": "specsfy-milestones"
+    "specsfy-milestone-governor": "specsfy-milestones",
+    "specsfy-06-tdd-bdd": "specsfy-06-implement",
+    "specsfy-07-implement": "specsfy-06-implement"
   },
-  "retired": []
+  "retired": [
+    "specsfy-progress",
+    "specsfy-base-progress"
+  ]
 }

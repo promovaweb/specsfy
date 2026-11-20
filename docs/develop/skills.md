@@ -48,7 +48,7 @@ adicionar mais instruções.
 
 `agents/openai.yaml` fornece o prompt padrão, menciona `$<nome-da-skill>` e
 define o nome exibido. Os identificadores técnicos permanecem em minúsculas,
-mas o nome exibido segue estes padrões: `Specsfy - 01 - Nome` para as sete
+mas o nome exibido segue estes padrões: `Specsfy - 01 - Nome` para as seis
 skills centrais numeradas, `Specsfy - Nome` para as demais skills base e
 `Specsfy - Especialista - Nome` para o catálogo técnico opcional.
 
@@ -86,7 +86,7 @@ executado por essa configuração. A conferência de arquivos e de saída zero
 permanece obrigatória. `update_stack.mjs` registra a declaração do runner sem
 reescrever sua configuração. Os casos executáveis ficam em
 `skills/tests/migration-runner.test.mjs`; o guia de
-[implementação](../user/skills/specsfy-07-implement.md#runner-próprio-de-migrations)
+[implementação](../user/skills/specsfy-06-implement.md#runner-próprio-de-migrations)
 mostra a configuração do consumidor.
 
 `specsfy-specialist-deploy` é a entrada para o fluxo completo de release ou
@@ -200,8 +200,8 @@ conversacional.
 <!-- markdownlint-disable MD013 -->
 | Modo | Skills |
 | --- | --- |
-| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-tdd-bdd`, `specsfy-07-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestones`, `specsfy-data-discovery`, `specsfy-setup`, `specsfy-update-spec` |
-| sem perguntas | `specsfy-01-inbox`, `specsfy-aux-database`, `specsfy-aux-stack`, `specsfy-documentator`, `specsfy-progress` |
+| perguntas | `specsfy-02-backlog`, `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`, `specsfy-06-implement`, `specsfy-aux-rules`, `specsfy-interviewer`, `specsfy-milestones`, `specsfy-data-discovery`, `specsfy-setup`, `specsfy-update-spec` |
+| sem perguntas | `specsfy-01-inbox`, `specsfy-aux-database`, `specsfy-aux-stack`, `specsfy-documentator` |
 <!-- markdownlint-enable MD013 -->
 <!-- markdownlint-enable MD013 -->
 
@@ -252,13 +252,14 @@ pendente.
 
 ```text
 inbox → backlog → specify → validate
-       → tasks → tdd-bdd → implement → progress
+       → tasks → implement (tests → implement)
                          ↑
                     update-spec
 ```
 
-`update-spec` pode reabrir definição, plano ou entrega. `progress` é somente
-leitura. `documentator` atua depois de mudanças implementadas no consumidor e
+`update-spec` pode reabrir definição, plano ou entrega. A etapa 06 tem os
+modos `tests` e `implement` na mesma skill. O progresso sai do command
+`specsfy progress`, somente leitura. `documentator` atua depois de mudanças implementadas no consumidor e
 projeta `docs/` junto de `.specsfy/PACKAGES.md`.
 
 ## Instalação
@@ -343,7 +344,7 @@ Em projetos Laravel, `specsfy-specialist-laravel-package-manager` amplia esse
 fluxo para pacotes recebidos por URL GitHub. Ele consulta os pacotes atuais,
 instala somente após autorização e mantém `docs/packages/README.md` mais uma
 ficha por pacote. `specsfy-03-specify` consulta essas fontes antes de registrar
-uma dependência na spec; `specsfy-07-implement` faz a mesma leitura antes de
+uma dependência na spec; `specsfy-06-implement` faz a mesma leitura antes de
 alterar Composer e carrega o especialista quando a tarefa envolve pacote.
 
 ## Validação

@@ -16,8 +16,8 @@ seleciona a etapa responsável e anuncia cada transição necessária.
 ## Nomes exibidos
 
 Os comandos técnicos continuam com o nome técnico, como `$specsfy-02-backlog`.
-Na interface, as sete etapas centrais aparecem como `Specsfy - 01 - Inbox` até
-`Specsfy - 07 - Implementar`. As skills adicionais usam `Specsfy - Nome`,
+Na interface, as seis etapas centrais aparecem como `Specsfy - 01 - Inbox` até
+`Specsfy - 06 - Testar e implementar`. As skills adicionais usam `Specsfy - Nome`,
 enquanto as técnicas usam `Specsfy - Especialista - Nome`.
 
 ## Como responder às perguntas
@@ -52,10 +52,8 @@ qualquer pergunta para uma etapa conversacional.
 | criar a fonte única | [`specsfy-03-specify`](specsfy-03-specify.md) | `spec.md` |
 | revisar definição | [`specsfy-04-validate`](specsfy-04-validate.md) | Definition Gate confiável |
 | decompor o plano | [`specsfy-05-tasks`](specsfy-05-tasks.md) | tarefas dentro da spec |
-| preparar e executar testes | [`specsfy-06-tdd-bdd`](specsfy-06-tdd-bdd.md) | RED/GREEN rastreável |
-| produzir a mudança | [`specsfy-07-implement`](specsfy-07-implement.md) | código, testes e evidência |
+| preparar os testes e produzir a mudança | [`specsfy-06-implement`](specsfy-06-implement.md) | RED/GREEN rastreável no modo `tests`; código, testes e evidência no modo `implement` |
 | incorporar mudança posterior | [`specsfy-update-spec`](specsfy-update-spec.md) | spec atualizada e gates reabertos |
-| consultar o estado | [`specsfy-progress`](specsfy-progress.md) | relatório somente leitura |
 | conversar conforme a fase | [`specsfy-interviewer`](specsfy-interviewer.md) | respostas confirmadas e Effort recalibrado |
 | definir o MVP, planejar a evolução e manter a projeção | [`specsfy-milestones`](specsfy-milestones.md) | milestones do MVP e pós-MVP, `specs.md` e progresso derivado |
 | descobrir o que o sistema precisa guardar | [`specsfy-data-discovery`](specsfy-data-discovery.md) | respostas confirmadas em `DATABASE.md` |
@@ -71,13 +69,14 @@ entrega um brief na conversa.
 Com a intenção de criar uma entrega confirmada,
 `specsfy-03-specify` monta a `spec.md` e `specsfy-04-validate` comprova o
 Ato I. A skill `specsfy-05-tasks` monta o plano, chama
-`specsfy-06-tdd-bdd` para materializar os testes e só aprova o Plan Gate
-depois de um RED válido. `specsfy-07-implement` executa as tarefas com
-evidência e documentação atualizada.
+`specsfy-06-implement` no modo `tests` para materializar os testes e só aprova
+o Plan Gate depois de um RED válido. A mesma skill, no modo `implement`,
+executa as tarefas com evidência e documentação atualizada.
 
 Uma necessidade surgida depois da definição retorna à mesma spec por
 `specsfy-update-spec`. Para apenas consultar gates, tarefas e o próximo
-trabalho sem alterar arquivos, use `specsfy-progress`.
+trabalho sem alterar arquivos, rode `specsfy progress`, descrito em
+[Ver o progresso](../reference.md#ver-o-progresso).
 
 Quando uma lacuna puder alterar a próxima etapa, chame
 `specsfy-interviewer`. Ele conversa com a spec sem substituir a skill que
