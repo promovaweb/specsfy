@@ -41,9 +41,8 @@ specsfy doctor --project .
 specsfy install --project . --detected
 ```
 
-Para atualizar o framework do projeto, use `specsfy update`. Para trocar o
-próprio binário pela última release, use `specsfy upgrade`. Os dois comandos não
-se confundem:
+Para atualizar o framework do projeto, use `specsfy update`. Para trocar o próprio
+binário pela última release, use `specsfy upgrade`:
 
 ```bash
 specsfy update --project .
@@ -54,7 +53,9 @@ specsfy upgrade --check
 `specsfy update` deixa o projeto igual ao inventário do framework: instala as
 skills que faltam, atualiza as que mudaram e remove as renomeadas e as
 aposentadas. Alteração sua é mantida, salvo com `--force`; `--check` só mostra o
-plano. Depois de um `specsfy upgrade`, rode `specsfy update` em cada projeto.
+plano. Depois de um `specsfy upgrade`, rode `specsfy update` em cada projeto. A
+TUI aberta avisa no cabeçalho `• vX.Y.Z installed: press q and reopen` e precisa
+ser reaberta; o `specsfy mcp` segue na versão antiga até o agente reiniciar o MCP.
 
 ## Skills e especialistas
 
@@ -257,8 +258,7 @@ Execute sem argumentos dentro do projeto consumidor para abrir a TUI:
 specsfy
 ```
 
-Não é preciso escrever `tui`; `specsfy tui --project PATH` abre outro projeto.
-A TUI tem nove abas:
+Não é preciso escrever `tui`; `specsfy tui --project PATH` abre outro projeto. A TUI tem nove abas:
 
 - **Overview**, painel das specs, gates, tarefas e checklist; `↑`/`↓` escolhem e `Enter` abre a spec selecionada.
 - **Specs**, specs por estado, com gates, tarefas e o Markdown; `t` muda o estado, `Espaço` marca o próximo item, `u` desfaz a marcação, `e` registra o esforço e `n` cria uma spec.

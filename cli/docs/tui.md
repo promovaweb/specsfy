@@ -133,6 +133,32 @@ O store do projeto é compartilhado pelas screens, então uma mudança detectada
 em `overview` também aparece em `specs`, `backlog`, `milestones`, `context`,
 `gates`, `tests` e `skills` na próxima leitura.
 
+## Versão nova instalada
+
+Um processo em execução nunca recarrega o próprio código: a TUI aberta segue na
+versão que carregou, mesmo depois de um `upgrade`. Para avisar que a instalação
+já mudou, a cada 30 s ela confere a data de modificação do executável em uso e
+do primeiro `specsfy` do `PATH`; no invólucro npm, esse é o script que o npm
+reescreve no upgrade. Só quando um deles muda ela roda o `--version` do comando
+que iniciaria um processo novo, o `specsfy` do `PATH` quando existe; nas outras
+conferências o custo é um `stat`.
+
+Quando a versão instalada é diferente da versão aberta, o cabeçalho mostra, em
+amarelo:
+
+```text
+• vX.Y.Z installed: press q and reopen
+```
+
+Reinstalar a mesma versão não mostra nada, e uma falha no `--version` é
+ignorada. Rodar o `--version` do invólucro npm já baixa o binário novo, então
+reabrir é imediato.
+
+O aviso vale só no binário compilado. Com `bun src/...` (desenvolvimento,
+testes e showcase) o check fica desligado. O servidor `{{bin}} mcp` também segue
+na versão antiga até o agente reiniciar o MCP; comandos avulsos sempre usam a
+versão instalada.
+
 ## Tema
 
 Três paletas em `src/tui/theme.ts`: `terminal` (padrão), `night` e `day`.

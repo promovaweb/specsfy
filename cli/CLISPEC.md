@@ -129,6 +129,10 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | `skills` | skills instaladas e disponíveis, com instalar, remover e atualizar confirmados | `↑/↓` skill, `i` install, `x` remove, `u` update all, `c` recarrega o catálogo |
 | `about` | identidade, runtime, projeto, licença, créditos e o painel Doctor com as checagens locais | globais |
 
+Quando uma versão nova do binário é instalada com a TUI aberta, o cabeçalho
+mostra o aviso `• vX.Y.Z installed: press q and reopen` em amarelo; o processo
+aberto segue na versão que carregou até ser reaberto.
+
 ### MCP
 
 | Tipo | Nome | Função | Efeito |
@@ -239,6 +243,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | 0019 | Ações e telas novas na TUI | done |
 | 0020 | Example nas pastas de estado e release do Hub | done |
 | 0021 | Navegação e mais ações na TUI | done |
+| 0022 | Aviso de versão instalada na TUI | done |
 
 ## Notes
 
@@ -285,3 +290,4 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 - 2026-11-20: spec 0019 (Ações e telas novas na TUI) closed.
 - 2026-11-20: spec 0020 (Example nas pastas de estado e release do Hub) closed.
 - 2026-11-20: spec 0021 (Navegação e mais ações na TUI) closed.
+- 2026-11-20: spec 0022 (Aviso de versão instalada na TUI) closed.

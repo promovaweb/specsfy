@@ -27,6 +27,7 @@ import {
   type Renderable,
 } from "@opentui/core";
 import { manifest } from "../app/manifest.ts";
+import { createInstalledVersionWatcher, type InstalledVersionDeps, runningCompiledBinary, systemInstalledVersionDeps } from "../domain/installed-version.ts";
 import { readSettings, getPath } from "../config/settings.ts";
 import { glyphs, currentTheme, resolveTheme, type Theme } from "./theme.ts";
 import { createScreens } from "./screens/index.ts";
@@ -46,6 +47,14 @@ export interface TuiOptions {
   screens?: Screen[];
   /** Store to use instead of creating one (tests). */
   store?: ProjectStore;
+  /**
+   * How to notice a newer specsfy installed while the TUI is open. Defaults
+   * to the system check when running the compiled binary and to none under
+   * `bun src/...` (development, tests and the showcase); tests inject one.
+   */
+  installedVersion?: InstalledVersionDeps | false;
+  /** Interval of the installed-version check in ms (default 30000). */
+  installedVersionInterval?: number;
 }
 
 function defaultInitialTab(screens: readonly Screen[]): string {
@@ -127,6 +136,10 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
       height: 1,
     }),
   );
+  // Filled when a newer specsfy is installed while this process runs: the
+  // process keeps its old code until it is reopened.
+  const updateNotice = new TextRenderable(renderer, { content: "", fg: theme.warn, flexShrink: 0, wrapMode: "none", height: 1 });
+  header.add(updateNotice);
   header.add(
     new TextRenderable(renderer, {
       content: `${process.platform}-${process.arch} ${glyphs.bullet} Bun ${Bun.version}`,
@@ -399,9 +412,19 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
     }
   };
   renderer.keyInput.on("keypress", onKey);
+  const versionDeps = options.installedVersion ?? (runningCompiledBinary() ? systemInstalledVersionDeps() : false);
+  let versionTimer: ReturnType<typeof setInterval> | undefined;
+  if (versionDeps) {
+    const watcher = createInstalledVersionWatcher(manifest.version, versionDeps, (version) => {
+      updateNotice.content = `${glyphs.bullet} v${version} installed: press q and reopen`;
+    });
+    void watcher.check();
+    versionTimer = setInterval(() => void watcher.check(), options.installedVersionInterval ?? 30_000);
+  }
   renderer.once("destroy", () => {
     renderer.keyInput.off("keypress", onKey);
     store.stop();
+    if (versionTimer) clearInterval(versionTimer);
   });
 
   const initial = options.initialTab ?? defaultInitialTab(screens);
