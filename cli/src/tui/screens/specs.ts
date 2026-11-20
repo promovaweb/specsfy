@@ -117,10 +117,10 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
     description: "Specs by state with gates, tasks and the Markdown",
     keys: [
       { key: "↑/↓", action: "spec" },
+      { key: "PgUp/PgDn", action: "scroll" },
       { key: "t", action: "move" },
       { key: "Space", action: "check" },
       { key: "n", action: "new" },
-      { key: "g", action: "gates" },
       { key: "r", action: "reload" },
     ],
     mount: ({ renderer, theme }) => {
