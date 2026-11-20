@@ -1,6 +1,6 @@
  ▌ Specsfy v0.34.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
-   Overview       Specs        Backlog        Gates         Tests         Skills        About                                               
+   Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
  ╭─ Binary ─────────────────────────────────────────────────────────────────────╮╭─ Project ──────────────────────────────────────────────╮ 
  │ Specsfy  v0.34.1                                                             ││ Author      Promovaweb                                 │ 
  │ Install the Specsfy framework, run the spec lifecycle and its gates, and     ││ License     AGPL-3.0-only                              │ 
@@ -12,19 +12,19 @@
  │ PID         4242                                                             ││                                                        │ 
  │ Data        ~/.specsfy                                                       ││                                                        │ 
  ╰──────────────────────────────────────────────────────────────────────────────╯╰────────────────────────────────────────────────────────╯ 
- ╭─ Credits ────────────────────────────────────────────────────────────────────╮╭─ Standards ────────────────────────────────────────────╮ 
- │ Bun                 runtime, bundler and binary compiler                     ││ Interface                                              │ 
- │                     https://bun.sh                                           ││ • OpenCLI 0.1 for the CLI description                  │ 
- │ OpenTUI             terminal user interface rendering                        ││ • MCP 2025-11-25 over stdio                            │ 
- │                     https://opentui.com                                      ││ • Fixed exit codes (0 success)                         │ 
- │ MCP TypeScript SDK  Model Context Protocol server over stdio                 ││                                                        │ 
- │                     https://modelcontextprotocol.io                          ││ Data                                                   │ 
- │ OpenCLI             standard description of the command-line interface       ││ • settings.json in plain text                          │ 
- │                     https://opencli.org                                      ││ • credentials.json with AES-256-GCM                    │ 
- │ Zod                 schema validation for MCP tools                          ││ • master.key with mode 0600                            │ 
+ ╭─ Credits ────────────────────────────────────────────────────────────────────╮╭─ Doctor ───────────────────────────────────────────────╮ 
+ │ Bun                 runtime, bundler and binary compiler                     ││ ✓ bun         1.4.4; minimum 1.4.4                     │ 
+ │                     https://bun.sh                                           ││ ! stdin       Not a TTY                                │ 
+ │ OpenTUI             terminal user interface rendering                        ││ ! stdout      Not a TTY                                │ 
+ │                     https://opentui.com                                      ││ ✓ directory   Directory exists; mode 0700              │ 
+ │ MCP TypeScript SDK  Model Context Protocol server over stdio                 ││ ! settings    Not created                              │ 
+ │                     https://modelcontextprotocol.io                          ││ ! master-key  none                                     │ 
+ │ OpenCLI             standard description of the command-line interface       ││ ! credentials Not created                              │ 
+ │                     https://opencli.org                                      ││ ✓ binary      specsfy 0.34.1                           │ 
+ │ Zod                 schema validation for MCP tools                          ││ ✓ platform    linux-x64                                │ 
  │                     https://zod.dev                                          ││                                                        │ 
- │                                                                              ││                                                        │ 
- │                                                                              ││                                                        │ 
+ │                                                                              ││ All local checks pass. Run specsfy doctor --project    │ 
+ │                                                                              ││ for the project.                                       │ 
  │                                                                              ││                                                        │ 
  │                                                                              ││                                                        │ 
  │                                                                              ││                                                        │ 

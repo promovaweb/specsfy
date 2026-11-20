@@ -32,6 +32,8 @@ describe("example project", () => {
     backlog: ["Backlog · 2", "Inbox · 0", "BACKLOG-0001"],
     gates: ["No gates are registered in this build.", "0006-produtos"],
     tests: ["Not run in this session.", "No output yet."],
+    milestones: ["No milestones yet"],
+    context: ["PROJECT.md", ".specsfy/STACK.md"],
     skills: ["Framework · 9", "✓ installed", "specsfy-01-inbox", "Catalog", "1 specialist(s)"],
     about: ["Credits", "OpenTUI"],
   };
@@ -60,12 +62,16 @@ describe("example project", () => {
       await tui.press("3");
       await tui.waitFor("Backlog · 2");
       await tui.press("4");
-      await tui.waitFor("No gates are registered");
+      await tui.waitFor("No milestones yet");
       await tui.press("5");
-      await tui.waitFor("Not run in this session.");
+      await tui.waitFor("PROJECT.md");
       await tui.press("6");
-      await tui.waitFor("specsfy-01-inbox");
+      await tui.waitFor("No gates are registered");
       await tui.press("7");
+      await tui.waitFor("Not run in this session.");
+      await tui.press("8");
+      await tui.waitFor("specsfy-01-inbox");
+      await tui.press("9");
       await tui.waitFor("Credits");
       tui.setup.mockInput.pressKey("q");
       await tui.closed;
@@ -100,7 +106,9 @@ describe("example project", () => {
     try {
       const frame = await tui.waitFor("5/6");
       expect(frame).toContain("Overview");
-      expect(frame).toContain("About");
+      // Nine tabs do not fit 80 columns: the bar scrolls to the selected one.
+      await tui.press("9");
+      expect(await tui.waitFor("Credits")).toContain("About");
     } finally {
       await tui.close();
     }
@@ -116,6 +124,8 @@ describe("empty project", () => {
     overview: "Capture an idea with $specsfy-01-inbox",
     specs: "No specs found",
     backlog: "Backlog · 0",
+    milestones: "No milestones yet",
+    context: "PROJECT.md",
     gates: "No gates are registered in this build.",
     tests: "Not run in this session.",
     skills: "○ available",

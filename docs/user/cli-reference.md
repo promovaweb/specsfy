@@ -14,7 +14,7 @@ Para aprender o percurso pela interface visual, consulte o
 ## `specsfy`
 
 Abre a TUI no diretório atual, sem argumentos. A TUI reúne as abas Overview,
-Specs, Backlog, Gates, Tests, Skills e About.
+Specs, Backlog, Milestones, Context, Gates, Tests, Skills e About.
 
 ```bash
 specsfy
@@ -251,10 +251,10 @@ NO_COLOR=1 specsfy test --project .
 
 Rodar `specsfy` sem argumentos já abre a TUI; `specsfy tui` serve para escolher
 outro projeto com `--project` ou a aba inicial com `--tab`. `--tab` aceita
-`overview`, `specs`, `backlog`, `gates`, `tests`, `skills` e `about`. A TUI
-roda gates e testes só com `Enter` e instala, remove ou atualiza skills só
-depois da confirmação com `y`. Fora de um TTY sai com `8`. `q`, `Esc` ou
-`Ctrl+C` encerram a interface.
+`overview`, `specs`, `backlog`, `milestones`, `context`, `gates`, `tests`,
+`skills` e `about`. A TUI roda gates e testes só com `Enter` e instala, remove
+ou atualiza skills só depois da confirmação com `y`. Fora de um TTY sai com
+`8`. `q`, `Esc` ou `Ctrl+C` encerram a interface.
 
 ```bash
 specsfy

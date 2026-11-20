@@ -25,7 +25,8 @@ O mesmo executável tem três modos, decididos em `cli/src/main.ts`:
 Sem argumentos e sem TTY, o binário imprime o help e sai com exit code 2.
 `specsfy tui` existe para passar `--project <dir>` ou `--tab <tab>`; abrir a
 TUI não exige escrever `tui`. A TUI tem as abas Overview, Specs, Backlog,
-Gates, Tests, Skills e About e fecha com `q`, `Esc` ou `Ctrl+C`.
+Milestones, Context, Gates, Tests, Skills e About e fecha com `q`, `Esc` ou
+`Ctrl+C`.
 
 A lista completa de commands, screens, tools, resources e prompts fica na
 seção `Surface` do `CLISPEC.md` e em `cli/docs/cli.md`, `cli/docs/tui.md` e

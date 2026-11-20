@@ -13,11 +13,11 @@ import { resolveProject } from "../../core/project.ts";
 import type { Command } from "../registry.ts";
 
 /** Tab ids accepted by `--tab`; same list as `tui.initialTab` and `SCREEN_IDS`. */
-const TABS = ["overview", "specs", "backlog", "gates", "tests", "skills", "about"];
+const TABS = ["overview", "specs", "backlog", "milestones", "context", "gates", "tests", "skills", "about"];
 
 export const tuiCommand: Command = {
   name: "tui",
-  description: "Open the terminal interface (Overview, Specs, Backlog, Gates, Tests, Skills and About). Requires a TTY.",
+  description: "Open the terminal interface (Overview, Specs, Backlog, Milestones, Context, Gates, Tests, Skills and About). Requires a TTY.",
   options: [
     {
       name: "--tab",

@@ -49,6 +49,11 @@ const NEXT_FOLDERS: Record<SpecFolder, readonly SpecFolder[]> = {
   completed: ["draft", "defined", "completed"],
 };
 
+/** States a spec in `folder` may move to, excluding staying where it is. */
+export function nextFolders(folder: SpecFolder): SpecFolder[] {
+  return NEXT_FOLDERS[folder].filter((candidate) => candidate !== folder);
+}
+
 const TABLE_STATUS = /^(\|\s*Status\s*\|\s*)([^|]*)(\|\s*)$/imu;
 const BOLD_STATUS = /^(\*\*Status\*\*:\s*)(.+?)\s*$/imu;
 const TABLE_FIELD = (field: string) => new RegExp(

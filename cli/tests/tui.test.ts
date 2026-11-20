@@ -42,8 +42,8 @@ describe("tui", () => {
     expect(frame).toContain("quit");
   });
 
-  test("key 7 goes to About and ? opens the help", async () => {
-    setup.mockInput.pressKey("7");
+  test("key 9 goes to About and ? opens the help", async () => {
+    setup.mockInput.pressKey("9");
     let frame = await waitFor("Credits");
     expect(frame).toContain("OpenTUI");
     setup.mockInput.pressKey("?");

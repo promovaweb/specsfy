@@ -8,6 +8,7 @@
 | Funcionalidade | Painel de vendas para o lojista |
 | Tipo | Funcionalidade |
 | Criado em | 2026-11-20 |
+| Milestones | M02 |
 
 ## Ideia original
 

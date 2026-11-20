@@ -8,6 +8,7 @@
 | Funcionalidade | Emissão de notas fiscais |
 | Tipo | Funcionalidade |
 | Criado em | 2026-11-20 |
+| Milestones | M02 |
 
 ## Ideia original
 

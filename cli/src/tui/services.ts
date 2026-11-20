@@ -18,6 +18,7 @@ import { join } from "node:path";
 import { projectOverview, type ProjectOverview } from "../core/overview.ts";
 import { gateDefinitions } from "../cli/commands/gates.ts";
 import { executeScriptCommand, type ScriptCommandDef } from "../engine/script-command.ts";
+import { inboxCaptureDef, lifecycleActions, specCreateDef, taskNextDef } from "../cli/commands/lifecycle.ts";
 import { runProjectTests, type TestRun } from "../domain/project-testing.ts";
 import { Catalog } from "../domain/catalog.ts";
 import { FRAMEWORK_SKILLS, releaseRef, SkillInstaller } from "../domain/installer.ts";
@@ -58,6 +59,33 @@ export interface TuiServices {
   removeSkills(project: string, names: string[]): Promise<string[]>;
   /** Updates every installed Specsfy skill. */
   updateSkills(project: string): Promise<string[]>;
+  /** Moves a spec to an adjacent state, as `specs transition`. */
+  transitionSpec(project: string, spec: string, to: string): Promise<{ from: string; to: string }>;
+  /** Marks the next checklist item of the first ready task, as `tasks next` + `tasks check`. */
+  checkNextItem(project: string, spec: string): Promise<{ task: string; item?: string }>;
+  /** Creates a spec in specs/draft/, as `specs new`; returns the script output. */
+  createSpec(project: string, title: string): Promise<string>;
+  /** Records a capture in specs/inbox/, as `inbox capture`; returns the script output. */
+  captureInbox(project: string, title: string, text: string): Promise<string>;
+}
+
+/** Runs a write script and fails with its output when it does not succeed. */
+async function runWrite(def: ScriptCommandDef, values: Record<string, unknown>, project: string): Promise<string> {
+  const { data } = await executeScriptCommand(def, values, project);
+  const output = formatScriptOutput(data.result, data.stderr);
+  if (!data.ok) throw new Error(output);
+  return output;
+}
+
+/** First ready task of a spec and its next checklist item, then marks it. */
+async function checkNextItem(project: string, spec: string): Promise<{ task: string; item?: string }> {
+  const { data } = await executeScriptCommand(taskNextDef, { spec, json: true }, project);
+  const result = data.result as { ready?: Array<{ id: string; next_item?: { key?: string } }> } | string;
+  const ready = typeof result === "object" ? result.ready?.[0] : undefined;
+  if (!ready) throw new Error("No ready task: every task is done or waiting on a dependency.");
+  const item = ready.next_item?.key;
+  await lifecycleActions.check(project, spec, ready.id, item, false);
+  return { task: ready.id, item };
 }
 
 /** Formats the result of a script run as readable text. */
@@ -122,6 +150,10 @@ export function defaultServices(): TuiServices {
     installSkills,
     removeSkills: async (project, names) => (await SkillInstaller.create(project)).remove(names),
     updateSkills: async (project) => (await SkillInstaller.create(project, false, { ref: releaseRef() })).updateAll(),
+    transitionSpec: (project, spec, to) => lifecycleActions.transition(project, spec, to),
+    checkNextItem,
+    createSpec: (project, title) => runWrite(specCreateDef, { title }, project),
+    captureInbox: (project, title, text) => runWrite(inboxCaptureDef, { title, input: text }, project),
   };
 }
 

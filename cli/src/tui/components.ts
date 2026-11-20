@@ -458,3 +458,65 @@ export function barChart(
   }
   return box;
 }
+
+/**
+ * Bottom bar of a screen that runs actions: asks for confirmation (`y`
+ * confirms, `n` or Esc cancels), offers numbered choices (1 to 9, Esc
+ * cancels) and shows the result of the last action. Screens forward their
+ * keys to `handleKey` first; while a question is open it consumes every key.
+ */
+export function actionBar(renderer: CliRenderer, theme: Theme) {
+  const box = new BoxRenderable(renderer, { height: 1, flexShrink: 0, flexDirection: "row", paddingLeft: 1, visible: false });
+  const text = new TextRenderable(renderer, { content: "", wrapMode: "none" });
+  box.add(text);
+  type Question =
+    | { kind: "confirm"; label: string; onYes: () => void }
+    | { kind: "choose"; label: string; options: string[]; onPick: (index: number) => void };
+  let question: Question | undefined;
+
+  const paint = (content: string, fg: ColorInput, bg: ColorInput) => {
+    text.content = content;
+    text.fg = fg;
+    text.bg = bg;
+    box.backgroundColor = bg;
+    box.visible = true;
+  };
+  const ask = (label: string, onYes: () => void) => {
+    question = { kind: "confirm", label, onYes };
+    paint(`${label}? Press y to confirm, n or Esc to cancel.`, theme.primaryText, theme.primary);
+  };
+  const choose = (label: string, options: string[], onPick: (index: number) => void) => {
+    question = { kind: "choose", label, options, onPick };
+    const list = options.map((option, index) => `${index + 1} ${option}`).join("   ");
+    paint(`${label}: ${list}   (Esc cancels)`, theme.primaryText, theme.primary);
+  };
+  /** Shows the outcome of an action: `ok`, `error` or a neutral note. */
+  const message = (content: string, tone: "ok" | "error" | "info" = "info") => {
+    question = undefined;
+    const glyph = tone === "ok" ? glyphs.ok : tone === "error" ? glyphs.error : glyphs.running;
+    paint(`${glyph} ${content}`, tone === "ok" ? theme.ok : tone === "error" ? theme.error : theme.text, theme.surface);
+  };
+  const handleKey = (name: string): boolean => {
+    if (!question) return false;
+    const current = question;
+    if (name === "escape" || (current.kind === "confirm" && name === "n")) {
+      message("Cancelled. Nothing changed.");
+      return true;
+    }
+    if (current.kind === "confirm" && name === "y") {
+      question = undefined;
+      current.onYes();
+      return true;
+    }
+    if (current.kind === "choose" && /^[1-9]$/.test(name)) {
+      const index = Number(name) - 1;
+      if (index < current.options.length) {
+        question = undefined;
+        current.onPick(index);
+      }
+      return true;
+    }
+    return true;
+  };
+  return { box, ask, choose, message, handleKey, busy: () => question !== undefined };
+}

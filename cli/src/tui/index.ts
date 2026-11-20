@@ -196,27 +196,68 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
       if (index >= 0) tabs.setSelectedIndex(index);
     },
     quit,
+    prompt: (label, onSubmit) => {
+      typing = { label, value: "", onSubmit };
+      if (active) refreshFooter(active);
+    },
   };
 
-  // Filter mode of `/`: while it is on, printable keys go to the query and
-  // no global key fires; Enter keeps the filter, Esc clears it.
+  // Typing modes. Filter (`/`): printable keys go to the query, which the
+  // screen applies on every change; Enter keeps it, Esc clears it. Prompt
+  // (`ctx.prompt`): the text goes to the screen on Enter; Esc cancels. In
+  // both, no global key fires while typing.
   let filtering = false;
   let query = "";
+  let typing: { label: string; value: string; onSubmit: (text: string) => void } | undefined;
   const filterKeys = [
     { key: "type", action: "filter" },
     { key: "Enter", action: "keep" },
     { key: "Esc", action: "clear" },
   ];
+  const promptKeys = [
+    { key: "Enter", action: "confirm" },
+    { key: "Esc", action: "cancel" },
+  ];
   const refreshFooter = (screen: Screen) => {
     app.remove(footer);
     const own = [...(screen.keys ?? []), ...(screen.filter ? [{ key: "/", action: "filter" }] : [])];
-    footer = keyBar(renderer, theme, filtering ? [{ key: `/${query}`, action: "" }, ...filterKeys] : [...own, ...globalKeys]);
+    footer = keyBar(
+      renderer,
+      theme,
+      typing
+        ? [{ key: `${typing.label}: ${typing.value}▏`, action: "" }, ...promptKeys]
+        : filtering
+          ? [{ key: `/${query}`, action: "" }, ...filterKeys]
+          : [...own, ...globalKeys],
+    );
     app.add(footer);
   };
   const setQuery = (next: string) => {
     query = next;
     active?.filter?.(query);
     if (active) refreshFooter(active);
+  };
+  /** Printable text of a key press, or undefined for control keys. */
+  const printable = (key: KeyEvent): string | undefined => {
+    const text = key.sequence ?? "";
+    return !key.ctrl && !key.meta && text.length === 1 && text >= " " ? text : undefined;
+  };
+  /** Handles a key in prompt mode; returns true when consumed. */
+  const promptKey = (key: KeyEvent): boolean => {
+    if (!typing) return false;
+    const current = typing;
+    if (key.name === "escape") typing = undefined;
+    else if (key.name === "return" || key.name === "enter") {
+      typing = undefined;
+      const text = current.value.trim();
+      if (text) current.onSubmit(text);
+    } else if (key.name === "backspace") current.value = current.value.slice(0, -1);
+    else {
+      const text = printable(key);
+      if (text) current.value += text;
+    }
+    if (active) refreshFooter(active);
+    return true;
   };
   /** Handles a key in filter mode; returns true when consumed. */
   const filterKey = (key: KeyEvent): boolean => {
@@ -236,8 +277,8 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
       return true;
     }
     if (["up", "down", "pageup", "pagedown"].includes(key.name)) return false;
-    const text = key.sequence ?? "";
-    if (!key.ctrl && !key.meta && text.length === 1 && text >= " ") setQuery(query + text);
+    const text = printable(key);
+    if (text) setQuery(query + text);
     return true;
   };
 
@@ -248,6 +289,7 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
       if (query) active.filter?.("");
       filtering = false;
       query = "";
+      typing = undefined;
       active.onLeave?.(context);
       const previous = mounted.get(active.id);
       if (previous) content.remove(previous);
@@ -306,6 +348,7 @@ export async function mountTui(renderer: CliRenderer, options: TuiOptions = {}, 
   tabs.on(TabSelectRenderableEvents.ITEM_SELECTED, (index: number) => show(index));
 
   const onKey = (key: KeyEvent) => {
+    if (promptKey(key)) return;
     if (filterKey(key)) return;
     if (key.name === "/" || key.sequence === "/") {
       if (active?.filter) {

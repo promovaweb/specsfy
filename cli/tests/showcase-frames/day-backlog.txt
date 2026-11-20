@@ -1,6 +1,6 @@
  ▌ Specsfy v0.34.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
-   Overview       Specs        Backlog        Gates         Tests         Skills        About                                               
+   Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
  ╭─ Backlog and inbox ────────────────────────╮╭─ specs/backlog/0001-notas-fiscais.md ────────────────────────────────────────────────────╮ 
  │ Backlog · 3                                ││ Backlog: Emissão de notas fiscais                                                        │ 
  │ > Emissão de notas fiscais   [Ready]       ││                                                                                          │ 
@@ -18,6 +18,8 @@
  │                                            ││ │Tipo                                  │Funcionalidade                                 │ │ 
  │                                            ││ ├──────────────────────────────────────┼───────────────────────────────────────────────┤ │ 
  │                                            ││ │Criado em                             │2026-11-20                                     │ │ 
+ │                                            ││ ├──────────────────────────────────────┼───────────────────────────────────────────────┤ │ 
+ │                                            ││ │Milestones                            │M02                                            │ │ 
  │                                            ││ ╰──────────────────────────────────────┴───────────────────────────────────────────────╯ │ 
  │                                            ││                                                                                          │ 
  │                                            ││ Ideia original                                                                           │ 
@@ -34,7 +36,5 @@
  │                                            ││                                                                                          │ 
  │                                            ││                                                                                          │ 
  │                                            ││                                                                                          │ 
- │                                            ││                                                                                          │ 
- │                                            ││                                                                                          │ 
  ╰────────────────────────────────────────────╯╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
-  ↑/↓  item   PgUp/PgDn  scroll   r  reload   /  filter   ←/→  tab   1-9  go   ?  help   q  quit
+  ↑/↓  item   PgUp/PgDn  scroll   c  capture   r  reload   /  filter   ←/→  tab   1-9  go   ?  help   q  quit

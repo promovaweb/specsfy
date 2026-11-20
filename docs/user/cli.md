@@ -258,15 +258,19 @@ specsfy
 ```
 
 Não é preciso escrever `tui`; `specsfy tui --project PATH` abre outro projeto.
-A TUI tem sete abas:
+A TUI tem nove abas:
 
 - **Overview**, painel de estatísticas das specs, gates, tarefas e checklist.
-- **Specs**, specs por estado, com gates, tarefas e o Markdown da selecionada.
-- **Backlog**, itens do backlog e capturas do inbox, com preview do Markdown.
+- **Specs**, specs por estado, com gates, tarefas e o Markdown; `t` muda o estado, `Espaço` marca o próximo item e `n` cria uma spec.
+- **Backlog**, itens do backlog e capturas do inbox; `c` registra uma captura.
+- **Milestones**, milestones de `specs/milestones/` com progresso e preview.
+- **Context**, documentos de contexto do projeto, com `✓` quando existem.
 - **Gates**, roda os gates da spec selecionada com `Enter`.
 - **Tests**, roda a suíte do projeto com `Enter`.
 - **Skills**, skills instaladas e do catálogo; instala, remove e atualiza.
 - **About**, identidade do binário, runtime, projeto, licença e créditos.
+
+Cada ação pede confirmação ou texto e mostra o resultado no rodapé.
 
 Teclas globais: `←`/`→`, `[`/`]`, `Tab` e `1` a `9` mudam de aba; `/` filtra
 a lista da tela (Enter mantém, `Esc` limpa) e `?` mostra o help de teclas.
@@ -281,34 +285,30 @@ inicial. A TUI relê as specs a cada `tui.watchInterval` segundos (padrão
 ![Dashboard Home](assets/cli/cli-dash.png)
 
 A Overview é o painel de estatísticas: barra **Overall** com a média das specs,
-medidores de specs, gates, tarefas e checklist, gráfico de specs por estado,
-cada spec com os três gates e barra própria (abertas primeiro), gates aprovados
-por tipo, backlog, inbox e o próximo passo.
+medidores de specs, gates, tarefas e checklist, specs por estado, gates de cada
+spec, backlog, inbox e próximo passo.
 
 #### Backlog: lista e leitura lado a lado
 
 ![Backlogs](assets/cli/cli-backlogs.png)
 
-A aba Backlog mantém a seleção na coluna esquerda e mostra o Markdown do item na
-direita, com as capturas do inbox na mesma lista. Assim é possível conferir
-status e conteúdo sem sair da TUI.
+A aba Backlog mantém a seleção à esquerda e mostra o Markdown do item na
+direita, com as capturas do inbox na mesma lista.
 
 #### Specs: gates, tarefas e progresso
 
 ![Specs](assets/cli/cli-specs.png)
 
 A aba Specs agrupa as specs por estado. A selecionada mostra gates, tarefas e
-progresso, com o Markdown abaixo. `↑`/`↓` trocam de spec, `PgUp`/`PgDn` rolam,
-`g` abre a aba Gates e `r` recarrega.
+progresso, com o Markdown abaixo. `g` abre Gates e `r` recarrega.
 
 #### Skills: instalar com confirmação
 
 ![Skills](assets/cli/cli-skills.png)
 
-A aba Skills lista as skills instaladas e as disponíveis no catálogo, por
-categoria, com o detalhe da selecionada ao lado. `i` instala, `x` remove, `u`
-atualiza todas e `c` baixa o catálogo de novo. Cada ação pede confirmação: `y`
-executa e `n` ou `Esc` cancela sem mudar nada. Todas as telas estão no [showcase](../develop/showcase.md).
+A aba Skills lista instaladas e catálogo por categoria, com o detalhe ao lado:
+`i` instala, `x` remove, `u` atualiza todas e `c` baixa o catálogo, cada ação
+com `y` para confirmar. Todas as telas estão no [showcase](../develop/showcase.md).
 
 ## Servidor MCP
 

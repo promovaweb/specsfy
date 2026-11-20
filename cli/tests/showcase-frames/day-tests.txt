@@ -1,6 +1,6 @@
  ▌ Specsfy v0.34.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
-   Overview       Specs        Backlog        Gates         Tests         Skills        About                                               
+   Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
  ╭─ Summary ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
  │ ○ Not run in this session.                                                                                                             │ 
  │ Enter runs the suite (Laravel with Pest). The run stops first when .env.testing does not declare a separate database.                  │ 

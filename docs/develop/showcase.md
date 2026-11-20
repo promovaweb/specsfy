@@ -3,9 +3,11 @@
 Prints de todas as telas da TUI do Specsfy ficam em
 `docs/user/assets/showcase/`, gerados a partir do projeto de demonstração de
 [`cli/tests/fixtures/showcase-project/`](../../cli/tests/fixtures/showcase-project/),
-nos temas `night` e `day`, numa tela de 140×40. O projeto é uma loja online
-com 8 specs em todos os estados, itens de backlog e capturas de inbox,
-construído por [`cli/scripts/build-demo-project.ts`](../../cli/scripts/build-demo-project.ts)
+nos temas `night` e `day`, numa tela de 140×40, em 20 prints. O projeto é uma
+loja online com 8 specs em todos os estados, itens de backlog, capturas de
+inbox, os milestones M01 e M02 e os arquivos de contexto (`PROJECT.md`,
+`.specsfy/STACK.md` e `.specsfy/RULES.md`), construído por
+[`cli/scripts/build-demo-project.ts`](../../cli/scripts/build-demo-project.ts)
 a partir de uma spec real do [`example/`](../../example/). A raiz desse projeto
 aparece nos prints como `~/projects/loja-online`.
 As imagens saem do próprio código da TUI. Quando uma tela muda, o
@@ -20,6 +22,8 @@ atual.
 | Overview | ![Overview night](../user/assets/showcase/night-overview.png) | ![Overview day](../user/assets/showcase/day-overview.png) |
 | Specs | ![Specs night](../user/assets/showcase/night-specs.png) | ![Specs day](../user/assets/showcase/day-specs.png) |
 | Backlog | ![Backlog night](../user/assets/showcase/night-backlog.png) | ![Backlog day](../user/assets/showcase/day-backlog.png) |
+| Milestones | ![Milestones night](../user/assets/showcase/night-milestones.png) | ![Milestones day](../user/assets/showcase/day-milestones.png) |
+| Context | ![Context night](../user/assets/showcase/night-context.png) | ![Context day](../user/assets/showcase/day-context.png) |
 | Gates | ![Gates night](../user/assets/showcase/night-gates.png) | ![Gates day](../user/assets/showcase/day-gates.png) |
 | Tests | ![Tests night](../user/assets/showcase/night-tests.png) | ![Tests day](../user/assets/showcase/day-tests.png) |
 | Skills | ![Skills night](../user/assets/showcase/night-skills.png) | ![Skills day](../user/assets/showcase/day-skills.png) |

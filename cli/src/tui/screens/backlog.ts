@@ -9,9 +9,9 @@
  */
 import { BoxRenderable } from "@opentui/core";
 import type { ProjectOverview } from "../../core/overview.ts";
-import { selectList, markdownView, markdownStyle, fit, type SelectItem } from "../components.ts";
+import { actionBar, selectList, markdownView, markdownStyle, fit, type SelectItem } from "../components.ts";
 import type { Theme } from "../theme.ts";
-import type { Screen } from "../screen.ts";
+import type { Screen, ScreenContext } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
 import { errorMessage } from "../store.ts";
 import { projectFile } from "../services.ts";
@@ -35,6 +35,19 @@ export function backlogItems(theme: Theme, overview: ProjectOverview): SelectIte
 export function createBacklogScreen(store: ProjectStore): Screen {
   let list: ReturnType<typeof selectList> | undefined;
   let reader: ReturnType<typeof markdownView> | undefined;
+  let actions: ReturnType<typeof actionBar> | undefined;
+
+  /** Records a capture in specs/inbox/ from one typed line, without questions. */
+  const capture = (ctx: ScreenContext) => {
+    ctx.prompt("Capture an idea", (text) => {
+      actions?.message("Capturing…");
+      const title = text.length > 72 ? `${text.slice(0, 71).trimEnd()}…` : text;
+      store.services.captureInbox(store.project, title, text).then(
+        () => { actions?.message(`Captured in specs/inbox/: ${title}`, "ok"); void store.reload(); },
+        (error) => actions?.message(errorMessage(error).split("\n")[0] ?? "Failed.", "error"),
+      );
+    });
+  };
   return {
     id: "backlog",
     title: "Backlog",
@@ -42,10 +55,15 @@ export function createBacklogScreen(store: ProjectStore): Screen {
     keys: [
       { key: "↑/↓", action: "item" },
       { key: "PgUp/PgDn", action: "scroll" },
+      { key: "c", action: "capture" },
       { key: "r", action: "reload" },
     ],
     mount: ({ renderer, theme }) => {
+      const screenBox = new BoxRenderable(renderer, { flexDirection: "column", flexGrow: 1 });
       const rootBox = new BoxRenderable(renderer, { flexDirection: "row", flexGrow: 1 });
+      actions = actionBar(renderer, theme);
+      screenBox.add(rootBox);
+      screenBox.add(actions.box);
       const style = markdownStyle(renderer, theme);
       reader = markdownView(renderer, theme, { title: "Preview", style });
       let generation = 0;
@@ -79,12 +97,14 @@ export function createBacklogScreen(store: ProjectStore): Screen {
       };
       draw(store.state());
       const unsubscribe = store.subscribe(draw);
-      renderer.once("destroy", () => { unsubscribe(); generation += 1; style.destroy(); list = undefined; reader = undefined; });
-      return rootBox;
+      renderer.once("destroy", () => { unsubscribe(); generation += 1; style.destroy(); list = undefined; reader = undefined; actions = undefined; });
+      return screenBox;
     },
     filter: (query) => list?.setFilter(query),
-    onKey: (name) => {
+    onKey: (name, ctx) => {
+      if (actions?.handleKey(name)) return true;
       switch (name) {
+        case "c": capture(ctx); return true;
         case "up": case "k": list?.move(-1); return true;
         case "down": case "j": list?.move(1); return true;
         case "pageup": reader?.scroll(-10); return true;

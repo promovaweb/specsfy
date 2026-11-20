@@ -43,7 +43,7 @@ CI pelo `--json`.
 
 | Command | Função | Options | `data` no `--json` | Exit codes | Credenciais |
 | --- | --- | --- | --- | --- | --- |
-| `tui` | Open the terminal interface (Overview, Specs, Backlog, Gates, Tests, Skills and About). Requires a TTY. | `--tab <tab>`, `--project <dir>` | ver `--skill reference` | 8, 6 | n/a |
+| `tui` | Open the terminal interface (Overview, Specs, Backlog, Milestones, Context, Gates, Tests, Skills and About). Requires a TTY. | `--tab <tab>`, `--project <dir>` | ver `--skill reference` | 8, 6 | n/a |
 | `status` | Show the project overview: specs by state, progress, gates, backlog and inbox. | `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `specs list` | List specs with state, gates and task progress. | `--state <state>`, `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `specs show` | Show one spec: metadata, gates, tasks and, with --content, the Markdown. | `<spec>`, `--content`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
@@ -120,12 +120,14 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | Screen | Função | Teclas |
 | --- | --- | --- |
 | `overview` | projeto, resumo de progresso, estados, backlog, inbox, próximos passos e MCP | `r` reload |
-| `specs` | specs por estado com gates, tarefas e o Markdown da selecionada | `↑/↓` spec, `PgUp/PgDn` scroll, `g` gates, `r` reload |
-| `backlog` | backlog e inbox com preview | `↑/↓` item, `PgUp/PgDn` scroll, `r` reload |
+| `specs` | specs por estado com gates, tarefas e o Markdown da selecionada | `↑/↓` spec, `t` move, `Espaço` check, `n` new spec, `g` gates, `r` reload |
+| `backlog` | backlog e inbox com preview | `↑/↓` item, `PgUp/PgDn` scroll, `c` capture, `r` reload |
+| `milestones` | milestones de `specs/milestones/` com a porcentagem do progresso derivado e a prévia | `↑/↓` milestone, `PgUp/PgDn` scroll, `s` sync |
+| `context` | documentos de contexto do projeto, com `✓` quando existem e a prévia | `↑/↓` file, `PgUp/PgDn` scroll |
 | `gates` | roda os gates da spec selecionada e mostra o resultado de cada um | `↑/↓` spec, `Enter` run gates, `PgUp/PgDn` scroll |
 | `tests` | roda a suíte do projeto com a proteção de banco e mostra resumo e saída | `Enter` run tests, `PgUp/PgDn` scroll |
 | `skills` | skills instaladas e disponíveis, com instalar, remover e atualizar confirmados | `↑/↓` skill, `i` install, `x` remove, `u` update all, `c` recarrega o catálogo |
-| `about` | About | globais |
+| `about` | identidade, runtime, projeto, licença, créditos e o painel Doctor com as checagens locais | globais |
 
 ### MCP
 
@@ -197,7 +199,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | --- | --- | --- | --- |
 | `output.format` | `enum` (`text`, `json`) | `text` | Default CLI output format when --json is not given. |
 | `output.colors` | `boolean` | `true` | Use ANSI colors in text output. NO_COLOR=1 always disables them. |
-| `tui.initialTab` | `enum` (`overview`, `specs`, `backlog`, `gates`, `tests`, `skills`, `about`) | `overview` | Tab opened when the TUI starts. |
+| `tui.initialTab` | `enum` (`overview`, `specs`, `backlog`, `milestones`, `context`, `gates`, `tests`, `skills`, `about`) | `overview` | Tab opened when the TUI starts. |
 | `tui.theme` | `enum` (`terminal`, `night`, `day`) | `terminal` | TUI palette. `terminal` (default) inherits the terminal theme colors; `night` and `day` are the fixed Specsfy brand palettes. |
 | `tui.watchInterval` | `number` | `0.75` | Seconds between checks for changed spec files in the TUI and in progress --watch. |
 | `catalog.repository` | `string` | `https://github.com/promovaweb/specsfy` | Git repository the framework skills are installed from. |
@@ -234,6 +236,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | 0016 | Consolidação das skills do framework | done |
 | 0017 | Filtro e abas da TUI | done |
 | 0018 | Projeto de demonstração do showcase | done |
+| 0019 | Ações e telas novas na TUI | done |
 
 ## Notes
 
@@ -277,3 +280,4 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 - 2026-11-20: spec 0016 (Consolidação das skills do framework) closed.
 - 2026-11-20: spec 0017 (Filtro e abas da TUI) closed.
 - 2026-11-20: spec 0018 (Projeto de demonstração do showcase) closed.
+- 2026-11-20: spec 0019 (Ações e telas novas na TUI) closed.

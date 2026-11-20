@@ -18,6 +18,7 @@
  */
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { syncMilestones } from "../src/domain/milestones.ts";
 
 const CLI = resolve(import.meta.dir, "..");
 const BASE = resolve(CLI, "../example/specs/specs/0001-diretorio-global-usuarios/spec.md");
@@ -70,7 +71,7 @@ function demoSpec(base: string, spec: DemoSpec, index: number): string {
     .replace(/^\| Definition Gate \| .* \|$/m, `| Definition Gate | ${spec.gates[0]} |`)
     .replace(/^\| Plan Gate \| .* \|$/m, `| Plan Gate | ${spec.gates[1]} |`)
     .replace(/^\| Delivery Gate \| .* \|$/m, `| Delivery Gate | ${spec.gates[2]} |`)
-    .replace(/^\| Atualizada em \| .* \|$/m, `| Atualizada em | ${DATE} |`);
+    .replace(/^\| Atualizada em \| .* \|$/m, `| Atualizada em | ${DATE} |\n| Milestones | ${index < 5 ? "M01" : "M02"} |`);
   // Inside section 14, a top-level task and its sub-items follow its index.
   const lines = text.split("\n");
   let inTasks = false;
@@ -97,6 +98,7 @@ function backlogItem(item: (typeof BACKLOG)[number]): string {
 | Funcionalidade | ${item.title} |
 | Tipo | Funcionalidade |
 | Criado em | ${DATE} |
+| Milestones | M02 |
 
 ## Ideia original
 
@@ -120,6 +122,12 @@ ${item.title}.
 `;
 }
 
+/** Milestone files with a human heading and goal; sync fills the progress. */
+const MILESTONES = [
+  { id: "M01", title: "M01 · MVP da loja", goal: "Vender pela internet: catálogo, carrinho, checkout com Pix, cupons e avaliações." },
+  { id: "M02", title: "M02 · Pós-venda", goal: "Acompanhar o pedido depois da compra e trazer o cliente de volta." },
+];
+
 if (import.meta.main) {
   const base = readFileSync(BASE, "utf8");
   rmSync(DEMO_PROJECT, { recursive: true, force: true });
@@ -135,6 +143,16 @@ if (import.meta.main) {
     mkdirSync(folder, { recursive: true });
     writeFileSync(join(folder, `${item.slug}.md`), inboxCapture(item));
   }
+  mkdirSync(join(DEMO_PROJECT, "specs", "milestones"), { recursive: true });
+  for (const milestone of MILESTONES) {
+    writeFileSync(join(DEMO_PROJECT, "specs", "milestones", `${milestone.id}.md`), `# ${milestone.title}\n\n## Objetivo\n\n${milestone.goal}\n`);
+  }
+  await syncMilestones(DEMO_PROJECT);
+  // Part of the context, so the Context tab shows present and missing files.
+  mkdirSync(join(DEMO_PROJECT, ".specsfy"), { recursive: true });
+  writeFileSync(join(DEMO_PROJECT, "PROJECT.md"), "# Loja online\n\nLoja virtual de produtos artesanais, com vendas por Pix e cartão.\n\n## Pessoas\n\n- Cliente que compra pelo celular.\n- Lojista que cadastra produtos e acompanha pedidos.\n");
+  writeFileSync(join(DEMO_PROJECT, ".specsfy", "STACK.md"), "# Stack\n\n| Camada | Tecnologia |\n| --- | --- |\n| Backend | Laravel 12 |\n| Frontend | React com Inertia |\n| Banco | PostgreSQL |\n");
+  writeFileSync(join(DEMO_PROJECT, ".specsfy", "RULES.md"), "# Regras do projeto\n\n## Testes\n\n- Toda rota tem teste de feature.\n\n## Pagamentos\n\n- Valores em centavos, nunca em ponto flutuante.\n");
   // The skills of example/ make the Skills tab look like a real project.
   writeFileSync(join(DEMO_PROJECT, "skills-lock.json"), readFileSync(resolve(CLI, "../example/skills-lock.json"), "utf8"));
   console.log(`✓ demo project written to ${DEMO_PROJECT}: ${SPECS.length} specs, ${BACKLOG.length} backlog items, ${INBOX.length} captures`);

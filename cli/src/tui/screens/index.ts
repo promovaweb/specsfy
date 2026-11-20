@@ -12,6 +12,8 @@ import { aboutScreen } from "./about.ts";
 import { createOverviewScreen } from "./overview.ts";
 import { createSpecsScreen, type SpecFocus } from "./specs.ts";
 import { createBacklogScreen } from "./backlog.ts";
+import { createMilestonesScreen } from "./milestones.ts";
+import { createContextScreen } from "./context.ts";
 import { createGatesScreen } from "./gates.ts";
 import { createTestsScreen } from "./tests.ts";
 import { createSkillsScreen } from "./skills.ts";
@@ -20,7 +22,7 @@ import { defaultServices } from "../services.ts";
 import type { Screen } from "../screen.ts";
 
 /** Stable tab ids, in tab order. */
-export const SCREEN_IDS = ["overview", "specs", "backlog", "gates", "tests", "skills", "about"] as const;
+export const SCREEN_IDS = ["overview", "specs", "backlog", "milestones", "context", "gates", "tests", "skills", "about"] as const;
 
 /** Builds the screens of one TUI instance. */
 export function createScreens(store: ProjectStore): Screen[] {
@@ -29,6 +31,8 @@ export function createScreens(store: ProjectStore): Screen[] {
     createOverviewScreen(store),
     createSpecsScreen(store, focus),
     createBacklogScreen(store),
+    createMilestonesScreen(store),
+    createContextScreen(store),
     createGatesScreen(store, focus),
     createTestsScreen(store),
     createSkillsScreen(store),

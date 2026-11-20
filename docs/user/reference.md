@@ -152,7 +152,7 @@ Aprofunde no índice de [Skills base](skills/README.md).
 
 | Comando | Faz |
 | --- | --- |
-| `specsfy` | abre a TUI, com as abas Overview, Specs, Backlog, Gates, Tests, Skills e About |
+| `specsfy` | abre a TUI, com as abas Overview, Specs, Backlog, Milestones, Context, Gates, Tests, Skills e About |
 | `specsfy --skill` | imprime a documentação embutida do framework |
 | `specsfy install --project .` | instala skills, templates e blocos gerenciados |
 | `specsfy doctor --project .` | confere runtime, terminal, configuração, Git e token do GitHub |

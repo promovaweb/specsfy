@@ -1,0 +1,40 @@
+ ▌ Specsfy v0.34.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
+ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
+   Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
+ ╭─ Milestones ───────────────────────────────╮╭─ specs/milestones/M01.md ────────────────────────────────────────────────────────────────╮ 
+ │ > M01 · MVP da loja  40%                   ││ M01 · MVP da loja                                                                        │ 
+ │   M02 · Pós-venda  0%                      ││                                                                                          │ 
+ │                                            ││ Objetivo                                                                                 │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ Vender pela internet: catálogo, carrinho, checkout com Pix, cupons e avaliações.         │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ Progresso derivado                                                                       │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ - 2 de 5 specs concluídas (40%).                                                         │ 
+ │                                            ││ - 0 itens de backlog relacionados.                                                       │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ Specs vinculadas                                                                         │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ - 0001-catalogo-de-produtos — Especificação integrada: Catálogo de produtos (Complete)   │ 
+ │                                            ││ - 0002-carrinho-de-compras — Especificação integrada: Carrinho de compras (Complete)     │ 
+ │                                            ││ - 0004-cupons-de-desconto — Especificação integrada: Cupons de desconto (Implementing)   │ 
+ │                                            ││ - 0005-avaliacoes-de-produtos — Especificação integrada: Avaliações de produtos (        │ 
+ │                                            ││ Implementing)                                                                            │ 
+ │                                            ││ - 0003-checkout-com-pix — Especificação integrada: Checkout com Pix (Reviewing)          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ Backlog relacionado                                                                      │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││ - Nenhum item de backlog relacionado.                                                    │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ │                                            ││                                                                                          │ 
+ ╰────────────────────────────────────────────╯╰──────────────────────────────────────────────────────────────────────────────────────────╯ 
+  ↑/↓  milestone   PgUp/PgDn  scroll   s  sync   /  filter   ←/→  tab   1-9  go   ?  help   q  quit

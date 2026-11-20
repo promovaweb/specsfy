@@ -120,8 +120,8 @@ specsfy
 `specsfy tui` só é necessário para escolher outro projeto ou a aba inicial,
 como em `specsfy tui --project ../api --tab specs`. A TUI encontra a raiz do
 projeto subindo a partir da pasta atual e se atualiza sozinha quando os
-arquivos das specs mudam. As abas são Overview, Specs, Backlog, Gates, Tests, Skills e
-About.
+arquivos das specs mudam. As abas são Overview, Specs, Backlog, Milestones,
+Context, Gates, Tests, Skills e About.
 
 ![Dashboard Home](https://promovaweb.com/docs/specsfy/cli/cli-dash.png)
 

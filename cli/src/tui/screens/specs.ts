@@ -11,9 +11,10 @@
  */
 import { BoxRenderable, type CliRenderer, type Renderable } from "@opentui/core";
 import type { SpecSummary } from "../../core/overview.ts";
-import { selectList, markdownView, markdownStyle, panel, keyValueTable, progressBar, fit, dim, type SelectItem } from "../components.ts";
+import { actionBar, selectList, markdownView, markdownStyle, panel, keyValueTable, progressBar, fit, dim, type SelectItem } from "../components.ts";
+import { nextFolders } from "../../domain/lifecycle.ts";
 import type { Theme } from "../theme.ts";
-import type { Screen } from "../screen.ts";
+import type { Screen, ScreenContext } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
 import { errorMessage } from "../store.ts";
 import { folderLabel, gateTone, replaceChildren, specsByFolder, stateText } from "./shared.ts";
@@ -66,18 +67,68 @@ function detailRows(renderer: CliRenderer, theme: Theme, spec: SpecSummary): Ren
 export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen {
   let list: ReturnType<typeof selectList> | undefined;
   let reader: ReturnType<typeof markdownView> | undefined;
+  let actions: ReturnType<typeof actionBar> | undefined;
+  let current: () => SpecSummary | undefined = () => undefined;
+
+  /** Runs a write, shows its outcome and reloads the project. */
+  const run = (label: string, work: () => Promise<string>) => {
+    actions?.message(`${label}…`);
+    work().then(
+      (done) => { actions?.message(done, "ok"); void store.reload(); },
+      (error) => actions?.message(errorMessage(error).split("\n")[0] ?? "Failed.", "error"),
+    );
+  };
+  const transition = () => {
+    const spec = current();
+    if (!spec) return;
+    if (spec.folder === "legacy") {
+      actions?.message("Specs in specs/specs/ have no state folder. Run: specsfy specs migrate", "error");
+      return;
+    }
+    const options = nextFolders(spec.folder);
+    actions?.choose(`Move ${spec.slug} to`, options.map((folder) => folderLabel(folder)), (index) => {
+      const to = options[index]!;
+      actions?.ask(`Move ${spec.slug} to ${folderLabel(to)}`, () =>
+        run("Moving", async () => {
+          const result = await store.services.transitionSpec(store.project, spec.path, to);
+          return `${spec.slug}: ${result.from} → ${result.to}`;
+        }));
+    });
+  };
+  const checkNext = () => {
+    const spec = current();
+    if (!spec) return;
+    actions?.ask(`Mark the next checklist item of ${spec.slug}`, () =>
+      run("Marking", async () => {
+        const result = await store.services.checkNextItem(store.project, spec.path);
+        return `${spec.slug}: ${result.task}${result.item ? ` ${result.item}` : ""} marked`;
+      }));
+  };
+  const create = (ctx: ScreenContext) => {
+    ctx.prompt("Title of the new spec", (title) =>
+      run("Creating", async () => {
+        await store.services.createSpec(store.project, title);
+        return `Spec "${title}" created in specs/draft/`;
+      }));
+  };
   return {
     id: "specs",
     title: "Specs",
     description: "Specs by state with gates, tasks and the Markdown",
     keys: [
       { key: "↑/↓", action: "spec" },
-      { key: "PgUp/PgDn", action: "scroll" },
+      { key: "t", action: "move" },
+      { key: "Space", action: "check" },
+      { key: "n", action: "new" },
       { key: "g", action: "gates" },
       { key: "r", action: "reload" },
     ],
     mount: ({ renderer, theme }) => {
+      const screenBox = new BoxRenderable(renderer, { flexDirection: "column", flexGrow: 1 });
       const rootBox = new BoxRenderable(renderer, { flexDirection: "row", flexGrow: 1 });
+      actions = actionBar(renderer, theme);
+      screenBox.add(rootBox);
+      screenBox.add(actions.box);
       const right = new BoxRenderable(renderer, { flexDirection: "column", flexGrow: 1, minWidth: 0 });
       const detail = panel(renderer, theme, { title: "Detail" });
       detail.flexShrink = 0;
@@ -85,6 +136,7 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
       reader = markdownView(renderer, theme, { title: "spec.md", style });
       let specs: SpecSummary[] = [];
       let generation = 0;
+      current = () => specs.find((candidate) => candidate.path === list?.selected()?.id);
 
       const showSpec = (item: SelectItem | undefined) => {
         const spec = specs.find((candidate) => candidate.path === item?.id);
@@ -125,19 +177,23 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
       };
       draw(store.state());
       const unsubscribe = store.subscribe(draw);
-      renderer.once("destroy", () => { unsubscribe(); generation += 1; style.destroy(); list = undefined; reader = undefined; });
-      return rootBox;
+      renderer.once("destroy", () => { unsubscribe(); generation += 1; style.destroy(); list = undefined; reader = undefined; actions = undefined; });
+      return screenBox;
     },
     onEnter: () => {
       if (focus.spec) list?.selectId(focus.spec);
     },
     filter: (query) => list?.setFilter(query),
     onKey: (name, ctx) => {
+      if (actions?.handleKey(name)) return true;
       switch (name) {
+        case "t": transition(); return true;
+        case "space": checkNext(); return true;
+        case "n": create(ctx); return true;
         case "up": case "k": list?.move(-1); return true;
         case "down": case "j": list?.move(1); return true;
         case "pageup": reader?.scroll(-10); return true;
-        case "pagedown": case "space": reader?.scroll(10); return true;
+        case "pagedown": reader?.scroll(10); return true;
         case "g": ctx.goTo("gates"); return true;
         case "r": void store.reload(); return true;
         default: return false;

@@ -1,11 +1,14 @@
 /**
- * About tab: binary identity, version, paths and credits.
+ * About tab: binary identity, version, paths, credits and the local checks
+ * of `specsfy doctor`.
  * Uses the same data as the `about` command, so the two surfaces never tell
  * different stories.
  */
 import { BoxRenderable, TextRenderable } from "@opentui/core";
 import { aboutData } from "../../cli/commands/about.ts";
-import { spacer, list, panel, dim, keyValueTable, heading } from "../components.ts";
+import { spacer, panel, dim, keyValueTable, segments, fit } from "../components.ts";
+import { collectDoctorChecks } from "../../cli/commands/doctor.ts";
+import { glyphs } from "../theme.ts";
 import type { Screen } from "../screen.ts";
 
 export const aboutScreen: Screen = {
@@ -55,13 +58,17 @@ export const aboutScreen: Screen = {
     }
     bottom.add(creditsPanel);
 
-    const standards = panel(renderer, theme, { title: "Standards", width: 58 });
-    standards.add(heading(renderer, theme, "Interface"));
-    standards.add(list(renderer, theme, ["OpenCLI 0.1 for the CLI description", "MCP 2025-11-25 over stdio", "Fixed exit codes (0 success)"]));
-    standards.add(spacer(renderer));
-    standards.add(heading(renderer, theme, "Data"));
-    standards.add(list(renderer, theme, ["settings.json in plain text", "credentials.json with AES-256-GCM", "master.key with mode 0600"]));
-    bottom.add(standards);
+    // Same local checks as `specsfy doctor` (no network, no project checks).
+    const doctor = panel(renderer, theme, { title: "Doctor", width: 58 });
+    const { checks, ok } = collectDoctorChecks();
+    const tone = { ok: [glyphs.ok, theme.ok], warn: [glyphs.warn, theme.warn], fail: [glyphs.error, theme.error] } as const;
+    for (const check of checks) {
+      const [glyph, color] = tone[check.status];
+      doctor.add(segments(renderer, [[`${glyph} `, color], [check.name.padEnd(12), theme.text], [fit(check.detail, 38), theme.textDim]]));
+    }
+    doctor.add(spacer(renderer));
+    doctor.add(dim(renderer, theme, ok ? "All local checks pass. Run specsfy doctor --project for the project." : "A check failed. Run specsfy doctor for details."));
+    bottom.add(doctor);
     rootBox.add(bottom);
 
     return rootBox;

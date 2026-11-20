@@ -12,25 +12,44 @@ encerra com exit code 8.
 ```
 
 `--tab <tab>` escolhe a aba inicial e tem prioridade sobre `tui.initialTab`
-em settings.json. Os valores são `overview`, `specs`, `backlog`, `gates`,
-`tests`, `skills` e `about`. `--project <dir>` fixa a raiz do projeto; sem
-ele, a TUI sobe a partir da pasta atual até encontrar `specs/`, `.specsfy/`
-ou `skills-lock.json`.
+em settings.json. Os valores são `overview`, `specs`, `backlog`, `milestones`,
+`context`, `gates`, `tests`, `skills` e `about`. `--project <dir>` fixa a raiz
+do projeto; sem ele, a TUI sobe a partir da pasta atual até encontrar
+`specs/`, `.specsfy/` ou `skills-lock.json`. Em terminais estreitos, a barra
+de abas rola até a aba selecionada.
 
 ## Screens
 
 | Screen | Função | Teclas da screen |
 | --- | --- | --- |
 | `overview` | Painel das specs: barra de progresso geral, medidores de specs, gates, tarefas e checklist, gráfico de specs por estado, gates aprovados por tipo e por spec, lista das specs com gates e barra própria, backlog, inbox e próximos passos. | `r` recarrega |
-| `specs` | Specs agrupadas por estado, com detalhe de gates e tarefas e o Markdown da selecionada. | `↑/↓` muda a spec, `PgUp/PgDn` rola, `g` abre os gates, `r` recarrega |
-| `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `r` recarrega |
+| `specs` | Specs agrupadas por estado, com detalhe de gates e tarefas e o Markdown da selecionada. | `↑/↓` muda a spec, `t` muda o estado, `Espaço` marca o próximo item de checklist, `n` cria uma spec, `g` abre os gates, `r` recarrega |
+| `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `c` captura uma ideia, `r` recarrega |
+| `milestones` | Milestones de `specs/milestones/`, com o título, a porcentagem do progresso derivado e a prévia do Markdown. | `↑/↓` muda o milestone, `PgUp/PgDn` rola, `s` sincroniza, `/` filtra |
+| `context` | Documentos de contexto do projeto, com `✓` quando existem e `○` quando faltam, e a prévia do selecionado. | `↑/↓` muda o documento, `PgUp/PgDn` rola, `/` filtra |
 | `gates` | Executa os gates do framework na spec selecionada e mostra a saída. | `↑/↓` muda a spec, `Enter` roda os gates, `PgUp/PgDn` rola |
 | `tests` | Executa a suíte do projeto pelo mesmo caminho do command `test`. | `Enter` roda os testes, `PgUp/PgDn` rola |
 | `skills` | Skills instaladas e disponíveis no catálogo, com detalhe, estado e a linha `Inventory`, que avisa quando as skills do projeto diferem do inventário do binário. | `↑/↓` muda a skill, `i` instala, `x` remove, `u` atualiza todas, `c` baixa o catálogo de novo; toda ação pede `y` para confirmar |
-| `about` | Identidade e runtime do binário, projeto, licença, créditos e padrões seguidos. | nenhuma própria |
+| `about` | Identidade e runtime do binário, projeto, licença, créditos e o painel Doctor, com as checagens locais de `specsfy doctor`. | nenhuma própria |
 
 Cada screen declara o campo `keys`, que monta a barra inferior. As teclas
 globais aparecem depois das teclas da screen.
+
+## Ações
+
+As telas que alteram o projeto chamam a mesma função do CLI, pedem confirmação
+e mostram o resultado numa linha no rodapé: `✓` em verde quando funciona, `✗`
+em vermelho quando falha. A cada resultado a TUI recarrega o projeto.
+
+| Tecla | Tela | Efeito |
+| --- | --- | --- |
+| `t` | Specs | Mostra os estados vizinhos numerados da spec selecionada; o número escolhe, `y` confirma e `Esc` cancela. Specs no layout legado `specs/specs/` pedem `specsfy specs migrate`. |
+| `Espaço` | Specs | Marca o próximo item de checklist da primeira tarefa pronta, igual a `specsfy tasks next` mais `tasks check`; `y` confirma e `n` ou `Esc` cancela. |
+| `n` | Specs | Pede o título na barra de teclas e cria uma spec em `specs/draft/`, igual a `specsfy specs new`; `Enter` cria e `Esc` cancela. |
+| `c` | Backlog | Pede uma linha na barra de teclas e registra uma captura em `specs/inbox/`, igual a `specsfy inbox capture`; `Enter` registra e `Esc` cancela. |
+
+`PgUp/PgDn` continuam rolando o Markdown; na aba Specs, `Espaço` deixou de
+rolar.
 
 ## Teclas globais
 
@@ -45,10 +64,11 @@ globais aparecem depois das teclas da screen.
 
 ## Filtro
 
-`/` abre o filtro nas telas com lista: `specs`, `backlog`, `gates` e `skills`.
-O que a pessoa digita filtra a lista pelo rótulo, sem diferenciar maiúsculas
-nem acentos, e os títulos de grupo que ainda têm itens continuam visíveis. O
-título da lista mostra a consulta, como ` · /cupom`.
+`/` abre o filtro nas telas com lista: `specs`, `backlog`, `milestones`,
+`context`, `gates` e `skills`. O que a pessoa digita filtra a lista pelo
+rótulo, sem diferenciar maiúsculas nem acentos, e os títulos de grupo que
+ainda têm itens continuam visíveis. O título da lista mostra a consulta, como
+` · /cupom`.
 
 `Enter` mantém o filtro e fecha a digitação, `Esc` limpa o filtro e
 `Backspace` apaga o último caractere. Durante a digitação, as teclas globais
@@ -95,8 +115,8 @@ vale para `progress --watch`.
 ```
 
 O store do projeto é compartilhado pelas screens, então uma mudança detectada
-em `overview` também aparece em `specs`, `backlog`, `gates`, `tests` e
-`skills` na próxima leitura.
+em `overview` também aparece em `specs`, `backlog`, `milestones`, `context`,
+`gates`, `tests` e `skills` na próxima leitura.
 
 ## Tema
 
@@ -176,7 +196,10 @@ Princípios do visual, no estilo modern unix:
 2. Preencha `id`, `title`, `description`, `keys` e `mount(ctx)`. Use os
    componentes de `src/tui/components.ts` (`panel`, `keyValueTable`, `list`,
    `heading`, `dim`, `progressBar`, `meter`, `barChart` e `segments`) e as
-   cores de `ctx.theme`.
+   cores de `ctx.theme`. Para telas que executam ações, use `actionBar` para
+   pedir `y`/`n`, oferecer escolhas numeradas e mostrar a mensagem de
+   resultado, e `ctx.prompt(label, onSubmit)` para pedir uma linha de texto na
+   barra de teclas.
 3. Se a screen precisar de atualização periódica, leia o store do projeto no
    `mount` e limpe o timer em `onLeave`.
 4. Registre em `src/tui/screens/index.ts`. A ordem da lista é a ordem das

@@ -17,6 +17,11 @@ export interface ScreenContext {
   goTo: (id: string) => void;
   /** Closes the TUI. */
   quit: () => void;
+  /**
+   * Asks for one line of text in the key bar. `onSubmit` receives the
+   * trimmed text on Enter; Esc or an empty line cancels without calling it.
+   */
+  prompt: (label: string, onSubmit: (text: string) => void) => void;
 }
 
 export interface Screen {
