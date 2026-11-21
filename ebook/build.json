@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
-  "version": "0.39.0",
-  "edition": "v0.39.0",
-  "generated_at": "2026-11-21T00:32:04Z",
-  "source_sha256": "531d88807a4a9c99c2189fc920e33b10188d32eb09c03b3c1a8bad0c2dd4cc9b",
+  "version": "0.40.0",
+  "edition": "v0.40.0",
+  "generated_at": "2026-11-21T01:24:13Z",
+  "source_sha256": "4ad3028f0373087193eebfa0e416233fc580f301a8a0429168505635b688c766",
   "sources": [
     ".ebook/build-ebook.sh",
     ".ebook/epub.css",
@@ -81,6 +81,7 @@
     "docs/user/specialists.md",
     "docs/user/specialists/application-security.md",
     "docs/user/specialists/architecture.md",
+    "docs/user/specialists/cloudflare.md",
     "docs/user/specialists/code-review.md",
     "docs/user/specialists/debugging.md",
     "docs/user/specialists/delivery.md",
@@ -88,7 +89,11 @@
     "docs/user/specialists/git.md",
     "docs/user/specialists/interface.md",
     "docs/user/specialists/laravel.md",
+    "docs/user/specialists/mcp.md",
     "docs/user/specialists/modeling.md",
+    "docs/user/specialists/mongodb.md",
+    "docs/user/specialists/mysql.md",
+    "docs/user/specialists/n8n.md",
     "docs/user/specialists/nextjs.md",
     "docs/user/specialists/observability.md",
     "docs/user/specialists/postgres.md",
@@ -98,6 +103,7 @@
     "docs/user/specialists/server.md",
     "docs/user/specialists/supabase.md",
     "docs/user/specialists/tailwind-css.md",
+    "docs/user/specialists/testing.md",
     "docs/user/specialists/typescript.md",
     "docs/user/specialists/ui-components.md",
     "docs/user/system-documentation.md",
@@ -138,12 +144,12 @@
   },
   "artifacts": {
     "pdf": {
-      "file": "Specsfy-Guia-do-Usuario-v0.39.0.pdf",
-      "sha256": "a2e97a599bf2d02216e67f7cd0b32d9f8a017c58305816dd86adce10d44ed96f"
+      "file": "Specsfy-Guia-do-Usuario-v0.40.0.pdf",
+      "sha256": "06825899688af018d8e6017a136f4cd71065881739f35a4c9b516ee0a392b6ec"
     },
     "epub": {
-      "file": "Specsfy-Guia-do-Usuario-v0.39.0.epub",
-      "sha256": "a9ef9c3c476c1a8e6fedc0c379bb3c7838e813899d3eb8907d0afb41b9269fd4"
+      "file": "Specsfy-Guia-do-Usuario-v0.40.0.epub",
+      "sha256": "ce3f08d7cdf969bd33a6229b5f8147f4f5c4e9e67aa356c68fb9f8a8ad8b33ac"
     }
   }
 }

@@ -4,6 +4,61 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.40.0] - 2026-11-20
+
+### Adicionado
+
+- Seis especialistas novos:
+  - `mcp`: servidores MCP por HTTP, com os modos protocol, laravel (pacote
+    `laravel/mcp`) e nextjs;
+  - `mysql`, com os modos schema, queries e operation;
+  - `mongodb`, com os modos modeling, queries e operation;
+  - `cloudflare`, com os modos dns, workers e security;
+  - `n8n`, com os modos workflows, self-hosting e integration;
+  - `testing`, com os modos pest, playwright e vitest.
+- O `laravel` ganhou o modo `mcp`, o `docker` ganhou o modo `proxy`
+  (Traefik) e o `delivery` ganhou a referência de GitHub Actions no modo
+  ci-cd.
+- `specsfy specialists suggest <spec>` (também `skills suggest`) e a tool
+  MCP `specialists_suggest`. O comando lê a spec, procura os sinais do
+  catálogo e lista o especialista e o modo sugeridos. Para cada um, informa se
+  já está declarado na spec e se está instalado. Um especialista de tecnologia
+  só aparece quando a stack do projeto o confirma, pela detecção do catálogo
+  ou pelo `.specsfy/STACK.md`.
+- O `specsfy verify` avisa quando a spec declara um especialista que não
+  existe ou não está instalado, e quando um sinal casado fica sem
+  especialista declarado.
+- A prévia da spec na TUI mostra a linha "Especialistas".
+
+### Alterado
+
+- Os sinais de cada especialista passaram a viver no `catalog.json`, em
+  `triggers` (sinal, modo e palavras-chave) e `modes` (nome, título da seção
+  no guia e o especialista antigo absorvido). As 7 tabelas de sinais das skills
+  base são geradas pelo `scripts/specialist-signals.mjs` (`npm run signals`),
+  e um teste falha se uma cópia divergir. Entraram sinais novos: validade, cota
+  de uso, valor monetário, papel por equipe e CRUD parcial. O `postgres` e o
+  `supabase` só entram com a tecnologia confirmada no `STACK.md`.
+- Os 21 especialistas foram revisados contra a documentação oficial atual.
+  Entre as mudanças: React 19.3, Next.js 16.4, TypeScript 7, Tailwind CSS 4.3,
+  shadcn CLI v4, PostgreSQL 19, Redis 8.10, OWASP Top 10:2025, ASVS 5.0 e
+  OpenAPI 3.2.1.
+- Correções vindas de um ensaio de ponta a ponta do método:
+  - os gates encontram a raiz do projeto sem `.git`;
+  - um teste de regressão deixou de contar como TDD;
+  - o Contrato CRUD declara as `Operações:` incluídas, e o validador só
+    cobra essas;
+  - o research aceita índice vazio quando a spec declara que não usa fonte
+    externa;
+  - o `specs transition` atualiza o vínculo "Spec promovida" no backlog;
+  - o `05-tasks` pode atualizar a lista de especialistas;
+  - entrou um protocolo para escolhas delegadas;
+  - a seção "No Specsfy" diz de onde o especialista lê em cada fase.
+- Octane com Open Swoole e ReUI ausentes viraram pendência de stack, cobrada
+  antes do deploy, em vez de travar o setup (decisão do Luiz).
+- No site, os 301 dos especialistas agrupados apontam para a seção do modo,
+  por exemplo `/docs/specsfy/especialistas/delivery/#versionamento`.
+
 ## [0.39.0] - 2026-11-20
 
 ### Alterado
