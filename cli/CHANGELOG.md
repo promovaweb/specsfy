@@ -4,6 +4,39 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.40.4] - 2026-11-20
+
+### Corrigido
+
+Ajustes do terceiro ensaio de ponta a ponta (Codex). O ensaio confirmou, em
+uso real, 9 dos 11 ajustes do segundo; esta versão fecha os 2 parciais e os
+ajustes menores.
+
+- `specialists suggest` e `verify` buscam a evidência dos sinais fora das
+  declarações (linha Especialistas, tabela da subseção 8 e linhas
+  `Especialista:`). Retirar uma declaração não faz sumir a sugestão quando a
+  spec descreve o sinal. A descoberta da interface existente e o contrato
+  Inertia são reconhecidos. Rollback de migration não sugere `delivery`; só o
+  rollback de deploy sugere.
+- O gate de interface exige
+  `Especialista: $specsfy-specialist-ui-components (components)` no bloco
+  de cada tarefa que materializa uma tela React.
+- As tarefas registram, por critério de aceite, quais asserções dão RED antes
+  do schema e quais dependem da migration, com o ponto que fecha cada uma.
+  `specsfy tasks next <spec> --phase red` aparece nas instruções de
+  preparação de testes.
+- Mudanças de texto:
+  - o `modeling` começa o fluxo pela fonte da fase e pode registrar no
+    backlog;
+  - no `ui-components`, a seleção de composição antes da execução é
+    decisão documental, e a instalação só acontece na tarefa autorizada;
+  - o `04-validate` explicita a ordem: findings, gate, transição pelo CLI
+    e gate estrito;
+  - o setup documenta a escolha delegada no perfil e os campos do
+    `context data`;
+  - entrou um exemplo combinado de sinais (equipe × papel × operação,
+    unicidade por equipe, erro Inertia).
+
 ## [0.40.3] - 2026-11-20
 
 ### Corrigido
