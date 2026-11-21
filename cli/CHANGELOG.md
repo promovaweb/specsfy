@@ -4,6 +4,22 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.38.0] - 2026-11-20
+
+### Removido
+
+- O especialista `specsfy-specialist-astro` saiu do catálogo, junto com os
+  guias `docs/user/astro.md` e `docs/user/specialists/astro.md`. Ele passa a
+  constar em `retired` no inventário, e o `specsfy update` o remove dos
+  projetos onde estiver instalado. As menções a ele nos outros especialistas
+  e nos docs saíram; as que falam do Astro como framework continuam.
+
+### Alterado
+
+- A etapa do site do `scripts/release.mjs` agora também trata remoções. Uma
+  página cuja fonte saiu do repositório é apagada do site. Se não houver 301
+  cadastrado para o endereço, ele ganha um 410 em `src/config/gone.mjs`.
+
 ## [0.37.0] - 2026-11-20
 
 ### Adicionado
