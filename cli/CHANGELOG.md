@@ -4,6 +4,55 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.39.0] - 2026-11-20
+
+### Alterado
+
+- Os especialistas foram agrupados: de 38 para 21. Os pequenos e os que
+  dividiam o mesmo assunto viraram modos de um único especialista, com
+  references, scripts e assets mesclados. Os 11 agrupamentos:
+  - `laravel` absorveu `laravel-package-manager`;
+  - `ui-components` juntou `react-ui-components`, `reui` e `shadcn-ui`;
+  - `interface` juntou `interface-experience`, `design-system`,
+    `ui-design`, `ux-design` e `web-accessibility`;
+  - `modeling` juntou `domain-modeling` e `data-modeling`;
+  - `architecture` juntou `software-architecture` e `web-api-design`;
+  - `docker` absorveu `docker-swarm`;
+  - `server` juntou `debian-server`, `ansible` e `server-report`;
+  - `delivery` juntou `deploy`, `versioning` e `delivery-engineering`;
+  - `git` juntou `gitflow` e `merge-conflict-resolution`;
+  - `observability` absorveu `performance-engineering`;
+  - `research` juntou `technical-research` e `prototyping`.
+
+  Continuam como estão `react`, `nextjs`, `postgres`, `supabase`,
+  `redis`, `typescript`, `tailwind-css`, `application-security`,
+  `code-review` e `debugging`.
+- Todo especialista tem, no `SKILL.md`, um guia "Quando usar": uma tabela
+  que liga cada situação ao modo e ao reference a abrir, e uma lista "Não use
+  para", que aponta o especialista certo para cada caso.
+- O catálogo soma a detecção dos especialistas agrupados. As dependências
+  passaram para os nomes novos: o `delivery` depende de `server` e
+  `docker`.
+- Os 25 nomes antigos estão em `renamed` no inventário, e o
+  `specsfy update` troca os instalados pelo especialista que os absorveu.
+- Os especialistas entram no fluxo das specs. A spec ganha a linha
+  `Especialistas` na tabela de metadados e a subseção `#### Especialistas`
+  no Plano técnico, que lista especialista, modo, sinal e fases. Cada fase
+  chama o especialista conforme a demanda:
+  - o `specsfy-02-backlog` anota os especialistas prováveis;
+  - o `specsfy-03-specify` preenche a lista pela tabela de sinais e carrega o
+    especialista antes de escrever a seção que depende dele;
+  - o `specsfy-05-tasks` marca `Especialista:` em cada tarefa;
+  - o `specsfy-06-implement` carrega os especialistas da spec e da tarefa;
+  - o `specsfy-04-validate` confere se foram instalados e aplicados;
+  - o `specsfy-update-spec` mantém a lista em dia.
+- Todo especialista ganhou a seção "No Specsfy": ler a spec aberta, o
+  `STACK.md` e o `RULES.md`, seguir o modo indicado, devolver as conclusões
+  para a seção da spec ou para a tarefa e nunca mudar o estado da spec.
+- No site, a página de cada especialista antigo responde 301 para a página
+  do especialista novo. A etapa do site do `scripts/release.mjs` gera esses
+  301 sozinha, a partir do `renamed`.
+
 ## [0.38.0] - 2026-11-20
 
 ### Removido
@@ -982,7 +1031,7 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ### Adicionado
 
-- Exige `$specsfy-specialist-react-ui-components` no planejamento e na
+- Exige `specsfy-specialist-react-ui-components` no planejamento e na
   implementação de telas React antes da escrita de JSX ou TSX.
 - Faz o setup instalar o especialista de componentes quando React for
   detectado no projeto.
@@ -1811,7 +1860,7 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ### Adicionado
 
-- Exige `$specsfy-specialist-react-ui-components` no planejamento e na
+- Exige `specsfy-specialist-react-ui-components` no planejamento e na
   implementação de telas React antes da escrita de JSX ou TSX.
 - Faz o setup instalar o especialista de componentes quando React for
   detectado no projeto.
