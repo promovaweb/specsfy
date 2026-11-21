@@ -81,9 +81,11 @@ detectada antes de liberar o código da tela.
 
 Depois de registrar as tarefas, a skill chama `specsfy-06-implement` no modo
 `tests`, passo `prepare`. A fase prepara um RED válido por chamada. Em cada
-retorno, a skill de tarefas consulta as dependências da seção 14 e encaminha
-o próximo teste pronto. A spec fica `Defined` com o Plan Gate pendente até o
-último RED exigido.
+retorno, a skill de tarefas usa `specsfy tasks next <spec> --phase red` para
+encontrar o próximo teste pronto. A spec fica `Defined` com o Plan Gate
+pendente até o último RED exigido. Quando um teste depende da estrutura de
+banco nova, o checklist e a evidência do AC indicam o que já pode ser testado
+e quais asserções precisam da migration, com a tarefa que vai verificá-las.
 
 O validador usa `[TEST] [TDD]` para contar os predecessores de código. As
 tarefas de aceite e regressão pós-código usam `[TEST]` e aparecem em um

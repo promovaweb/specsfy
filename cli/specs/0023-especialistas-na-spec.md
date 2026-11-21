@@ -19,8 +19,11 @@ número, slug, nome da pasta ou caminho da spec. Cada trigger com ao menos uma
 palavra-chave encontrada no Markdown gera uma sugestão com nome, modo opcional,
 sinal e estados de declaração e instalação. A busca ignora caixa e acentos,
 respeita limites de palavras e aceita espaços consecutivos em expressões.
-Marcações de exemplo em blocos de código e as próprias declarações ficam fora da
-busca. A instalação é verificada pela presença de `SKILL.md` em
+Marcações de exemplo em blocos de código e as três fontes de declaração ficam
+fora da busca, inclusive as justificativas da tabela de modos. A inspeção do
+shell ou das telas existentes indica `interface/discovery`. Contratos e
+respostas Inertia indicam `architecture/web-api`. O sinal de rollback para
+`delivery/deploy` exige contexto de publicação. A instalação é verificada pela presença de `SKILL.md` em
 `.agents/skills/<nome>/`. Depois de ler a spec, o comando retorna 0 mesmo com
 uma lista vazia. A saída em texto segue o formato `especialista (modo) <- sinal`
 com os dois estados, e `--json` retorna os mesmos dados.
@@ -87,6 +90,8 @@ mesma leitura na prévia, com a proteção existente contra leituras atrasadas.
   palavras e expressões normalizadas e informa declaração e instalação em texto
   e JSON. A tool `specialists_suggest` retorna os mesmos dados.
 - [x] `verify` informa os três avisos em múltiplas specs com o gate aprovado.
+- [x] A descoberta e o contrato Inertia produzem evidências sem as declarações
+  dos modos. `verify` aponta o rollback de deploy e ignora o da migration.
 - [x] Catálogo inválido e falha na detecção geram avisos e preservam a
   análise, o resultado da política e a atestação.
 - [x] Aliases positivos, títulos sem número e marcadores de Laravel e n8n

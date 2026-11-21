@@ -92,7 +92,12 @@ implementação recente.
 Pedido surgido depois da definição retorna a `update-spec`. A skill chama
 `backlog` quando faltar decisão, `validate` quando mudar comportamento e
 `tasks` quando mudar somente o plano. Teste ou RED ausente chama o modo
-`tests` de `implement` com o plano pendente. Se o plano já estava aprovado,
+`tests` de `implement` com o plano pendente. Em `Defined`, o passo `prepare`
+usa `specsfy tasks next <spec> --phase red`. O seletor padrão atende à
+execução depois do Plan Gate. Uma asserção que depende de schema registra
+no checklist e na evidência do AC qual migration a libera e qual tarefa
+a verifica, preservando o RED válido exigido para aprovar o plano.
+Se o plano já estava aprovado,
 `tasks` reabre o Ato II antes de chamar esse modo. O progresso sai do command
 `specsfy progress`, sem skill própria. Depois da correção, a etapa que detectou a pendência é
 retomada automaticamente. Handoffs não autorizam instalação, deploy, publicação

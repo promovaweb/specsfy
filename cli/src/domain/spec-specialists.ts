@@ -89,9 +89,6 @@ function readSpec(markdown: string) {
     }
     if (specialistTable && cells) {
       declare(cells[0] ?? "", cells[1]);
-      if (cells[2] && !/^[-:\s]+$/u.test(cells[2])) {
-        lines.push({ line: index + 1, text: original[index]!, prose: cells[2], heading: subsection, taskTags });
-      }
       continue;
     }
     specialistTable = false;
@@ -259,8 +256,14 @@ function matchSignal(source: SourceLine, text: string, name: string, mode: strin
     const conditional = /\b(?:pre-condicao|antes d[eo]|eventual|condicao (?:futura|de entrega))\b/u.test(text);
     const actualDeploy = /\b(?:executar|realizar|efetuar)\s+(?:o\s+)?deploy\b/u.test(text);
     if (conditional && !actualDeploy) return false;
-    if (/\bproducao\b/u.test(text) &&
-      !/\b(?:deploy|rollout|rollback|publicar|implantar|publicacao|implantacao)\b/u.test(text)) return false;
+    const deployment = /\b(?:deploy|rollout|publicar|implantar|publicacao|implantacao)\b/u;
+    if (/\brollback\b/u.test(text)) {
+      const migration = /\b(?:migrations?|migrac(?:ao|oes)|migrate:rollback|schema|tabelas?)\b/u;
+      const deployRollback = /\brollback (?:d[aeo] )?(?:deploy|rollout|release|implantacao|publicacao)\b/u;
+      if (!deployRollback.test(text) && !actualDeploy && migration.test(`${source.heading} ${text}`)) return false;
+      if (!deployment.test(`${source.heading} ${text}`) &&
+        !/\b(?:release|imagem em producao|versao implantada)\b/u.test(text)) return false;
+    } else if (/\bproducao\b/u.test(text) && !deployment.test(text)) return false;
   }
   if (name === "delivery" && mode === "versioning" && /\bversao resolvida\b/u.test(text) &&
     !/\b(?:semver|tag de release|changelog)\b/u.test(text)) return false;
@@ -271,9 +274,12 @@ function matchSignal(source: SourceLine, text: string, name: string, mode: strin
   if (patterns.some((pattern) => pattern.test(text))) return true;
   switch (`${name}/${mode}`) {
     case "architecture/web-api":
-      return /\b(?:contratos? (?:web )?inertia|(?:operacoes|respostas|rotas|contratos?)\b[^.;]*\b(?:inertia\s*\/\s*http|http\s*inertia)|inertia\s*\/\s*http)\b/u.test(text);
+      return /\binertia\b/u.test(text) &&
+        /\b(?:http|contratos?|rotas?|redirects?|redirecion\w*|respostas?|requisic(?:ao|oes)|get|post|erros? (?:de validacao|inertia))\b/u.test(text);
     case "interface/discovery":
-      return /\b(?:descoberta (?:d[aeo] )?(?:interface|telas?)|inventario\b[^.;]*\b(?:shell|telas?)|interface existente)\b/u.test(text);
+      return /\b(?:descoberta (?:d[aeo] )?(?:interface|telas?)|(?:shell|interface|telas?) existent(?:e|es)|menu atual)\b/u.test(text) ||
+        (/\b(?:inspecao|inspecion\w*|inventario|levantamento)\b/u.test(text) &&
+          /\b(?:shell|telas?|base de interface|navegacao)\b/u.test(text));
     case "ui-components/components":
       return /\b(?:componentes?|blocos?|telas?|paginas?|composicao)\s+(?:visua(?:l|is)\s+)?react\b/u.test(text) ||
         (/\[CODE\]/u.test(source.taskTags) && /\b(?:react|[\w/-]+\.tsx)\b/u.test(text));

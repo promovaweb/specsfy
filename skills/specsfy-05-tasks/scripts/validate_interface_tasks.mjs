@@ -2,6 +2,17 @@
 /** Valida a fase de interface exigida para specs com tela usada por pessoas. */
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import { parseGateTasks } from "./parse_tasks.mjs";
+
+const components = "$specsfy-specialist-ui-components (components)";
+
+function materializesReact(task, reactStack) {
+  if (!task.tags.has("CODE") || task.tags.has("TEST") || task.tags.has("MIGRATION")) return false;
+  const execute = task.checklist.find(({ key }) => key === "EXECUTE")?.text ?? "";
+  const work = `${task.description} ${execute}`;
+  return /\.(?:jsx|tsx)\b|\b(?:telas?|páginas?|componentes?|formulários?) React\b/iu.test(work) ||
+    (reactStack && /^Fase de interface$/iu.test(task.subsection));
+}
 
 const input = process.argv.slice(2).find((argument) => !argument.startsWith("--"));
 
@@ -30,6 +41,14 @@ if (!input || !existsSync(input)) {
     if (phase && !phase.includes("INTERFACE.md")) errors.push("Fase de interface deve atualizar INTERFACE.md com os blocos e componentes usados.");
     if (screenCount && taskCount < screenCount) {
       errors.push(`Fase de interface possui ${taskCount} tarefa(s) para ${screenCount} tela(s) registrada(s).`);
+    }
+    const source = tasks.replace(/<!--[\s\S]*?-->/gu, (comment) => comment.replace(/[^\r\n]/gu, " "));
+    const stack = text.match(/^####\s+Stack e convenções de interface[ \t]*$([\s\S]*?)(?=^#{1,6}\s|(?![\s\S]))/im)?.[1] ?? "";
+    const reactStack = /\bReact\b/iu.test(stack);
+    for (const task of parseGateTasks(source)) {
+      if (materializesReact(task, reactStack) && !task.annotations.includes(components)) {
+        errors.push(`${task.id} exige 'Especialista: ${components}' no próprio bloco da tarefa.`);
+      }
     }
   }
 

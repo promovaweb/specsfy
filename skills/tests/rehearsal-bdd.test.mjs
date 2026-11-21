@@ -18,6 +18,9 @@ const contracts = new Map([
   ['Distinguir baseline de lista vazia conhecida', [['github-regressions', 'lista explicitamente vazia']]],
   ['Compartilhar declarações entre spec e findings', [['github-regressions', 'mesmas declarações']]],
   ['Mapear o menu na seção de navegação', [['interface-contract', 'mapeamento do menu exige rótulo']]],
+  ['Planejar provas de aceite que dependem da migration', [
+    ['framework-contracts', 'provas de aceite que dependem da migration'],
+  ]],
 ]);
 
 const scenarios = parseFeature(read('skills/tests/features/ensaio_metodologia.feature'));

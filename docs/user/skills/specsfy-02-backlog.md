@@ -96,6 +96,10 @@ Respostas diretas suas e evidências do projeto ficam em seus próprios registro
 - um caminho claro para retomar depois.
 - nenhuma `spec.md` criada automaticamente sem promoção.
 
+Para uma jornada com ReUI, o backlog registra a composição prevista. Filtros,
+modal e painel lateral entram quando o fluxo exigir. A instalação fica para
+a execução autorizada da tarefa de interface.
+
 ## Erros comuns
 
 - transformar o backlog em uma especificação completa.

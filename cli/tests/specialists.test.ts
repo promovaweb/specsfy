@@ -28,7 +28,7 @@ const queueEntry = {
   ...entry("queue"),
   triggers: [
     { signal: "Async processing", keywords: ["fila assíncrona"] },
-    { signal: "Examples and partial words", keywords: ["bar", "termo de exemplo", "specsfy-specialist-delivery"] },
+    { signal: "Examples, declarations and partial words", keywords: ["bar", "termo de exemplo", "termo de declaração", "specsfy-specialist-laravel", "specsfy-specialist-delivery"] },
   ],
 };
 const catalog = { schema_version: 1, skills: [interfaceEntry, queueEntry, entry("laravel"), entry("modeling"), entry("delivery")] };
@@ -270,7 +270,7 @@ test("groups signals by mode with source lines and ignores negated and out-of-sc
     put(project, ".specsfy/STACK.md", "# Stack\n\n- Pest\n");
     const markdown = [
       "# Cupons",
-      "| Especialistas | testing, architecture |",
+      "| Especialistas | testing, architecture, interface |",
       "<!-- Comment", "Contrato HTTP ignorado", "-->",
       "### 3. Escopo e atores",
       "#### Fora de escopo",
@@ -281,15 +281,22 @@ test("groups signals by mode with source lines and ignores negated and out-of-sc
       "Listagem e cadastro. Jornada de navegação.",
       "Não haverá rollout, deploy ou OpenAPI. Interface com teclado, sem versão pública.",
       "Exportação via webhook está fora de escopo.",
+      "Inspeção local do shell AppSidebar, da navegação e das telas do diretório existente.",
+      "O POST redireciona para a lista e retorna erros Inertia em falha de validação.",
       "### 8. Plano técnico",
       "#### Especialistas",
       "| Especialista | Modo | Sinal que o puxou | Fases |",
       "| --- | --- | --- | --- |",
       "| interface | discovery | Inventário do shell e das telas | Specify |",
+      "| interface | ux | Fluxo de navegação | Specify |",
       "| architecture | web-api | Contratos Inertia e paginação | Specify |",
       "| testing | pest | Testes Pest HTTP por cenário e regressão | Tasks |",
+      "#### Migrations",
+      "O rollback remove a tabela; a foreign key usa cascade.",
+      "Conferir rollback da migration durante deploy.",
       "### 14. Tarefas",
       "- [ ] T001 [CODE] Implementar página React em resources/js/pages/coupons.tsx — Depends: none",
+      "  - Especialista: $specsfy-specialist-interface (ux)",
       "  - Especialista: $specsfy-specialist-ui-components (components)",
       "- [ ] T002 [TEST] Rodar regressão Pest — Depends: T001",
       "  - [ ] **VERIFY**: Rodar Playwright para teste de navegador.",
@@ -299,23 +306,61 @@ test("groups signals by mode with source lines and ignores negated and out-of-sc
       "Todos os cenários de aceite passam.",
     ].join("\n");
     put(project, relativeSpec, markdown);
-    const run = await cli(["specialists", "suggest", "1", "--project", project, "--json"], home, { SPECSFY_SPECIALISTS_CATALOG: "" });
-    expect(run.code).toBe(0);
-    const found = run.json?.data.suggestions;
-    const find = (name: string, mode: string) => found.filter((item: { name: string; mode?: string }) =>
-      item.name === `specsfy-specialist-${name}` && item.mode === mode);
-    expect(find("interface", "ux")).toEqual([expect.objectContaining({ signals: [
-      expect.objectContaining({ evidence: { line: 12, text: expect.stringContaining("Jornada") } }),
-      expect.objectContaining({ evidence: { line: 12, text: expect.stringContaining("Listagem") } }),
-    ] })]);
-    for (const [name, mode, line] of [["interface", "discovery", 19], ["architecture", "web-api", 20], ["ui-components", "components", 23]] as const) {
-      expect(find(name, mode)).toEqual([expect.objectContaining({ declared: true, signals: [
-        expect.objectContaining({ evidence: { line, text: markdown.split("\n")[line - 1] } }),
+    const suggest = async () => {
+      const run = await cli(["specialists", "suggest", "1", "--project", project, "--json"], home, { SPECSFY_SPECIALISTS_CATALOG: "" });
+      expect(run.code).toBe(0);
+      return run.json?.data.suggestions;
+    };
+    for (const declared of [true, false]) {
+      const source = declared ? markdown : markdown.split("\n").filter((line) =>
+        !/^\| (?:interface \| (?:ux|discovery)|architecture \| web-api)|Especialista: \$specsfy-specialist-interface \(ux\)/u.test(line)
+      ).join("\n");
+      put(project, relativeSpec, source);
+      const found = await suggest();
+      const find = (name: string, mode: string) => found.filter((item: { name: string; mode?: string }) =>
+        item.name === `specsfy-specialist-${name}` && item.mode === mode);
+      expect(find("interface", "ux")).toEqual([expect.objectContaining({ declared, signals: [
+        expect.objectContaining({ evidence: { line: 12, text: expect.stringContaining("Jornada") } }),
+        expect.objectContaining({ evidence: { line: 12, text: expect.stringContaining("Listagem") } }),
       ] })]);
+      for (const [name, mode, prefix] of [
+        ["interface", "discovery", "Inspeção local"], ["architecture", "web-api", "O POST"],
+        ["ui-components", "components", "- [ ] T001"],
+      ] as const) {
+        const lines = source.split("\n");
+        const index = lines.findIndex((line) => line.startsWith(prefix));
+        expect(find(name, mode)).toEqual([expect.objectContaining({ declared: name === "ui-components" || declared, signals: [
+          expect.objectContaining({ evidence: { line: index + 1, text: lines[index] } }),
+        ] })]);
+      }
+      expect(find("testing", "pest")[0].declared).toBe(true);
+      expect(find("testing", "playwright")[0].declared).toBe(false);
+      expect(found.filter(({ name }: { name: string }) => /(?:debugging|delivery|observability)$/.test(name))).toEqual([]);
     }
-    expect(find("testing", "pest")[0].declared).toBe(true);
-    expect(find("testing", "playwright")[0].declared).toBe(false);
-    expect(found.filter(({ name }: { name: string }) => /(?:debugging|delivery|observability)$/.test(name))).toEqual([]);
+  } finally {
+    rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test("verify warns about rollback of a deployment and excludes migration rollback and declaration text", async () => {
+  const project = temporary("specsfy-specialist-rollback-");
+  try {
+    const deployRollback = "Planejar rollback do deploy em produção.";
+    const plan = [
+      "#### Especialistas", "", "| Especialista | Modo | Sinal que o puxou | Fases |",
+      "| --- | --- | --- | --- |", "| interface | ux | Deploy em produção | Tasks |", "",
+      "#### Migrations", "", "O rollback remove a tabela.",
+    ].join("\n");
+    const source = validSpec({ Especialistas: "interface" }).replace("### 8. Plano técnico\n\nConteúdo descrito.", `### 8. Plano técnico\n\n${plan}`);
+    for (const rollback of ["", deployRollback]) {
+      put(project, relativeSpec, source.replace("O rollback remove a tabela.", `O rollback remove a tabela.\n\n${rollback}`));
+      const run = await cli(["verify", "--spec", "1", "--project", project, "--json"], home, { SPECSFY_SPECIALISTS_CATALOG: "" });
+      expect(run.code).toBe(0);
+      const delivery = run.json?.data.warnings.filter(({ name }: { name?: string }) => name === "specsfy-specialist-delivery");
+      expect(delivery).toEqual(rollback ? [expect.objectContaining({ mode: "deploy", signals: [
+        expect.objectContaining({ evidence: { line: expect.any(Number), text: deployRollback } }),
+      ] })] : []);
+    }
   } finally {
     rmSync(project, { recursive: true, force: true });
   }

@@ -218,15 +218,15 @@ specsfy context monitor --project . --check
 specsfy context stack --project .
 specsfy context rule --project . --section "Testes" --rule "Pest em PHP."
 specsfy context database --project .
-specsfy context data --project . --name "Pedido" --purpose "Acompanhar a entrega."
 specsfy context usage 0001 --json
 specsfy docs build --project .
 specsfy docs build --project . --check
 ```
 
 `context monitor --check` marca `status: pending` e sai com `10` quando um
-documento derivado ficou desatualizado. `context usage` estima o custo de leitura de uma spec. `docs
-build --check` sai com `10` quando a documentação está desatualizada.
+documento derivado ficou desatualizado. `context usage` estima o custo de leitura.
+Para os campos de `context data`, consulte a [referência do CLI](cli-reference.md#contexto-do-projeto).
+`docs build --check` sai com `10` quando a documentação está desatualizada.
 
 ## Milestones
 

@@ -61,8 +61,10 @@ Não use para:
    `$specsfy-06-implement`.
 5. Confirme componentes, primitives e telas em `INTERFACE.md` e, quando a fase
    trabalhar o plano técnico da spec, descreva a composição em
-   `Views e experiência` na seção 8. Preserve a primitive já registrada e
-   instale um registry novo somente após decisão explícita.
+   `Views e experiência` na seção 8. Em Backlog e Specify, a seleção é uma
+   decisão documental. Registre a composição prevista, a base observada e
+   as dependências a confirmar. Instale componentes e configure registries
+   somente durante a execução autorizada da tarefa que entrega a composição.
 
 ## Fluxo
 
@@ -78,8 +80,9 @@ Não use para:
    os estados e os breakpoints. Fixe as superfícies CRUD e dashboard e as
    operações incluídas no Contrato CRUD antes de buscar componentes.
 4. Escolha o menor conjunto de componentes que atenda ao comportamento.
-   Prefira o equivalente local. Resolva dependências e peça autorização
-   antes de instalar pacotes.
+   Prefira o equivalente local. Em Backlog e Specify, encerre o fluxo com
+   o registro da escolha e das dependências previstas. Execute a adaptação,
+   a instalação e os passos seguintes na tarefa autorizada.
 5. Adapte dados, rotas, ações, permissões, textos, estados, tokens e
    composição. Mantenha primitives e blocos reutilizáveis nos diretórios
    definidos pelo projeto. A página compõe o fluxo e os componentes de
@@ -111,22 +114,23 @@ Não use para:
 ### Modo reui
 
 Todo CRUD com interface React e Tailwind usa ReUI como base visual: Data Grid
-ou List para consulta, Filters para recorte, Form e campos ReUI para criação e
-edição, Dialog ou Sheet para ações contextuais e Alert/Badge para retorno e
-status. Não crie uma alternativa manual quando o catálogo gratuito já atender
+ou List para listagem, Form e campos ReUI para criação e edição quando
+incluídas e Alert/Badge para retorno e status. Inclua Filters quando a jornada
+exigir recorte. Inclua Dialog ou Sheet quando uma ação precisar abrir em
+modal ou painel lateral, conforme o fluxo definido. Não crie uma alternativa manual quando o catálogo gratuito já atender
 a interação. (regra da casa)
 
 1. Confirme React 19+, Tailwind CSS v4 e shadcn/ui com a CLI atual. Use o
-   modo shadcn para inicializar ou auditar `components.json`, aliases, tema e
-   primitives. Leia [reui-setup.md](references/reui-setup.md) para escolher a
-   variante Base UI ou Radix já adotada e configurar `@reui`.
+   modo shadcn para auditar `components.json`, aliases, tema e primitives.
+   Leia [reui-setup.md](references/reui-setup.md) para identificar a variante
+   Base UI ou Radix já adotada e os requisitos de configuração de `@reui`.
 2. Abra [reui-catalog-free.md](references/reui-catalog-free.md) para mapear
    o CRUD e [reui-components-free.md](references/reui-components-free.md)
    para percorrer as famílias antes de criar uma alternativa. Em Laravel
    com React, leia também a
    [matriz shadcn/ui e ReUI](references/reui-shadcn-components.md).
-3. Leia a API, as dependências e os exemplos reais do item. Instale o menor
-   conjunto gratuito pelo comando `npx shadcn@latest add` indicado pelo
+3. Leia a API, as dependências e os exemplos reais do item. Na execução
+   autorizada da tarefa, instale o menor conjunto gratuito pelo comando `npx shadcn@latest add` indicado pelo
    registry, usando itens `@reui/c-*` e as dependências públicas resolvidas.
 4. Leia [reui-standards.md](references/reui-standards.md) para aplicar os
    tokens ReUI consumidos pela tela nos dois temas. Em Laravel, combine
@@ -165,7 +169,8 @@ a interação. (regra da casa)
   operações incluídas declaradas no campo `Operações:` do Contrato CRUD da
   spec; uma tela só de listagem e cadastro não ganha editar/apagar. Para CRUD
   React e Tailwind, consulte ReUI gratuito primeiro: Data Grid ou List,
-  Filters, Form e campos, Dialog ou Sheet, Alert e Badge. Se `consultar`
+  Form e campos, Alert e Badge. Consulte Filters, Dialog ou Sheet conforme
+  a jornada. Se `consultar`
   constar no Contrato CRUD, habilite o link da linha por clique e teclado com
   controles independentes. Adapte o `Breadcrumb` do shell e associe o erro
   de campo abaixo do controle.

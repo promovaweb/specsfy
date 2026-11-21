@@ -192,7 +192,10 @@ palavras. Pergunte somente por lacuna, conflito ou informação que mudou desde
 a última confirmação.
 
 Quando o nível geral ainda não estiver no perfil nem na conversa, faça esta
-primeira rodada:
+primeira rodada em uma execução interativa. Em execução delegada, deixe a
+preferência pessoal como `A confirmar` em `.specsfy/USER-PROFILE.md` quando
+faltar confirmação. Aprove o setup se os demais critérios passarem. Registre
+um nível somente quando a pessoa o confirmar.
 
 ```text
 Pergunta 1. Como você prefere receber as orientações deste setup?

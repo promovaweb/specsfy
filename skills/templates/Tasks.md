@@ -23,6 +23,20 @@ Checklist obrigatório por tarefa, na ordem:
 
 #### Fase 1 — RED TDD informado pelo BDD
 
+Quando um AC precisar de tabela nova, registre no `VERIFY` do TDD as
+asserções que podem dar RED antes do schema e indique cada asserção
+`pendente de schema`, a tarefa `[MIGRATION]` que a libera e o ID e passo da
+tarefa que verifica o resultado. Em `EVIDENCE`, leve essa informação à linha
+do AC com o comando e a causa do RED observado. Atualize essa linha no ponto
+de verificação posterior com os resultados reais.
+
+Exemplo com a migration T004 aplicada no banco de teste:
+
+- Paginação e validade da lista → T005 / `VERIFY`, com fixtures de mais de uma
+  página, registros nos limites de validade e relógio fixo.
+- Ausência de gravação após o `403` → T007 / `VERIFY`, com comparação da tabela
+  antes e depois do POST. A asserção HTTP pode rodar antes de T004.
+
 - [ ] T001 [TEST] [TDD] [US-001] Derivar do AC-001 um caso Pest falhando em tests/Feature/RecursoTest.php — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none
   - [ ] **PREP**: Ler o Gherkin da spec e confirmar regra, IDs e nível.
   - [ ] **EXECUTE**: Escrever o caso TDD com marcador próprio `SPECSFY:`, sem criar ou executar `.feature`.
@@ -64,9 +78,11 @@ Checklist obrigatório por tarefa, na ordem:
 - [ ] T005 [CODE] [US-001] Implementar comportamento em app/Services/RecursoService.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T004
   - [ ] **PREP**: Confirmar RED TDD e dependências.
   - [ ] **EXECUTE**: Implementar a menor mudança.
-  - [ ] **VERIFY**: Executar testes focais e regressão.
+  - [ ] **VERIFY**: Executar testes focais e regressão. Quando indicado nos
+    ACs, usar as fixtures da tabela criada por T004 para conferir paginação e validade.
   - [ ] **VISUAL**: Conferir bordas, espaçamentos, margens, padding e tipografia do sistema na interface afetada; registrar `Não aplicável` com motivo quando não houver superfície visual.
-  - [ ] **EVIDENCE**: Registrar GREEN e arquivos alterados.
+  - [ ] **EVIDENCE**: Registrar GREEN e arquivos alterados. Atualizar os ACs
+    com os resultados das asserções pendentes verificadas nesta tarefa.
   - [ ] **IMPROVE**: Aplicar melhoria ou justificar nenhuma.
   <!-- specsfy:evidence {"task":"T005","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["app/Services/RecursoService.php"],"commands":[{"run":"comando focal","exit":0}]} -->
 
@@ -92,9 +108,11 @@ O comentário é obrigatório para tarefa `[CODE]` concluída quando a spec decl
 - [ ] T007 [TEST] Executar regressão e rastreabilidade em tests/Feature/RecursoTest.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T005, T006
   - [ ] **PREP**: Identificar suites, checks e gates.
   - [ ] **EXECUTE**: Executar regressão e rastreabilidade.
-  - [ ] **VERIFY**: Confirmar ausência de gaps.
+  - [ ] **VERIFY**: Confirmar ausência de gaps e, para o AC aplicável, conferir
+    que o POST proibido preserva os registros da tabela criada por T004.
   - [ ] **VISUAL**: Repassar a conferência visual final ou registrar `Não aplicável` com motivo concreto.
-  - [ ] **EVIDENCE**: Registrar contagens e comandos finais.
+  - [ ] **EVIDENCE**: Registrar contagens e comandos finais e atualizar o AC
+    com o resultado da asserção de ausência de gravação.
   - [ ] **IMPROVE**: Registrar retrospectiva do processo.
 
 ### 15. Ordem de execução

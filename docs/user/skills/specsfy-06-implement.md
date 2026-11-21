@@ -76,8 +76,10 @@ Caso: TDD-AC-001
 Em Laravel, o teste de aplicação combina `testing/pest + laravel/app`.
 Uma rota nova pode produzir um RED com `404` se o teste alcançou a aplicação
 e a rota ainda não existe. Mantenha a asserção do resultado esperado, como
-`403` para uma pessoa sem permissão. A asserção sobre os registros de uma
-tabela nova roda depois que a migration for aplicada no banco de teste.
+`403` para uma pessoa sem permissão. Depois da migration no banco de teste,
+a tarefa indicada no checklist confirma as asserções pendentes, como a
+paginação com dados de teste ou a ausência de gravação após o POST proibido,
+e atualiza a evidência do AC.
 
 Use Playwright para um plano automatizado de navegador com stack compatível,
 ou após decidir explicitamente instalar o runner para o plano. Registre

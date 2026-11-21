@@ -219,9 +219,13 @@ palavra “interface”.
    jornada, o fluxo, a composição e os estados antes dos especialistas
    seguintes.
 4. Quando a stack React e Tailwind usar ReUI, todo CRUD declarado na
-   descoberta deve registrar Data Grid ou List, Filters, Form, Dialog ou Sheet
-   e os estados ReUI aplicáveis; carregue
-   `$specsfy-specialist-ui-components` antes de fechar a área.
+   descoberta registra a composição prevista e os estados aplicáveis.
+   Considere Data Grid ou List para listagem e Form para criação ou edição.
+   Inclua Filters se a jornada exigir recorte e Dialog ou Sheet se a ação
+   exigir modal ou painel lateral. Carregue
+   `$specsfy-specialist-ui-components` antes de fechar a área. No Backlog e
+   em Specify, registre a seleção como decisão documental, com a base
+   observada. Instale a composição somente na execução autorizada da tarefa.
 
 ## Especialistas
 

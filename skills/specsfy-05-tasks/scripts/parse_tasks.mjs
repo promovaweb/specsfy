@@ -88,8 +88,11 @@ export function parseGateTasks(text, errors = []) {
 
   const tasks = [];
   let active;
+  let subsection = "";
   for (const [offset, raw] of section.lines.entries()) {
     const line = section.start + offset + 2;
+    const heading = /^ {0,3}#{1,6}[ \t]+(.+?)\s*$/u.exec(raw);
+    if (heading) subsection = heading[1];
     const task = raw.match(/^\s*-\s+\[([ xX])\]\s+(T\d{3,})\s+(.+)$/);
     if (task) {
       const [, checked, id, content] = task;
@@ -106,11 +109,19 @@ export function parseGateTasks(text, errors = []) {
         depends: new Set(contract?.[2].match(/\bT\d{3,}\b/g)),
         line,
         checklist: [],
+        subsection,
+        annotations: [],
       };
       tasks.push(active);
       continue;
     }
 
+    if (active && !heading && raw.length - raw.trimStart().length > active.raw.length - active.raw.trimStart().length) {
+      const annotation = /^\s*-\s+Especialista:\s+(.+?)\s*$/iu.exec(raw);
+      if (annotation) active.annotations.push(annotation[1]);
+    } else if (heading || raw.trim()) {
+      active = undefined;
+    }
     const checklist = raw.match(/^\s{2,}-\s+\[([ xX])\]\s+\*\*(PREP|EXECUTE|VERIFY|VISUAL|EVIDENCE|IMPROVE)\*\*:\s+(.+?)\s*$/);
     if (checklist && active) {
       active.checklist.push({ key: checklist[2], complete: checklist[1].toLowerCase() === "x", text: checklist[3], line });

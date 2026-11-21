@@ -46,3 +46,8 @@ Feature: Validar specs e tarefas em cópias do projeto
     Given uma spec com menu e rótulo na seção de navegação
     Then o destino declarado na mesma seção satisfaz o contrato
     And um destino em outra seção não satisfaz o contrato
+
+  Scenario: Planejar provas de aceite que dependem da migration
+    Given uma spec em Defined com Plan Gate pendente
+    When a próxima tarefa TDD é selecionada para preparar o RED
+    Then o checklist e a evidência por aceite indicam quais asserções aguardam o schema e onde serão verificadas

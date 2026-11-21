@@ -86,3 +86,16 @@ test('contrato e documentação usam as mesmas opções de resposta', () => {
   includes(source('Spec.md'),terms);
   includes(read('docs/develop/skills.md'),terms);
 });
+
+test('provas de aceite que dependem da migration têm ponto de verificação', () => {
+  const tasks = source('specsfy-05-tasks/SKILL.md');
+  const implement = source('specsfy-06-implement/SKILL.md');
+  const tests = source('specsfy-06-implement/references/tests.md');
+  const template = source('templates/Tasks.md');
+  for (const text of [tasks, implement, tests]) {
+    includes(text, ['specsfy tasks next <spec> --phase red']);
+  }
+  for (const text of [tasks, tests, template]) {
+    includes(text.toLowerCase().replace(/\s+/gu, ' '), ['pendente de schema', 'paginação', 'validade', 'ausência de gravação']);
+  }
+});

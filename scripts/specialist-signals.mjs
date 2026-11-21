@@ -40,6 +40,8 @@ export function signalsTable(catalog) {
   return [
     "Especialistas de tecnologia (`postgres`, `supabase`, `redis`, `laravel`, `react`, `nextjs`, `typescript`, `tailwind-css`, `docker`) só entram quando o `.specsfy/STACK.md` ou os manifests confirmam a tecnologia; sem essa confirmação, use o especialista de conceito (`modeling`, `architecture`, `interface`). Um sinal pode puxar mais de um especialista.",
     "",
+    "Exemplo combinado em Laravel com Inertia: para autorização por equipe × papel × operação, aplique `application-security`, `laravel/app`, `interface/ux` e `testing/pest`. Verifique em Pest HTTP a capacidade de criar exposta à UI e as decisões no GET do formulário e no POST. No reenvio de um código normalizado, use `modeling/data` e `laravel/app` para garantir unicidade por equipe e `architecture/web-api` para definir o erro de campo no fluxo Inertia. Em Pest, prove que equipes distintas podem usar o mesmo código e que repetir o POST na mesma equipe após um resultado incerto exibe o erro sem duplicar a gravação.",
+    "",
     "| Sinal na demanda, na spec ou no código | Especialista | Modo |",
     "| --- | --- | --- |",
     ...rows,

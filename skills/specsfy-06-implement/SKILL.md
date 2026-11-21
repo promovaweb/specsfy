@@ -34,7 +34,8 @@ runner adotar em projeto Node sem PHP.
 
 1. Leia o cabeçalho da spec quando o pedido não deixar o modo claro. Com
    `Status: Defined` e `Plan Gate: Pending`, o modo é `tests`, no passo
-   `prepare`. Com `Status: Planned` ou `Implementing` e `Plan Gate: Passed`,
+   `prepare`. Selecione a tarefa com `specsfy tasks next <spec> --phase red`
+   quando o handoff não indicar um ID. Com `Status: Planned` ou `Implementing` e `Plan Gate: Passed`,
    o modo é `implement`.
 2. Se ainda houver mais de uma leitura razoável, pergunte qual modo a pessoa
    quer, pelo `Contrato de perguntas numeradas`.
@@ -112,7 +113,8 @@ sempre ignorados e as regras de cada modo estão na referência do modo.
 | --- | --- | --- | --- |
 | auditar rastreabilidade | `specsfy gate trace <spec>` | `gate_trace` | `node .agents/skills/specsfy-06-implement/scripts/check_traceability.mjs <spec.md> .` |
 | auditar aceite | `specsfy gate acceptance <spec>` | `gate_acceptance` | `node .agents/skills/specsfy-06-implement/scripts/verify_acceptance.mjs <spec.md> .` |
-| próxima tarefa pronta | `specsfy tasks next <spec>` | `task_next` | `node .agents/skills/specsfy-06-implement/scripts/next_task.mjs <spec.md>` |
+| próximo predecessor no passo `tests` → `prepare` | `specsfy tasks next <spec> --phase red` | `task_next` com `phase: red` | seleção pela seção 14 conforme [tests.md](references/tests.md) |
+| próxima tarefa pronta após o Plan Gate | `specsfy tasks next <spec>` | `task_next` | `node .agents/skills/specsfy-06-implement/scripts/next_task.mjs <spec.md>` |
 | conferir a comprovação de uma tarefa | `specsfy gate evidence <spec> --task TNNN` | `gate_evidence` | `node .agents/skills/specsfy-06-implement/scripts/verify_evidence.mjs <spec.md> . --task TNNN` |
 | resumo de entrega | `specsfy tasks delivery <spec> --format markdown` | `delivery_render` | `node .agents/skills/specsfy-06-implement/scripts/render_delivery.mjs <spec.md> --format markdown` |
 | progresso geral | `specsfy progress --project <raiz>` | `project_status` | `node .agents/skills/specsfy-05-tasks/scripts/progress.mjs <raiz> --json` |

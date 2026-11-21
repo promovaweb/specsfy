@@ -169,6 +169,10 @@ Cada gate sai com 0 quando aprova e com 10 quando encontra problemas. O
 | `gate database` | Confere que os testes usam um banco separado e que um comando não apaga dados. | `--command <command>`, `--project <dir>` |
 | `verify` | Roda a política do projeto ou diagnostica uma spec. | `--spec <id>`, `--boundary local\|git\|ci`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` |
 
+`gate interface` exige `Especialista: $specsfy-specialist-ui-components (components)`
+no bloco de cada tarefa que implementa uma tela React. O diagnóstico indica o
+ID da tarefa que precisa da anotação.
+
 `verify` usa os scripts de `.agents/skills/` do projeto. Quando essa pasta
 não existe, usa os scripts embutidos no binário e a checagem de skills falha.
 O Node.js não é necessário. O `--self-test` exercita a política e os canários
@@ -249,8 +253,13 @@ comando aceita número, slug, pasta ou caminho. Cada linha reúne os sinais de
 um par nome e modo e mostra a primeira linha e o trecho da spec que sustentam
 cada sinal. A declaração do modo vem da subseção Especialistas do plano
 técnico ou das anotações da seção Tarefas. O cabeçalho também permite declarar
-um especialista sem modo. O texto negado, as seções fora de escopo e os
-exemplos em blocos de código ficam fora da busca.
+um especialista sem modo. `suggest` e os avisos de `verify` buscam evidências
+no conteúdo da spec e ignoram essas três fontes de declarações, o texto
+negado, as seções fora de escopo e os exemplos em blocos de código.
+Descrições da inspeção do shell e das telas existentes podem sugerir
+`interface/discovery`. Contratos e respostas Inertia podem sugerir
+`architecture/web-api`. Um rollback associado a deploy pode sugerir
+`delivery/deploy`. Um rollback de migration fica fora desse sinal.
 
 A instalação é conferida em `.agents/skills/`. Para especialistas com
 `stack: true`, o sinal precisa de confirmação da tecnologia pela detecção ou

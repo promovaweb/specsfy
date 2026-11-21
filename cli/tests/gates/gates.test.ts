@@ -87,13 +87,21 @@ describe("gate spec", () => {
   });
 });
 
-describe("other gates on example/", () => {
-  test("interface passes and returns the script text", async () => {
-    const run = await cli(["gate", "interface", "0001", "--project", EXAMPLE_DIR, "--json"], home);
-    expect(run.code).toBe(0);
-    expect(typeof run.json?.data.result).toBe("string");
-  });
+test("gate interface requires a component specialist in each React screen task", async () => {
+  const source = await Bun.file(join(EXAMPLE_DIR, "specs/completed/0001-diretorio-global-usuarios/spec.md")).text();
+  const root = project(source);
+  const args = ["gate", "interface", "0001", "--project", root, "--json"];
+  const blocked = await cli(args, home);
+  expect(blocked.code).toBe(10);
+  expect(blocked.stderr + blocked.stdout).toContain("T003 exige");
+  put(root, "specs/specs/0001-lista/spec.md", source.replace(/(^- \[x\] T003 .*\n)/mu,
+    "$1  - Especialista: $specsfy-specialist-ui-components (components)\n"));
+  const run = await cli(args, home);
+  expect(run.code).toBe(0);
+  expect(run.json?.data.result).toContain("Interface nas tarefas: OK");
+});
 
+describe("other gates on example/", () => {
   test("trace forwards --kinds and --minimum-tests", async () => {
     const run = await cli(["gate", "trace", "0001", "--kinds", "US,AC", "--minimum-tests", "1", "--project", EXAMPLE_DIR, "--json"], home);
     expect([0, 10]).toContain(run.code);

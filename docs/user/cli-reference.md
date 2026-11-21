@@ -216,7 +216,7 @@ specsfy verify --attestation run.json
 | `specsfy context stack` | Atualiza o bloco `specsfy:stack` de `.specsfy/STACK.md` a partir de manifests, lockfiles e configurações, preservando o conteúdo humano. |
 | `specsfy context rule` | Registra uma diretriz confirmada em `.specsfy/RULES.md` com `--section` e `--rule`. |
 | `specsfy context database` | Atualiza o bloco `specsfy:database` de `.specsfy/DATABASE.md` a partir de schemas, migrations, models e configurações, sem copiar registros ou segredos. |
-| `specsfy context data` | Registra informações confirmadas na seção `Informações a guardar confirmadas`. Aceita `--name`, `--purpose`, `--store`, `--format`, `--links`, `--access`, `--lifecycle` e `--sources`. |
+| `specsfy context data` | Registra informações confirmadas na seção `Informações a guardar confirmadas`. Exige `--name`, `--purpose`, `--store`, `--format`, `--links`, `--access`, `--lifecycle` e `--sources`. |
 | `specsfy context usage` | Estima o custo de leitura de uma spec por seção. `--usage-json <arquivo>` ingere `input_tokens` e `output_tokens` medidos e `--compare <arquivo>` compara com outra spec ou medição. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.

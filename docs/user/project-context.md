@@ -85,6 +85,9 @@ Ao terminar a preparação dos contextos e especialistas, o setup executa
 sistema existente em `docs/` e atualiza `.specsfy/PACKAGES.md`, mesmo quando a
 execução não começou por uma alteração recente no código.
 
+Em uma execução delegada, a preferência pessoal de nível das orientações
+pode ficar como `A confirmar` até você responder.
+
 ## Conversar sobre os dados
 
 Use `$specsfy-setup` no modo `data-discovery` quando uma jornada depender de
@@ -117,7 +120,8 @@ ser guardado, o formato sugerido, o que fica ligado, os papéis que a usam e
 quando ela muda ou sai do sistema. A sugestão de formato, como texto curto,
 data, valor em dinheiro ou escolha entre opções, só é gravada depois que você
 confirmar que ela atende ao uso real. Se você autorizar a skill a decidir,
-a opção vai em `Escolhas delegadas`, com a fonte da autorização e seu alcance.
+o campo pode indicar que depende de escolha delegada. A decisão fica em
+`Escolhas delegadas`, com a fonte da autorização e seu alcance.
 
 ### Erros comuns
 

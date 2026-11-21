@@ -88,8 +88,11 @@ expressa. Uma informação com usos distintos gera um registro por uso.
 
 ## Registrar o que foi confirmado
 
-Depois de cada resposta confirmada, chame o script com nome do domínio e frases
-curtas que quem opera o produto entenda:
+Depois de cada resposta confirmada, execute `specsfy context data` com nome
+do domínio e frases curtas que quem opera o produto entenda. O comando exige
+os oito campos com valores não vazios: `--name`, `--purpose`, `--store`,
+`--format`, `--links`, `--access`, `--lifecycle` e `--sources`.
+`--project` indica a raiz quando precisar explicitá-la.
 
 ```bash
 specsfy context data \
@@ -121,16 +124,17 @@ registrar_dados_conversados.mjs \
   --fontes "<caminhos de Inbox, backlog, MVP ou spec>"
 ```
 
-Registre somente respostas confirmadas na seção `Informações a guardar
-confirmadas`, separada do que foi observado no código. O trecho detectado
-automaticamente pertence ao modo `database` e fica intocado.
+Na seção `Informações a guardar confirmadas`, atribua à pessoa somente respostas
+confirmadas e inclua suas fontes. Se um campo obrigatório depender de escolha autorizada
+por delegação, use uma indicação explícita na célula, por exemplo
+`--format "Depende de escolha delegada (ver Escolhas delegadas)"`. Para um
+campo ainda em aberto e fora do alcance da delegação, use `A confirmar`.
+Em `--sources`, cite as fontes das informações confirmadas.
 
-Se a pessoa delegar expressamente a escolha, aplique a opção recomendada no
-alcance autorizado e registre em `### Escolhas delegadas` de
-`.specsfy/DATABASE.md` a escolha, a fonte da autorização e o alcance. Use
-`context data` para as respostas confirmadas e preserve a evidência observada
-no trecho detectado pelo modo `database`. Deixe em aberto o que a autorização
-não cobrir.
+Quando a pessoa delegar a escolha, registre em `### Escolhas delegadas` de
+`.specsfy/DATABASE.md` a decisão ou pendência, o campo, a fonte da autorização
+e seu alcance. Atribua a escolha ao agente no exercício dessa autorização.
+Preserve o trecho detectado automaticamente pelo modo `database`.
 
 ## Handoffs
 

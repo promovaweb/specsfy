@@ -82,9 +82,11 @@ a configuração do projeto e [test-levels.md](test-levels.md). Depois:
    `prepare`, use `Status: Defined` e `Plan Gate: Pending`; nos passos `cycle`
    e `verify`, use `Status: Planned` ou `Implementing`.
 2. Em `prepare`, use o ID enviado por `$specsfy-05-tasks`. Se ele faltar,
-   percorra os `Depends` da seção 14 e selecione a primeira tarefa
-   `[TEST] [TDD]` aberta exigida pelo Plan Gate com dependências concluídas.
-   Use a ordem da seção 14 entre tarefas prontas. Derive o teste do `AC`
+   execute `specsfy tasks next <spec> --phase red` ou use `task_next` com
+   `phase: red`. Sem ambos, selecione na ordem da seção 14 a primeira tarefa
+   `[TEST] [TDD]` aberta exigida pelo Plan Gate com `Depends` concluídos.
+   Após o Plan Gate, use `specsfy tasks next <spec>` para a execução.
+   Derive o teste do `AC`
    Gherkin e dos `FR/NFR` referenciados. Em `cycle`, selecione a fatia ativa
    pelo `AC` e seus `FR/NFR`.
 3. Resolva o runner de testes pela stack antes de escrever testes:
@@ -152,13 +154,24 @@ mesmo que a resposta observada antes da implementação seja `404`. Confirme a
 causa no roteamento. Um erro de bootstrap, fixture, dependência ou schema de
 base exige correção antes de repetir o teste.
 
-Separe a verificação HTTP da asserção que depende da tabela nova. Registre
-no plano a asserção de persistência, como a ausência de gravação após o
-`403`, e execute-a quando a migration da fatia estiver aplicada no banco de
-teste. Uma asserção que falha apenas porque a tabela nova ainda não existe
-fica pendente de schema e não conta como RED da regra de persistência.
+No checklist (`VERIFY` e `EVIDENCE`) e na linha do AC na tabela
+`Evidência RED-GREEN-REFACTOR`, registre quais asserções produziram RED, com
+comando e causa. Para cada asserção marcada como `pendente de schema`, indique
+a tarefa `[MIGRATION]` que a libera e o ID e passo da tarefa que a verifica.
+Nesse ponto, rode o teste focal com a migration aplicada e atualize a mesma
+evidência com o comando e o resultado de cada asserção pendente.
 
-Registre o RED observado na tabela `Evidência RED-GREEN-REFACTOR`.
+| Asserção pendente após o RED inicial | Ponto de verificação após a migration |
+| --- | --- |
+| Paginação com ordenação estável e limite por página | No `VERIFY` da tarefa de listagem, use fixtures suficientes para cruzar o limite da página e compare os IDs de duas páginas. |
+| Estado de validade exibido na lista | No `VERIFY` da listagem, use fixtures válidas e expiradas em torno do limite e congele o relógio. Uma prova da regra temporal sem banco pode rodar antes, quando prevista para o AC. |
+| Ausência de gravação após um POST proibido | Prove o contrato HTTP separadamente. No `VERIFY` da tarefa de regressão, repita o POST e confira que a tabela permanece igual. |
+
+Um `404` pela ausência da rota prova somente a ausência daquele contrato HTTP.
+Repetir esse resultado em outros testes não prova paginação, validade ou
+persistência. Falha por falta da tabela fica pendente de schema. Se faltar
+um RED válido exigido pelo Plan Gate, revise o desenho do teste ou as
+dependências com `$specsfy-05-tasks` e mantenha o gate pendente.
 
 No passo `prepare`, registre um RED válido e conclua o checklist da tarefa
 `[TEST] [TDD]` correspondente. Informe o ID e a evidência no retorno automático

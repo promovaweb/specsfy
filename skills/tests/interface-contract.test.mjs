@@ -60,13 +60,43 @@ test('trabalho em tela exige o especialista de componentes antes de JSX', () => 
 });
 test('spec com telas exige fase de interface no plano de tarefas', t => {
   const root = temporary(t), script = join(ROOT, 'skills/specsfy-05-tasks/scripts/validate_interface_tasks.mjs');
-  const spec = put(root, 'spec.md', fixtures.phase);
+  const annotation = '  - Especialista: $specsfy-specialist-ui-components (components)\n';
+  const spec = put(root, 'spec.md', fixtures.phase.replace('### 15.', `${annotation}\n### 15.`));
   const complete = node(script, [spec]);
   assert.equal(complete.status, 0, complete.stderr);
   put(root, 'spec.md', fixtures.phase.replace('#### Fase de interface\n\n- [ ] T001 [CODE] Criar a lista em src/clients/List.tsx e atualizar INTERFACE.md — Refs: FR-001 — Depends: none\n\n', ''));
   const incomplete = node(script, [spec]);
   assert.equal(incomplete.status, 1, incomplete.stdout + incomplete.stderr);
   includes(incomplete.stderr, ['Fase de interface']);
+});
+test('cada tarefa de tela React exige seu próprio especialista de componentes', t => {
+  const root = temporary(t), script = join(ROOT, 'skills/specsfy-05-tasks/scripts/validate_interface_tasks.mjs');
+  const annotation = '  - Especialista: $specsfy-specialist-ui-components (components)';
+  const tasks = [
+    '- [ ] T001 [CODE] Criar a lista em src/clients/List.tsx e atualizar INTERFACE.md — Refs: FR-001 — Depends: none',
+    annotation,
+    '- [ ] T002 [CODE] Criar a tela de cadastro em src/clients/Create.tsx — Refs: FR-002 — Depends: T001',
+    annotation,
+    '- [ ] T003 [TEST] Testar a tela em src/clients/Create.test.tsx — Refs: FR-002 — Depends: T002',
+  ].join('\n');
+  const markdown = [
+    '| Interface para pessoas | Sim |',
+    '### 8. Plano técnico',
+    '#### Especialistas',
+    '| Especialista | Modo |',
+    '| --- | --- |',
+    '| ui-components | components |',
+    fixtures.phase.slice(fixtures.phase.indexOf('### 10.')).replace(/^- \[ \] T001.*$/m, tasks),
+  ].join('\n\n');
+  const spec = put(root, 'spec.md', markdown);
+  const complete = node(script, [spec]);
+  assert.equal(complete.status, 0, complete.stderr);
+
+  put(root, 'spec.md', markdown.replace(`${annotation}\n`, ''));
+  const incomplete = node(script, [spec]);
+  assert.equal(incomplete.status, 1, incomplete.stdout + incomplete.stderr);
+  includes(incomplete.stderr, ['T001', annotation.trim().slice(2)]);
+  assert.doesNotMatch(incomplete.stderr, /T002|T003/);
 });
 test('inspeção identifica stack, rotas e componentes já existentes', t => {
   const root = temporary(t);

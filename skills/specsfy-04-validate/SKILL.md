@@ -147,7 +147,8 @@ importantes e a transição automática correspondente:
 - `NOT READY` com correção já decidida → `$specsfy-update-spec` para uma spec
   anteriormente aprovada ou `$specsfy-03-specify` para a definição inicial.
 
-Anuncie o motivo e carregue imediatamente a skill escolhida.
+Anuncie o motivo. Registre o resultado e, em `READY`, conclua a transição e
+o gate estrito antes de carregar a próxima skill.
 
 ## Registrar no arquivo único
 
@@ -155,15 +156,14 @@ Registre o resultado sem alterar requisitos por conta própria:
 
 1. atualize `Gate do Ato I — Definição` na seção 13 com resultado, data e
    achados;
-2. em `READY`, defina `Definition Gate: Passed` e `Status: Defined`;
-3. em `NOT READY`, defina `Definition Gate: Failed`, `Plan Gate: Pending`,
+2. em `NOT READY`, defina `Definition Gate: Failed`, `Plan Gate: Pending`,
    `Delivery Gate: Pending` e mantenha `Status: Draft`;
-4. quando o gate passar, execute novamente `specsfy gate spec <spec>` sem
-   `--allow-draft`;
+3. em `READY`, registre `Definition Gate: Passed` no cabeçalho e execute
+   `specsfy specs transition <id> defined`. O CLI atualiza `Status` para
+   `Defined` junto com a movimentação do arquivo;
+4. após a transição, execute `specsfy gate spec <spec>` sem `--allow-draft`,
+   usando o novo caminho em `specs/defined/`;
 5. relate o resultado no chat.
-
-Quando o Definition Gate passar, execute `specsfy specs transition <id> defined`,
-equivalente a `specsfy specs transition <id> defined`.
 
 ### Retirar da fila as capturas esgotadas
 

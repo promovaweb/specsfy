@@ -28,15 +28,11 @@ specs/<estado>/0004-recuperar-senha/spec.md.
 3. Encontra uma lacuna: “a validade do link não foi decidida”.
 4. Retorna para o refinamento do backlog e registra a validade de 30 minutos.
 5. Executa novamente os validadores.
-6. Atualiza a seção de gates:
-
-```text
-Definition Gate: Passed
-Status: Defined
-```
-
-1. Move a spec para `defined` e confere as capturas de `specs/inbox/` que a
-   originaram. Se a spec, sozinha ou com outras já aprovadas, cobre a
+6. Registra os achados na seção 13 e `Definition Gate: Passed` no cabeçalho.
+7. Executa `specsfy specs transition <id> defined`. O CLI move a spec e
+   atualiza `Status` para `Defined`.
+8. Executa `specsfy gate spec <spec>` com o caminho novo.
+9. Confere as capturas de `specs/inbox/` que deram origem à spec. Se a spec, sozinha ou com outras já aprovadas, cobre a
    solicitação inteira, executa `specsfy inbox process <captura> --spec <id>` e a captura
    passa para `specs/inbox/processed/`. Se ficou alguma parte sem spec
    aprovada, a captura permanece na fila ativa e a skill informa o que resta.

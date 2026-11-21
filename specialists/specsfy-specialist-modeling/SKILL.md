@@ -61,16 +61,19 @@ Não use para:
 
 ## Fluxo
 
-1. Ler a spec, o código, as migrations, os schemas, os models e os testes
-   existentes antes de propor conceito, campo ou relação.
+1. Ler a fonte da fase indicada em «No Specsfy». Na fase 02, comece pelo
+   item de backlog e suas capturas de origem. Consulte código, migrations,
+   schemas, models e testes existentes antes de propor conceito, campo ou
+   relação.
 2. Identificar se o pedido é sobre significado e consistência (domain) ou sobre
    o que fica persistido e como evolui (data). Em dúvida, resolver o domínio
    primeiro.
 3. Coletar os termos reais usados pelas pessoas do domínio, não os nomes de
    tabela ou classe já existentes, e expor sinônimos e colisões de sentido.
-4. Registrar as escolhas apenas na fonte autorizada do projeto: seção de
-   domínio e de dados da spec, `.specsfy/DATABASE.md`, glossário e ADR
-   existentes. Nunca criar documento de modelo paralelo.
+4. Registrar vocabulário, decisões e dúvidas no item de backlog durante a
+   fase 02. Nas fases seguintes, use a seção de domínio e dados da spec e,
+   quando aplicável, `.specsfy/DATABASE.md`, glossário e ADR existentes.
+   Preserve essas fontes como o registro do modelo.
 5. Executar o fluxo do modo escolhido e encaminhar a implementação ao
    especialista da stack e do banco detectados.
 

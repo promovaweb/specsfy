@@ -159,6 +159,15 @@ plano técnico e aplique as atualizações de status e gates descritas abaixo.
   `.feature` ou step definition e não o execute.
 - Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
   Node, usa o runner confirmado pelo usuário e o script `test:tdd`.
+- Para cada AC que depende de tabela nova, indique no checklist `VERIFY` quais
+  asserções podem dar RED antes da migration e quais ficam como
+  `pendente de schema`. Para cada pendência, indique o ID da tarefa
+  `[MIGRATION]` que a libera e a tarefa e o passo posteriores que verificam
+  a asserção. Repita os vínculos em `EVIDENCE` e na evidência do AC. Exemplos:
+  paginação e validade da lista exigem fixtures da tabela nova. A ausência de
+  gravação após um `403` exige a tabela para comparar o estado antes e depois.
+  Mantenha a tarefa de verificação posterior dependente da migration e do
+  código necessário. O predecessor TDD exige RED válido antes do Plan Gate.
 - Faça cada tarefa `[CODE]` depender do predecessor TDD da mesma fatia com RED.
 - Faça toda tarefa `[CODE]` exigir a reconstrução independente de `docs/` por
   `$specsfy-documentator` antes de `EXECUTE`, inclusive quando a documentação
@@ -292,9 +301,11 @@ tarefa concluída sem evidence.
 ### Fechar o Plan Gate
 
 Quando a estrutura passar com `Status: Defined` e `Plan Gate: Pending`,
-siga a ordem de dependências da seção 14. Selecione a primeira tarefa
-`[TEST] [TDD]` aberta exigida pelo Plan Gate cujas dependências já estejam
-concluídas. Use a ordem da seção 14 para desempatar entre tarefas prontas.
+selecione o próximo predecessor com `specsfy tasks next <spec> --phase red`
+ou a tool MCP `task_next` com `phase: red`. Sem o binário ou a tool, selecione
+a primeira tarefa `[TEST] [TDD]` aberta exigida pelo Plan Gate com dependências
+concluídas, na ordem da seção 14. Após a aprovação do plano, use
+`specsfy tasks next <spec>` para selecionar tarefas de execução.
 
 Com o ID da tarefa, chame automaticamente `$specsfy-06-implement` no modo
 `tests`, passo `prepare`. A skill registra um RED e devolve o controle após
