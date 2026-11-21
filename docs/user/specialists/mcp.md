@@ -55,7 +55,7 @@ que protege os dados da aplicação também deve proteger a tool que os lê.
 
 Sanctum atende clientes gerenciados que já recebem um token. Passport é a
 opção documentada para clientes que precisam descobrir e executar o fluxo
-OAuth. O especialista [Laravel](laravel.md#servidor-mcp) também cobre essa
+OAuth. O especialista [Laravel](laravel.md) também cobre essa
 integração no modo `mcp`.
 
 ## Next.js
