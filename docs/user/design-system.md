@@ -15,17 +15,12 @@ do CLI.
 Instale a skill quando for criar ou revisar uma interface:
 
 ```bash
-specsfy skills install specsfy-specialist-design-system
+specsfy skills install specsfy-specialist-interface
 ```
 
-Se a entrega já usa a coordenação completa de interface, instale:
-
-```bash
-specsfy skills install specsfy-specialist-interface-experience
-```
-
-O catálogo resolve o especialista de design system junto das dependências de UX
-e UI.
+O mesmo especialista cobre a descoberta de interface, o design system, o UI, o
+UX e a acessibilidade web. Os componentes visuais prontos ficam com
+`specsfy-specialist-ui-components`.
 
 ## Como funciona
 

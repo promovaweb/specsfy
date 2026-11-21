@@ -16,8 +16,29 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
   Edge Functions): usar `$specsfy-specialist-supabase`, que aplica Postgres
   por baixo com essas camadas adicionais.
 - Combinar com `$specsfy-specialist-laravel` quando o ponto de entrada for
-  Eloquent e com `$specsfy-specialist-performance-engineering` quando o
+  Eloquent e com `$specsfy-specialist-observability` quando o
   gargalo abranger além do banco (aplicação, rede, cache).
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
+   `.specsfy/RULES.md` e, por tratar schema e dado persistido,
+   `.specsfy/DATABASE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-postgres`. Sem indicação, confirme pelo
+   "Quando usar" acima se o banco é Postgres e qual versão está instalada.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Leve schema, índice e plano real para a subseção `Migrations` da seção 8
+   e para `### 9. Modelo de dados`, e mantenha `.specsfy/DATABASE.md`
+   sincronizado pela skill `$specsfy-setup` no modo `database`.
 
 ## Fluxo
 
@@ -101,7 +122,7 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-data-modeling` para entidades, relações e ciclo de vida
+- `$specsfy-specialist-modeling` para entidades, relações e ciclo de vida
   antes dos detalhes específicos do Postgres.
 - `$specsfy-specialist-application-security` define ameaça, autorização e
   isolamento que constraints, roles e RLS materializam no banco.
@@ -109,9 +130,8 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
   Supabase (RLS, Auth, Realtime, pooling específico).
 - `$specsfy-specialist-laravel` quando o ponto de entrada for Eloquent e a
   correção precisar refletir em migration/model.
-- `$specsfy-specialist-performance-engineering` quando o gargalo não se
-  resolver só com índice/plano (rede, cache, aplicação).
-- `$specsfy-specialist-observability` para métricas e alertas de banco em
+- `$specsfy-specialist-observability` quando o gargalo não se resolver só com
+  índice/plano (rede, cache, aplicação) e para métricas e alertas de banco em
   produção (conexões, locks, replicação, lag).
 - `$specsfy-specialist-redis` quando parte do estado consultado estiver em
   cache fora do banco: o Postgres continua sendo a fonte de verdade que o

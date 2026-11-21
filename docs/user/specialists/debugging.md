@@ -14,7 +14,7 @@ sintoma.
 - Um timeout, um erro ou uma lentidão foi relatado com sintoma concreto.
 
 Para otimizar um sistema que funciona sem falhas, use o especialista
-Performance, que parte de uma meta de desempenho.
+Observabilidade, que parte de uma meta de desempenho.
 
 ## Como ele trabalha
 
@@ -73,15 +73,13 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Pesquisa Técnica](technical-research.md) confirma comportamento externo e
-  compatibilidade em fontes primárias.
+- [Pesquisa](research.md) confirma comportamento externo e compatibilidade em
+  fontes primárias.
 - [Observabilidade](observability.md) instrumenta produção quando os sinais
-  atuais não separam as suposições.
-- [Performance](performance-engineering.md) entra quando o sintoma é
-  degradação sem erro funcional.
+  atuais não separam as suposições e entra quando o sintoma é degradação sem
+  erro funcional.
 - [Code Review](code-review.md) revisa a correção e o teste de regressão.
-- [Relatório de servidor](server-report.md) reúne logs e uso de disco por
-  host.
+- [Servidor](server.md) reúne logs e uso de disco por host.
 
 ## Referência técnica
 

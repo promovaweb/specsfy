@@ -36,8 +36,9 @@
  *   2. moves them to a clean worktree of the website origin/main and gives
  *      the website checkout back as it was (other work there stays intact);
  *      a page the sync removed (its source left this repository) is deleted
- *      there and its route gets a 410 in src/config/gone.mjs, unless
- *      src/config/redirects.mjs already sends it somewhere with a 301;
+ *      there; the page of a specialist renamed in skills/inventory.json gets
+ *      a 301 to the new page in src/config/redirects.mjs and any other route
+ *      a 410 in src/config/gone.mjs (routes that already have one are kept);
  *   3. publishes the media to R2 (`npm run media:publicar`), writes a
  *      sitespec, bumps the website patch version and changelog, commits only
  *      those paths, tags, pushes and creates the website GitHub Release;
@@ -197,22 +198,45 @@ function nextSitespecId(worktree) {
 }
 
 /**
- * Registers removed documentation routes as 410 in src/config/gone.mjs of
- * the website worktree. A route that already has a 301 in
- * src/config/redirects.mjs (a page merged into another) or a 410 entry is
- * left alone. Returns the routes added.
+ * Gives every removed documentation route its HTTP answer in the website
+ * worktree. The page of a specialist renamed in skills/inventory.json (merged
+ * into another) gets a 301 to the new page in src/config/redirects.mjs; any
+ * other removed route gets a 410 in src/config/gone.mjs. Routes that already
+ * have a 301 or a 410 are left alone. Returns the routes of each kind.
  */
-function registerGoneRoutes(worktree, routes) {
-  if (!routes.length) return [];
+function registerRemovedRoutes(worktree, routes) {
+  const result = { moved: [], gone: [] };
+  if (!routes.length) return result;
   const goneFile = join(worktree, "src", "config", "gone.mjs");
-  const redirects = readFileSync(join(worktree, "src", "config", "redirects.mjs"), "utf8");
+  const redirectsFile = join(worktree, "src", "config", "redirects.mjs");
+  let redirects = readFileSync(redirectsFile, "utf8");
   let gone = readFileSync(goneFile, "utf8");
-  const added = routes.filter((route) => !redirects.includes(`'${route}'`) && !gone.includes(`'${route}'`));
-  if (!added.length) return [];
+  const pending = routes.filter((route) => !redirects.includes(`'${route}'`) && !gone.includes(`'${route}'`));
+  const renamed = JSON.parse(readFileSync(join(ROOT, "skills", "inventory.json"), "utf8")).renamed ?? {};
+  const moves = [];
+  for (const route of pending) {
+    const specialist = /^\/docs\/specsfy\/especialistas\/(.+)$/u.exec(route)?.[1];
+    const target = specialist && renamed[`specsfy-specialist-${specialist}`];
+    if (target) moves.push([route, `/docs/specsfy/especialistas/${target.replace(/^specsfy-specialist-/u, "")}/`]);
+  }
+  if (moves.length) {
+    const anchor = "\t'/docs/specsfy/ideias':";
+    if (!redirects.includes(anchor)) {
+      console.error("✗ src/config/redirects.mjs changed: the /docs/specsfy block was not found");
+      process.exit(1);
+    }
+    const lines = [`\t// Specsfy ${version} juntou especialistas: a página antiga aponta para o especialista que a absorveu.`, ...moves.map(([from, to]) => `\t'${from}': '${to}',`)];
+    redirects = redirects.replace(anchor, `${lines.join("\n")}\n${anchor}`);
+    writeFileSync(redirectsFile, redirects);
+    result.moved = moves.map(([from]) => from);
+  }
+  const added = pending.filter((route) => !result.moved.includes(route));
+  if (!added.length) return result;
   const lines = added.map((route) => `\t'${route}': 'Página da documentação do Specsfy retirada na versão ${version}: a fonte saiu do repositório, sem página equivalente.',`);
   gone = gone.replace("export const goneRoutes = {\n", `export const goneRoutes = {\n${lines.join("\n")}\n`);
   writeFileSync(goneFile, gone);
-  return added;
+  result.gone = added;
+  return result;
 }
 
 /** Publishes the Specsfy documentation, ebook and images on the website. */
@@ -247,7 +271,7 @@ function releaseSite() {
       mkdirSync(dirname(join(worktree, path)), { recursive: true });
       cpSync(join(WEBSITE, path), join(worktree, path));
     }
-    const gone = registerGoneRoutes(worktree, removed);
+    const { moved, gone } = registerRemovedRoutes(worktree, removed);
     // Give the website checkout back: tracked files return to HEAD and new
     // files the sync created there are removed (media stays, it is ignored).
     for (const path of written) {
@@ -317,13 +341,13 @@ function releaseSite() {
     let count = 0;
     const lock = readFileSync(join(worktree, "package-lock.json"), "utf8").replace(new RegExp(`"version": "${previous.replaceAll(".", "\\.")}"`, "g"), (match) => (count++ < 2 ? `"version": "${next}"` : match));
     writeFileSync(join(worktree, "package-lock.json"), lock);
-    const goneNote = gone.length ? ` Páginas retiradas, com 410: ${gone.map((route) => `\`${route}/\``).join(", ")}.` : "";
+    const goneNote = (gone.length ? ` Páginas retiradas, com 410: ${gone.map((route) => `\`${route}/\``).join(", ")}.` : "") + (moved.length ? ` Páginas fundidas, com 301 para a nova: ${moved.map((route) => `\`${route}/\``).join(", ")}.` : "");
     const entry = `Documentação do Specsfy em \`/docs/specsfy/\` na versão ${version}, com o ebook e as imagens do guia publicados no R2.${goneNote} Sitespec ${id}.`;
     const changelog = readFileSync(join(worktree, "CHANGELOG.md"), "utf8");
     writeFileSync(join(worktree, "CHANGELOG.md"), changelog.replace("# Changelog do website\n\n", `# Changelog do website\n\n## [${next}] - ${now.slice(0, 10)}\n\n### Alterado\n\n- ${entry}\n\n`));
     // Only these paths: a worktree without the media regenerates registries
     // (imagens-responsivas-registro.json) that must never be committed.
-    const paths = ["package.json", "package-lock.json", "CHANGELOG.md", "scripts/media-manifest.json", ".sitespec", "src/content/opensource-docs/specsfy", "public/docs/specsfy/downloads/build.json", "src/config/gone.mjs"];
+    const paths = ["package.json", "package-lock.json", "CHANGELOG.md", "scripts/media-manifest.json", ".sitespec", "src/content/opensource-docs/specsfy", "public/docs/specsfy/downloads/build.json", "src/config/gone.mjs", "src/config/redirects.mjs"];
     step("website stage", "git", ["add", "--", ...paths], worktree);
     step("website commit", "git", ["commit", "-q", "-m", `docs: Specsfy ${version} em /docs/specsfy ${next}`], worktree);
     step("website tag", "git", ["tag", `v${next}`], worktree);

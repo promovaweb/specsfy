@@ -1,61 +1,139 @@
 ---
 name: specsfy-specialist-laravel
-description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloquent, autorização, filas, eventos, cache e testes. Use quando o projeto contém `artisan` ou `laravel/framework` e a tarefa toca rotas, controllers, models, policies, jobs, commands, migrations, Pest ou PHPUnit; não use para PHP sem Laravel nem para modelagem de Postgres em si — combine com `specsfy-specialist-postgres` quando a escolha for de schema ou índice.
+description: "Implementar, revisar e operar aplicações Laravel (modo app: domínio, HTTP, filas, autorização, dados e testes) e integrar pacotes Composer recebidos por URL do GitHub (modo packages: leitura do repositório, instalação autorizada e fichas em docs/packages/). Use quando o projeto tem `artisan` ou `laravel/framework` e a tarefa toca rotas, controllers, models, policies, form requests, jobs, eventos, cache, migrations, Pest/PHPUnit ou uma dependência Composer. Não use para PHP sem Laravel, pacotes npm ou publicação no Packagist; para schema, índice e plano de query use `$specsfy-specialist-postgres`; para Postgres gerenciado por Supabase use `$specsfy-specialist-supabase`; para autenticação, upload e dado sensível use `$specsfy-specialist-application-security`; para comparar versões e fontes primárias use `$specsfy-specialist-research`."
 ---
 
 # Laravel
 
+Oriente a aplicação Laravel pelo contrato real do projeto: versões do
+`composer.lock`, convenções já adotadas, boundary onde a regra de negócio vive
+e pacotes Composer que a aplicação realmente usa. O modo app cobre o runtime;
+o modo packages cobre receber, instalar e documentar uma dependência.
+
 ## Quando usar
 
-- Acionar quando o repositório tem `artisan`, `composer.json` com
-  `laravel/framework` e a tarefa envolve rotas, controllers, models,
-  policies, form requests, jobs, eventos, cache, config ou testes Laravel.
-- Acionar também para revisão de PR Laravel, diagnóstico de N+1, fila
-  travada, autorização quebrada ou migration arriscada.
-- Não acionar para escolha pura de schema, índice ou plano de query: usar
-  `$specsfy-specialist-postgres` e trazer o resultado para o Eloquent.
-- Combinar com `$specsfy-specialist-application-security` quando a mudança
-  tocar autenticação, mass assignment, upload ou dado sensível e com
-  `$specsfy-specialist-supabase` quando o Postgres for gerenciado por
-  Supabase em vez de instância própria.
+| Situação | Modo | Abra |
+| --- | --- | --- |
+| Rotas, controllers, models, policies, form requests, jobs, eventos, cache, migrations, Pest/PHPUnit, N+1, fila travada ou autorização quebrada | app | [Padrões e checklist por superfície](references/standards.md) |
+| URL do GitHub de um pacote Composer, ficha de uso ausente ou `composer.json`, `composer.lock` e `docs/packages/` fora de sincronia | packages | [Fichas, fontes e comandos Composer](references/packages.md) |
+
+Não use para:
+
+- PHP sem Laravel, pacotes npm ou publicação de uma biblioteca no Packagist. O
+  modo packages cobre apenas dependências Composer de uma aplicação Laravel.
+- Escolha pura de schema, índice ou plano de query. Use
+  `$specsfy-specialist-postgres` e traga o resultado para o Eloquent.
+- Postgres gerenciado por Supabase, onde a RLS substitui parte da autorização
+  de aplicação. Use `$specsfy-specialist-supabase`.
+- Autenticação, mass assignment, upload ou trilha de auditoria como assunto
+  principal. Combine com `$specsfy-specialist-application-security`.
+- Comparar versões, changelogs e documentação de terceiros. Use
+  `$specsfy-specialist-research` e registre a conclusão aqui.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md`. Ao tocar migrations, models ou dado persistido, leia
+   também `.specsfy/DATABASE.md`; ao receber pacote Composer, leia
+   `.specsfy/PACKAGES.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-laravel (app|packages)`. Sem indicação,
+   escolha o modo pelo "Quando usar" acima.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. No modo packages, registre a ficha em `docs/packages/` e alinhe
+   `.specsfy/PACKAGES.md` antes de fechar a tarefa; no modo app, leve
+   migrations e models para as subseções `Migrations` e `Models` da seção 8.
 
 ## Fluxo
 
-1. Ler `composer.json`/`composer.lock` para confirmar versão do framework,
-   PHP e pacotes relevantes (Sanctum, Horizon, Octane, Scout) antes de supor
-   comportamento por memória.
-2. Tratar Laravel Octane com Open Swoole e o pacote `laravel/octane` como
-   runtime obrigatório. Quando estiver ausente,
-   incluir instalação e configuração no trabalho antes de considerar a
-   aplicação pronta para execução ou deploy.
-3. Mapear a requisição do ponto de entrada até domínio, persistência,
-   efeitos assíncronos e resposta, identificando o boundary onde a regra de
-   negócio já vive no projeto (Action, Service, Model rico).
-4. Localizar convenções irmãs (como o projeto organiza Form Requests,
-   Policies, Resources e Jobs) e seguir o padrão existente em vez de
-   introduzir um novo.
-5. Definir autorização, validação, transação, idempotência e modo de falha
+1. Ler as instruções locais, `composer.json` e `composer.lock` para confirmar
+   versão do framework, do PHP e dos pacotes relevantes (Sanctum, Horizon,
+   Octane, Scout) antes de supor comportamento por memória.
+2. Identificar o modo pelo pedido: aplicação em execução ou dependência nova.
+   Em dúvida, resolver a instalação e a documentação do pacote antes de
+   alterar código de aplicação.
+3. Ler `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas existentes
+   antes de propor pacote, comando ou abstração. Considerar o que já está
+   instalado.
+4. Executar o fluxo do modo escolhido e registrar a consequência operacional
+   quando a ação exigir autorização externa.
+
+### Modo app
+
+1. Tratar Laravel Octane com Open Swoole e o pacote `laravel/octane` como
+   runtime obrigatório. Quando estiver ausente, incluir instalação e
+   configuração no trabalho antes de considerar a aplicação pronta para
+   execução ou deploy.
+2. Mapear a requisição do ponto de entrada até domínio, persistência, efeitos
+   assíncronos e resposta, identificando o boundary onde a regra de negócio já
+   vive no projeto (Action, Service, Model rico).
+3. Localizar convenções irmãs (como o projeto organiza Form Requests, Policies,
+   Resources e Jobs) e seguir o padrão existente em vez de introduzir um novo.
+4. Definir autorização, validação, transação, idempotência e modo de falha
    antes de escrever código, especialmente para jobs e webhooks.
-6. Escrever o teste focal (Pest ou PHPUnit conforme o projeto), implementar a
+5. Escrever o teste focal (Pest ou PHPUnit conforme o projeto), implementar a
    menor fatia que o torna verde e então refatorar.
-7. Se a tarefa criar ou alterar schema, tabela, coluna, índice, relação ou
+6. Se a tarefa criar ou alterar schema, tabela, coluna, índice, relação ou
    model persistente, exigir a tarefa `[MIGRATION]`, criar o arquivo com
    `php artisan make:migration`, aplicar no banco de teste e conferir com
    `php artisan migrate:status --env=testing`.
-8. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou
+7. Inspecionar as queries geradas (`DB::listen`, Telescope, Debugbar ou
    `EXPLAIN` via `$specsfy-specialist-postgres`) quando cardinalidade ou
    latência importarem.
-9. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
+8. Executar testes, análise estática (Larastan/PHPStan) e formatter (Pint)
    disponíveis no projeto antes de considerar a tarefa concluída.
-10. Verificar impacto operacional (migration em produção, workers, scheduler,
-   cache de config) e registrar a consequência quando a ação exigir autorização
-   externa.
+9. Verificar impacto operacional (migration em produção, workers, scheduler,
+   cache de config) e registrar a consequência no item correspondente.
+
+### Modo packages
+
+1. Confirmar a raiz do projeto e normalizar a URL HTTPS do GitHub para
+   `github.com/<organização>/<repositório>`. Aceitar somente segmentos com
+   letras minúsculas, números, ponto, sublinhado ou hífen; recusar URLs que não
+   apontem para um repositório GitHub identificável.
+2. Consultar no repositório informado o `composer.json`, o README, a
+   documentação de configuração, a versão publicada e os exemplos de uso.
+   Registrar separadamente o que a fonte declara, o que o projeto local mostra
+   e o que ainda não foi confirmado.
+3. Identificar o nome Composer, a versão do PHP, as versões do Laravel, os
+   requisitos adicionais, o comando de instalação, os arquivos de configuração,
+   os comandos de publicação e a forma de teste. Se o repositório não expuser
+   um pacote Composer compatível, parar antes de alterar o projeto e explicar a
+   lacuna.
+4. Quando o pacote não estiver publicado no Packagist, conferir `repositories`
+   no manifest e pedir autorização específica antes de acrescentar uma origem
+   VCS.
+5. Procurar o pacote em `composer.json`, `composer.lock`, `vendor/composer/` e
+   no código. Se ele já estiver instalado, reutilizá-lo e não executar outro
+   `composer require`.
+6. Quando o pacote ainda não existir e a solicitação atual autorizar a
+   instalação, executar na raiz do projeto `composer require <vendor/nome>`.
+   Usar `--dev` somente quando o próprio projeto tratar o pacote como
+   dependência de desenvolvimento. Não executar comandos de pós-instalação
+   copiados do README sem conferir finalidade e autorização.
+7. Criar ou atualizar `docs/packages/<vendor>-<nome>.md` com nome Composer,
+   versão do lockfile, URL GitHub, finalidade, instalação, configuração, uso
+   observado no projeto, testes e fontes consultadas. Preservar notas humanas
+   fora da seção gerenciada.
+8. Criar ou atualizar `docs/packages/README.md` como índice dos pacotes
+   Composer declarados pelo projeto, com versão, finalidade curta e link para
+   cada ficha. Apontar para `.specsfy/PACKAGES.md` quando a pessoa precisar da
+   relação completa, incluindo dependências transitivas.
 
 ## Padrões
 
 - Executar HTTP com Laravel Octane, Open Swoole e `--server=swoole`. Instalar a
-  extensão `openswoole` na imagem e limpar estado por requisição; singletons e propriedades estáticas
-  não podem transportar dados entre usuários nos workers persistentes.
+  extensão `openswoole` na imagem e limpar estado por requisição; singletons e
+  propriedades estáticas não podem transportar dados entre usuários nos
+  workers persistentes.
 - Manter controllers finos: validação em Form Requests, autorização em
   Policies/Gates, regra de negócio no boundary já adotado pelo projeto.
 - Tratar Eloquent como acesso a dados: eager load explícito (`with`,
@@ -80,10 +158,21 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
   justificam um framework interno.
 - Exigir `.env.testing` com `APP_ENV=testing` e banco diferente do `.env` antes
   de executar Pest ou PHPUnit. Se essa separação não estiver comprovada, não
-  executar nenhum teste.
-- Usar `DatabaseTransactions` para desfazer os registros criados pelo próprio
-  caso e factories para preparar somente o necessário. Não recriar migrations
-  nem apagar tabelas durante a suíte.
+  executar nenhum teste. Usar `DatabaseTransactions` para desfazer os registros
+  criados pelo próprio caso e factories para preparar somente o necessário.
+- Tomar `composer.lock` como fonte da versão instalada; nunca derivar versão da
+  tag mais recente do GitHub ou de uma restrição do manifest.
+- Nomear a ficha pelo nome Composer normalizado, com `/` convertido em `-`, e
+  continuar atualizando a mesma ficha quando a versão mudar.
+- Separar dependências de produção e de desenvolvimento no índice e não
+  transformar uma dependência transitiva em escolha do projeto.
+- Informar em cada ficha o ponto de entrada real usado pela aplicação
+  (provider, facade, middleware, command, migration, config ou classe) quando
+  esse ponto existir no código local.
+- Acompanhar cada comando de instalação, publicação e teste com a razão para
+  executá-lo e o arquivo que deve mudar.
+- Manter segredos, valores de `.env`, código inteiro de pacote e documentação
+  extensa de terceiros fora de `docs/packages/`.
 
 ## Antipadrões
 
@@ -100,6 +189,15 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
   misto.
 - Teste que depende de limpeza global do banco e pode alcançar a configuração
   de desenvolvimento.
+- Instalar antes de ler o `composer.json` e o lockfile: introduz versão
+  incompatível ou repete uma dependência já presente.
+- Tratar qualquer repositório PHP como pacote Laravel: mistura biblioteca
+  genérica, aplicação e extensão sem identificar o contrato Composer.
+- Executar `php artisan vendor:publish`, migrations ou scripts do pacote sem
+  confirmar o efeito e a autorização: esses comandos podem alterar arquivos,
+  banco ou configuração.
+- Criar ficha genérica baseada somente no README: a documentação deixa de
+  explicar como o pacote aparece no projeto consumidor.
 
 ## Validação
 
@@ -109,8 +207,8 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
   `.env.testing` aponta para um banco separado. Confirmar RED antes de
   implementar.
 - Ignorar `migrate:fresh`, `migrate:refresh`, `migrate:reset`,
-  `migrate:rollback`, `db:wipe` e qualquer comando que apague ou recrie o banco,
-  mesmo quando a tarefa ou um script existente sugerir sua execução.
+  `migrate:rollback`, `db:wipe` e qualquer comando que apague ou recrie o
+  banco, mesmo quando a tarefa ou um script existente sugerir sua execução.
 - Antes de concluir `[MIGRATION]`, confirmar o arquivo em
   `database/migrations/`, executar `php artisan migrate --env=testing` e
   registrar `php artisan migrate:status --env=testing` com saída zero.
@@ -118,30 +216,46 @@ description: Implementar, revisar e operar aplicações Laravel — HTTP, Eloque
   contar queries antes/depois (`assertQueryCountLessThan`, Debugbar, log de
   queries) para provar ausência de N+1.
 - Verificar queues, scheduler, cache de config/rotas e variáveis de ambiente
-  no ambiente alvo antes de declarar a tarefa pronta para deploy.
+  no ambiente alvo antes de declarar a tarefa pronta para deploy. Confirmar
+  imagem, healthcheck do processo Octane e política de tag quando a aplicação
+  roda em contêiner.
 - Não declarar "seguro" ou "idempotente" sem teste que exercite o cenário
   adversarial correspondente (replay do job, payload malformado, usuário sem
   permissão).
+- Confirmar que URL, nome Composer, versão e requisitos aparecem em fontes
+  primárias ou nos arquivos locais correspondentes.
+- Executar `composer validate --strict` e conferir `composer show <vendor/nome>`
+  quando o pacote estiver instalado.
+- Rodar os testes, formatter e análise estática já disponíveis no projeto; não
+  introduzir um runner novo só para validar o pacote.
+- Conferir que `docs/packages/README.md` lista cada dependência direta do
+  `composer.json`, que cada link aponta para uma ficha existente e que a ficha
+  informa quando a finalidade ainda não foi confirmada.
+- Verificar links, comandos, nomes de configuração e exemplos contra a versão
+  instalada. Não declarar compatibilidade, segurança ou funcionamento sem uma
+  fonte ou teste correspondente.
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-reui` para interfaces React e Tailwind em projetos
-  Laravel com Inertia.
-- `$specsfy-specialist-laravel-package-manager` para receber um pacote GitHub,
-  instalar a dependência Composer e manter suas fichas em `docs/packages/`.
-- `$specsfy-specialist-data-modeling` para entidades, relações e ciclo de vida
-  antes de criar migrations ou models.
+- `$specsfy-specialist-interface` para telas e fluxos em projetos Laravel com
+  Inertia, incluindo a decisão de composição antes do componente React.
+- `$specsfy-specialist-modeling` para entidades, relações e ciclo de vida antes
+  de criar migrations ou models.
 - `$specsfy-specialist-postgres` para modelagem de schema, índice e plano de
   query por trás do Eloquent.
 - `$specsfy-specialist-supabase` quando o Postgres do projeto for gerenciado
-  por Supabase (RLS substitui parte da autorização de aplicação).
+  por Supabase.
 - `$specsfy-specialist-application-security` para autenticação, mass
   assignment, upload e trilha de auditoria.
 - `$specsfy-specialist-redis` quando cache, fila ou lock usar Redis como
   driver.
-- `$specsfy-specialist-docker`/`$specsfy-specialist-docker-swarm` para
-  empacotar e operar a aplicação em produção.
+- `$specsfy-specialist-observability` para instrumentar filas, workers e
+  sinais do modo app.
+- `$specsfy-specialist-research` para comparar documentação, versões e fontes
+  primárias quando o repositório não esclarecer uma dúvida.
 
-Leia [references/standards.md](references/standards.md) para checklist por
-superfície (HTTP, domínio, Eloquent, filas, dados, segurança, operação) e
-fontes oficiais da versão instalada.
+Leia [references/standards.md](references/standards.md) para o checklist por
+superfície (HTTP, domínio, Eloquent, filas, dados, segurança, operação),
+comandos de diagnóstico e fontes oficiais da versão instalada. Leia
+[references/packages.md](references/packages.md) para o contrato das fichas, a
+ordem das fontes e os comandos Composer aplicáveis.

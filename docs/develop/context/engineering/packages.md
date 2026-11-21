@@ -75,7 +75,7 @@ aplicativo, não um catálogo de pacotes obrigatórios para usar o Specsfy.
 ## Pacotes Laravel no projeto consumidor
 
 Quando uma tarefa receber uma URL GitHub de pacote Laravel, o especialista
-`specsfy-specialist-laravel-package-manager` lê a documentação e compara o
+`specsfy-specialist-laravel` lê a documentação e compara o
 nome e a versão com `composer.json`, `composer.lock`, `vendor/` e as fontes de
 contexto do projeto. Pacote já instalado é reutilizado; pacote novo só entra
 após autorização para executar `composer require`.

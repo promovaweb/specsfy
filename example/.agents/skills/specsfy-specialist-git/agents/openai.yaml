@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Git"
+  short_description: "Gitflow e conflitos resolvidos pela intenção"
+  default_prompt: "Use $specsfy-specialist-git para orientar esta tarefa com padrões e validação especializados."

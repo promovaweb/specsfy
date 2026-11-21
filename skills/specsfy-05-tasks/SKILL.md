@@ -166,11 +166,11 @@ Quando `Interface para pessoas` for `Sim`:
 - inclua uma tarefa para atualizar `INTERFACE.md` com finalidade, arquivo, API,
   estados, consumidores e regra de reaproveitamento de todos os blocos criados
   ou alterados;
-- em projetos React, cada tarefa de tela registra no `PREP` o uso de
-  `$specsfy-specialist-react-ui-components` antes da implementação, porque essa
-  skill orienta a busca, o reaproveitamento e a adaptação dos componentes reais
-  do projeto. Se ela não estiver instalada, retorne ao `$specsfy-setup` para
-  instalar o especialista detectado antes de liberar a tarefa `[CODE]`;
+- em projetos React, cada tarefa de tela inclui
+  `Especialista: $specsfy-specialist-ui-components (components)` para orientar
+  a busca, o reaproveitamento e a adaptação de componentes. Se a skill
+  estiver ausente, siga o protocolo da seção Especialistas antes de liberar
+  a tarefa `[CODE]`;
 - agrupe essas tarefas na subseção obrigatória `#### Fase de interface` da
   seção 14. Cada tela registrada recebe ao menos uma tarefa própria, em vez de
   ficar escondida dentro de uma tarefa genérica de backend.
@@ -336,8 +336,10 @@ node .agents/skills/specsfy-05-tasks/scripts/progress.mjs <raiz> --json
   deduza progresso de commits, arquivos soltos ou memória da conversa. Para
   mudar estado, carregue a skill responsável.
 
-## Especialistas sob demanda
+## Especialistas
 
-Leia [references/specialists.md](references/specialists.md) ao decompor
-trabalho de tecnologia, dados, interface ou operação que demande checklist
-próprio.
+Ao decompor a entrega, consulte a seção 8 da spec e
+[a tabela de sinais](references/specialists.md). Carregue os especialistas
+aplicáveis ao planejamento. Em tarefas de UI, dados, API, deploy ou qualquer
+outro sinal aplicável, registre um item sem checkbox
+`Especialista: $specsfy-specialist-<nome> (<modo>)` por especialista e modo.

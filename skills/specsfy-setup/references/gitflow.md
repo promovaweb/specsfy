@@ -5,7 +5,7 @@ existente, uma branch chamada `develop` ou qualquer outro sinal do repositório
 não autorizam propor Gitflow. A escolha do modelo de branch pertence à pessoa
 que conduz o projeto.
 
-- Carregar `$specsfy-specialist-gitflow` somente quando a pessoa pedir
+- Carregar `$specsfy-specialist-git` somente quando a pessoa pedir
   Gitflow explicitamente nesta conversa, ou quando `RULES.md` já registrar
   essa escolha de uma tarefa anterior.
 - Ao carregar, registrar a convenção confirmada (branches permanentes,
@@ -19,7 +19,7 @@ que conduz o projeto.
 Instale no projeto consumidor:
 
 ```bash
-npx skills add https://github.com/promovaweb/specsfy --skill specsfy-specialist-gitflow --agent universal --copy --full-depth
+npx skills add https://github.com/promovaweb/specsfy --skill specsfy-specialist-git --agent universal --copy --full-depth
 ```
 
 Se a skill já estiver instalada, anuncie a transição automática e carregue-a

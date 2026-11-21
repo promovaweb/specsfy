@@ -71,14 +71,12 @@ npx skills add https://github.com/promovaweb/specsfy \
 - [Debugging](debugging.md) reproduz e explica um defeito encontrado na
   revisão.
 - [TypeScript](typescript.md) aprofunda contratos de tipo.
-- [Acessibilidade Web](web-accessibility.md) aprofunda semântica, teclado e
-  WCAG.
+- [Interface](interface.md) aprofunda semântica, teclado e WCAG.
 - [Segurança de Aplicações](application-security.md) aprofunda identidade e
   autorização.
-- [Arquitetura de Software](software-architecture.md) avalia acoplamento e
-  estrutura.
-- [Resolução de Conflitos Git](merge-conflict-resolution.md) entra quando a
-  revisão precisa ser refeita depois de um conflito.
+- [Arquitetura](architecture.md) avalia acoplamento e estrutura.
+- [Git](git.md) entra quando a revisão precisa ser refeita depois de um
+  conflito.
 
 ## Referência técnica
 

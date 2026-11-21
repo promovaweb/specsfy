@@ -11,12 +11,12 @@ Na interface, cada uma usa o padrão `Specsfy - Especialista - Nome`, como
 `Specsfy - Especialista - Laravel`. O identificador de comando continua
 `specsfy-specialist-laravel`.
 
-Para criar ou alterar interfaces, `specsfy-specialist-interface-experience`
-coordena a entrega e carrega `specsfy-specialist-design-system` antes dos
-especialistas de UX, UI e componentes. O design system mantém as orientações
-gerais, os defaults e os cenários de CRUD. A experiência de interface examina
-a stack e o sistema atual, conduz as perguntas sobre telas e menus e garante
-uma fase específica de interface nas tarefas.
+Para criar ou alterar interfaces, `specsfy-specialist-interface` reúne a
+experiência de interface, o design system, o UI design, o UX design e a
+acessibilidade web. Ele examina a stack e o sistema atual, conduz as perguntas
+sobre telas e menus, mantém as orientações gerais, os defaults e os cenários de
+CRUD e garante uma fase específica de interface nas tarefas. Os componentes
+visuais prontos ficam com `specsfy-specialist-ui-components`.
 
 ## Detectar e instalar
 
@@ -50,19 +50,18 @@ entre skills não instala o catálogo inteiro de forma automática.
 
 Ao iniciar o setup, você autoriza o Specsfy a detectar e instalar os
 especialistas diretamente ligados à stack encontrada, além de um núcleo comum
-de modelagem de dados, domínio, arquitetura e interfaces ReUI. Ele mostra os
+de modelagem, arquitetura e componentes de interface. Ele mostra os
 itens e usa `npx skills add` no projeto atual. Tecnologias sem sinal no código não entram na
 instalação.
 
 | Stack encontrada | Especialista |
 | --- | --- |
-| Laravel | Laravel e gestor de pacotes Laravel |
+| Laravel | Laravel |
 | Supabase, PostgreSQL ou Redis | Supabase, PostgreSQL ou Redis correspondente |
 | React, Next.js ou TypeScript | especialista correspondente |
-| Tailwind CSS ou shadcn/ui | Tailwind CSS ou shadcn/ui correspondente |
-| ReUI solicitado para React e Tailwind | ReUI, React, Tailwind CSS e shadcn/ui |
-| Docker, Swarm ou Ansible | especialista de plataforma e versionamento correspondente |
-| OpenAPI, OpenTelemetry, Prometheus ou CI/CD | API, observabilidade ou entrega correspondente |
+| Tailwind CSS, shadcn/ui ou ReUI | Tailwind CSS ou componentes de interface |
+| Docker, Swarm ou Ansible | Docker e servidor correspondentes |
+| OpenAPI, OpenTelemetry, Prometheus ou CI/CD | arquitetura, observabilidade ou entrega correspondente |
 
 ## Instalação manual
 
@@ -72,18 +71,18 @@ acessibilidade ou pesquisa técnica:
 
 ```bash
 npx skills add https://github.com/promovaweb/specsfy \
-  --skill specsfy-specialist-web-accessibility --agent universal --copy --full-depth
+  --skill specsfy-specialist-interface --agent universal --copy --full-depth
 ```
 
 O setup não remove especialistas instalados manualmente. Eles permanecem no
 projeto e podem ser usados quando a entrega precisar deles.
 
-Para usar os componentes gratuitos do ReUI, instale o especialista e suas
-dependências resolvidas pelo catálogo:
+Para usar os componentes gratuitos do ReUI e as primitives shadcn/ui, instale o
+especialista de componentes e suas dependências resolvidas pelo catálogo:
 
 ```bash
 npx skills add https://github.com/promovaweb/specsfy \
-  --skill specsfy-specialist-reui --agent universal --copy --full-depth
+  --skill specsfy-specialist-ui-components --agent universal --copy --full-depth
 ```
 
 Ele prepara o registry ReUI para React 19, Tailwind CSS v4 e shadcn/ui. Em
@@ -94,9 +93,9 @@ ações contextuais e das mensagens de retorno. A
 skill consulta o catálogo gratuito antes de permitir a criação de componente
 manual equivalente.
 
-## Gestor de pacotes Laravel
+## Pacotes Laravel
 
-`specsfy-specialist-laravel-package-manager` recebe a URL de um repositório
+No modo de pacotes, `specsfy-specialist-laravel` recebe a URL de um repositório
 GitHub, lê seu contrato Composer e sua documentação e compara o pacote com o
 que já existe no projeto. Quando a solicitação autoriza a instalação, executa
 `composer require` na raiz Laravel e confere o lockfile atualizado.
@@ -127,7 +126,7 @@ O setup cria `INTERFACE.md` e `DESIGNSYSTEM.MD` na raiz do projeto quando eles
 estão ausentes. O `INTERFACE.md` registra tokens e registries, além das telas
 e de todos os blocos criados ou reaproveitados. O `DESIGNSYSTEM.MD` guarda as
 orientações gerais, os defaults e os padrões de CRUD e dashboard, com estados e
-exceções por alcance. O especialista Design System mantém esse arquivo.
+exceções por alcance. O `specsfy-specialist-interface` mantém esse arquivo.
 
 Cada bloco registrado informa:
 
@@ -141,10 +140,10 @@ blocos React e os componentes shadcn/ui e ReUI escolhidos. As tarefas de
 interface atualizam o `INTERFACE.md` antes de serem concluídas.
 
 Antes de desenvolver uma tela React, o planejamento e a implementação carregam
-`$specsfy-specialist-react-ui-components`. A skill procura primeiro os blocos
+`$specsfy-specialist-ui-components`. A skill procura primeiro os blocos
 existentes, orienta o reaproveitamento ou a adaptação e mantém `INTERFACE.md`
-alinhado ao código. Se ela ainda não estiver instalada, o fluxo retorna ao
-setup e instala o especialista detectado antes de escrever JSX ou TSX.
+alinhado ao código. Se a skill estiver ausente, o agente propõe a instalação
+e pede autorização antes de escrever JSX ou TSX.
 
 Nas superfícies CRUD, o padrão é `PageHeader` e `DataGrid` para listas,
 com a linha inteira abrindo o detalhe por clique ou teclado; `PageHeader` e
@@ -159,13 +158,13 @@ team ativo, o módulo e o título atual. Em Laravel, o padrão reaproveita o
 
 | Domínio | Especialistas |
 | --- | --- |
-| backend e banco de dados | Laravel, Supabase, Postgres, Redis e APIs web |
+| backend e banco de dados | Laravel, Supabase, Postgres e Redis |
 | frontend | React, Next.js, TypeScript e Tailwind CSS |
-| interface | design system, experiência de interface, shadcn/ui, UI, UX e acessibilidade web |
-| plataforma | versionamento, Docker, Docker Swarm, Ansible e engenharia de entrega |
-| qualidade | segurança, observabilidade e performance |
-| design técnico | arquitetura e modelagem de domínio |
-| engenharia | code review, debugging, prototipação, pesquisa e conflitos Git |
+| interface | interface e componentes de UI |
+| plataforma | Docker, servidor e entrega |
+| qualidade | segurança de aplicações, code review e observabilidade |
+| design técnico | arquitetura e modelagem |
+| engenharia | debugging, pesquisa e Git |
 
 Cada especialista explica o fluxo de trabalho e as validações próprias da sua
 tecnologia. Uma mudança em Eloquent pode combinar Laravel e Postgres, por
@@ -174,66 +173,59 @@ orientações de todo o catálogo.
 
 ## Guia de cada especialista
 
-Esta é a referência de entrada para todos os especialistas distribuídos pelo
+Esta é a referência de entrada para os 21 especialistas distribuídos pelo
 Specsfy, com um guia do usuário para cada um. Use o nome de comando na
 instalação. O setup instala o núcleo e os especialistas detectados; os demais permanecem disponíveis para instalação
 manual quando a entrega pedir aquele domínio.
 
 | Especialista | Quando usar |
 | --- | --- |
-| [Laravel](specialists/laravel.md) | Domínio PHP, HTTP, filas, autorização, persistência e testes Laravel. |
-| [Gestor de pacotes Laravel](specialists/laravel-package-manager.md) | Pacotes Composer recebidos por URL GitHub, instalação e fichas em `docs/packages/`. |
+| [Laravel](specialists/laravel.md) | Domínio PHP, HTTP, filas, autorização, persistência, testes e pacotes Composer recebidos por URL GitHub. |
 | [Supabase](specialists/supabase.md) | Postgres gerenciado, Auth, RLS, Storage, Realtime e Edge Functions. |
 | [PostgreSQL](specialists/postgres.md) | Modelagem relacional, SQL, índices, migrations e operação do banco. |
 | [Redis](specialists/redis.md) | Cache, filas, locks, rate limiting e estruturas de dados em memória. |
-| [Modelagem de Dados](specialists/data-modeling.md) | Entidades, relações, ciclos de vida e contratos persistentes. |
-| [Modelagem de Domínio](specialists/domain-modeling.md) | Linguagem do negócio, invariantes e limites entre módulos. |
-| [Arquitetura de Software](specialists/software-architecture.md) | Módulos, dependências, atributos de qualidade e fronteiras técnicas. |
-| [Design System](specialists/design-system.md) | Regras macro, defaults, estados, padrões CRUD e exceções com alcance. |
+| [Modelagem](specialists/modeling.md) | Modelagem de domínio e de dados: linguagem do negócio, invariantes, entidades, relações e ciclos de vida. |
+| [Arquitetura](specialists/architecture.md) | Módulos, dependências, atributos de qualidade e contratos de API web. |
+| [Interface](specialists/interface.md) | Descoberta de interface, design system, UI, UX, acessibilidade web e fase de interface nas tarefas. |
+| [Componentes de UI](specialists/ui-components.md) | Catálogo de blocos React, composições gratuitas do ReUI e primitives shadcn/ui. |
 | [React](specialists/react.md) | Componentes, estado, efeitos, acessibilidade e testes de interface. |
 | [Tailwind CSS](specialists/tailwind-css.md) | Tokens, responsividade, variantes e CSS do design system. |
-| [shadcn/ui](specialists/shadcn-ui.md) | Primitives, registry, tema e padrões acessíveis de aplicação. |
-| [ReUI](specialists/reui.md) | Composições gratuitas para interfaces React e Tailwind, especialmente CRUDs. |
-| [Componentes React](specialists/react-ui-components.md) | Catálogos copiáveis que complementam UI design em projetos React. |
-| [UI Design](specialists/ui-design.md) | Layouts, dashboards, tabelas, formulários, estados e hierarquia visual. |
-| [UX Design](specialists/ux-design.md) | Fluxos, arquitetura de informação, pesquisa e validação de uso. |
-| [Experiência de Interface](specialists/interface-experience.md) | Leitura do sistema atual, telas, formulários e tarefas de interface. |
-| [Acessibilidade Web](specialists/web-accessibility.md) | WCAG, semântica, teclado, foco e tecnologias assistivas. |
 | [Next.js](specialists/nextjs.md) | App Router, fronteiras server/client, cache, dados e deploy. |
 | [TypeScript](specialists/typescript.md) | Tipos, strictness, módulos e contratos de API. |
-| [Docker](specialists/docker.md) | Imagens, Compose, segurança, builds e ambiente local. |
-| [Deploy](specialists/deploy.md) | Orquestra `SEMVER`, inventário, conexões, chaves públicas, Compose local, stack Swarm e Ansible. |
-| [Versionamento](specialists/versioning.md) | Arquivo `SEMVER`, incrementos e alinhamento entre artefato, tag e deploy. |
-| [Debian Server](specialists/debian-server.md) | APT, systemd, SSH, nftables, sysctl, storage e Docker Engine no host. |
-| [Relatório de servidor](specialists/server-report.md) | Diagnóstico somente leitura de containers, serviços Swarm e disco por host. |
-| [Docker Swarm](specialists/docker-swarm.md) | Stacks, serviços, redes, secrets, rollout e recuperação. |
-| [Ansible](specialists/ansible.md) | Playbooks, roles, Vault e automação de infraestrutura. |
-| [APIs Web](specialists/web-api-design.md) | Contratos HTTP, erros, paginação, idempotência e evolução de API. |
-| [Observabilidade](specialists/observability.md) | Logs, métricas, traces, SLOs e alertas acionáveis. |
-| [Engenharia de Entrega](specialists/delivery-engineering.md) | CI/CD, artefatos, promoções, migrations, rollout e rollback. |
+| [Docker](specialists/docker.md) | Imagens, Compose, ambiente local, stack Swarm, rollout e recuperação. |
+| [Servidor](specialists/server.md) | Debian, APT, systemd, SSH, nftables, Ansible, Vault e relatório de servidor por host. |
+| [Entrega](specialists/delivery.md) | Deploy, arquivo `SEMVER`, inventário, chaves públicas, CI/CD, rollout e rollback. |
+| [Git](specialists/git.md) | Gitflow, branches, merges, ciclo de release e resolução de conflitos. |
+| [Observabilidade](specialists/observability.md) | Logs, métricas, traces, SLOs, alertas, orçamentos de performance e regressões. |
 | [Segurança de Aplicações](specialists/application-security.md) | Ameaças, controles, segredos e verificações de segurança. |
-| [Performance](specialists/performance-engineering.md) | Orçamentos, medição, profiling, carga e regressões. |
 | [Code Review](specialists/code-review.md) | Revisão técnica guiada pelo contrato e pelos testes. |
 | [Debugging](specialists/debugging.md) | Diagnóstico de bugs, falhas intermitentes e regressões. |
-| [Prototipação](specialists/prototyping.md) | Protótipos descartáveis para dúvidas técnicas ou de interface. |
-| [Pesquisa Técnica](specialists/technical-research.md) | Pesquisa rastreável em fontes primárias e artefatos observáveis. |
-| [Resolução de Conflitos Git](specialists/merge-conflict-resolution.md) | Conflitos Git preservando intenção e integração do código. |
-| [Gitflow](specialists/gitflow.md) | Branches, merges e ciclo de release quando o projeto adotá-lo. |
+| [Pesquisa](specialists/research.md) | Pesquisa rastreável em fontes primárias e protótipos descartáveis para dúvidas técnicas. |
 
 Cada linha corresponde ao comando `specsfy-specialist-<nome-em-inglês>` do
 catálogo. A listagem completa de nomes, tags, dependências e sinais de
 detecção está em `specialists/catalog.json` no repositório do Specsfy.
 
-## Relação com as bases
+## Especialistas dentro do fluxo
 
-- `specsfy-02-backlog` identifica a necessidade.
-- `specsfy-03-specify` registra requisitos e atributos de qualidade.
-- `specsfy-04-validate` seleciona lentes de revisão.
-- `specsfy-05-tasks` usa checklists técnicos para decompor trabalho.
-- `specsfy-06-implement` preserva RED/GREEN no modo `tests` e executa de
-  acordo com a stack no modo `implement`.
-- `specsfy-update-spec` revisa requisitos e atributos de qualidade
-  afetados por uma mudança posterior.
+A linha `Especialistas` no cabeçalho da spec lista os nomes curtos separados
+por vírgula, como `interface, laravel`. Na seção 8, a tabela `Especialistas`
+registra o modo, o sinal observado e as fases em que a skill será carregada.
+Uma spec sem demanda especializada deixa esses campos vazios.
+
+- **Backlog** identifica sinais no pedido e anota os especialistas prováveis
+  no item refinado.
+- **Especificação (`specify`)** confirma os sinais, preenche o cabeçalho e a
+  tabela e carrega a skill ao escrever a seção que depende dela.
+- **Validação (`validate`)** confere a instalação, as exigências aplicáveis e
+  os sinais cobertos e registra os achados no gate.
+- **Planejamento de tarefas (`tasks`)** carrega as orientações aplicáveis e
+  anota cada tarefa que precisa de um especialista com o nome e o modo, por
+  exemplo, `Especialista: $specsfy-specialist-ui-components (components)`.
+- **Implementação e testes (`implement`)** carregam, antes de cada tarefa,
+  os especialistas aplicáveis da spec e da tarefa nos modos indicados.
+- **Atualização da spec (`update-spec`)** atualiza o cabeçalho e a tabela da
+  seção 8 quando a mudança traz um novo sinal.
 
 A presença de um especialista não aprova nenhum gate do Specsfy, porque o Plan
 Gate continua exigindo um RED válido e o Delivery Gate continua dependendo dos

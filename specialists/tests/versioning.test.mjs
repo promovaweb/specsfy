@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {ROOT,temporary,put,node} from '../../tests/helpers.mjs';
-const script=join(ROOT,'specialists/specsfy-specialist-versioning/scripts/semver.mjs');
+const script=join(ROOT,'specialists/specsfy-specialist-delivery/scripts/semver.mjs');
 const run=(project,...args)=>node(script,[...args,'--project',project]);
 test('inicializa e consulta SEMVER na raiz',t=>{
  const root=temporary(t),initialized=run(root,'init','--initial','1.2.3'),current=run(root,'current');

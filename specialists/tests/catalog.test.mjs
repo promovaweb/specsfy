@@ -49,35 +49,31 @@ test('metadados permitem descobrir e instalar as dependências', () => {
     for (const name of item.requires ?? []) assert.ok(expected.includes(name), name);
   }
 });
+/** Text of a specialist folder (SKILL.md, references and scripts; assets are code samples). */
+const folder = name => files(join(base, name)).filter(path => !path.includes('/assets/') && /\.(md|mjs|yaml)$/.test(path)).map(path => readFileSync(path, 'utf8')).join('\n');
 test('especialistas de plataforma cobrem a cadeia de deploy versionado', () => {
+  // docker absorveu docker-swarm; server absorveu ansible, debian-server e server-report.
   const contracts = {
-    docker: ['independentes por família', 'modos de processo', 'SemVer'],
-    'docker-swarm': ['ordem de dependência', 'migrations', 'convergência'],
-    ansible: ['preflight', 'check mode', 'Docker Secrets'],
-    'debian-server': ['sysctl.d', 'systemd', 'Docker'],
+    docker: ['independentes por família', 'modos de processo', 'SemVer', 'ordem de dependência', 'migrations', 'convergência'],
+    server: ['preflight', 'check mode', 'Docker Secrets', 'sysctl.d', 'systemd', 'Docker'],
   };
-  for (const [suffix, terms] of Object.entries(contracts)) {
-    const name = `specsfy-specialist-${suffix}`;
-    includes(content(name) + '\n' + read(`specialists/${name}/references/standards.md`), terms);
-  }
+  for (const [suffix, terms] of Object.entries(contracts)) includes(folder(`specsfy-specialist-${suffix}`), terms);
 });
-test('especialistas delegam a orquestração completa ao deploy', () => {
-  for (const suffix of ['ansible', 'delivery-engineering', 'docker', 'docker-swarm']) {
-    const name = `specsfy-specialist-${suffix}`;
-    assert.deepEqual(entry(name).requires ?? [], []);
-    includes(content(name), ['$specsfy-specialist-deploy']);
-  }
+test('especialistas de plataforma delegam a orquestração completa ao delivery', () => {
+  for (const suffix of ['docker', 'server']) includes(content(`specsfy-specialist-${suffix}`), ['$specsfy-specialist-delivery']);
+  assert.deepEqual(entry('specsfy-specialist-docker').requires ?? [], []);
 });
-test('orquestrador de deploy instala a cadeia de servidor completa', () => {
-  const name = 'specsfy-specialist-deploy';
-  assert.deepEqual([...entry(name).requires].sort(), ['ansible', 'debian-server', 'docker', 'docker-swarm', 'versioning'].map(suffix => `specsfy-specialist-${suffix}`).sort());
-  includes(content(name), ['SEMVER', 'Docker Engine', 'docker swarm init', 'Ansible']);
+test('delivery instala a cadeia de servidor completa', () => {
+  const name = 'specsfy-specialist-delivery';
+  assert.deepEqual([...entry(name).requires].sort(), ['specsfy-specialist-docker', 'specsfy-specialist-server']);
+  includes(folder(name), ['SEMVER', 'Docker Engine', 'docker swarm init', 'Ansible']);
+  for (const path of ['scripts/semver.mjs', 'scripts/scaffold.mjs', 'assets/vault.mjs', 'assets/check-hosts.mjs']) assert.ok(existsSync(join(base, name, path)), path);
 });
-test('componentes React possuem apoio de UI e galeria completa', () => {
-  const name = 'specsfy-specialist-react-ui-components';
-  includes(content(name), ['$specsfy-specialist-ui-design']);
-  includes(content('specsfy-specialist-ui-design'), [`$${name}`]);
-  assert.deepEqual(entry(name).requires, ['specsfy-specialist-design-system', 'specsfy-specialist-ui-design']);
+test('componentes de UI possuem apoio de interface e galeria completa', () => {
+  const name = 'specsfy-specialist-ui-components';
+  includes(content(name), ['$specsfy-specialist-interface']);
+  includes(content('specsfy-specialist-interface'), [`$${name}`]);
+  assert.ok(entry(name).requires.includes('specsfy-specialist-interface'));
   const directory = join(base, name, 'assets/components');
   const groups = readdirSync(directory, { withFileTypes: true }).filter(item => item.isDirectory()).map(item => item.name);
   const populated = groups.filter(group => readdirSync(join(directory, group)).some(file => file.endsWith('.tsx')));
@@ -85,17 +81,16 @@ test('componentes React possuem apoio de UI e galeria completa', () => {
   assert.deepEqual(populated.sort(), ['actions-feedback', 'data-display', 'forms', 'hero', 'layout-navigation', 'marketing-company', 'marketing-content', 'marketing-conversion', 'marketing-features', 'marketing-proof', 'typography'].sort());
 });
 test('React e shadcn identificam a base de primitives do projeto', () => {
-  includes(content('specsfy-specialist-react'), ['$specsfy-specialist-shadcn-ui']);
+  includes(content('specsfy-specialist-react'), ['$specsfy-specialist-ui-components']);
   includes(content('specsfy-specialist-react').toLowerCase(), ['base de primitives']);
-  includes(content('specsfy-specialist-shadcn-ui'), ['Base UI', 'Radix', '[references/primitives.md](references/primitives.md)']);
-  includes(read('specialists/specsfy-specialist-shadcn-ui/references/primitives.md'), ['@base-ui/react', 'radix-ui', '@radix-ui/react-', 'react-aria-components', 'não comprova que o componente usa Base UI']);
+  includes(content('specsfy-specialist-ui-components'), ['Base UI', 'Radix', '(references/shadcn-primitives.md)']);
+  includes(read('specialists/specsfy-specialist-ui-components/references/shadcn-primitives.md'), ['@base-ui/react', 'radix-ui', '@radix-ui/react-', 'react-aria-components', 'não comprova que o componente usa Base UI']);
 });
-test('gerenciador de pacotes Laravel publica o contrato de contexto', () => {
-  const name = 'specsfy-specialist-laravel-package-manager';
-  assert.deepEqual(entry(name).requires, ['specsfy-specialist-laravel']);
+test('laravel publica o contrato de contexto dos pacotes', () => {
+  const name = 'specsfy-specialist-laravel';
   assert.ok(entry(name).detect.files.includes('artisan'));
   assert.ok(entry(name).detect.dependencies.includes('laravel/framework'));
-  includes(content(name), ['URL do GitHub', 'composer.json', 'composer.lock', 'composer require', 'docs/packages/README.md', 'docs/packages/', '.specsfy/PACKAGES.md', 'pacotes já instalados']);
+  includes(folder(name), ['URL do GitHub', 'composer.json', 'composer.lock', 'composer require', 'docs/packages/README.md', 'docs/packages/', '.specsfy/PACKAGES.md', 'pacotes já instalados']);
   for (const path of ['specsfy-03-specify/SKILL.md', 'specsfy-06-implement/references/implement.md']) includes(read(`skills/${path}`), [name]);
 });
 

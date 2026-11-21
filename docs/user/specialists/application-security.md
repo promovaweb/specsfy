@@ -82,7 +82,7 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Ansible](ansible.md) e [Docker](docker.md) aplicam o hardening do host e do
+- [Servidor](server.md) e [Docker](docker.md) aplicam o hardening do host e do
   runtime.
 - [Laravel](laravel.md) e [Next.js](nextjs.md) implementam as superfícies da
   aplicação.
@@ -91,9 +91,9 @@ npx skills add https://github.com/promovaweb/specsfy \
   informações sensíveis.
 - [PostgreSQL](postgres.md) e [Supabase](supabase.md) modelam o acesso por
   linha e por tenant.
-- [Engenharia de Entrega](delivery-engineering.md) protege credenciais de
-  pipeline e a cadeia de suprimentos.
-- [APIs Web](web-api-design.md) revisa a exposição que vem do contrato HTTP.
+- [Entrega](delivery.md) protege credenciais de pipeline e a cadeia de
+  suprimentos.
+- [Arquitetura](architecture.md) revisa a exposição que vem do contrato HTTP.
 
 ## Referência técnica
 

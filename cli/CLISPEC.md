@@ -31,7 +31,7 @@ CI pelo `--json`.
   continuam com o agente e as skills; o binário cria esqueletos, move estados
   e valida.
 - Publicar, fazer deploy ou mexer em servidores: o especialista
-  `specsfy-specialist-deploy` mantém o próprio fluxo.
+  `specsfy-specialist-delivery` mantém o próprio fluxo.
 - Integração direta com ClickUp, GitHub Issues ou outros gestores; o
   binário só aponta o handoff para o ClickUpfy quando a skill existe.
 - Rodar migrations ou comandos que alteram o banco de dados do projeto.

@@ -8,7 +8,7 @@ cinco documentos em `.specsfy/` registram a stack, as instruções confirmadas,
 a persistência observada no código, os pacotes instalados e o perfil de
 interação do setup.
 As orientações gerais de interface ficam em `DESIGNSYSTEM.MD`, na raiz do
-projeto. Elas seguem um ciclo próprio com a skill especialista de design system.
+projeto. Elas seguem um ciclo próprio com a skill especialista de interface.
 
 Execute `$specsfy-setup` depois de instalar o framework. Depois disso, o
 framework a executa obrigatoriamente antes de iniciar cada skill, inclusive em
@@ -48,11 +48,11 @@ preservado em todas as execuções. A referência publicável das diretrizes viv
 | `.specsfy/RULES.md` | diretrizes explícitas confirmadas | `$specsfy-setup` (modo `rules`) |
 | `.specsfy/DATABASE.md` | persistência e relações | `$specsfy-setup` (modo `database`) |
 | `.specsfy/PACKAGES.md` | pacotes npm e Composer com finalidade | `$specsfy-documentator` |
-| `docs/packages/README.md` | índice dos pacotes Composer diretos e links para fichas de uso | `$specsfy-specialist-laravel-package-manager` |
-| `docs/packages/<vendor>-<nome>.md` | instalação, configuração, uso local e testes do pacote | `$specsfy-specialist-laravel-package-manager` |
+| `docs/packages/README.md` | índice dos pacotes Composer diretos e links para fichas de uso | `$specsfy-specialist-laravel` |
+| `docs/packages/<vendor>-<nome>.md` | instalação, configuração, uso local e testes do pacote | `$specsfy-specialist-laravel` |
 | `.specsfy/USER-PROFILE.md` | nível de conhecimento, respostas confirmadas e fontes do setup | `$specsfy-setup` |
 | `.specsfy/SPECKIT.md` | constituição e fontes preservadas do GitHub Spec Kit | `$specsfy-setup` |
-| `DESIGNSYSTEM.MD` | defaults comuns de interface, CRUD, dashboards, estados e exceções | `$specsfy-setup` cria; `$specsfy-specialist-design-system` mantém |
+| `DESIGNSYSTEM.MD` | defaults comuns de interface, CRUD, dashboards, estados e exceções | `$specsfy-setup` cria; `$specsfy-specialist-interface` mantém |
 
 Os modelos ficam em `.specsfy/templates/Project.md`, `Stack.md`, `Rules.md`,
 `Database.md` e `UserProfile.md`, junto dos demais templates do framework. Para

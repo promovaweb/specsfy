@@ -1,6 +1,6 @@
 /** Preserva steps dos contratos transversais de cobertura, contexto, interface e banco. */
 import assert from 'node:assert/strict';
-import { read } from '../helpers.mjs';
+import { read, readSpecialist } from '../helpers.mjs';
 const includes = (source, terms) => terms.forEach(term => assert.ok(source.includes(term), term));
 const normalized = source => source.split(/\s+/).join(' ');
 const skill = name => read(`skills/${name}/SKILL.md`);
@@ -32,7 +32,7 @@ const expectations = [
   ['detalhes usam DetailLists com PageHeader', 'crud', ['DetailLists', 'PageHeader']],
   ['criação e edição usam seções com duas colunas responsivas', 'crud', ['seções', 'duas colunas', 'grid-cols-2', 'mobile']],
   ['erros de campo aparecem em vermelho abaixo do campo', 'crud', ['vermelho', 'abaixo']],
-  ['ela aplica os defaults quando a pessoa não informa direção visual', 'policy', ['não informa direção visual', 'defaults']],
+  ['ela aplica os defaults quando a pessoa não informa direção visual', 'policy', ['Aplique os defaults na ausência de direção visual']],
   ['ela registra exceções com alcance definido', 'policy', ['alcance', 'exceções']],
   ['ela preserva a personalidade do produto na hierarquia de informação', 'policy', ['personalidade', 'hierarquia']],
   ['o CLI publica o template DESIGNSYSTEM.MD', 'installer', ['"DESIGNSYSTEM.MD"']],
@@ -75,18 +75,18 @@ export const policySteps = [
   ['o template global de design system do Specsfy', ctx => { ctx.template = design(); }],
   ['os padrões de CRUD são lidos', ctx => { ctx.crud = ctx.template; }],
   ['os padrões comuns de interface são lidos', ctx => { ctx.common = ctx.template; }],
-  ['o contrato de interação do DataGrid do Specsfy', ctx => { ctx.datagrid = design() + read('specialists/specsfy-specialist-react-ui-components/assets/components/data-display/table.tsx'); }],
+  ['o contrato de interação do DataGrid do Specsfy', ctx => { ctx.datagrid = design() + read('specialists/specsfy-specialist-ui-components/assets/components/data-display/table.tsx'); }],
   ['a navegação da lista é lida', ctx => { ctx.row = ctx.datagrid; }],
   ['o contrato de implementação visual do Specsfy', ctx => { ctx.visualContract = read('skills/Spec.md') + read('skills/templates/Tasks.md') + read('skills/specsfy-06-implement/references/implement.md'); }],
   ['a revisão de desenvolvimento é lida', ctx => { ctx.visual = ctx.visualContract; }],
   ['o contrato de navegação contextual do Specsfy', ctx => { ctx.navigation = design() + read('skills/templates/Interface.md') + read('example/resources/js/layouts/app-layout.tsx'); ctx.breadcrumbs = read('example/resources/js/components/breadcrumbs.tsx'); ctx.primitive = read('example/resources/js/components/ui/breadcrumb.tsx'); }],
   ['o breadcrumb global é lido', ctx => { ctx.breadcrumb = ctx.navigation; }],
   ['Laravel reaproveita o breadcrumb existente do layout', ctx => { includes(ctx.breadcrumb, ['AppLayoutTemplate breadcrumbs={breadcrumbsWithTeam}']); includes(ctx.breadcrumbs, ['export function Breadcrumbs']); includes(ctx.primitive, ['aria-label="breadcrumb"']); }],
-  ['a skill especialista de design system do Specsfy', ctx => { ctx.skill = read('specialists/specsfy-specialist-design-system/SKILL.md'); }],
-  ['sua política de direção é lida', ctx => { ctx.policy = ctx.skill; }],
+  ['o especialista de interface do Specsfy no modo system', ctx => { ctx.skill = readSpecialist('interface'); }],
+  ['sua política de direção é lida', ctx => { ctx.policy = normalized(ctx.skill); }],
   ['o instalador e o catálogo de especialistas do Specsfy', ctx => { ctx.installer = (read('cli/src/domain/installer.ts')+read('skills/inventory.json')); ctx.catalog = JSON.parse(read('specialists/catalog.json')); ctx.interface = read('skills/templates/Interface.md'); }],
   ['a integração do design system é lida', ctx => { ctx.integration = [ctx.installer, ctx.catalog, ctx.interface]; }],
-  ['o especialista de experiência depende do especialista de design system', ctx => assert.ok(ctx.catalog.skills.find(entry => entry.name === 'specsfy-specialist-interface-experience').requires.includes('specsfy-specialist-design-system'))],
+  ['o especialista de interface reúne experiência e design system', ctx => { assert.ok(ctx.catalog.skills.find(entry => entry.name === 'specsfy-specialist-interface')); assert.ok(ctx.catalog.skills.find(entry => entry.name === 'specsfy-specialist-ui-components').requires.includes('specsfy-specialist-interface')); }],
   ['o contrato de setup do Specsfy', ctx => { ctx.setup = skill('specsfy-setup') + read('skills/specsfy-setup/references/setup.md'); }],
   ['a cobertura funcional do setup é lida', ctx => { ctx.setupCoverage = normalized(ctx.setup); }],
 ];

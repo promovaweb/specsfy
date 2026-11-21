@@ -1,8 +1,8 @@
 /** Confere as opções reais do parser Node e os exemplos do manual do Vault. */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { read } from './helpers.mjs';
-import { commandOptions } from '../specialists/specsfy-specialist-deploy/assets/vault.mjs';
+import { read, readSpecialist } from './helpers.mjs';
+import { commandOptions } from '../specialists/specsfy-specialist-delivery/assets/vault.mjs';
 
 test('cada ação e opção do Vault possui documentação e cinco exemplos', () => {
   const guide = read('docs/user/deploy-vault.md');
@@ -14,8 +14,12 @@ test('cada ação e opção do Vault possui documentação e cinco exemplos', ()
   }
 });
 test('especialistas e guia técnico descrevem execução pelo agente', () => {
-  for (const path of ['specialists/specsfy-specialist-deploy/SKILL.md', 'specialists/specsfy-specialist-ansible/SKILL.md', 'docs/develop/skills.md']) {
-    const content = read(path);
-    for (const term of ['--non-interactive', 'configure-vault']) assert.ok(content.includes(term), path + ': ' + term);
+  const sources = {
+    delivery: readSpecialist('delivery'),
+    server: readSpecialist('server'),
+    'docs/develop/skills.md': read('docs/develop/skills.md'),
+  };
+  for (const [name, content] of Object.entries(sources)) {
+    for (const term of ['--non-interactive', 'configure-vault']) assert.ok(content.includes(term), name + ': ' + term);
   }
 });

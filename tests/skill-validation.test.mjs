@@ -30,5 +30,5 @@ test('CLI retorna JSON e código de falha para a skill informada', t => {
 });
 test('descoberta inclui skills base, especialistas e operações locais', () => {
   const paths = defaultDirectories();
-  for (const path of ['skills/specsfy-setup', 'specialists/specsfy-specialist-deploy', '.agents/skills/specsfy-monorepo-documentator', 'cli/.agents/skills/specsfy-release-cli']) assert.ok(paths.includes(join(ROOT, path)), path);
+  for (const path of ['skills/specsfy-setup', 'specialists/specsfy-specialist-delivery', '.agents/skills/specsfy-monorepo-documentator', 'cli/.agents/skills/specsfy-release-cli']) assert.ok(paths.includes(join(ROOT, path)), path);
 });

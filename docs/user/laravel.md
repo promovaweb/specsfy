@@ -36,18 +36,11 @@ npx skills add https://github.com/promovaweb/specsfy \
   --skill specsfy-specialist-laravel --agent universal --copy --full-depth
 ```
 
-Para adotar um pacote Laravel a partir de um repositório GitHub, instale também
-o gestor de pacotes:
-
-```bash
-npx skills add https://github.com/promovaweb/specsfy \
-  --skill specsfy-specialist-laravel-package-manager --agent universal --copy --full-depth
-```
-
-Depois, peça ao agente:
+Para adotar um pacote Laravel a partir de um repositório GitHub, use o modo de
+pacotes do mesmo especialista, que já vem na instalação acima. Peça ao agente:
 
 ```text
-Use $specsfy-specialist-laravel-package-manager com https://github.com/organizacao/pacote.
+Use $specsfy-specialist-laravel com https://github.com/organizacao/pacote.
 Leia a documentação, confira se o pacote já está instalado e, com autorização,
 instale-o e documente seu uso.
 ```

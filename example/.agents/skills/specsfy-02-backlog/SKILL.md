@@ -196,8 +196,7 @@ Quando a pessoa pedir aprofundamento, promoção ou criação de uma spec:
    percorrer o mapa mecanicamente.
 5. Leia `../specsfy-03-specify/references/mcr-10.md` e faça a análise
    categorial silenciosamente antes da primeira pergunta.
-6. Leia `references/specialists.md` somente quando tecnologia ou disciplina
-   exigir contexto adicional.
+6. Registre os especialistas prováveis conforme a seção Especialistas.
 
 ### Área Interface
 
@@ -215,14 +214,20 @@ palavra “interface”.
 2. Pergunte sobre telas, fluxo de informação, menus e navegação principal,
    formulário, padrão de ação como painel lateral ou modal e composição. Não
    escolha o padrão no lugar da pessoa quando houver alternativas reais.
-3. Carregue `$specsfy-specialist-interface-experience` antes de fechar essa
-   área; ele coordena a análise do sistema atual e os especialistas seguintes.
-   Carregue `$specsfy-specialist-ux-design` antes de fechar a jornada e
-   `$specsfy-specialist-ui-design` antes de fechar a composição.
+3. Carregue `$specsfy-specialist-interface` antes de fechar essa
+   área; ele coordena a análise do sistema atual, conduz a descoberta e fecha a
+   jornada, o fluxo, a composição e os estados antes dos especialistas
+   seguintes.
 4. Quando a stack React e Tailwind usar ReUI, todo CRUD declarado na
    descoberta deve registrar Data Grid ou List, Filters, Form, Dialog ou Sheet
-   e os estados ReUI aplicáveis; carregue `$specsfy-specialist-reui` antes de
-   fechar a área.
+   e os estados ReUI aplicáveis; carregue
+   `$specsfy-specialist-ui-components` antes de fechar a área.
+
+## Especialistas
+
+Ao refinar, consulte [a tabela de sinais](references/specialists.md) e anote
+no item os especialistas prováveis, com modo e motivo. Quando a descoberta
+depender do especialista, siga o protocolo de carregamento da referência.
 
 ## Conduzir a descoberta adaptativa
 

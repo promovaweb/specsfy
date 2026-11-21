@@ -33,7 +33,7 @@ test('ordem editorial contém cada página exatamente uma vez',()=>{
  const actual=pages(join(ROOT,'docs/user'),'docs/user');assert.equal(ordered.length,actual.length);assert.deepEqual([...new Set(ordered)].sort(),actual.sort());
 });
 test('capítulo de deploy liga SemVer ao runtime',()=>{
- includes(read('docs/user/deploy.md'),['SEMVER','specsfy-specialist-versioning','Docker','Ansible','Docker Swarm','rollback']);includes(read('docs/user/reading-order.txt'),['docs/user/deploy.md']);
+ includes(read('docs/user/deploy.md'),['SEMVER','specsfy-specialist-delivery','Docker','Ansible','Docker Swarm','rollback']);includes(read('docs/user/reading-order.txt'),['docs/user/deploy.md']);
 });
 test('manifesto comprova fontes, hashes, aliases e metadados documentais',()=>{
  const result=spawnSync(join(ROOT,'.ebook/build-ebook.sh'),['--check'],{cwd:ROOT,encoding:'utf8',timeout:60000});assert.equal(result.status,0,result.stdout+result.stderr);

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Entrega"
+  short_description: "Deploy, SEMVER e CI/CD com rollout seguro"
+  default_prompt: "Use $specsfy-specialist-delivery para orientar esta tarefa com padrões e validação especializados."

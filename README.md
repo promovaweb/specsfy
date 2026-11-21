@@ -236,7 +236,7 @@ percurso de desenvolvimento.
 - [Referência rápida](docs/user/reference.md): arquivos, estados, gates, IDs,
   skills, comandos e glossário em uma página.
 - [Deploy](docs/user/deploy.md): release, servidores e produção em Docker Swarm
-  com o especialista `specsfy-specialist-deploy`.
+  com o especialista `specsfy-specialist-delivery`.
 - [Edição em PDF e EPUB](ebook/): o mesmo guia do usuário em formato portátil.
 - [Tutorial completo](specsfy/README.md): uma primeira entrega passo a passo, da
   captura à verificação.

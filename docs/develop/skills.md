@@ -58,10 +58,22 @@ O corpo usa instruções imperativas e mantém o fluxo essencial perto da ação
 Conteúdo extenso, padrões externos e matrizes de decisão ficam em
 `references/`, com indicação explícita de quando devem ser lidos.
 
+As skills base selecionam especialistas pelos sinais da demanda, da spec e
+do código. As referências de cada fase incluem a mesma tabela para uso em
+instalações independentes. O
+[contrato de especialistas no fluxo](../../skills/tests/specialist-flow.test.mjs)
+confere a paridade das tabelas com o catálogo e os modos dos especialistas.
+
+O [template da spec](../../skills/templates/Spec.md) armazena os nomes curtos
+no cabeçalho e associa modo, sinal e fases na seção 8. A seção 14 registra
+cada `Especialista:` como item sem checkbox, entre a linha da tarefa e seu
+checklist, preservando a seleção da próxima tarefa e a contagem dos seis
+itens canônicos.
+
 Scripts automatizam transformações determinísticas. Eles retornam códigos úteis,
 não instalam globalmente e não realizam ações destrutivas por padrão.
 
-O especialista `specsfy-specialist-versioning` inclui
+O especialista `specsfy-specialist-delivery` inclui
 `scripts/semver.mjs`. O utilitário cria, consulta, incrementa e confere o
 arquivo `SEMVER` na raiz do projeto consumidor. Ele também gera a referência
 Docker com essa versão e recusa uma tag diferente.
@@ -89,13 +101,13 @@ reescrever sua configuração. Os casos executáveis ficam em
 [implementação](../user/skills/specsfy-06-implement.md#runner-próprio-de-migrations)
 mostra a configuração do consumidor.
 
-`specsfy-specialist-deploy` é a entrada para o fluxo completo de release ou
-deploy. Seu catálogo instala Versioning, Docker, Debian Server, Ansible e Docker
-Swarm como dependências. O gerador cria `compose.yaml` para desenvolvimento,
-`stack.yaml` para produção e os arquivos Ansible que preparam o usuário `deploy`,
-o Docker Engine e o Swarm. Os outros especialistas continuam atendendo tarefas
-focais sem assumir a coordenação da entrega. Toda publicação ou alteração
-remota depende de autorização explícita.
+`specsfy-specialist-delivery` é a entrada para o fluxo completo de release ou
+deploy. Seu catálogo instala Docker e Servidor como dependências e concentra o
+versionamento e a engenharia de entrega. O gerador cria `compose.yaml` para
+desenvolvimento, `stack.yaml` para produção e os arquivos Ansible que preparam o
+usuário `deploy`, o Docker Engine e o Swarm. Os outros especialistas continuam
+atendendo tarefas focais sem assumir a coordenação da entrega. Toda publicação
+ou alteração remota depende de autorização explícita.
 
 O scaffold usa `cloudflare-tunnel` como valor padrão de `--proxy`. Nesse modo,
 ele acrescenta `cloudflared` à rede overlay da aplicação, cria a referência ao
@@ -159,8 +171,8 @@ processo atual. Sem a variável, o wrapper exige
 `ansible/inventory.yml`. O arquivo `inventory.example.yml` não pode ser usado
 silenciosamente como alvo real.
 
-A descoberta de máquinas pertence ao especialista Debian sob coordenação do
-deploy. Ele coleta um host por rodada e registra alias, `ansible_host`,
+A descoberta de máquinas pertence ao modo Debian do especialista Servidor, sob
+coordenação da entrega. Ele coleta um host por rodada e registra alias, `ansible_host`,
 `ansible_port`, `ansible_user` e grupo do Swarm. Uma solicitação para adicionar
 servidor mescla a nova entrada, preserva os hosts atuais e executa a sequência
 conexão, chave pública, baseline Debian, Docker Engine e ingresso no Swarm.
@@ -288,7 +300,7 @@ pelas skills segue `custom/<Nome>.md`, template gerenciado e, somente no
 monorepo, `skills/templates/<Nome>.md`.
 
 `DESIGNSYSTEM.MD` é o template das regras macro do produto consumidor. A skill
-`specsfy-specialist-design-system` cria ou atualiza o arquivo na raiz do
+`specsfy-specialist-interface` cria ou atualiza o arquivo na raiz do
 consumidor. `Interface.md` registra componentes e telas locais, sem repetir as
 regras macro.
 
@@ -346,7 +358,7 @@ contrato de atualização de `docs/`.
 lockfiles para o documentador. O inventário é derivado e não substitui os
 manifests nem autoriza instalar, atualizar ou remover dependências.
 
-Em projetos Laravel, `specsfy-specialist-laravel-package-manager` amplia esse
+Em projetos Laravel, `specsfy-specialist-laravel` amplia esse
 fluxo para pacotes recebidos por URL GitHub. Ele consulta os pacotes atuais,
 instala somente após autorização e mantém `docs/packages/README.md` mais uma
 ficha por pacote. `specsfy-03-specify` consulta essas fontes antes de registrar

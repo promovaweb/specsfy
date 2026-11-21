@@ -89,18 +89,19 @@ import f81 from "../../../skills/specsfy-setup/scripts/update_stack.mjs" with { 
 import f82 from "../../../skills/specsfy-update-spec/SKILL.md" with { type: "text" };
 import f83 from "../../../skills/specsfy-update-spec/agents/openai.yaml" with { type: "text" };
 import f84 from "../../../skills/specsfy-update-spec/references/change-classification.md" with { type: "text" };
-import f85 from "../../../skills/specsfy-update-spec/scripts/analyze_change.mjs" with { type: "text" };
-import f86 from "../../../skills/templates/Backlog.md" with { type: "text" };
-import f87 from "../../../skills/templates/DESIGNSYSTEM.MD" with { type: "text" };
-import f88 from "../../../skills/templates/Database.md" with { type: "text" };
-import f89 from "../../../skills/templates/Inbox.md" with { type: "text" };
-import f90 from "../../../skills/templates/Interface.md" with { type: "text" };
-import f91 from "../../../skills/templates/Project.md" with { type: "text" };
-import f92 from "../../../skills/templates/Rules.md" with { type: "text" };
-import f93 from "../../../skills/templates/Spec.md" with { type: "text" };
-import f94 from "../../../skills/templates/Stack.md" with { type: "text" };
-import f95 from "../../../skills/templates/Tasks.md" with { type: "text" };
-import f96 from "../../../skills/templates/UserProfile.md" with { type: "text" };
+import f85 from "../../../skills/specsfy-update-spec/references/specialists.md" with { type: "text" };
+import f86 from "../../../skills/specsfy-update-spec/scripts/analyze_change.mjs" with { type: "text" };
+import f87 from "../../../skills/templates/Backlog.md" with { type: "text" };
+import f88 from "../../../skills/templates/DESIGNSYSTEM.MD" with { type: "text" };
+import f89 from "../../../skills/templates/Database.md" with { type: "text" };
+import f90 from "../../../skills/templates/Inbox.md" with { type: "text" };
+import f91 from "../../../skills/templates/Interface.md" with { type: "text" };
+import f92 from "../../../skills/templates/Project.md" with { type: "text" };
+import f93 from "../../../skills/templates/Rules.md" with { type: "text" };
+import f94 from "../../../skills/templates/Spec.md" with { type: "text" };
+import f95 from "../../../skills/templates/Stack.md" with { type: "text" };
+import f96 from "../../../skills/templates/Tasks.md" with { type: "text" };
+import f97 from "../../../skills/templates/UserProfile.md" with { type: "text" };
 
 /** Relative path inside `skills/` mapped to the file contents. */
 export const SKILL_FILES: Readonly<Record<string, string>> = {
@@ -189,16 +190,17 @@ export const SKILL_FILES: Readonly<Record<string, string>> = {
   "specsfy-update-spec/SKILL.md": f82,
   "specsfy-update-spec/agents/openai.yaml": f83,
   "specsfy-update-spec/references/change-classification.md": f84,
-  "specsfy-update-spec/scripts/analyze_change.mjs": f85,
-  "templates/Backlog.md": f86,
-  "templates/DESIGNSYSTEM.MD": f87,
-  "templates/Database.md": f88,
-  "templates/Inbox.md": f89,
-  "templates/Interface.md": f90,
-  "templates/Project.md": f91,
-  "templates/Rules.md": f92,
-  "templates/Spec.md": f93,
-  "templates/Stack.md": f94,
-  "templates/Tasks.md": f95,
-  "templates/UserProfile.md": f96,
+  "specsfy-update-spec/references/specialists.md": f85,
+  "specsfy-update-spec/scripts/analyze_change.mjs": f86,
+  "templates/Backlog.md": f87,
+  "templates/DESIGNSYSTEM.MD": f88,
+  "templates/Database.md": f89,
+  "templates/Inbox.md": f90,
+  "templates/Interface.md": f91,
+  "templates/Project.md": f92,
+  "templates/Rules.md": f93,
+  "templates/Spec.md": f94,
+  "templates/Stack.md": f95,
+  "templates/Tasks.md": f96,
+  "templates/UserProfile.md": f97,
 };

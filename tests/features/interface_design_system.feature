@@ -13,7 +13,7 @@ Feature: Governança de interface do Specsfy
     And erros de campo aparecem em vermelho abaixo do campo
 
   Scenario: Aplicar defaults sem apagar uma direção explícita
-    Given a skill especialista de design system do Specsfy
+    Given o especialista de interface do Specsfy no modo system
     When sua política de direção é lida
     Then ela aplica os defaults quando a pessoa não informa direção visual
     And ela registra exceções com alcance definido
@@ -23,7 +23,7 @@ Feature: Governança de interface do Specsfy
     Given o instalador e o catálogo de especialistas do Specsfy
     When a integração do design system é lida
     Then o CLI publica o template DESIGNSYSTEM.MD
-    And o especialista de experiência depende do especialista de design system
+    And o especialista de interface reúne experiência e design system
     And o template Interface.md aponta para DESIGNSYSTEM.MD
 
   Scenario: Orientar dashboards e blocos comuns de interface

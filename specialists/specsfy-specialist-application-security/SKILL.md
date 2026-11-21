@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-application-security
-description: "Modelar ameaças e revisar segurança de aplicações, APIs, autenticação, autorização, dados, dependências, secrets e infraestrutura. Use para mudanças com trust boundaries, identidade, entrada externa, dados sensíveis ou revisão de segurança; use também para threat modeling antes de uma feature com nova superfície de ataque; não declare segurança sem comprovação, e para hardening de pipeline/credenciais de deploy use `$specsfy-specialist-delivery-engineering`."
+description: "Modelar ameaças e revisar segurança de aplicações, APIs, autenticação, autorização, dados, dependências, secrets e infraestrutura. Use para mudanças com trust boundaries, identidade, entrada externa, dados sensíveis ou revisão de segurança; use também para threat modeling antes de uma feature com nova superfície de ataque; não declare segurança sem comprovação, e para hardening de pipeline/credenciais de deploy use `$specsfy-specialist-delivery`."
 ---
 
 # Segurança de aplicações
@@ -13,10 +13,31 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
   (novo endpoint público, nova integração, novo tipo de usuário) para fazer
   threat modeling preventivo.
 - Não acionar como substituto de revisão de credenciais de pipeline/deploy:
-  usar `$specsfy-specialist-delivery-engineering` para isso; aqui o foco é a
+  usar `$specsfy-specialist-delivery` para isso; aqui o foco é a
   aplicação e seus dados, não a esteira de entrega.
 - Combinar com `$specsfy-specialist-postgres`/`$specsfy-specialist-supabase`
   quando a exposição envolve modelagem de acesso a dado por linha ou tenant.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md` e, quando a superfície for tela ou formulário,
+   `INTERFACE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-application-security`. Sem indicação,
+   confirme pelo "Quando usar" acima se a mudança cria trust boundary nova.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Registre ameaça, controle e teste negativo em `### 7. Requisitos` e em
+   `### 12. Plano de testes e rastreabilidade`, e deixe a exposição residual
+   como dúvida aberta com owner e sinal de observabilidade.
 
 ## Fluxo
 
@@ -99,11 +120,11 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-ansible` e `$specsfy-specialist-docker` implementam
+- `$specsfy-specialist-server` e `$specsfy-specialist-docker` implementam
   hardening de host, container e runtime; esta skill define ameaça, privilégio
   e controle que a configuração precisa provar.
 - `$specsfy-specialist-laravel`, `$specsfy-specialist-nextjs` e
-  `$specsfy-specialist-shadcn-ui` implementam superfícies de aplicação;
+  `$specsfy-specialist-ui-components` implementam superfícies de aplicação;
   autorização, validação server-side e exposição de dados permanecem aqui.
 - `$specsfy-specialist-code-review` aplica a revisão ampla e
   `$specsfy-specialist-observability` registra sinais de abuso sem vazar dados
@@ -111,9 +132,9 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - `$specsfy-specialist-postgres` e `$specsfy-specialist-supabase` para
   modelagem de autorização por linha/tenant no nível de dado (RLS,
   constraints).
-- `$specsfy-specialist-delivery-engineering` para hardening de credenciais
+- `$specsfy-specialist-delivery` para hardening de credenciais
   de pipeline, assinatura de artefato e supply chain.
-- `$specsfy-specialist-web-api-design` quando a exposição vem do desenho do
+- `$specsfy-specialist-architecture` quando a exposição vem do desenho do
   contrato de API (verbos, versionamento, exposição de campo sensível).
 
 Leia [references/standards.md](references/standards.md) para checklist de

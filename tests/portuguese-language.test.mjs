@@ -42,7 +42,7 @@ test('nomes exibidos das skills estão em português',()=>{
  for(const root of ['.agents','skills','specialists'])for(const path of files(join(ROOT,root)).filter(path=>path.endsWith('/openai.yaml')))for(const line of readFileSync(path,'utf8').split('\n'))if(line.includes('display_name:')&&pattern.test(line))failures.push(relative(ROOT,path)+': '+line);
  assert.deepEqual(failures,[]);
 });
-const gallery=()=>files(join(ROOT,'specialists/specsfy-specialist-react-ui-components/assets')).filter(path=>path.endsWith('.tsx'));
+const gallery=()=>files(join(ROOT,'specialists/specsfy-specialist-ui-components/assets')).filter(path=>path.endsWith('.tsx'));
 test('galeria React não contém placeholders em latim',()=>{
  const failures=[];for(const path of gallery())for(const phrase of data.LATIN_PLACEHOLDERS)if(readFileSync(path,'utf8').toLowerCase().includes(phrase))failures.push(relative(ROOT,path)+': '+phrase);assert.deepEqual(failures,[]);
 });

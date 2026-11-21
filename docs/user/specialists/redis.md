@@ -87,14 +87,13 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Performance](performance-engineering.md) mede se o Redis resolve a
-  lentidão observada.
+- [Observabilidade](observability.md) mede se o Redis resolve a lentidão
+  observada e cuida de métricas e alertas de cache.
 - [PostgreSQL](postgres.md) guarda a fonte oficial dos registros.
-- [Observabilidade](observability.md) cuida de métricas e alertas de cache.
 - [Laravel](laravel.md) entra quando o Redis é o driver de cache, fila ou
   sessão.
-- [Docker](docker.md) e [Docker Swarm](docker-swarm.md) empacotam e operam
-  Redis, Sentinel ou Cluster.
+- [Docker](docker.md) empacota e opera Redis, Sentinel ou Cluster, inclusive no
+  cluster de produção.
 
 ## Referência técnica
 

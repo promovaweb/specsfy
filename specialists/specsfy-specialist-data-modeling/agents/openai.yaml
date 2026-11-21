@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Modelagem de Dados"
-  short_description: "Entidades, relações e ciclos de vida persistentes"
-  default_prompt: "Use $specsfy-specialist-data-modeling para analisar e modelar os dados desta entrega."

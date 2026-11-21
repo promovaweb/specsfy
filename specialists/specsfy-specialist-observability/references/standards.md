@@ -1,5 +1,12 @@
 # Padrões e referências de observabilidade
 
+## Índice das referências
+
+| Modo | Arquivo | Conteúdo |
+| --- | --- | --- |
+| signals | [standards.md](standards.md) | este arquivo: pilares, RED/USE, SLI/SLO, sinais por componente, cardinalidade e correlação |
+| performance | [performance.md](performance.md) | metodologia de benchmark, Web Vitals, teste de carga, teoria das filas e profiling |
+
 ## Os três pilares e quando cada um resolve o quê
 
 | Pilar | Responde | Não substitui |

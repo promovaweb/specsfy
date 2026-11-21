@@ -20,6 +20,27 @@ description: Projetar, implementar e revisar soluções Supabase — Postgres, A
   envolver JWT, claims customizadas ou superfícies de autorização fora do
   banco.
 
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
+   `.specsfy/RULES.md` e, por tratar schema, policy e dado persistido,
+   `.specsfy/DATABASE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-supabase`. Sem indicação, confirme pelo
+   "Quando usar" acima se existe `supabase/config.toml` no projeto.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Registre papel, privilégio e policy de cada operação em
+   `### 9. Modelo de dados`, marque a migration na subseção `Migrations` e
+   mantenha `.specsfy/DATABASE.md` refletindo o schema real.
+
 ## Fluxo
 
 1. Identificar SDK usado (`@supabase/supabase-js`, `ssr`, framework

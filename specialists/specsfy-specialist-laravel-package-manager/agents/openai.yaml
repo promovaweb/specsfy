@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Gestor de pacotes Laravel"
-  short_description: "Instala e documenta pacotes Composer Laravel"
-  default_prompt: "Use $specsfy-specialist-laravel-package-manager para ler um pacote GitHub, conferir a instalação Composer e manter docs/packages/."

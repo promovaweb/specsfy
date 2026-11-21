@@ -12,9 +12,9 @@ do componente desde a primeira versão.
 - Você precisa saber se um padrão visual repetido deve virar token, `@apply`
   local ou componente extraído.
 
-A escolha da biblioteca de componentes fica com os especialistas shadcn/ui ou
-Componentes React. Este especialista cuida dos tokens e das classes usados por
-esses componentes.
+A escolha da biblioteca de componentes fica com o especialista Componentes de
+UI. Este especialista cuida dos tokens e das classes usados por esses
+componentes.
 
 ## Como ele trabalha
 
@@ -78,15 +78,13 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [ReUI](reui.md) fornece composições React e Tailwind gratuitas.
-- [shadcn/ui](shadcn-ui.md) constrói componentes sobre estes tokens.
+- [Componentes de UI](ui-components.md) fornece as composições React e Tailwind
+  gratuitas e os componentes construídos sobre estes tokens.
 - [React](react.md) e [Next.js](nextjs.md) fornecem os componentes onde as
   classes são aplicadas.
 - [TypeScript](typescript.md) tipa variantes `cva`.
-- [Componentes React](react-ui-components.md) e [UI Design](ui-design.md)
-  cuidam da composição visual da página.
-- [Acessibilidade Web](web-accessibility.md) aprofunda contraste, zoom e
-  reflow.
+- [Interface](interface.md) cuida da composição visual da página e aprofunda
+  contraste, zoom e reflow.
 
 ## Referência técnica
 

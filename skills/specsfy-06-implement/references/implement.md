@@ -111,7 +111,7 @@ são sequenciais.
 5. Para Laravel, consulte `.specsfy/PACKAGES.md`, `docs/packages/README.md` e
    as fichas existentes antes de adicionar ou trocar uma dependência. Se a
    tarefa trouxer uma URL do GitHub ou mudar o Composer, carregue
-   `$specsfy-specialist-laravel-package-manager` e reutilize pacotes já
+   `$specsfy-specialist-laravel` e reutilize pacotes já
    instalados que atendam ao requisito.
 6. Confira o comando da suíte base com `specsfy gate database` e execute-a
    somente após `SAFE`. Registre falhas preexistentes para não atribuí-las à
@@ -151,9 +151,9 @@ são sequenciais.
 - Antes de programar, confirme os itens escolhidos na tabela da seção 10 e em
   `INTERFACE.md`. Depois, registre em `INTERFACE.md` todos os blocos criados,
   alterados ou reaproveitados.
-- Em projeto React, carregue `$specsfy-specialist-react-ui-components`
-  antes de escrever JSX ou TSX. Se ele não estiver instalado, volte ao
-  `$specsfy-setup` para instalar o especialista detectado e
+- Em projeto React, carregue `$specsfy-specialist-ui-components`
+  antes de escrever JSX ou TSX. Se ele não estiver instalado, siga o
+  [protocolo de carregamento](specialists-implement.md) e
   não implemente a tela até concluir esse preparo.
 - Em um CRUD, confirme um único `PageHeader` reutilizável em todas as telas,
   `DataGrid` em largura total, coluna `ID` sempre visível, link da linha para o
@@ -179,7 +179,7 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
    - Interface: implemente a tela, os menus, o formulário e a interação
      definidos na spec, com os estados descritos. Rota de API, componente
      vazio ou atalho não substituem a tela acordada.
-   - React: siga `$specsfy-specialist-react-ui-components` para localizar,
+   - React: siga `$specsfy-specialist-ui-components` para localizar,
      reaproveitar, adaptar e registrar componentes antes de criar uma nova
      composição.
    - `[MIGRATION]`: crie primeiro o arquivo versionado no caminho planejado,
@@ -345,6 +345,5 @@ responsável quando necessário e deixe a tarefa aberta até a correção.
 
 ## Especialistas sob demanda
 
-Leia [specialists-implement.md](specialists-implement.md) antes de executar
-uma tarefa cuja tecnologia ou consequência de falha não esteja coberta pelo
-contexto local. Instale somente com autorização no projeto consumidor.
+Antes de cada tarefa, siga [specialists-implement.md](specialists-implement.md)
+para carregar as skills aplicáveis da spec e da tarefa nos modos registrados.

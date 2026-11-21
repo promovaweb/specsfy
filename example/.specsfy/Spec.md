@@ -273,13 +273,11 @@ componentes próprios. Antes de criar uma peça, leia `INTERFACE.md`, localize
 algo reutilizável e registre nela cada arquivo criado ou reaproveitado, sua
 origem, seus consumidores e o componente shadcn/ui ou ReUI correspondente.
 
-Orquestre `$specsfy-specialist-interface-experience` para analisar o sistema
-atual e conduzir a descoberta; depois use `$specsfy-specialist-ux-design` para
-jornada e fluxo,
-`$specsfy-specialist-ui-design` para composição e estados e o especialista da
-stack de interface detectada, como `$specsfy-specialist-react` somente em
-projetos React, para materializar o que foi especificado. Esses especialistas
-não substituem a conversa com a pessoa.
+Orquestre `$specsfy-specialist-interface` para analisar o sistema atual,
+conduzir a descoberta, fechar jornada e fluxo e definir composição e estados;
+depois use o especialista da stack de interface detectada, como
+`$specsfy-specialist-react` somente em projetos React, para materializar o que
+foi especificado. Esses especialistas não substituem a conversa com a pessoa.
 O resultado deve ser simples, funcional e completo para a tarefa proposta.
 
 Um backlog não autoriza implementação nem cria uma segunda fonte normativa. A

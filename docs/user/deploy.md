@@ -4,9 +4,9 @@ Deploy não começa no servidor. Ele começa quando a entrega recebe um número
 que acompanha o código, a imagem e o manifesto até o ambiente de destino.
 
 O Specsfy usa um arquivo chamado `SEMVER` na raiz do projeto para manter essa
-identidade. As skills de Docker, Docker Swarm, Ansible e engenharia de entrega
-consultam o mesmo valor. Assim, você consegue responder qual código foi
-compilado, qual imagem chegou ao registry e qual versão está ativa no cluster.
+identidade. As skills de Docker, servidor e entrega consultam o mesmo valor.
+Assim, você consegue responder qual código foi compilado, qual imagem chegou ao
+registry e qual versão está ativa no cluster.
 
 Este capítulo acompanha o percurso completo. A aplicação sai de uma mudança
 validada, vira uma imagem imutável, passa pela preparação do servidor e chega
@@ -31,7 +31,7 @@ mudança e impede que uma correção pareça uma quebra de compatibilidade:
 - aumente `MAJOR` quando a interface pública perde a compatibilidade, como
   `1.5.0` para `2.0.0`.
 
-A skill `$specsfy-specialist-versioning` analisa o alcance da entrega, propõe o
+A skill `$specsfy-specialist-delivery` analisa o alcance da entrega, propõe o
 incremento e explica a consequência. Durante a preparação autorizada, ela
 atualiza o arquivo. Publicar imagem, criar tag, abrir uma GitHub Release ou
 alterar um servidor continua dependendo de autorização explícita.
@@ -39,7 +39,7 @@ alterar um servidor continua dependendo de autorização explícita.
 Se o projeto ainda não tiver o arquivo, informe a versão inicial:
 
 ```bash
-node .agents/skills/specsfy-specialist-versioning/scripts/semver.mjs \
+node .agents/skills/specsfy-specialist-delivery/scripts/semver.mjs \
   init --initial 1.0.0 --project .
 ```
 
@@ -47,10 +47,10 @@ O mesmo utilitário permite consultar a versão antes de qualquer alteração e
 incrementá-la depois que o alcance da entrega estiver confirmado:
 
 ```bash
-node .agents/skills/specsfy-specialist-versioning/scripts/semver.mjs \
+node .agents/skills/specsfy-specialist-delivery/scripts/semver.mjs \
   current --project .
 
-node .agents/skills/specsfy-specialist-versioning/scripts/semver.mjs \
+node .agents/skills/specsfy-specialist-delivery/scripts/semver.mjs \
   bump patch --project .
 ```
 
@@ -78,7 +78,7 @@ baixem os mesmos bytes.
 
 ```mermaid
 flowchart TD
-  P[Solicitação em linguagem natural] --> D[specsfy-specialist-deploy]
+  P[Solicitação em linguagem natural] --> D[specsfy-specialist-delivery]
   D --> I[Lista dos servidores]
   I --> C[Teste das conexões]
   C --> K[Chaves públicas para deploy]
@@ -100,11 +100,11 @@ flowchart TD
 Você não precisa chamar cada especialista manualmente durante um fluxo de
 deploy. O catálogo declara as relações necessárias.
 
-Use `$specsfy-specialist-deploy` como entrada única para um release ou deploy
+Use `$specsfy-specialist-delivery` como entrada única para um release ou deploy
 completo. Ela gera a base operacional com:
 
 ```bash
-node .agents/skills/specsfy-specialist-deploy/scripts/scaffold.mjs \
+node .agents/skills/specsfy-specialist-delivery/scripts/scaffold.mjs \
   --project . \
   --image registry.example/org/aplicacao
 ```
@@ -189,7 +189,7 @@ curtos para outro painel do Herdr.
 
 ### Versionamento prepara a entrega
 
-`$specsfy-specialist-versioning` lê o estado atual, propõe `patch`, `minor` ou
+`$specsfy-specialist-delivery` lê o estado atual, propõe `patch`, `minor` ou
 `major` e atualiza `SEMVER`. Ela compara o valor com a publicação anterior e
 recusa reutilizar um número já publicado.
 
@@ -203,9 +203,9 @@ processos, com comandos próprios.
 A imagem é compilada uma única vez. Staging e produção recebem o mesmo digest,
 sem um novo build por ambiente.
 
-### Ansible prepara os hosts
+### Servidor e Ansible preparam os hosts
 
-`$specsfy-specialist-ansible` confere `SEMVER`, imagem e manifestos no
+`$specsfy-specialist-server` confere `SEMVER`, imagem e manifestos no
 preflight. Depois, prepara o Debian, autentica no registry, instala os arquivos
 versionados e valida a stack antes da escrita no cluster.
 
@@ -215,7 +215,7 @@ segredos ficam no Ansible Vault ou em um cofre externo, fora do repositório.
 
 ### Docker Swarm aplica a versão
 
-`$specsfy-specialist-docker-swarm` recebe uma imagem já publicada. O arquivo de
+`$specsfy-specialist-docker` recebe uma imagem já publicada. O arquivo de
 stack aponta para a tag conferida ou, de preferência, para o digest. O Swarm
 distribui as réplicas, respeita healthchecks e executa `update_config`.
 

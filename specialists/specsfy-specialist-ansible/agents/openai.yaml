@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Ansible"
-  short_description: "Automação Ansible idempotente e segura"
-  default_prompt: "Use $specsfy-specialist-ansible para orientar esta tarefa com padrões e validação especializados."

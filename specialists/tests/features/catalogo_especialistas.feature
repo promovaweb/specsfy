@@ -7,8 +7,8 @@ Feature: Catálogo de especialistas sob demanda
   Scenario: Publicar o catálogo completo da stack Promovaweb
     Given o catálogo versionado de especialistas
     Then todas as skills usam o prefixo specsfy-specialist-
-    And Laravel, Supabase, Postgres, Redis, Docker Swarm, Ansible, Debian Server, React e Nextjs estão disponíveis
-    And Shadcn, UI, UX e acessibilidade estão disponíveis separadamente
+    And Laravel, Supabase, Postgres, Redis, Docker, servidores, React e Nextjs estão no catálogo, com suporte a Swarm, Ansible e Debian
+    And shadcn/ui, design system, UI, UX e acessibilidade têm modos próprios em componentes e interface
 
   Scenario: Publicar especialistas autocontidos
     Given uma skill especialista do catálogo
@@ -31,16 +31,16 @@ Feature: Catálogo de especialistas sob demanda
 
   Scenario: Combinar design de UI com referências React reutilizáveis
     Given o catálogo versionado de especialistas
-    Then a skill de componentes React e a skill de UI orientam uso conjunto
+    Then os especialistas de componentes e interface orientam uso conjunto
     And as famílias de componentes React estão disponíveis como assets copiáveis
 
   Scenario: Gerenciar pacotes Laravel a partir do GitHub
     Given o catálogo versionado de especialistas
-    Then o gestor de pacotes Laravel está disponível
-    And ele define instalação e documentação em docs/packages
+    Then o especialista Laravel oferece um modo para gerenciar pacotes
+    And esse modo define instalação e documentação em docs/packages
     And specify e implement consultam os pacotes já instalados
 
   Scenario: Orquestrar deploy completo em Docker Swarm
     Given o catálogo versionado de especialistas
-    Then a skill de deploy coordena SEMVER, Docker, servidor, Ansible e Swarm
+    Then o especialista de entrega coordena deploy e SEMVER com Docker, Swarm, servidor e Ansible
     And o gerador publica Compose local, stack de produção e playbook completo

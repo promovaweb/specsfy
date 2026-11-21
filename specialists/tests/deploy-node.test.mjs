@@ -5,10 +5,10 @@ import { readFileSync, statSync, chmodSync, mkdirSync, symlinkSync, existsSync, 
 import { join } from 'node:path';
 import { spawnSync, spawn } from 'node:child_process';
 import { ROOT, temporary, put, node } from '../../tests/helpers.mjs';
-import { configure, defaultPasswordPath, externalPath } from '../specsfy-specialist-deploy/assets/vault.mjs';
-import { inventoryHosts, roleFor, connectionStates } from '../specsfy-specialist-deploy/assets/check-hosts.mjs';
+import { configure, defaultPasswordPath, externalPath } from '../specsfy-specialist-delivery/assets/vault.mjs';
+import { inventoryHosts, roleFor, connectionStates } from '../specsfy-specialist-delivery/assets/check-hosts.mjs';
 
-const scaffold = join(ROOT, 'specialists/specsfy-specialist-deploy/scripts/scaffold.mjs');
+const scaffold = join(ROOT, 'specialists/specsfy-specialist-delivery/scripts/scaffold.mjs');
 const successful = result => assert.equal(result.status, 0, result.stdout + result.stderr);
 const includes = (text, terms) => terms.forEach(term => assert.ok(text.includes(term), term));
 const text = (root, path) => readFileSync(join(root, path), 'utf8');

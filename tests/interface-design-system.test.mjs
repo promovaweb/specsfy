@@ -3,9 +3,9 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
-import {ROOT,read,temporary,put,node} from './helpers.mjs';
+import {ROOT,read,readSpecialist,temporary,put,node} from './helpers.mjs';
 const template=read('skills/templates/DESIGNSYSTEM.MD');
-const specialist=read('specialists/specsfy-specialist-design-system/SKILL.md');
+const specialist=readSpecialist('interface');
 const includes=(text,terms)=>{for(const term of terms)assert.ok(text.includes(term),term);};
 test('template declara composições CRUD e cenários canônicos',()=>{
  includes(template,['DataGrid','DetailLists','PageHeader','Breadcrumb','seções','duas colunas','grid-cols-2','mobile','vermelho','abaixo','Cenários canônicos']);
@@ -14,7 +14,7 @@ test('template declara dashboard e padrões de componentes',()=>{
  includes(template,['Dashboard canônico','KPI','shadcn/ui','ReUI','Skeleton','teclado','prefers-reduced-motion']);
 });
 test('DataGrid cobre navegação pela linha inteira e exceções de ações',()=>{
- const asset=read('specialists/specsfy-specialist-react-ui-components/assets/components/data-display/table.tsx');
+ const asset=read('specialists/specsfy-specialist-ui-components/assets/components/data-display/table.tsx');
  includes(template+asset,['linha inteira','teclado','ações internas','TableRowAction','data-row-link']);includes(asset,['data-row-action','absolute inset-0','relative z-10']);
  const row=asset.slice(asset.indexOf('export function TableRow('),asset.indexOf('export function TableRowAction')),cell=asset.slice(asset.indexOf('export function TableCell'));
  includes(row,['href?: string','TableRowContext.Provider','children,','{children}']);includes(cell,['<Link','tabIndex','z-0']);
@@ -34,12 +34,14 @@ test('Laravel reutiliza breadcrumb com a equipe atual',()=>{
  includes(read('example/resources/js/components/breadcrumbs.tsx'),['export function Breadcrumbs']);includes(read('example/resources/js/components/ui/breadcrumb.tsx'),['aria-label="breadcrumb"']);
 });
 test('especialista declara defaults e exceções com alcance',()=>{
- includes(specialist,['DESIGNSYSTEM.MD','não informa direção visual','defaults','exceções','alcance','personalidade','hierarquia']);
+ includes(specialist.split(/\s+/).join(' '),['DESIGNSYSTEM.MD','Aplique os defaults na ausência de direção visual','exceções','alcance','personalidade','hierarquia']);
 });
 test('catálogo, instalador e template de interface estão ligados',()=>{
  includes((read('cli/src/domain/installer.ts')+read('skills/inventory.json')),['"DESIGNSYSTEM.MD"']);includes(read('skills/templates/Interface.md'),['DESIGNSYSTEM.MD','Padrão de dashboard','ReUI']);
- const entries=new Map(JSON.parse(read('specialists/catalog.json')).skills.map(entry=>[entry.name,entry]));assert.ok(entries.has('specsfy-specialist-design-system'));
- for(const name of ['specsfy-specialist-interface-experience','specsfy-specialist-ui-design','specsfy-specialist-ux-design','specsfy-specialist-react-ui-components'])assert.ok(entries.get(name)?.requires?.includes('specsfy-specialist-design-system'),name);
+ const entries=new Map(JSON.parse(read('specialists/catalog.json')).skills.map(entry=>[entry.name,entry]));assert.ok(entries.has('specsfy-specialist-interface'));
+ // Design system, UX, UI, discovery and accessibility are modes of the interface specialist.
+ includes(read('specialists/specsfy-specialist-interface/SKILL.md'),['| discovery |','| system |','| ux |','| ui |','| accessibility |']);
+ assert.ok(entries.get('specsfy-specialist-ui-components')?.requires?.includes('specsfy-specialist-interface'));
 });
 test('setup cria o design system e preserva conteúdo local',t=>{
  const root=temporary(t);for(const name of ['Project.md','Stack.md','Rules.md','Database.md','Interface.md','DESIGNSYSTEM.MD'])put(root,'.specsfy/templates/'+name,read('skills/templates/'+name));

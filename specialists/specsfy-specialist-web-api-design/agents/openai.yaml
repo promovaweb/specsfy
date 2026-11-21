@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - APIs Web"
-  short_description: "Contratos HTTP compatíveis e resilientes"
-  default_prompt: "Use $specsfy-specialist-web-api-design para orientar esta tarefa com padrões e validação especializados."

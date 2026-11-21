@@ -109,6 +109,8 @@ sequenciais.
     Delivery Gate pendente quando a tarefa estiver aberta ou faltar o arquivo,
     o comando de aplicação ou a consulta de estado.
 
+Antes de classificar os achados, execute a conferência da seção Especialistas.
+
 ## Classificar achados
 
 | Nível | Quando usar |
@@ -224,8 +226,9 @@ node .agents/skills/specsfy-04-validate/scripts/verify_repo.mjs . \
   `test:tdd`; quando ele falta, a falha orienta a skill a perguntar ao usuário
   e sugerir Vitest.
 
-## Especialistas sob demanda
+## Especialistas
 
-Leia [references/specialists.md](references/specialists.md) quando um gate
-depender de revisão técnica específica. Recomende a instalação de forma
-explícita; ela nunca acontece como efeito colateral da validação.
+Use [a tabela de sinais](references/specialists.md) em cada validação. Confira
+a instalação de cada especialista listado, carregue os aplicáveis à revisão
+e verifique se a spec aplica suas exigências e cobre todos os sinais
+pertinentes. Registre os achados no gate avaliado, na seção 13.

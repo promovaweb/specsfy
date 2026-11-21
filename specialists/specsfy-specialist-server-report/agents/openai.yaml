@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Server Report"
-  short_description: "Diagnóstico de servidor com Ansible e relatório por host"
-  default_prompt: "Use $specsfy-specialist-server-report para orientar esta tarefa com padrões e validação especializados."

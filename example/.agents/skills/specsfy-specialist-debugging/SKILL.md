@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-debugging
-description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de performance por reprodução, minimização, suposição falsificável e instrumentação até a causa no nível do mecanismo. Use quando o usuário pedir diagnóstico ou relatar algo quebrado, incluindo falhas intermitentes e degradação de performance; não implementar correção quando o pedido for somente diagnóstico; não use para otimizar algo que já funciona corretamente sem sintoma, use `$specsfy-specialist-performance-engineering` para isso.
+description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de performance por reprodução, minimização, suposição falsificável e instrumentação até a causa no nível do mecanismo. Use quando o usuário pedir diagnóstico ou relatar algo quebrado, incluindo falhas intermitentes e degradação de performance; não implementar correção quando o pedido for somente diagnóstico; não use para otimizar algo que já funciona corretamente sem sintoma, use `$specsfy-specialist-observability` para isso.
 ---
 
 # Diagnóstico
@@ -13,10 +13,31 @@ description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de
   degradação de performance com sintoma concreto (timeout, erro, lentidão
   reportada).
 - Não acionar para otimizar um sistema que já se comporta corretamente e sem
-  sintoma: isso é `$specsfy-specialist-performance-engineering`, que parte de
+  sintoma: isso é `$specsfy-specialist-observability`, que parte de
   um SLO e não de uma falha.
 - Combinar com `$specsfy-specialist-observability` quando o ambiente de
   produção não expuser sinal suficiente para instrumentar o boundary certo.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md` para reproduzir no ambiente real, não no suposto.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-debugging`. Sem indicação, confirme pelo
+   "Quando usar" acima se existe sintoma observado antes de investigar.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Registre reprodução, causa no nível do mecanismo e o teste de regressão
+   que falha sem a correção na seção 8 e em `### 12. Plano de testes e
+   rastreabilidade`; sem autorização para corrigir, devolva o diagnóstico
+   como dúvida aberta.
 
 ## Fluxo
 
@@ -86,16 +107,15 @@ description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-server-report` reúne logs, serviços e uso de disco
+- `$specsfy-specialist-server` reúne logs, serviços e uso de disco
   em relatórios por host, com coleta somente leitura via Ansible.
 
-- `$specsfy-specialist-technical-research` confirma comportamento externo,
+- `$specsfy-specialist-research` confirma comportamento externo,
   errata ou compatibilidade quando a causa depende de documentação primária.
 - `$specsfy-specialist-observability` para instrumentar produção quando o
-  sinal disponível não é suficiente para discriminar suposições.
-- `$specsfy-specialist-performance-engineering` quando o sintoma for
-  degradação sem erro funcional: o diagnóstico de causa raiz aqui pode
-  entregar a esta skill a escolha de qual otimização vale o custo.
+  sinal disponível não é suficiente para discriminar suposições e quando o
+  sintoma for degradação sem erro funcional: o diagnóstico de causa raiz aqui
+  pode entregar a esta skill a escolha de qual otimização vale o custo.
 - `$specsfy-specialist-code-review` para revisar a correção e o teste de
   regressão antes do merge.
 

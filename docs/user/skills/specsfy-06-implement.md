@@ -83,7 +83,7 @@ suíte normal do projeto, não em um arquivo `.feature` nem em uma segunda suít
 
 1. A skill confirma Definition Gate e Plan Gate aprovados.
 2. Para uma interface, confere as telas, menus, formulário, ações e estados definidos.
-3. Em React, carrega `$specsfy-specialist-react-ui-components`, localiza os
+3. Em React, carrega `$specsfy-specialist-ui-components`, localiza os
    componentes atuais e define quais serão reaproveitados ou adaptados antes
    de escrever JSX ou TSX.
 4. Verifica a tarefa predecessora e o RED atual.

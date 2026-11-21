@@ -20,10 +20,10 @@ Componentes React e UI Design.
 ## Como ele trabalha
 
 1. Para uma tela ou um formulário, lê o `INTERFACE.md` e a seção de interface
-   da spec, voltando aos especialistas de UX e UI quando esse material falta.
+   da spec, voltando ao especialista Interface quando esse material falta.
 2. Confirma a versão do React, o framework, as convenções e a estratégia de
    testes. Com shadcn/ui, identifica a base de primitives instalada pelo
-   especialista shadcn/ui.
+   especialista Componentes de UI.
 3. Interrompe o trabalho quando o `.specsfy/STACK.md` não declara React e
    encaminha a tarefa ao especialista da stack observada.
 4. Modela os estados visíveis (nominal, carregando, vazio, erro, desatualizado
@@ -81,15 +81,13 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [ReUI](reui.md) fornece composições gratuitas para React e Tailwind.
-- [shadcn/ui](shadcn-ui.md) identifica a base de primitives e os componentes
-  visuais.
+- [Componentes de UI](ui-components.md) fornece as composições gratuitas do
+  ReUI, as primitives shadcn/ui e a biblioteca visual.
+- [Interface](interface.md) define a composição da página e aprofunda a
+  acessibilidade.
 - [Tailwind CSS](tailwind-css.md) estiliza os componentes.
 - [Next.js](nextjs.md) cuida do limite entre servidor e cliente.
-- [Componentes React](react-ui-components.md) e [UI Design](ui-design.md)
-  escolhem a biblioteca visual.
 - [TypeScript](typescript.md) tipa props e estado.
-- [Acessibilidade Web](web-accessibility.md) aprofunda a auditoria.
 
 ## Referência técnica
 

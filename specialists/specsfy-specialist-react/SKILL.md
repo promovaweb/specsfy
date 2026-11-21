@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-react
-description: Projetar, implementar e revisar interfaces React com composição, estado, efeitos, concorrência, acessibilidade, performance e testes. Use quando a tarefa envolve componentes React, hooks, context, forms ou renderização cliente; use também para decidir ownership de estado entre componente, context e biblioteca externa; não use para fronteiras server/client, cache ou routing de framework — aí use a skill Next.js; para a galeria de componentes visuais prontos, use react-ui-components.
+description: Projetar, implementar e revisar interfaces React com composição, estado, efeitos, concorrência, acessibilidade, performance e testes. Use quando a tarefa envolve componentes React, hooks, context, forms ou renderização cliente; use também para decidir ownership de estado entre componente, context e biblioteca externa; não use para fronteiras server/client, cache ou routing de framework — aí use a skill Next.js; para a galeria de componentes visuais prontos, use a skill ui-components.
 ---
 
 # React
@@ -14,24 +14,43 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 - Não acionar para escolha de Server vs Client Component, cache de dados ou
   roteamento de framework; usar `$specsfy-specialist-nextjs` nesse caso.
 - Não acionar para escolher ou adaptar uma biblioteca de componentes visuais
-  prontos; usar `$specsfy-specialist-react-ui-components` com
-  `$specsfy-specialist-ui-design` para isso.
+  prontos; usar `$specsfy-specialist-ui-components` para o catálogo e
+  `$specsfy-specialist-interface` para a composição visual.
 - Combinar com `$specsfy-specialist-typescript` quando o componente expõe
   props públicas ou modela estado com union discriminada e com
-  `$specsfy-specialist-web-accessibility` para auditoria aprofundada de
+  `$specsfy-specialist-interface` para auditoria aprofundada de
   teclado e leitor de tela.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md` e, quando a tarefa renderizar tela, `INTERFACE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-react`. Sem indicação, confirme pelo
+   "Quando usar" acima se o React está instalado antes de assumir a stack.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Confirme telas e estados em `INTERFACE.md` e registre componente,
+   ownership de estado e teste correspondente na seção 8 e na estratégia TDD.
 
 ## Fluxo
 
 1. Para uma tela ou formulário, ler `INTERFACE.md` e a seção de interface da spec antes do
    código. Confirmar telas, fluxo de informação, campos, validações, padrão de
    abertura e estados. Se o material não existir, retornar ao
-   `$specsfy-specialist-ux-design` e `$specsfy-specialist-ui-design`; não
-   trocar uma interface pedida por endpoint ou componente vazio.
+   `$specsfy-specialist-interface`; não trocar uma interface pedida por
+   endpoint ou componente vazio.
 2. Confirmar versão do React, renderer, framework (se houver), convenções do
    projeto e estratégia de testes já em uso. Quando a tela usar shadcn/ui,
    identificar antes a base de primitives instalada, seguindo
-   `$specsfy-specialist-shadcn-ui`; nunca deduzir Radix ou Base UI pela
+   `$specsfy-specialist-ui-components`; nunca deduzir Radix ou Base UI pela
    aparência do componente.
    Se `.specsfy/STACK.md` não declarar React ou o projeto não tiver essa
    dependência, não inicie esta implementação: encaminhe ao especialista da
@@ -112,21 +131,17 @@ description: Projetar, implementar e revisar interfaces React com composição, 
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-reui` para composições React e Tailwind do catálogo
-  gratuito.
-- `$specsfy-specialist-shadcn-ui` identifica a base de primitives e governa os
-  componentes visuais; esta skill governa o comportamento React dentro deles.
+- `$specsfy-specialist-ui-components` mantém o catálogo de composições React e
+  Tailwind, identifica a base de primitives instalada e governa os componentes
+  visuais; esta skill governa o comportamento React dentro deles.
+- `$specsfy-specialist-interface` escolhe e compõe a biblioteca visual pronta e
+  aprofunda a auditoria de acessibilidade além do teclado básico validado aqui.
 - `$specsfy-specialist-tailwind-css` estiliza o componente sem assumir
   ownership de estado, effect ou concorrência.
 - `$specsfy-specialist-nextjs` para fronteira server/client, cache de dados e
   roteamento: este especialista trata React independente de framework.
-- `$specsfy-specialist-react-ui-components` e `$specsfy-specialist-ui-design`
-  para escolher e compor uma biblioteca visual pronta; este especialista
-  entra depois, para ownership de estado, efeitos e testes.
 - `$specsfy-specialist-typescript` para tipar props, estado e union
   discriminada de forma exaustiva.
-- `$specsfy-specialist-web-accessibility` para auditoria aprofundada além do
-  teclado básico validado aqui.
 
 Leia [references/standards.md](references/standards.md) para modelagem de
 estado, effects, composição, listas, context, testes e performance, com

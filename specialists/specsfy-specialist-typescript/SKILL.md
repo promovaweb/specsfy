@@ -14,8 +14,29 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 - Não acionar para a lógica de negócio ou de framework em si (React, hooks,
   rotas): combine com a skill do framework e use esta para o contrato de
   tipos que ele expõe.
-- Combinar com `$specsfy-specialist-web-api-design` quando o tipo modela um
+- Combinar com `$specsfy-specialist-architecture` quando o tipo modela um
   contrato de API consumido por outro serviço.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md` e, quando a mudança publicar ou alterar pacote,
+   `.specsfy/PACKAGES.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-typescript`. Sem indicação, confirme
+   pelo "Quando usar" acima qual contrato de tipos está em jogo.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Registre o contrato público de tipos na seção 8 ou em
+   `### 10. Interfaces e contratos` e cite o typecheck como verificação; ao
+   publicar pacote, alinhe `.specsfy/PACKAGES.md`.
 
 ## Fluxo
 
@@ -103,10 +124,10 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 - `$specsfy-specialist-nextjs` consome estes tipos para params de rota, Server
   Actions/endpoints e content collections; esta skill não decide roteamento ou
   fronteira server/client.
-- `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-shadcn-ui` usam
+- `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-ui-components` usam
   tipos desta skill para variantes (`cva`) e schemas de formulário fortemente
   tipados.
-- `$specsfy-specialist-web-api-design` quando o tipo espelha um contrato de
+- `$specsfy-specialist-architecture` quando o tipo espelha um contrato de
   API consumido por outro serviço: a fonte de verdade do contrato vive lá.
 - `$specsfy-specialist-code-review` para revisão ampla além de tipos, quando
   a mudança também afeta lógica de negócio ou arquitetura.

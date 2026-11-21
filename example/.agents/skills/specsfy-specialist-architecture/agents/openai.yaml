@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Arquitetura"
+  short_description: "Sistema, dependências e APIs HTTP"
+  default_prompt: "Use $specsfy-specialist-architecture para orientar esta tarefa com padrões e validação especializados."

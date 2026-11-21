@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Design System"
-  short_description: "Governança visual e padrões globais de SaaS"
-  default_prompt: "Use $specsfy-specialist-design-system para criar ou atualizar DESIGNSYSTEM.MD antes de projetar uma tela, aplicando os padrões CRUD, estados e exceções por alcance."

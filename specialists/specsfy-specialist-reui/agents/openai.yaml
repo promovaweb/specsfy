@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - ReUI"
-  short_description: "Interfaces React e Tailwind com ReUI gratuito"
-  default_prompt: "Use $specsfy-specialist-reui para preparar e criar esta interface com componentes gratuitos do ReUI."

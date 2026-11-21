@@ -106,7 +106,9 @@ describe("instalador", () => {
     expect(RENAMED_BASE_SKILLS["specsfy-milestone-governor"]).toBe(
       "specsfy-milestones",
     );
-    expect(Object.keys(RENAMED_BASE_SKILLS)).toHaveLength(19);
+    // 19 base skills plus the 25 specialists merged in 0.39.0.
+    expect(RENAMED_BASE_SKILLS["specsfy-specialist-docker-swarm"]).toBe("specsfy-specialist-docker");
+    expect(Object.keys(RENAMED_BASE_SKILLS)).toHaveLength(44);
     expect(BASE_SKILLS).toContain("specsfy-update-spec");
   });
 

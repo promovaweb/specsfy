@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-code-review
-description: Revisar diffs, branches e PRs por contrato, correção, segurança, arquitetura, testes e impacto operacional, relatando achados por severidade com localização e comprovação. Use quando o usuário pedir code review, segunda opinião sobre uma mudança ou avaliação de impacto de um diff; é somente leitura salvo pedido explícito para corrigir; não use para desenhar a arquitetura do zero, use `$specsfy-specialist-software-architecture` para isso.
+description: Revisar diffs, branches e PRs por contrato, correção, segurança, arquitetura, testes e impacto operacional, relatando achados por severidade com localização e comprovação. Use quando o usuário pedir code review, segunda opinião sobre uma mudança ou avaliação de impacto de um diff; é somente leitura salvo pedido explícito para corrigir; não use para desenhar a arquitetura do zero, use `$specsfy-specialist-architecture` para isso.
 ---
 
 # Revisão de código
@@ -12,12 +12,34 @@ description: Revisar diffs, branches e PRs por contrato, correção, segurança,
 - Acionar também quando o pedido for "segunda opinião" sobre uma mudança já
   escrita, mesmo sem PR aberto.
 - Não acionar para desenhar uma escolha estrutural nova do zero: use
-  `$specsfy-specialist-software-architecture`; a revisão avalia o que já foi
+  `$specsfy-specialist-architecture`; a revisão avalia o que já foi
   decidido e escrito, não substitui a escolha.
 - Combinar com `$specsfy-specialist-application-security` quando o diff tocar
   autenticação, autorização, dados sensíveis ou entrada externa e com
-  `$specsfy-specialist-domain-modeling` quando o achado for sobre nomes,
+  `$specsfy-specialist-modeling` quando o achado for sobre nomes,
   invariantes ou fronteiras de domínio confusas.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md` antes de julgar o diff, porque eles definem a stack e
+   as regras que o código deve seguir.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-code-review`. Sem indicação, confirme
+   pelo "Quando usar" acima qual diff ou PR está sob revisão.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Revise o diff contra os cenários BDD da seção 6 e os requisitos da
+   seção 7, e devolva cada achado com `arquivo:linha`, impacto e correção
+   provável como comentário da tarefa ou dúvida aberta, sem corrigir por
+   conta própria.
 
 ## Fluxo
 
@@ -85,15 +107,15 @@ description: Revisar diffs, branches e PRs por contrato, correção, segurança,
 - `$specsfy-specialist-debugging` fornece reprodução e causa raiz quando o
   review encontra um defeito ainda não explicado.
 - `$specsfy-specialist-typescript` aprofunda contratos de tipo e
-  `$specsfy-specialist-web-accessibility` aprofunda semântica, teclado e WCAG
+  `$specsfy-specialist-interface` aprofunda semântica, teclado e WCAG
   quando essas falhas aparecem no diff.
 - `$specsfy-specialist-application-security` quando o diff tocar identidade,
   autorização, dado sensível ou entrada externa: a revisão de segurança
   aprofunda o que esta skill só sinaliza.
-- `$specsfy-specialist-software-architecture` quando o achado for sobre
+- `$specsfy-specialist-architecture` quando o achado for sobre
   acoplamento, boundary ou escolha estrutural que o diff expõe, não apenas
   sobre o diff em si.
-- `$specsfy-specialist-merge-conflict-resolution` quando a revisão precisar
+- `$specsfy-specialist-git` quando a revisão precisar
   ser refeita após uma resolução de conflito, já que a resolução pode mudar
   o comportamento resultante.
 

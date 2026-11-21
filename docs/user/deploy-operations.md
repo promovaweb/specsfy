@@ -1,6 +1,6 @@
 # Servidores, conexões e comandos de deploy
 
-A `specsfy-specialist-deploy` prepara os arquivos do projeto e mantém a lista
+A `specsfy-specialist-delivery` prepara os arquivos do projeto e mantém a lista
 de máquinas que receberão a aplicação. Este capítulo detalha essa camada
 operacional: onde cada arquivo fica, como uma máquina entra no ambiente, o que
 o teste de conexão comprova e quais comandos curtos você pode copiar no Herdr.
@@ -77,7 +77,7 @@ solicitada sem misturar tokens entre os dois caminhos.
 
 ## Como os servidores entram no inventário
 
-Antes da primeira conexão, a orquestradora aciona o especialista de Debian e
+Antes da primeira conexão, a orquestradora aciona o especialista Servidor e
 pergunta quais máquinas fazem parte do ambiente. A conversa trata um servidor
 por rodada. Para cada máquina, você confirma:
 

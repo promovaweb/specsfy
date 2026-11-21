@@ -1,5 +1,12 @@
 # Padrões e referências Laravel
 
+## Índice das referências
+
+| Modo | Arquivo | Conteúdo |
+| --- | --- | --- |
+| app | [standards.md](standards.md) | este arquivo: Eloquent, autorização, filas, migrations, segurança, operação, diagnóstico e fontes oficiais |
+| packages | [packages.md](packages.md) | ficha por pacote, índice `docs/packages/README.md`, ordem das fontes e comandos Composer |
+
 ## Eloquent e N+1
 
 - N+1 aparece quando um loop acessa uma relação lazy-loaded por item da

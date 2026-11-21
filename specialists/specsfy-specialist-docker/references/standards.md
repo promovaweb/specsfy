@@ -1,4 +1,30 @@
-# Padrões e referências Docker
+# Padrões comuns e referências Docker
+
+Reúne os padrões que valem para imagem, Compose e serviços em cluster e serve
+de índice para a referência de cada modo.
+
+## Índice dos modos
+
+| Modo | Abre | Conteúdo |
+| --- | --- | --- |
+| compose | este arquivo | imagem, multi-stage, segredos de build, checklist de produção, Compose, base images, scan e sinais |
+| swarm | [swarm.md](swarm.md) | Raft, redes overlay, placement, rollout, secrets e recuperação |
+
+## Padrões comuns aos dois modos
+
+- Toda referência entregue ao runtime é imutável e rastreável: tag SemVer, tag
+  de commit e digest registrado, com a tag Git publicada só depois da imagem
+  disponível no registry.
+- Segredo nunca entra na imagem nem em `ARG`/`ENV`: em build usa
+  `--mount=type=secret`; em runtime usa Docker Secret, secret manager ou arquivo
+  montado.
+- A imagem testada é a imagem publicada. Não recompilar por ambiente nem buildar
+  no node que executa o container.
+- Healthcheck verifica dependência real, o processo trata `SIGTERM` e o
+  container não roda como root quando o workload permite.
+- Configuração de ambiente fica fora do artefato e o comportamento é validado
+  antes de publicar. A documentação oficial fica nas
+  [fontes](#fontes-oficiais) ao final deste arquivo.
 
 ## Imagem única para processos Laravel
 

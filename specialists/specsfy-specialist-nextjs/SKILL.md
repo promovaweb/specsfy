@@ -17,8 +17,28 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
   para a fronteira server/client.
 - Combinar com `$specsfy-specialist-application-security` quando a rota expõe
   mutation, upload ou dado sensível e com
-  `$specsfy-specialist-performance-engineering` quando o sintoma for Web
+  `$specsfy-specialist-observability` quando o sintoma for Web
   Vitals ou TTFB fora do SLO.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+   `.specsfy/RULES.md` e, quando a rota renderizar tela, `INTERFACE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-nextjs`. Sem indicação, confirme pelo
+   "Quando usar" acima se o projeto depende de `next` antes de propor rota.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Registre router, fronteira server/client, cache e revalidação da rota na
+   subseção `Arquitetura e módulos` da seção 8; mudança de contrato de
+   dados passa por `### 10. Interfaces e contratos`.
 
 ## Fluxo
 
@@ -96,21 +116,21 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-web-accessibility` aprofunda WCAG, foco e tecnologia
+- `$specsfy-specialist-interface` aprofunda WCAG, foco e tecnologia
   assistiva nas rotas e Client Components.
 - `$specsfy-specialist-react` para hooks, estado, efeitos e composição
   independentes do framework: use em conjunto para qualquer Client Component
   não trivial.
-- `$specsfy-specialist-react-ui-components` e `$specsfy-specialist-ui-design`
+- `$specsfy-specialist-ui-components` e `$specsfy-specialist-interface`
   para a biblioteca visual e a composição de página, antes de decidir a
   fronteira server/client aqui.
 - `$specsfy-specialist-application-security` para autorização, upload e dado
   sensível em Server Actions e route handlers.
-- `$specsfy-specialist-performance-engineering` para investigar Web Vitals,
+- `$specsfy-specialist-observability` para investigar Web Vitals,
   TTFB ou regressão de performance com metodologia própria.
 - `$specsfy-specialist-typescript` para tipar params de rota, payload de
   Server Action e retorno de data fetching de forma segura.
-- `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-shadcn-ui` para a
+- `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-ui-components` para a
   camada de estilo e os componentes visuais renderizados dentro de cada
   Server/Client Component.
 

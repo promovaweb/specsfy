@@ -87,16 +87,13 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Modelagem de Dados](data-modeling.md) define entidades, relações e ciclos
-  de vida.
+- [Modelagem](modeling.md) define entidades, relações e ciclos de vida.
 - [Segurança de Aplicações](application-security.md) define o isolamento que
   constraints, roles e RLS aplicam.
 - [Supabase](supabase.md) entra quando o Postgres é gerenciado pelo Supabase.
 - [Laravel](laravel.md) leva as correções para migrations e models.
-- [Performance](performance-engineering.md) entra quando o problema vai além
-  de índice e plano.
-- [Observabilidade](observability.md) cuida de métricas de conexões, locks e
-  replicação.
+- [Observabilidade](observability.md) entra quando o problema vai além de
+  índice e plano e cuida de métricas de conexões, locks e replicação.
 - [Redis](redis.md) guarda cache fora do banco, com o Postgres como fonte
   oficial.
 - [Docker](docker.md) empacota e opera o servidor Postgres em container.

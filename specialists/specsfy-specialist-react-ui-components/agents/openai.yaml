@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Componentes de UI React"
-  short_description: "Biblioteca React e Tailwind para interfaces"
-  default_prompt: "Use $specsfy-specialist-react-ui-components com $specsfy-specialist-ui-design para escolher e adaptar componentes React para esta interface."

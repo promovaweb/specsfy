@@ -89,7 +89,7 @@ exigindo autorização específica.
 5. Em spec Laravel, leia também `.specsfy/PACKAGES.md`,
    `docs/packages/README.md` e as fichas de `docs/packages/`. Se a solicitação
    trouxer uma URL GitHub de pacote ou depender de uma biblioteca Composer,
-   carregue `$specsfy-specialist-laravel-package-manager` para conferir se o
+   carregue `$specsfy-specialist-laravel` para conferir se o
    pacote já existe e registrar a necessidade sem duplicar dependências.
 6. Se faltar informação para identificar problema, ator e resultado, anuncie a
    pendência e carregue `$specsfy-02-backlog` para executar o ciclo. Retome
@@ -121,6 +121,8 @@ exigindo autorização específica.
    separado e sem copiar a referência para o pacote da fatia.
 
 ## Escrever
+
+Aplique a seção Especialistas ao preparar e escrever cada parte da spec.
 
 ### Pacote e proveniência
 
@@ -202,8 +204,8 @@ exigindo autorização específica.
   como fonte da stack e do sistema atual; registre o que será preservado e
   alterado. Sem esse exame, não proponha biblioteca incompatível nem
   reestruture uma tela existente.
-- Carregue `$specsfy-specialist-ux-design`, `$specsfy-specialist-ui-design` e
-  o especialista da stack de interface. Não aceite uma descrição de CRUD que
+- Carregue `$specsfy-specialist-interface` e o especialista da stack de
+  interface. Não aceite uma descrição de CRUD que
   tenha somente API, banco ou serviço.
 - Em Laravel com React, registre explicitamente shadcn/ui e ReUI, todos os
   blocos React previstos, suas responsabilidades, arquivos, componentes de
@@ -284,9 +286,10 @@ Informe:
 - transição automática para `$specsfy-04-validate`, com motivo e resultado
   esperado.
 
-## Especialistas sob demanda
+## Especialistas
 
-Leia [references/specialists.md](references/specialists.md) quando requisitos,
-NFRs, dados ou decisões técnicas exigirem conhecimento especializado. Registre
-o requisito na spec e proponha carregar o especialista. Se ele não estiver
-instalado, peça autorização específica antes de instalar.
+Consulte [a tabela de sinais](references/specialists.md) na preparação e ao
+escrever. Preencha a linha `Especialistas` e a tabela da seção 8 com modos,
+sinais e fases. Carregue a skill antes de escrever a seção que depende dela,
+como `interface` em Views e experiência e `modeling` no modelo de dados,
+seguindo o protocolo de carregamento da referência.

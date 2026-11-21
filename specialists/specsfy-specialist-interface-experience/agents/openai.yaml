@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy - Especialista - Experiência de Interface"
-  short_description: "Descoberta e entrega de interfaces completas"
-  default_prompt: "Use $specsfy-specialist-interface-experience para analisar o sistema atual e orientar esta interface."

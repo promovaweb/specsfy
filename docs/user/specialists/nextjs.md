@@ -84,15 +84,13 @@ npx skills add https://github.com/promovaweb/specsfy \
 ## Especialistas relacionados
 
 - [React](react.md) cuida de hooks, estado e composição.
-- [Componentes React](react-ui-components.md) e [UI Design](ui-design.md)
-  cuidam da biblioteca visual e da composição das páginas.
-- [Acessibilidade Web](web-accessibility.md) revisa WCAG e foco.
+- [Componentes de UI](ui-components.md) e [Interface](interface.md) cuidam da
+  biblioteca visual e da composição das páginas, inclusive da acessibilidade.
 - [Segurança de Aplicações](application-security.md) revisa Server Actions e
   route handlers.
-- [Performance](performance-engineering.md) investiga Web Vitals e TTFB.
+- [Observabilidade](observability.md) investiga Web Vitals e TTFB.
 - [TypeScript](typescript.md) tipa parâmetros de rota e payloads.
-- [Tailwind CSS](tailwind-css.md) e [shadcn/ui](shadcn-ui.md) cuidam do
-  estilo e dos componentes.
+- [Tailwind CSS](tailwind-css.md) cuida do estilo dos componentes.
 
 Astro e Next.js têm modelos de cache diferentes. O capítulo
 [Next.js](../nextjs.md) mostra como o Specsfy se aplica a um projeto Next.js.

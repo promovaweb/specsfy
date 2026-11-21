@@ -43,6 +43,15 @@ runner adotar em projeto Node sem PHP.
    devolve ao `implement` quando o RED da fatia está registrado e a tarefa de
    produção pode começar.
 
+## Especialistas
+
+Antes de cada tarefa, consulte a seção 8 da spec e os itens `Especialista:`
+da tarefa. Carregue os especialistas aplicáveis no modo indicado e siga o
+`Quando usar` de cada um. Use
+[specialists-implement.md](references/specialists-implement.md) em
+`implement` e [specialists-tests.md](references/specialists-tests.md) em
+`tests`, inclusive ao trocar de modo durante a mesma tarefa.
+
 ## Trocar de modo
 
 A troca entre `tests` e `implement` acontece dentro desta skill, sem carregar

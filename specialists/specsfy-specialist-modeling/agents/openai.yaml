@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Modelagem"
+  short_description: "Domínio, dados e contratos persistentes"
+  default_prompt: "Use $specsfy-specialist-modeling para orientar esta tarefa com padrões e validação especializados."

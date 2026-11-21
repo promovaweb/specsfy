@@ -9,7 +9,7 @@ test("#6: instalador oficial preserva conteúdo e registra os três especialista
   const root = await temporaryDirectory();
   const source = join(root, "source");
   const consumer = join(root, "consumer");
-  const names = ["specsfy-specialist-nextjs", "specsfy-specialist-laravel", "specsfy-specialist-delivery-engineering"];
+  const names = ["specsfy-specialist-nextjs", "specsfy-specialist-laravel", "specsfy-specialist-delivery"];
   for (const name of names) {
     await cp(resolve(import.meta.dirname, "../../../specialists", name), join(source, name), { recursive: true });
   }

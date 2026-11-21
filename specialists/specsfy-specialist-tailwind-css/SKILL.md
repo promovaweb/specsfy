@@ -12,11 +12,30 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 - Acionar também para decidir se um padrão visual repetido deve virar token,
   `@apply` local ou componente extraído.
 - Não acionar para a escolha da biblioteca de componentes em si (Radix,
-  shadcn/ui); usar `$specsfy-specialist-shadcn-ui` ou
-  `$specsfy-specialist-react-ui-components` para isso e voltar aqui para o
-  sistema de tokens e classes que os sustenta.
-- Combinar com `$specsfy-specialist-web-accessibility` para contraste, zoom e
+  shadcn/ui); usar `$specsfy-specialist-ui-components` para isso e voltar aqui
+  para o sistema de tokens e classes que a sustenta.
+- Combinar com `$specsfy-specialist-interface` para contraste, zoom e
   `prefers-reduced-motion`.
+
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
+   `.specsfy/RULES.md` e, para tokens e telas em uso, `INTERFACE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-tailwind-css`. Sem indicação, confirme
+   pelo "Quando usar" acima a versão instalada antes de propor sintaxe.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Mapeie cada token ou classe nova para a tela e o estado descritos em
+   `INTERFACE.md` e registre na seção 8 a escolha entre utilitário,
+   `@apply` e componente extraído.
 
 ## Fluxo
 
@@ -85,7 +104,7 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 - Confundir a responsabilidade desta skill com a escolha de biblioteca de
   componentes prontos: Tailwind é a camada de utilitários/tema; a escolha
   de "qual Data Table usar" pertence a
-  `$specsfy-specialist-shadcn-ui`/`$specsfy-specialist-react-ui-components`.
+  `$specsfy-specialist-ui-components`.
 
 ## Validação
 
@@ -105,20 +124,16 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-reui` para composições React e Tailwind do catálogo
-  gratuito.
-- `$specsfy-specialist-shadcn-ui` para o sistema de componentes construído
-  sobre Tailwind + Radix; este especialista cobre o token/utilitário que o
-  sustenta.
+- `$specsfy-specialist-ui-components` mantém as composições React e Tailwind do
+  catálogo gratuito e o sistema de componentes construído sobre Tailwind +
+  Radix; este especialista cobre o token e o utilitário que o sustenta.
+- `$specsfy-specialist-interface` escolhe e compõe a página e aprofunda
+  contraste, zoom, reflow e `prefers-reduced-motion`.
 - `$specsfy-specialist-react` e `$specsfy-specialist-nextjs` fornecem o
   componente/framework onde as classes Tailwind são aplicadas; esta skill não
   decide estrutura de componente nem fronteira server/client.
 - `$specsfy-specialist-typescript` tipa variantes `cva` quando o projeto
   expõe props de estilo fortemente tipadas.
-- `$specsfy-specialist-react-ui-components` e `$specsfy-specialist-ui-design`
-  para a escolha e composição visual da página.
-- `$specsfy-specialist-web-accessibility` para contraste, zoom, reflow e
-  `prefers-reduced-motion` em profundidade.
 
 Leia [references/standards.md](references/standards.md) para camadas de
 tokens, variantes, `@container`, detecção de classes e migração entre

@@ -77,9 +77,9 @@ npx skills add https://github.com/promovaweb/specsfy \
 - [React](react.md) consome os tipos em props, estado e eventos.
 - [Next.js](nextjs.md) usa os tipos em rotas, Server Actions e content
   collections.
-- [Tailwind CSS](tailwind-css.md) e [shadcn/ui](shadcn-ui.md) usam os tipos em
-  variantes `cva` e schemas de formulário.
-- [APIs Web](web-api-design.md) guarda a fonte oficial dos contratos de API.
+- [Tailwind CSS](tailwind-css.md) usa os tipos em variantes `cva` e schemas de
+  formulário.
+- [Arquitetura](architecture.md) guarda a fonte oficial dos contratos de API.
 - [Code Review](code-review.md) faz a revisão ampla da mudança.
 
 ## Referência técnica

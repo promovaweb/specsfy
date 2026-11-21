@@ -119,9 +119,11 @@ remanescentes.
    comportamento, registre razão, decisão e IDs impactados na seção 17. Para
    mudança somente de plano, registre a razão na seção de plano ou risco
    afetada, sem criar uma decisão de produto artificial.
-4. Mantenha a evidência histórica como foi produzida e marque como pendente
+4. Atualize as referências a especialistas quando a mudança trouxer novos
+   sinais, conforme a seção Especialistas.
+5. Mantenha a evidência histórica como foi produzida e marque como pendente
    toda prova posterior que dependa da versão invalidada.
-5. Execute a projeção de impacto:
+6. Execute a projeção de impacto:
 
    ```bash
    specsfy specs change <spec> --base HEAD --mode impact
@@ -139,6 +141,14 @@ remanescentes.
    A classificação usa títulos canônicos, não números de seção, e `unknown`
    reabre do Ato I por segurança. O comando é somente leitura e não substitui a
    comparação semântica com o pedido.
+
+## Especialistas
+
+Quando a mudança trouxer um sinal novo, use
+[a tabela de sinais](references/specialists.md) para atualizar a linha
+`Especialistas` do cabeçalho e a subseção `#### Especialistas` da seção 8.
+Registre o modo, o sinal e as fases. Carregue a skill quando a revisão
+depender dela, seguindo o protocolo da referência.
 
 ## Invalidar somente o necessário
 

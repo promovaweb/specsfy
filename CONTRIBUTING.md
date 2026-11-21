@@ -28,7 +28,7 @@ Requisitos:
 - Bun 1.4.4 para o CLI.
 - PHP 8.4 e Composer para a aplicação em [`example/`](example/).
 - `xmllint`, `pdftohtml` e `unzip` para conferir o ebook.
-- `shellcheck` para os testes dos especialistas de deploy.
+- `shellcheck` para os testes dos especialistas de entrega.
 
 Clone e prepare a raiz:
 
@@ -146,7 +146,7 @@ passa, `1` para falha de contrato e `2` para argumentos ou diretórios inválido
 
 ```bash
 node scripts/validate-skills.mjs skills/specsfy-setup
-node scripts/validate-skills.mjs specialists/specsfy-specialist-deploy
+node scripts/validate-skills.mjs specialists/specsfy-specialist-delivery
 node scripts/validate-skills.mjs skills/specsfy-setup --json
 ```
 

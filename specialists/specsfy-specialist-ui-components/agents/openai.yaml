@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Componentes de UI"
+  short_description: "Componentes React, ReUI gratuito e shadcn/ui"
+  default_prompt: "Use $specsfy-specialist-ui-components para orientar esta tarefa com padrões e validação especializados."

@@ -27,7 +27,7 @@ test('handoff automático mantém autorização de ações sensíveis',()=>{
 });
 test('referências de especialistas distinguem carregamento e instalação',()=>{
  const references=readdirSync(join(ROOT,'skills')).filter(name=>existsSync(join(ROOT,'skills',name,'references'))).flatMap(name=>readdirSync(join(ROOT,'skills',name,'references')).filter(file=>/^specialists(-[a-z]+)?\.md$/.test(file)).map(file=>name+'/references/'+file));
- assert.equal(references.length,6);
+ assert.equal(references.length,7);
  for(const path of references)includes(normalize(source(path)),['transição automática','mesma conversa','instal','npx skills add']);
 });
 test('especialista ausente exige autorização e instalação por npx',()=>{

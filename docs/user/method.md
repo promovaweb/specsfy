@@ -273,6 +273,9 @@ Por exemplo, se a implementação encontrar um teste ausente, o agente volta ao
 planejamento e à preparação TDD, obtém um RED válido e só então retoma o código.
 Ele não aprova um gate apenas para contornar a pendência.
 
+Quando a entrega exige orientação técnica, o cabeçalho e a seção 8 da spec
+registram os [especialistas acionados durante o fluxo](specialists.md#especialistas-dentro-do-fluxo).
+
 ## Mudanças durante o trabalho
 
 Se a necessidade mudar depois que a spec já existe, explique a alteração em

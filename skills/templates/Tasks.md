@@ -7,6 +7,9 @@ Use `[CODE] [MIGRATION]` para toda alteração ligada ao banco. A tarefa aponta
 para um arquivo versionado de migration, aplica-o no banco de teste e consulta
 seu estado antes da conclusão.
 
+Quando aplicável, inclua logo abaixo da linha da tarefa um item sem checkbox
+`Especialista: $specsfy-specialist-<nome> (<modo>)` para cada especialista.
+
 Checklist obrigatório por tarefa, na ordem:
 
 ```markdown
@@ -75,7 +78,8 @@ O comentário é obrigatório para tarefa `[CODE]` concluída quando a spec decl
 #### Fase de interface
 
 - [ ] T006 [CODE] [US-001] Implementar a tela de [responsabilidade] em src/features/recurso/ListaRecurso.tsx — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T005
-  - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10; em React, carregar `$specsfy-specialist-react-ui-components` antes de escrever JSX ou TSX.
+  - Especialista: $specsfy-specialist-ui-components (components)
+  - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10.
   - [ ] **EXECUTE**: Implementar os blocos React, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `INTERFACE.md`.
   - [ ] **VERIFY**: Exercitar menus, navegação, validações, feedback e teclado.
   - [ ] **VISUAL**: Conferir PageHeader reutilizado, DataGrid em largura total, coluna `ID`, link da linha, ações de editar e apagar, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes.

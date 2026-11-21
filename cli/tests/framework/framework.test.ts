@@ -262,6 +262,19 @@ describe("update reconciles the project with the inventory", () => {
     expect(Object.keys(readJsonFile(join(project, "skills-lock.json")).skills)).not.toContain("specsfy-specialist-astro");
   }, 60_000);
 
+  test("a merged specialist (docker-swarm) is replaced by the one that absorbed it", async () => {
+    mkdirSync(join(repository, "specialists", "specsfy-specialist-docker"), { recursive: true });
+    writeFileSync(join(repository, "specialists", "specsfy-specialist-docker", "SKILL.md"), "---\nname: specsfy-specialist-docker\ndescription: Docker\n---\n");
+    git(repository, "add", ".");
+    git(repository, "commit", "-qm", "add docker specialist");
+    await plant("specsfy-specialist-docker-swarm", true);
+    const r = await run(["update", "--project", project]);
+    expect(r.code).toBe(0);
+    expect(r.json!.data.plan.rename).toEqual([{ from: "specsfy-specialist-docker-swarm", to: "specsfy-specialist-docker" }]);
+    expect(existsSync(skill("specsfy-specialist-docker-swarm"))).toBe(false);
+    expect(existsSync(join(skill("specsfy-specialist-docker"), "SKILL.md"))).toBe(true);
+  }, 60_000);
+
   test("the tag of the binary is used, and --latest follows the default branch", async () => {
     git(repository, "tag", `v${manifest.version}`);
     const source = join(repository, "skills", "specsfy-01-inbox", "SKILL.md");

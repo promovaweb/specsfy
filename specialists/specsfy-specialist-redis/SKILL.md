@@ -19,6 +19,27 @@ description: Projetar e operar Redis para cache, filas, sessões, rate limiting,
   de cache em produção e com `$specsfy-specialist-laravel`/outro framework
   quando o driver de cache/fila da aplicação for Redis.
 
+## No Specsfy
+
+1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
+   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
+   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
+   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
+   `.specsfy/RULES.md` e, quando a chave ou a fila derivar de tabela
+   existente, `.specsfy/DATABASE.md`.
+2. Siga o modo indicado na spec ou na tarefa, no formato
+   `Especialista: $specsfy-specialist-redis`. Sem indicação, confirme pelo
+   "Quando usar" acima qual dado fica no Redis e qual é a fonte de verdade.
+3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
+   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
+   dúvida aberta da spec.
+4. Não mude o estado da spec nem marque gate: isso pertence a
+   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
+   `$specsfy-06-implement`.
+5. Registre chave, TTL, eviction e o comportamento com o Redis indisponível
+   como decisão da seção 8, dizendo qual dado volta ao banco quando a chave
+   expira ou o serviço cai.
+
 ## Fluxo
 
 1. Definir a finalidade do dado (cache, sessão, fila, lock, contador),
@@ -105,16 +126,17 @@ description: Projetar e operar Redis para cache, filas, sessões, rate limiting,
 
 ## Skills relacionadas
 
-- `$specsfy-specialist-performance-engineering` mede se Redis reduz o gargalo e
-  verifica custo, cauda de latência e regressão sob carga.
+- `$specsfy-specialist-observability` mede se Redis reduz o gargalo, verifica
+  custo, cauda de latência e regressão sob carga e entrega as métricas e os
+  alertas de cache em produção.
 - `$specsfy-specialist-postgres` quando Redis for cache derivado de dado
   cuja fonte de verdade e integridade são do banco relacional.
 - `$specsfy-specialist-observability` para métricas, alertas e dashboards
   de cache em produção.
 - `$specsfy-specialist-laravel` quando o cliente for o driver de cache/
   fila/sessão do framework.
-- `$specsfy-specialist-docker`/`$specsfy-specialist-docker-swarm` para
-  empacotar e operar Redis/Sentinel/Cluster.
+- `$specsfy-specialist-docker` para empacotar e operar Redis/Sentinel/Cluster,
+  inclusive no cluster de produção.
 
 Leia [references/standards.md](references/standards.md) para estruturas de
 dado, persistência, cluster, segurança e padrões de cache.

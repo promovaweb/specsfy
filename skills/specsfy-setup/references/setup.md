@@ -111,7 +111,7 @@ em paralelo; as etapas dependem do resultado da anterior.
     obrigatória no setup`).
 12. **Gitflow, somente sob pedido.** Quando a pessoa pedir ou indicar
     explicitamente Gitflow (ver [references/gitflow.md](gitflow.md)),
-    anuncie o handoff, carregue `$specsfy-specialist-gitflow` e registre a
+    anuncie o handoff, carregue `$specsfy-specialist-git` e registre a
     convenção de branches confirmada em `RULES.md` pelo modo `rules`.
     Uma branch `develop` ou outro sinal implícito no repositório não é pedido.
 13. **Fechar.** Execute o monitor novamente e resolva todo `PENDING`.
@@ -158,7 +158,7 @@ regulares em `specs/` e atualiza o bloco gerenciado de `.specsfy/SPECKIT.md`.
 - O setup inicial não cria `SEMVER`, `Dockerfile`, `compose.yaml`,
   `stack.yaml`, `deploy` nem `ansible/`. Versionamento e deploy começam só
   quando a pessoa pedir; nesse caso, anuncie o handoff para
-  `$specsfy-specialist-deploy`.
+  `$specsfy-specialist-delivery`.
 - Toda execução é idempotente: com as mesmas entradas, não altera arquivos já
   reconciliados, não duplica blocos e não inicia outra etapa.
 
@@ -349,31 +349,27 @@ Depois de ler a stack:
 
 | Stack observada | Especialista instalado |
 | --- | --- |
-| Laravel | `specsfy-specialist-laravel` |
-| Pacote Laravel recebido por URL GitHub | `specsfy-specialist-laravel-package-manager` |
+| Laravel, inclusive pacote recebido por URL GitHub | `specsfy-specialist-laravel` |
 | Supabase | `specsfy-specialist-supabase` |
 | PostgreSQL | `specsfy-specialist-postgres` |
 | Redis | `specsfy-specialist-redis` |
-| React | `specsfy-specialist-react` e `specsfy-specialist-react-ui-components` |
+| React | `specsfy-specialist-react` e `specsfy-specialist-ui-components` |
 | Next.js | `specsfy-specialist-nextjs` |
 | TypeScript | `specsfy-specialist-typescript` |
 | Tailwind CSS | `specsfy-specialist-tailwind-css` |
-| shadcn/ui | `specsfy-specialist-shadcn-ui` |
-| Docker ou Compose | `specsfy-specialist-docker` |
-| Release ou deploy completo | `specsfy-specialist-deploy` |
-| Docker Swarm | `specsfy-specialist-docker-swarm` |
-| Ansible | `specsfy-specialist-ansible` |
-| OpenAPI | `specsfy-specialist-web-api-design` |
+| shadcn/ui ou ReUI | `specsfy-specialist-ui-components` |
+| Docker, Compose ou Swarm | `specsfy-specialist-docker` |
+| Release ou deploy completo | `specsfy-specialist-delivery` |
+| Ansible | `specsfy-specialist-server` |
+| OpenAPI | `specsfy-specialist-architecture` |
 | OpenTelemetry ou Prometheus | `specsfy-specialist-observability` |
-| CI/CD | `specsfy-specialist-delivery-engineering` |
+| CI/CD | `specsfy-specialist-delivery` |
 
 | Núcleo instalado em todo setup | Finalidade |
 | --- | --- |
-| `specsfy-specialist-data-modeling` | dados, entidades, relações e ciclo de vida |
-| `specsfy-specialist-domain-modeling` | linguagem, regras e limites de domínio |
-| `specsfy-specialist-software-architecture` | módulos, dependências e estrutura técnica |
-| `specsfy-specialist-reui` | base ReUI para interfaces e CRUDs React/Tailwind |
-| `specsfy-specialist-shadcn-ui` | primitives, tema e registry para o ReUI |
+| `specsfy-specialist-modeling` | dados, entidades, linguagem, regras e limites de domínio |
+| `specsfy-specialist-architecture` | módulos, dependências e estrutura técnica |
+| `specsfy-specialist-ui-components` | base ReUI, primitives, tema e registry para React/Tailwind |
 
 Em todo projeto Laravel com React, shadcn/ui e ReUI são instalados juntos:
 shadcn/ui prepara a base e ReUI cria CRUDs e interfaces sobre ela. Depois da

@@ -1,9 +1,10 @@
 # Docker
 
 O especialista Docker orienta o agente na criação e na revisão de imagens,
-arquivos Compose de desenvolvimento e políticas de tag. Ele produz imagens
-pequenas, reproduzíveis e executadas sem root, com healthcheck e tratamento de
-sinais definidos.
+arquivos Compose e políticas de tag, além da orquestração de serviços em vários
+nós com Docker Swarm. Ele trabalha em dois modos: **Compose**, para imagens e
+ambiente local ou de CI, e **Swarm**, para stacks, redes, secrets, rollout e
+recuperação do cluster.
 
 ## Quando usar
 
@@ -12,33 +13,39 @@ sinais definidos.
 - Um container não faz build, não sobe ou não responde ao healthcheck.
 - Você quer reduzir o tamanho da imagem, remover um segredo vazado em uma
   camada ou corrigir um processo que ignora o `SIGTERM`.
+- O projeto usa `docker swarm init`, `docker swarm join`, `docker stack deploy`
+  ou arquivos de stack com a chave `deploy:`.
+- Você precisa definir managers e workers, planejar rollout e rollback ou
+  recuperar o quorum do cluster.
 
-Orquestração com vários nós, réplicas, secrets de cluster e redes overlay
-ficam com o especialista Docker Swarm. Aqui, o Compose atende ao ambiente
-local e à CI.
+Desenvolvimento local e build de imagem ficam no modo Compose. Orquestração com
+vários nós, réplicas, secrets de cluster e redes overlay ficam no modo Swarm.
+Várias chaves do Compose, como `profiles`, `build` e `depends_on` com condição,
+não têm efeito em `docker stack deploy`.
 
 ## Como ele trabalha
 
 1. Identifica a arquitetura alvo, o runtime base, o build context e o contrato
    de execução com variáveis, portas e volumes.
-2. Inspeciona o `Dockerfile`, o `.dockerignore`, o Compose e a política de
-   imagens do projeto.
-3. Em um release ou deploy, atua sob o especialista Deploy, usa a versão do
-   especialista Versionamento e recusa a referência quando o
+2. Inspeciona o `Dockerfile`, o `.dockerignore`, o Compose, o arquivo de stack e
+   a política de imagens do projeto.
+3. Em um release ou deploy, atua sob o especialista [Delivery](delivery.md),
+   que prepara a versão e coordena a entrega, e recusa a referência quando o
    `verify-docker-tag` aponta diferença.
-4. Separa build e runtime em estágios. A imagem final fica sem compilador,
-   cache de pacotes ou código que não roda em produção.
-5. Fixa lockfiles e a versão da imagem base, de preferência por digest.
-6. Executa o processo como usuário sem root, com privilégios limitados e sem
-   segredos na imagem.
-7. Define healthcheck, sinais, volumes, redes e configuração externa.
-8. Constrói a imagem, procura vulnerabilidades e testa a execução com o mesmo
-   usuário e as mesmas variáveis de produção.
+4. Define a topologia quando o alvo é cluster: managers, workers, zonas,
+   labels, quorum e dependências externas como registry, storage e DNS.
+5. Entrega o resultado do modo com as validações correspondentes.
 
-## Padrões aplicados
+## Compose
 
-- Extensões nativas compilam em estágios independentes, para que uma mudança
-  em Redis não invalide toda a toolchain.
+O modo Compose cobre a imagem e o ambiente local. A imagem final fica pequena,
+reproduzível e executada sem root.
+
+- Build e runtime ficam em estágios separados, com `multi-stage build`. A
+  imagem final não leva compilador, cache de pacotes nem código que não roda em
+  produção.
+- Extensões nativas compilam em estágios independentes, para que uma mudança em
+  Redis não invalide toda a toolchain.
 - Serviços que compartilham o código usam uma imagem única, com modos de
   processo no entrypoint, como HTTP, scheduler, filas e WebSocket.
 - As tags de SemVer e de commit são imutáveis e o digest usado no deploy fica
@@ -54,8 +61,33 @@ local e à CI.
   sinais.
 - Volumes nomeados ou bind mounts guardam o conteúdo persistente fora da
   camada gravável.
-- Quando a carga permite, o container roda com limites de recurso e
-  filesystem somente leitura.
+- Quando a carga permite, o container roda com limites de recurso e filesystem
+  somente leitura.
+
+## Swarm
+
+O modo Swarm cobre o cluster de produção. A mesma imagem imutável roda em todos
+os nodes e o rollout preserva a capacidade durante a troca.
+
+- O Cloudflare Tunnel é a entrada pública padrão no deploy coordenado pelo
+  especialista Delivery, na mesma rede overlay da aplicação, com o serviço
+  Laravel sem porta pública.
+- O token do túnel chega por Docker Secret montado como arquivo, com
+  `cloudflared --token-file`.
+- Dependências, aplicação e ingress ficam em stacks separadas, publicadas em
+  ordem de dependência.
+- As migrations rodam em uma única réplica, enquanto os outros serviços sobem
+  com migrations desativadas.
+- HTTP, filas, scheduler e WebSocket usam a mesma imagem, com comandos e
+  healthchecks próprios.
+- As redes overlay são externas e criptografadas, com os serviços de banco
+  restritos à rede interna.
+- O cluster tem 1, 3 ou 5 managers, em número ímpar, para que o quorum não
+  dependa de um único manager em produção.
+- As imagens são referenciadas por digest e ficam acessíveis a todos os nodes.
+- Secrets e configs são versionados por nome, como `app_secret_v2`.
+- Limites e reservas de recursos são declarados de forma explícita.
+- O placement usa labels administradas (`node.labels.*`) em vez de hostnames.
 
 ## Erros que ele evita
 
@@ -64,6 +96,11 @@ local e à CI.
 - Imagem que atende tráfego rodando como root.
 - Compilador e headers na camada final.
 - Healthcheck que só confere a porta e ignora o banco ou a fila.
+- Rolling update sem `start-first` em serviço com poucas réplicas, o que deixa
+  o serviço sem capacidade por alguns instantes.
+- Volume local em serviço que pode ser reagendado para outro node.
+- Secret alterado no lugar, já que o Swarm trata secrets como imutáveis.
+- Usar o `docker-compose.yml` de desenvolvimento como stack de produção.
 
 ## Como conferir o resultado
 
@@ -73,6 +110,14 @@ local e à CI.
   foram exercitados, inclusive com uma dependência indisponível.
 - O SBOM ou o scanner do projeto rodou sobre a imagem final, com tamanho e
   camadas inspecionados.
+- `docker stack config --compose-file <arquivo>` detecta erros de interpolação
+  e de schema.
+- `docker service ps`, `docker service logs` e as réplicas são acompanhados
+  durante todo o rollout.
+- A falha de um worker foi simulada. Com autorização e backup validado, a
+  perda de um manager também foi testada.
+- O rollback da aplicação foi provado, com migrations compatíveis enquanto as
+  duas versões convivem.
 
 ## Como instalar
 
@@ -83,25 +128,21 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 ## Especialistas relacionados
 
-- [Deploy](deploy.md) coordena a entrega completa.
-- [Versionamento](versioning.md) confere a identidade da imagem.
-- [Docker Swarm](docker-swarm.md) cuida do cluster de produção.
+- [Delivery](delivery.md) coordena release, versão, Vault e deploy completo.
+- [Server](server.md) cuida do host Debian e do serviço do Docker Engine.
 - [Segurança de Aplicações](application-security.md) revisa a cadeia de
   suprimentos.
-- [Observabilidade](observability.md) cuida de logs, métricas e traces do
-  processo.
-- [PostgreSQL](postgres.md) e [Redis](redis.md) cuidam do que roda dentro dos
-  serviços de banco e cache.
-- [Supabase](supabase.md) entra quando a CLI do Supabase orquestra o ambiente
-  local.
+- [Observabilidade](observability.md) cuida dos sinais que mantêm, pausam ou
+  revertem o rollout.
+- [PostgreSQL](postgres.md), [Redis](redis.md) e [Supabase](supabase.md) cuidam
+  do que roda dentro dos serviços de banco, cache e ambiente local.
 - [Laravel](laravel.md) define workers, scheduler e variáveis da aplicação.
-- [Debian Server](debian-server.md) cuida do host que executa a imagem.
-- [Relatório de servidor](server-report.md) coleta logs e uso de disco por
-  host.
 
 ## Referência técnica
 
 As instruções completas que o agente segue estão no
 [SKILL.md do especialista](../../../specialists/specsfy-specialist-docker/SKILL.md),
-com build, Compose, segurança e cadeia de suprimentos no arquivo de referência
-da mesma pasta.
+com os padrões comuns, o build e o Compose em
+[standards.md](../../../specialists/specsfy-specialist-docker/references/standards.md)
+e a topologia, o rollout e a recuperação em
+[swarm.md](../../../specialists/specsfy-specialist-docker/references/swarm.md).

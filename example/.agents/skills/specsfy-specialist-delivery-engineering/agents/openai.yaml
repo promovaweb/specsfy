@@ -1,4 +1,0 @@
-interface:
-  display_name: "Specsfy · Entrega"
-  short_description: "CI/CD, artefatos, rollout e rollback"
-  default_prompt: "Use $specsfy-specialist-delivery-engineering para orientar esta tarefa com padrões e validação especializados."

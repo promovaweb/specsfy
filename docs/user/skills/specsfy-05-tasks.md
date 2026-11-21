@@ -70,7 +70,7 @@ por si só.
 Essas tarefas ficam em uma `Fase de interface` dedicada. Há uma tarefa por tela
 registrada, usando os componentes e a stack já existentes no projeto.
 Em projetos React, o `PREP` de cada tarefa carrega
-`$specsfy-specialist-react-ui-components` antes da escrita de JSX ou TSX. Se o
+`$specsfy-specialist-ui-components` antes da escrita de JSX ou TSX. Se o
 especialista estiver ausente, o fluxo retorna ao setup para instalar a skill
 detectada antes de liberar o código da tela.
 

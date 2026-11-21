@@ -238,6 +238,6 @@ rastreabilidade.
 
 ## Especialistas sob demanda
 
-Leia [specialists-tests.md](specialists-tests.md) quando o runner, a
-fronteira ou o oráculo de teste for específico de uma tecnologia. O
-especialista complementa; este modo preserva RED/GREEN e rastreabilidade.
+Antes de preparar ou executar testes de cada tarefa, siga
+[specialists-tests.md](specialists-tests.md) para carregar as skills
+aplicáveis da spec e da tarefa nos modos registrados.

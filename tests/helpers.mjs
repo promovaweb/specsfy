@@ -1,5 +1,5 @@
 /** Utilitários de testes: projetos descartáveis e processos com saída capturada. */
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +7,16 @@ import { spawnSync } from 'node:child_process';
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const read = path => readFileSync(join(ROOT, path), 'utf8');
+
+/** Lê o corpo e as referências autorais de um especialista. */
+export function readSpecialist(name) {
+  const directory = `specialists/specsfy-specialist-${name}`;
+  const references = join(directory, 'references');
+  const files = readdirSync(join(ROOT, references), { withFileTypes: true })
+    .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
+    .map(entry => join(references, entry.name));
+  return [join(directory, 'SKILL.md'), ...files].map(read).join('\n');
+}
 
 /** Remove somente a árvore temporária criada pelo próprio teste. */
 export function temporary(t) {

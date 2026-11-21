@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Servidores"
+  short_description: "Debian, Ansible idempotente e relatório por host"
+  default_prompt: "Use $specsfy-specialist-server para orientar esta tarefa com padrões e validação especializados."

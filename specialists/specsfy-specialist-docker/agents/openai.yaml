@@ -1,4 +1,4 @@
 interface:
   display_name: "Specsfy - Especialista - Docker"
-  short_description: "Imagens e Compose seguros e reproduzíveis"
+  short_description: "Imagens e Compose, Swarm com stacks e rollout"
   default_prompt: "Use $specsfy-specialist-docker para orientar esta tarefa com padrões e validação especializados."

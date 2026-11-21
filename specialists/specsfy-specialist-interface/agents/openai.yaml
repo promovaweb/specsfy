@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Interface"
+  short_description: "Discovery, design system, UX, UI e acessibilidade"
+  default_prompt: "Use $specsfy-specialist-interface para orientar esta tarefa com padrões e validação especializados."
