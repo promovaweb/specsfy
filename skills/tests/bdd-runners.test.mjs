@@ -89,3 +89,39 @@ test('regressão pós-código não satisfaz a cobertura TDD de um aceite', t => 
   assert.equal(result.counts.regression, 1);
   assert.ok(result.errors.includes('AC-003 não possui tarefa TDD informada pelo BDD da spec.'));
 });
+
+test('plano aprovado sem tag TDD preserva os três predecessores e separa regressão', t => {
+  const root = temporary(t);
+  const approved = header.replace('Defined', 'Planned').replace('Pending', 'Passed');
+  const predecessors = ['AC-001', 'AC-002', 'AC-003']
+    .map((ac, index) => (task(`T00${index + 1}`, ac).replace(' [TDD]', '') + checklist).replaceAll('[ ]', '[x]'))
+    .join('');
+  const code = '- [ ] T004 [CODE] Implementar em app/Example.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003\n' + checklist;
+  const legacy = validate(root, approved + predecessors + code);
+  assert.deepEqual(legacy.errors, []);
+  assert.equal(legacy.counts.tdd, 3);
+  assert.equal(legacy.counts.regression, 0);
+
+  const regression = task('T005', 'AC-003').replace(' [TDD]', '').replace('Depends: none', 'Depends: T004') + checklist;
+  const result = validate(root, approved + predecessors + code + regression);
+  assert.deepEqual(result.errors, []);
+  assert.equal(result.counts.tdd, 3);
+  assert.equal(result.counts.regression, 1);
+
+  const mixed = validate(root, approved + predecessors.replace('[TEST]', '[TEST] [TDD]') + code + regression);
+  assert.equal(mixed.counts.tdd, 1);
+  assert.ok(mixed.errors.includes('AC-002 não possui tarefa TDD informada pelo BDD da spec.'));
+});
+
+test('mínimos TDD contam apenas ACs principais distintos na feature, nos requisitos e no código', t => {
+  const predecessors = ['AC-001, AC-002, AC-003', 'AC-001', 'AC-001']
+    .map((ac, index) => task(`T00${index + 1}`, ac) + checklist).join('');
+  const code = '- [ ] T004 [CODE] Implementar em app/Example.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003\n' + checklist;
+  const result = validate(temporary(t), header + predecessors + code);
+  for (const id of ['A feature', 'US-001', 'FR-001', 'NFR-001', 'T004']) {
+    assert.ok(result.errors.some(error => error.startsWith(`${id} possui 1 predecessor(es) TDD`)), result.errors.join('\n'));
+  }
+  for (const id of ['AC-002', 'AC-003']) {
+    assert.ok(result.errors.includes(`${id} não possui tarefa TDD informada pelo BDD da spec.`));
+  }
+});

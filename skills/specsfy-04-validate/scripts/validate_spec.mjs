@@ -3,6 +3,7 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import { parseGateTasks } from "../../specsfy-05-tasks/scripts/parse_tasks.mjs";
 
 const args = process.argv.slice(2);
 const input = args.find((arg) => !arg.startsWith("--"));
@@ -29,15 +30,35 @@ function minimumBddErrors(body) {
   return errors;
 }
 
+const formOrAction = /\b(?:formulários?|aç(?:ão|ões)|bot(?:ão|ões))\b/i;
 const crudOperations = new Map([
-  ["listar", { control: /DataGrid/i, label: "DataGrid com coluna ID", task: /\blist(?:ar|agem|a)\b/i }],
-  ["consultar", { control: /\b(?:detalhe|consulta)\b/i, label: "acesso ao detalhe", task: /\b(?:consult(?:ar|a)|detalh(?:ar|e))\b/i }],
-  ["criar", { control: /(?:formulários?|ação|ações|botão|botões)[^.]*(?:\bcriar\b|criação|cadastro)/i, label: "formulário ou ação de criação", task: /(?:\bcriar\b|criação|\bcadastr(?:ar|o)\b)/i }],
-  ["editar", { control: /(?:formulários?|ação|ações|botão|botões)[^.]*(?:\beditar\b|edição)/i, label: "controle de edição", task: /(?:\beditar\b|edição)/i }],
-  ["apagar", { control: /(?:ação|ações|botão|botões)[^.]*(?:\bapagar\b|\bexcluir\b|exclusão)/i, label: "ação de exclusão", task: /(?:\bapagar\b|\bexcluir\b|exclusão)/i }],
+  ["listar", { control: /\bDataGrid\b/i, label: "DataGrid com coluna ID" }],
+  ["consultar", {
+    control: /\b(?:link|tela|DetailLists|aç(?:ão|ões)|bot(?:ão|ões))\b/i,
+    action: /\b(?:consultar|consulta|detalhar|detalhe|DetailLists)\b/i,
+    label: "acesso ao detalhe",
+  }],
+  ["criar", {
+    control: formOrAction, action: /\b(?:criar|criação|cadastrar|cadastro|incluir|inclusão)\b/i,
+    label: "formulário ou ação de criação",
+  }],
+  ["editar", {
+    control: formOrAction, action: /\b(?:editar|edição|alterar|alteração|atualizar|atualização)\b/i,
+    label: "controle de edição",
+  }],
+  ["apagar", {
+    control: /\b(?:aç(?:ão|ões)|bot(?:ão|ões))\b/i,
+    action: /\b(?:apagar|excluir|exclusão|remover|remoção)\b/i,
+    label: "ação de exclusão",
+  }],
 ]);
 
-function crudErrors(content, body) {
+function affirmativeControl(text, pattern, extra = /.*/) {
+  return text.split(/[.!?;\r\n]+/).some((clause) =>
+    pattern.test(clause) && extra.test(clause) && !/\b(?:n(?:ã|a)o|nem|sem)\b/i.test(clause));
+}
+
+function crudErrors(content, body, status) {
   const prefix = "Interface para pessoas: Contrato CRUD";
   const declaration = /^[ \t]*(?:[-*][ \t]+)?(?:\*\*Operações\*\*:|\*\*Operações:\*\*|Operações:)[ \t]*(.*)$/gim;
   const declarations = [...content.matchAll(declaration)];
@@ -55,18 +76,47 @@ function crudErrors(content, body) {
 
   const controls = content.replace(declaration, "");
   const errors = [];
-  if (!/PageHeader/i.test(controls)) errors.push(`${prefix} precisa declarar PageHeader.`);
-  const taskSection = body.match(/^###[ \t]+(?:14\.[ \t]+)?Tarefas[ \t]*$([\s\S]*?)(?=^###[ \t]+|(?![\s\S]))/im)?.[1] ?? "";
-  const tasks = [...taskSection.matchAll(/^[ \t]*- \[[ xX]\] T\d{3,}[ \t]+((?:\[[^\]\r\n]+\][ \t]+)+)([^\r\n]+)/gm)];
-  const codeTasks = tasks.filter(task => task[1].includes("[CODE]"))
-    .map(task => task[2].split(/[—-] Refs:/)[0]);
+  if (!affirmativeControl(controls, /\bPageHeader\b/i)) errors.push(`${prefix} precisa declarar PageHeader.`);
+
+  const entries = new Map();
+  for (const line of controls.split(/\r?\n/)) {
+    const entry = line.match(/^[ \t]*[-*][ \t]+(?:\*\*([\p{L}]+)\*\*|([\p{L}]+)):[ \t]*(.*)$/iu);
+    if (!entry) continue;
+    const operation = (entry[1] ?? entry[2]).toLowerCase();
+    if (!crudOperations.has(operation) && !/\bTarefa:/i.test(entry[3])) continue;
+    if (!operations.includes(operation)) {
+      errors.push(`${prefix}: entrada para operação não declarada: ${operation}.`);
+      continue;
+    }
+    if (!entries.has(operation)) entries.set(operation, []);
+    entries.get(operation).push(entry[3]);
+  }
+
+  const tasks = parseGateTasks(body);
+  const resolveTasks = tasks.length > 0 || !["Draft", "Defined"].includes(status) ||
+    field(body, "Plan Gate") === "Passed";
   for (const operation of operations) {
-    const { control, label, task } = crudOperations.get(operation);
-    if (!control.test(controls) || (operation === "listar" && !/\bID\b/.test(controls))) {
+    const { control, action, label } = crudOperations.get(operation);
+    const rows = entries.get(operation) ?? [];
+    if (rows.length !== 1) {
+      errors.push(`${prefix}: ${operation} exige uma entrada com ${label} e a tarefa da seção 14.`);
+      continue;
+    }
+    const entry = rows[0].match(/^(.+?)[ \t]+[—-][ \t]+Tarefa:[ \t]+(`?)(T\d{3,})\2\.?[ \t]*$/i);
+    const description = entry?.[1] ?? rows[0];
+    const id = entry?.[3].toUpperCase();
+    if (!affirmativeControl(description, control, operation === "listar" ? /\bID\b/ : undefined)) {
       errors.push(`${prefix}: ${operation} exige ${label}.`);
     }
-    if (tasks.length && !codeTasks.some(description => task.test(description))) {
-      errors.push(`${prefix}: ${operation} exige uma tarefa [CODE] na seção 14.`);
+    if (!id) {
+      errors.push(`${prefix}: ${operation} exige a referência Tarefa: TNNN.`);
+    } else if (resolveTasks) {
+      const matching = tasks.filter(task => task.id === id);
+      const task = matching[0];
+      if (matching.length !== 1 || !task.tags.has("CODE") || !task.refs.size ||
+          !affirmativeControl(task.description, control, action)) {
+        errors.push(`${prefix}: ${operation} exige que ${id} seja uma tarefa [CODE] da seção 14 que implemente ${label}.`);
+      }
     }
   }
   return errors;
@@ -114,7 +164,7 @@ function interfaceErrors(body, status) {
     if (title === "Revisão visual durante o desenvolvimento" && visualChecks.some(([pattern]) => !pattern.test(content))) {
       errors.push("Interface para pessoas: Revisão visual durante o desenvolvimento precisa conferir bordas, espaçamentos, margens, padding e tipografia.");
     }
-    if (title === "Contrato CRUD") errors.push(...crudErrors(content, body));
+    if (title === "Contrato CRUD") errors.push(...crudErrors(content, body, status));
   }
   return errors;
 }

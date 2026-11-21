@@ -7,8 +7,11 @@
  * unknown spec is NOT_FOUND, an invalid transition or effort is USAGE.
  */
 
-import { mkdir, readFile, readdir, rename } from "node:fs/promises";
-import { basename, dirname, join, relative, sep } from "node:path";
+import { Database } from "bun:sqlite";
+import { createHash } from "node:crypto";
+import { mkdir, readFile, readdir, realpath, rename } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { AppError, error } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
 import { scanBacklogs } from "./backlog.ts";
@@ -121,85 +124,141 @@ export async function transitionSpec(
 ): Promise<SpecTransition> {
   assertFolder(to);
   const root = resolvePath(project);
-  const spec = await resolveSpec(root, identifier);
-  if (!NEXT_FOLDERS[spec.folder].includes(to)) {
-    throw error.usage(
-      `Invalid transition: ${spec.folder} to ${to}. Accepted from ${spec.folder}: ${NEXT_FOLDERS[spec.folder].join(", ")}.`,
-      { from: spec.folder, to, accepted: [...NEXT_FOLDERS[spec.folder]] },
-    );
-  }
-  const status = STATUS_BY_FOLDER[to];
-  const content = await readFile(spec.path, "utf8");
-  const updated = updateResearchPaths(
-    updateStatus(content, status),
-    spec.folder,
-    to,
-    identifier,
-  );
-  const targetDirectory = join(root, "specs", to, identifier);
-  const targetPath = join(targetDirectory, "spec.md");
-  if (spec.directory !== targetDirectory) {
-    if (await pathExists(targetDirectory)) {
-      throw new AppError(ExitCode.GENERIC_ERROR, `The destination already holds a spec: ${targetDirectory}`);
+  return withSpecLock(root, identifier, async () => {
+    const spec = await resolveSpec(root, identifier);
+    if (!NEXT_FOLDERS[spec.folder].includes(to)) {
+      throw error.usage(
+        `Invalid transition: ${spec.folder} to ${to}. Accepted from ${spec.folder}: ${NEXT_FOLDERS[spec.folder].join(", ")}.`,
+        { from: spec.folder, to, accepted: [...NEXT_FOLDERS[spec.folder]] },
+      );
     }
-    await mkdir(dirname(targetDirectory), { recursive: true });
-    const sourceLink = relative(root, spec.path).split(sep).join("/");
-    const targetLink = relative(root, targetPath).split(sep).join("/");
-    const backlinks = (await scanBacklogs(root)).map(({ path, content }) => ({
-      path, content, updated: updatePromotedPath(content, sourceLink, targetLink),
-    })).filter((item) => item.updated !== item.content);
-    await rename(spec.directory, targetDirectory);
-    const written: typeof backlinks = [];
-    let statusWritten = false;
-    try {
-      await writeTextAtomic(targetPath, updated);
-      statusWritten = true;
-      for (const item of backlinks) {
-        if (await readFile(item.path, "utf8") !== item.content) {
-          throw new Error(`Backlog item changed during the transition: ${item.path}`);
-        }
-        await writeTextAtomic(item.path, item.updated);
-        written.push(item);
-      }
-    } catch (cause) {
-      const rollback = await Promise.allSettled([
-        ...written.map(async (item) => {
-          const current = await readFile(item.path, "utf8");
-          const restored = current === item.updated ? item.content : updatePromotedPath(current, targetLink, sourceLink);
-          if (current !== restored) await writeTextAtomic(item.path, restored);
-        }),
-        (async () => {
-          if (statusWritten) await writeTextAtomic(targetPath, content);
-          await rename(targetDirectory, spec.directory);
-        })(),
-      ]);
-      const failures = rollback.flatMap((result) => result.status === "rejected" ? [result.reason] : []);
-      if (failures.length) throw new AggregateError([cause, ...failures], `Transition rollback failed: ${[cause, ...failures].join("; ")}`);
-      throw cause;
-    }
-  } else {
-    await writeTextAtomic(spec.path, updated);
-  }
-  return {
-    identifier,
-    from: spec.folder,
-    to,
-    folder: to,
-    path: targetPath,
-    directory: targetDirectory,
-    status,
-  };
+    return relocateSpec(root, spec, to);
+  });
 }
 
-function updatePromotedPath(content: string, source: string, target: string): string {
+async function withSpecLock<T>(root: string, identifier: string, operation: () => Promise<T>): Promise<T> {
+  const key = createHash("sha256").update(await realpath(root)).update("\0").update(identifier).digest("hex");
+  const directory = join(tmpdir(), `specsfy-transitions-${process.getuid?.() ?? "user"}`);
+  await mkdir(directory, { recursive: true, mode: 0o700 });
+  const lock = new Database(join(directory, key));
+  // SQLite coordinates processes on the same file and releases the lock on process exit.
+  // The empty lock file stays in place so waiting processes always use the same inode.
+  try {
+    lock.exec("PRAGMA busy_timeout = 0");
+    const deadline = Date.now() + 30_000;
+    for (;;) {
+      try {
+        lock.exec("BEGIN IMMEDIATE");
+        break;
+      } catch (cause) {
+        if ((cause as { code?: string }).code !== "SQLITE_BUSY") throw cause;
+        if (Date.now() >= deadline) throw new Error(`Timed out waiting for the transition of ${identifier}`, { cause });
+        await Bun.sleep(25);
+      }
+    }
+    return await operation();
+  } finally {
+    lock.close();
+  }
+}
+
+function specLocations(root: string, identifier: string): string[] {
+  return [...SPEC_FOLDERS, "specs", ""].map((folder) => join(root, "specs", folder, identifier, "spec.md"));
+}
+
+function portableRelative(from: string, to: string): string {
+  return relative(from, to).split(sep).join("/");
+}
+
+async function relocateSpec(root: string, spec: ResolvedSpec, to: SpecFolder): Promise<SpecTransition> {
+  const { identifier } = spec;
+  const status = STATUS_BY_FOLDER[to];
+  const targetDirectory = join(root, "specs", to, identifier);
+  const targetPath = join(targetDirectory, "spec.md");
+  const moves = spec.directory !== targetDirectory;
+  if (moves && await pathExists(targetDirectory)) {
+    throw new AppError(ExitCode.GENERIC_ERROR, `The destination already holds a spec: ${targetDirectory}`);
+  }
+  const content = await readFile(spec.path, "utf8");
+  const locations = specLocations(root, identifier);
+  const targetResearch = portableRelative(root, targetDirectory) + "/research/";
+  const updated = locations.reduce((markdown, path) =>
+    markdown.replaceAll(portableRelative(root, dirname(path)) + "/research/", targetResearch),
+    updateStatus(content, status),
+  );
+  const sources = new Set(locations.filter((path) => path !== targetPath));
+  const backlinks = (await scanBacklogs(root)).map(({ path, content }) => ({
+    path, content, updated: updatePromotedPath(root, path, content, sources, targetPath),
+  })).filter((item) => item.updated !== item.content);
+
+  if (moves) {
+    await mkdir(dirname(targetDirectory), { recursive: true });
+    await rename(spec.directory, targetDirectory);
+  }
+  const written: typeof backlinks = [];
+  let statusWritten = false;
+  try {
+    if (updated !== content) {
+      await writeTextAtomic(targetPath, updated);
+      statusWritten = true;
+    }
+    for (const item of backlinks) {
+      if (await readFile(item.path, "utf8") !== item.content) {
+        throw new Error(`Backlog item changed during the transition: ${item.path}`);
+      }
+      await writeTextAtomic(item.path, item.updated);
+      written.push(item);
+    }
+  } catch (cause) {
+    const rollback = await Promise.allSettled([
+      ...written.map(async (item) => {
+        const current = await readFile(item.path, "utf8");
+        const restored = current === item.updated ? item.content :
+          updatePromotedPath(root, item.path, current, new Set([targetPath]), spec.path);
+        if (current !== restored) await writeTextAtomic(item.path, restored);
+      }),
+      (async () => {
+        if (statusWritten) await writeTextAtomic(targetPath, content);
+        if (moves) await rename(targetDirectory, spec.directory);
+      })(),
+    ]);
+    const failures = rollback.flatMap((result) => result.status === "rejected" ? [result.reason] : []);
+    if (failures.length) throw new AggregateError([cause, ...failures], `Transition rollback failed: ${[cause, ...failures].join("; ")}`);
+    throw cause;
+  }
+
+  return { identifier, from: spec.folder, to, folder: to, path: targetPath, directory: targetDirectory, status };
+}
+
+function updatePromotedPath(root: string, backlogPath: string, content: string, sources: ReadonlySet<string>, target: string): string {
   return content.replace(
-    /^( {0,3}\|[ \t]*Spec promovida[ \t]*\|[ \t]*)([^|\r\n]*?)([ \t]*\|[ \t]*)(?=\r?$)/gim,
+    /^( {0,3}\|[ \t]*Spec promovida[ \t]*\|[ \t]*)((?:\\\||[^|\r\n])*?)([ \t]*\|[ \t]*)(?=\r?$)/gim,
     (row, before: string, cell: string, after: string) => {
-      const quoted = /^(`+)(.*?)\1$/.exec(cell);
-      const path = (quoted?.[2] ?? cell).replaceAll("\\", "/").replace(/^\.\//, "");
-      if (path !== source) return row;
+      const quoted = /^(`+)(.*?)\1$/u.exec(cell);
+      const link = quoted ? undefined : /^(\[(?:\\.|[^\]\\])*\]\([ \t]*)(<[^>]+>|[^\s)]+)(.*\))$/u.exec(cell);
+      const value = quoted?.[2] ?? link?.[2] ?? cell;
+      const bracketed = link && value.startsWith("<");
+      const destination = bracketed ? value.slice(1, -1) : value;
+      const suffix = link ? /[?#].*$/u.exec(destination)?.[0] ?? "" : "";
+      let path = destination.slice(0, destination.length - suffix.length).replaceAll("\\", "/");
+      if (link) {
+        if (/^(?:[a-z][a-z\d+.-]*:|\/)/iu.test(path)) return row;
+        try {
+          path = decodeURI(path);
+        } catch {
+          return row;
+        }
+      }
+      const base = link ? dirname(backlogPath) : root;
+      if (!sources.has(resolve(base, path))) return row;
+      const next = isAbsolute(path) ? target.split(sep).join("/") : portableRelative(base, target);
+      const formatted = path.startsWith("./") ? "./" + next : next;
+      if (link) {
+        const href = encodeURI(formatted) + suffix;
+        return before + link[1] + (bracketed ? `<${href}>` : href) + link[3] + after;
+      }
       const ticks = quoted?.[1] ?? "";
-      return before + ticks + target + ticks + after;
+      return before + ticks + formatted + ticks + after;
     },
   );
 }
@@ -211,31 +270,17 @@ export async function migrateSpecs(project: string): Promise<SpecTransition[]> {
   const results: SpecTransition[] = [];
   for (const path of legacy) {
     const identifier = basename(dirname(path));
-    const content = await readFile(path, "utf8");
-    const status = readStatus(content);
-    const to = status ? FOLDER_BY_STATUS.get(status.toLowerCase()) : undefined;
-    if (!to) {
-      throw error.usage(`Invalid Status to migrate ${identifier}: ${status ?? "missing"}`);
-    }
-    const sourceDirectory = dirname(path);
-    const targetDirectory = join(root, "specs", to, identifier);
-    if (await pathExists(targetDirectory)) {
-      throw new AppError(ExitCode.GENERIC_ERROR, `The destination already holds a spec: ${targetDirectory}`);
-    }
-    const legacyPrefix = relative(root, sourceDirectory).split(sep).join("/");
-    const migrated = content.replaceAll(`${legacyPrefix}/research/`, `specs/${to}/${identifier}/research/`);
-    await writeTextAtomic(path, updateStatus(migrated, STATUS_BY_FOLDER[to]));
-    await mkdir(dirname(targetDirectory), { recursive: true });
-    await rename(sourceDirectory, targetDirectory);
-    results.push({
-      identifier,
-      from: folderFromLegacyStatus(status!),
-      to,
-      folder: to,
-      path: join(targetDirectory, "spec.md"),
-      directory: targetDirectory,
-      status: STATUS_BY_FOLDER[to],
+    const result = await withSpecLock(root, identifier, async () => {
+      const spec = await resolveSpec(root, identifier);
+      if (spec.path !== path) return undefined;
+      const status = readStatus(await readFile(path, "utf8"));
+      const to = status ? FOLDER_BY_STATUS.get(status.toLowerCase()) : undefined;
+      if (!to) {
+        throw error.usage(`Invalid Status to migrate ${identifier}: ${status ?? "missing"}`);
+      }
+      return relocateSpec(root, spec, to);
     });
+    if (result) results.push(result);
   }
   return results;
 }
@@ -340,19 +385,6 @@ function updateStatus(content: string, status: string): string {
   return `${content}${newline}\n| Status | ${status} |\n`;
 }
 
-/** Keeps the research index aligned with the physical folder after a transition. */
-function updateResearchPaths(
-  content: string,
-  from: SpecFolder,
-  to: SpecFolder,
-  identifier: string,
-): string {
-  if (from === to) return content;
-  const source = `specs/${from}/${identifier}/research/`;
-  const target = `specs/${to}/${identifier}/research/`;
-  return content.replaceAll(source, target);
-}
-
 function readTableField(content: string, field: string): string | undefined {
   const expression = TABLE_FIELD(field);
   for (const line of content.split(/\r?\n/u)) {
@@ -387,10 +419,6 @@ function appendEffortHistory(
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
-}
-
-function folderFromLegacyStatus(status: string): SpecFolder {
-  return FOLDER_BY_STATUS.get(status.toLowerCase()) ?? "draft";
 }
 
 function assertFolder(folder: string): asserts folder is SpecFolder {

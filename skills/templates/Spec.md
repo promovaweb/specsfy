@@ -281,16 +281,17 @@ tests/
 
 #### Contrato CRUD
 
-- **Operações**: [Escolha entre listar, consultar, criar, editar, apagar.
-  Escreva os itens incluídos em uma única linha, por exemplo: `listar, criar`.]
+- **Operações**: [Escolha entre listar, consultar, criar, editar, apagar e
+  escreva os itens incluídos em uma única linha.]
 - [As telas incluídas compartilham o mesmo `PageHeader` reutilizável.]
-- [Se listar, use `DataGrid` em largura total com a coluna `ID` visível.
-  Se consultar, descreva o acesso ao detalhe. Quando houver também listagem,
-  a linha abre o detalhe por mouse e teclado.]
-- [Se criar ou editar, descreva o formulário ou a ação que o abre. Se apagar,
-  descreva a ação independente, a permissão e a confirmação.]
-- [Na seção 14, nomeie as operações incluídas nas tarefas de interface. Uma
-  tarefa pode cobrir mais de uma operação.]
+- [Escreva uma entrada em uma única linha para cada operação declarada,
+  com o controle de interface e o ID da tarefa `[CODE]` da seção 14.
+  Reserve os IDs na definição e confirme-os no planejamento.]
+- [Formato da entrada: `- **listar**: DataGrid com a coluna ID visível — Tarefa: T005`.]
+- [Para consulta, descreva o acesso ao detalhe. Quando também houver
+  listagem, a linha abre o detalhe por mouse e teclado.]
+- [Para criar ou editar, descreva o formulário ou a ação que o abre. Para
+  apagar, descreva a ação independente, a permissão e a confirmação.]
 - [Registre em `INTERFACE.md` os componentes reaproveitados e os novos, com
   seus consumidores, estados e regra de extensão.]
 
@@ -432,7 +433,7 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
 
 #### Fase de interface
 
-- [ ] T005 [CODE] [US-001] Implementar a tela de [responsabilidade] em src/features/recurso/ListaRecurso.tsx — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
+- [ ] T005 [CODE] [US-001] Implementar a tela de [responsabilidade] com DataGrid e coluna ID em src/features/recurso/ListaRecurso.tsx — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002, T003
   - Especialista: $specsfy-specialist-ui-components (components)
   - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10.
   - [ ] **EXECUTE**: Implementar os blocos React, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `INTERFACE.md`.

@@ -197,7 +197,7 @@ export interface VerifyData {
 
 interface VerifyWarning {
   severity: "warning";
-  kind: "unknown-specialist" | "specialist-not-installed" | "undeclared-specialist" | "catalog-unavailable";
+  kind: "unknown-specialist" | "specialist-not-installed" | "undeclared-specialist" | "catalog-unavailable" | "stack-detection-failed";
   message: string;
   spec?: string;
   name?: string;
@@ -277,11 +277,13 @@ async function verifySpecialists(project: string, checks: VerifyCheck[]): Promis
   const warnings: VerifyWarning[] = catalogWarning
     ? [{ severity: "warning", kind: "catalog-unavailable", message: catalogWarning }]
     : [];
+  const { stack, stackWarning } = await projectStackSpecialists(project, catalog);
+  if (stackWarning) warnings.push({ severity: "warning", kind: "stack-detection-failed", message: stackWarning });
   for (const path of paths) {
     const markdown = await readFile(path, "utf8").catch(() => undefined);
     if (markdown === undefined) continue;
     const spec = relative(project, path).split(sep).join("/");
-    const { names, suggestions } = analyzeSpecSpecialists(markdown, catalog, installed, await projectStackSpecialists(project, catalog));
+    const { names, suggestions } = analyzeSpecSpecialists(markdown, catalog, installed, stack);
     for (const name of names) {
       if (!known.has(name)) warnings.push({ severity: "warning", kind: "unknown-specialist", spec, name, message: `${name} is not in the specialist catalog.` });
       if (!installed.has(name)) warnings.push({ severity: "warning", kind: "specialist-not-installed", spec, name, message: `${name} is declared but not installed in .agents/skills.` });

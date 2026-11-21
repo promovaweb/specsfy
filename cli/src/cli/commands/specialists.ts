@@ -41,13 +41,19 @@ export const specialistSuggestDef: NativeProjectCommandDef = {
       loadSpecCatalog(),
       installedSpecSpecialists(project),
     ]);
-    const { suggestions } = analyzeSpecSpecialists(markdown, catalog, installed, await projectStackSpecialists(project, catalog));
+    const { stack, stackWarning } = await projectStackSpecialists(project, catalog);
+    const { suggestions } = analyzeSpecSpecialists(markdown, catalog, installed, stack);
+    const warnings = [catalogWarning, stackWarning].filter(Boolean);
     return {
-      data: { project, spec: relative(project, path).split(sep).join("/"), suggestions, ...(catalogWarning ? { catalogWarning } : {}) },
+      data: {
+        project, spec: relative(project, path).split(sep).join("/"), suggestions,
+        ...(catalogWarning ? { catalogWarning } : {}),
+        ...(stackWarning ? { stackWarning } : {}),
+      },
       text: () => suggestions.map(({ name, mode, signal, declared, installed }) =>
         `${name}${mode ? ` (${mode})` : ""} <- ${signal} [${declared ? "declared" : "not declared"}, ${installed ? "installed" : "not installed"}]`
       ).join("\n") || "No specialist suggestions.",
-      warning: catalogWarning ? `WARNING: ${catalogWarning}` : undefined,
+      warning: warnings.map((message) => `WARNING: ${message}`).join("\n") || undefined,
     };
   },
 };

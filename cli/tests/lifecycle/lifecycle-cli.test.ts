@@ -1,8 +1,9 @@
 /** Spec lifecycle commands (spec 0003) end to end, on copies of `example/`. */
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { ExitCode } from "../../src/app/exit-codes.ts";
 import { copyExample, removeCopy, runCli } from "./helpers.ts";
 
 let home: string;
@@ -44,6 +45,27 @@ describe("specs transition", () => {
   test("an unknown spec exits with 6", async () => {
     const r = await cli("specs", "transition", "9999", "defined");
     expect(r.code).toBe(6);
+  });
+
+  test("concurrent CLI processes resolve the same spec under the transition lock", async () => {
+    const workspace = mkdtempSync(join(tmpdir(), "specsfy-transition-processes-"));
+    try {
+      const spec = "0042-login-social";
+      const source = join(workspace, "specs", "planned", spec);
+      const backlog = join(workspace, "specs", "backlog");
+      mkdirSync(source, { recursive: true });
+      mkdirSync(backlog);
+      writeFileSync(join(source, "spec.md"), "# Login social\n\n| Status | Planned |\n");
+      const item = join(backlog, "item.md");
+      writeFileSync(item, `| Spec promovida | [Spec](../planned/${spec}/spec.md) |\n`);
+      const args = ["specs", "transition", "42", "in-progress", "--project", workspace, "--json"];
+      const results = await Promise.all([runCli(args, home), runCli(args, home)]);
+      expect(results.map(({ code }) => code)).toEqual([ExitCode.SUCCESS, ExitCode.SUCCESS]);
+      expect(results.map(({ json }) => json.data.from).sort()).toEqual(["in-progress", "planned"]);
+      expect(readFileSync(item, "utf8")).toBe(`| Spec promovida | [Spec](../in-progress/${spec}/spec.md) |\n`);
+    } finally {
+      rmSync(workspace, { recursive: true, force: true });
+    }
   });
 });
 

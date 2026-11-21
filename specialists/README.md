@@ -21,6 +21,13 @@ specsfy skills detect
 specsfy skills install specsfy-specialist-laravel
 ```
 
+O [catálogo](catalog.json) usa `detect` para reconhecer arquivos,
+dependências e imagens de serviços em Compose (`detect.images`). Nas sugestões
+de uma spec, `stack: true` indica que o especialista precisa de confirmação
+no projeto. A detecção ou um nome listado em `aliases` e declarado em
+`.specsfy/STACK.md`, como PostgreSQL ou Next.js, confirma a tecnologia.
+Interface e Arquitetura podem ser sugeridas a partir dos sinais da spec.
+
 Para implementar interfaces React a partir de referências copiáveis, use
 `specsfy-specialist-ui-components`. Ele reúne o catálogo de blocos React, as
 composições gratuitas do ReUI e as primitives shadcn/ui; o CLI resolve e instala

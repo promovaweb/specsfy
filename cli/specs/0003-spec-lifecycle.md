@@ -18,9 +18,10 @@ o estado dentro das regras.
 <tarefa> [item] [--undo]` e `tasks delivery <spec>`. Transição fora da
 ordem do método sai com 2 e explica os destinos aceitos.
 
-Quando a pasta muda de estado, a transição também atualiza a célula
-`Spec promovida` nos itens do backlog vinculados ao caminho anterior.
-O caminho novo é relativo ao projeto e a formatação da célula é preservada.
+Transições e migrações também atualizam a célula `Spec promovida` no backlog.
+Um caminho de texto é relativo ao projeto. Um link Markdown é relativo ao
+arquivo que o contém. A formatação da célula permanece e a próxima
+transição corrige vínculos antigos, mesmo quando a spec fica no mesmo estado.
 
 ## Design
 
@@ -29,8 +30,9 @@ O caminho novo é relativo ao projeto e a formatação da célula é preservada.
 `next_task`, `render_delivery`) e commands nativos sobre
 `src/domain/lifecycle.ts` e `inbox.ts`. `tasks check` é nativo e altera o
 checkbox da tarefa ou do item no `spec.md`.
-O domínio lê os itens com `scanBacklogs` e escreve apenas as células cujo
-valor aponta para o `spec.md` movido.
+O domínio lê os itens com `scanBacklogs` e compara os caminhos resolvidos
+com as localizações conhecidas do mesmo identificador. Um lock por spec
+serializa a resolução do estado, a movimentação e a escrita dos vínculos.
 
 ## Surface
 
@@ -57,6 +59,10 @@ valor aponta para o `spec.md` movido.
 - [x] `tasks check` marca e desmarca o checkbox
 - [x] `inbox capture --json` cria o arquivo em `specs/inbox/`
 - [x] Transição atualiza vínculos com e sem crases e preserva as outras specs.
+- [x] Transições concorrentes serializam as escritas e uma nova transição
+  corrige vínculos antigos após uma interrupção.
+- [x] Transição e migração reescrevem vínculos Markdown e caminhos
+  equivalentes preservando o formato da célula.
 
 ## Notes
 

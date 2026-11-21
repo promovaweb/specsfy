@@ -1,5 +1,5 @@
 /** Contratos do ciclo de vida físico das especificações. */
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { describe, expect, test } from "bun:test";
 import {
@@ -86,6 +86,12 @@ describe("ciclo de vida das specs", () => {
       ["quoted.md", `# Backlog\r\n| Spec promovida |  \`${previous}\`  |\r\n| Referência | ${previous} |\r\n`,
         `# Backlog\r\n| Spec promovida |  \`${target}\`  |\r\n| Referência | ${previous} |\r\n`],
       ["plain.md", `| Spec promovida | ${previous} |\n`, `| Spec promovida | ${target} |\n`],
+      ["normalized.md", `| Spec promovida | \`specs/planned/../planned/${identifier}/spec.md\` |\n`,
+        `| Spec promovida | \`${target}\` |\n`],
+      ["link.md", `| Spec promovida | [Ver \\| spec](<../planned/${identifier}/spec.md#login> "Login") |\n`,
+        `| Spec promovida | [Ver \\| spec](<../in-progress/${identifier}/spec.md#login> "Login") |\n`],
+      ["external.md", `| Spec promovida | [Ver spec](https://example.com/${previous}) |\n`,
+        `| Spec promovida | [Ver spec](https://example.com/${previous}) |\n`],
       ["other.md", "| Spec promovida | specs/planned/0043-other/spec.md |\n", "| Spec promovida | specs/planned/0043-other/spec.md |\n"],
     ] as const;
     for (const [file, before] of fixtures) await writeFile(join(backlog, file), before);
@@ -93,6 +99,46 @@ describe("ciclo de vida das specs", () => {
     await transitionSpec(project, identifier, "in-progress");
 
     for (const [file, , after] of fixtures) expect(await readFile(join(backlog, file), "utf8")).toBe(after);
+  });
+
+  test("serializes state resolution through backlog writes for concurrent transitions", async () => {
+    const project = await temporaryDirectory();
+    const identifier = "0042-login-social";
+    await createSpec(project, `specs/planned/${identifier}`, "Planned");
+    const backlog = join(project, "specs/backlog");
+    await mkdir(backlog);
+    const item = join(backlog, "item.md");
+    await writeFile(item, `| Spec promovida | specs/planned/${identifier}/spec.md |\n`);
+
+    const results = await Promise.all([
+      transitionSpec(project, identifier, "in-progress"),
+      transitionSpec(project, identifier, "in-progress"),
+    ]);
+
+    expect(results.map(({ from }) => from).sort()).toEqual(["in-progress", "planned"]);
+    expect(await readFile(item, "utf8")).toBe(`| Spec promovida | specs/in-progress/${identifier}/spec.md |\n`);
+  });
+
+  test("repairs backlinks after an interrupted move when retrying the same state", async () => {
+    const project = await temporaryDirectory();
+    const identifier = "0042-login-social";
+    const previous = `specs/planned/${identifier}`;
+    const current = `specs/in-progress/${identifier}`;
+    await createSpec(project, previous, "Planned");
+    const backlog = join(project, "specs/backlog");
+    await mkdir(backlog);
+    await mkdir(join(project, "specs/in-progress"));
+    await rename(join(project, previous), join(project, current));
+    const item = join(backlog, "item.md");
+    await writeFile(item, `| Spec promovida | [Ver](../planned/${identifier}/spec.md) |\n`);
+    const legacy = join(backlog, "legacy.md");
+    await writeFile(legacy, `| Spec promovida | specs/specs/${identifier}/spec.md |\n`);
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      await transitionSpec(project, identifier, "in-progress");
+      expect(await readFile(item, "utf8")).toBe(`| Spec promovida | [Ver](../in-progress/${identifier}/spec.md) |\n`);
+      expect(await readFile(legacy, "utf8")).toBe(`| Spec promovida | ${current}/spec.md |\n`);
+    }
   });
 
   test("destino ocupado preserva o conteúdo da spec de origem", async () => {
@@ -177,6 +223,10 @@ describe("ciclo de vida das specs", () => {
   test("migra a estrutura anterior para a pasta correspondente ao Status", async () => {
     const project = await temporaryDirectory();
     await createSpec(project, "specs/specs/0042-login-social", "Complete");
+    const backlog = join(project, "specs/backlog");
+    await mkdir(backlog);
+    const item = join(backlog, "item.md");
+    await writeFile(item, "| Spec promovida | [Spec](../specs/0042-login-social/spec.md) |\n");
 
     await expect(migrateSpecs(project)).resolves.toEqual([
       expect.objectContaining({
@@ -187,6 +237,7 @@ describe("ciclo de vida das specs", () => {
     await expect(
       readFile(join(project, "specs/completed/0042-login-social/spec.md"), "utf8"),
     ).resolves.toContain("| Status | Complete |");
+    expect(await readFile(item, "utf8")).toBe("| Spec promovida | [Spec](../completed/0042-login-social/spec.md) |\n");
   });
 
   for (const legacy of ["specs/specs", "specs"]) {

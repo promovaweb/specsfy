@@ -42,12 +42,24 @@ test('referências entre especialistas possuem correspondência recíproca', () 
   }
 });
 test('metadados permitem descobrir e instalar as dependências', () => {
+  const stackNames = [
+    'cloudflare', 'docker', 'laravel', 'mcp', 'mongodb', 'mysql', 'n8n', 'nextjs',
+    'postgres', 'react', 'redis', 'supabase', 'tailwind-css', 'testing', 'typescript',
+    'ui-components',
+  ].map(name => `specsfy-specialist-${name}`);
+  assert.deepEqual(catalog.filter(item => item.stack).map(item => item.name).sort(), stackNames);
   for (const item of catalog) {
     for (const field of ['description', 'category', 'tags']) assert.ok(item[field]?.length, `${item.name}: ${field}`);
-    for (const field of ['files', 'dependencies']) assert.ok(Array.isArray(item.detect[field]));
+    for (const markers of [item.detect.files, item.detect.dependencies, item.detect.images ?? []]) {
+      assert.ok(Array.isArray(markers) && markers.every(marker => typeof marker === 'string' && marker.trim()), item.name);
+    }
+    assert.ok(item.stack === undefined || typeof item.stack === 'boolean', item.name);
+    if (item.stack) assert.ok(item.aliases?.length, item.name);
+    assert.ok(Array.isArray(item.aliases ?? []) && (item.aliases ?? []).every(alias => typeof alias === 'string' && alias.trim()), item.name);
     assert.ok(Array.isArray(item.requires ?? []));
     for (const name of item.requires ?? []) assert.ok(expected.includes(name), name);
   }
+  assert.ok(entry('specsfy-specialist-n8n').detect.images.includes('n8nio/n8n'));
 });
 /** Text of a specialist folder (SKILL.md, references and scripts; assets are code samples). */
 const folder = name => files(join(base, name)).filter(path => !path.includes('/assets/') && /\.(md|mjs|yaml)$/.test(path)).map(path => readFileSync(path, 'utf8')).join('\n');
@@ -88,7 +100,7 @@ test('React e shadcn identificam a base de primitives do projeto', () => {
 });
 test('laravel publica o contrato de contexto dos pacotes', () => {
   const name = 'specsfy-specialist-laravel';
-  assert.ok(entry(name).detect.files.includes('artisan'));
+  assert.deepEqual(entry(name).detect.files, ['artisan']);
   assert.ok(entry(name).detect.dependencies.includes('laravel/framework'));
   includes(folder(name), ['URL do GitHub', 'composer.json', 'composer.lock', 'composer require', 'docs/packages/README.md', 'docs/packages/', '.specsfy/PACKAGES.md', 'pacotes já instalados']);
   for (const path of ['specsfy-03-specify/SKILL.md', 'specsfy-06-implement/references/implement.md']) includes(read(`skills/${path}`), [name]);

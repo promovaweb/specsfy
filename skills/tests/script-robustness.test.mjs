@@ -103,3 +103,29 @@ test('a declaração de ausência de fonte externa não mascara índice inválid
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.ok(evidence.endsWith('/' + JSON.parse(result.stdout).artifacts[0].path));
 });
+
+test('research rejeita cada claim malformado mesmo com índice vazio ou outro claim válido', t => {
+  const root = temporary(t);
+  put(root, 'specs/defined/0001-exemplo/research/fonte.md', '# Fonte\n');
+  const claim = (id, level, budget, file = 'fonte.md') =>
+    `- **${id}** [${level}] Afirmação — Verdict: verified — Confidence: high — Evidence: research/${file} — Budget: ${budget}\n`;
+  const validate = (index, claims) => {
+    const spec = put(root, 'specs/defined/0001-exemplo/spec.md',
+      '#### Artefatos de pesquisa armazenados\n\n' + index + '\n#### Researchs executados\n\n' + claims);
+    const result = node(script('specsfy-03-specify', 'load_research'), [spec, '--json']);
+    return { status: result.status, ...JSON.parse(result.stdout) };
+  };
+  const absent = validate('- Nenhum artefato externo.\n', claim('R-001', 'high', '1/x', 'ausente.md'));
+  assert.equal(absent.status, 1, JSON.stringify(absent));
+  assert.ok(absent.errors.some(error => error.includes('R-001') && error.includes('ResearchClaim')));
+  const mixed = validate('- `research/fonte.md`\n',
+    claim('R-001', 'low', '1/3') + claim('R-002', 'critical', '1/x') + claim('R-003', 'medium', '1/x'));
+  assert.equal(mixed.status, 1, JSON.stringify(mixed));
+  assert.deepEqual(mixed.claims.map(item => item.id), ['R-001']);
+  for (const id of ['R-002', 'R-003']) {
+    assert.ok(mixed.errors.some(error => error.includes(id) && error.includes('ResearchClaim')));
+  }
+  const local = validate('- Nenhum artefato externo.\n',
+    '- **R-001**: O código local já trata a falha.\n- Orientação com `[critical]`.\n');
+  assert.equal(local.status, 0, JSON.stringify(local));
+});

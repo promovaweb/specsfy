@@ -120,7 +120,7 @@ grava apenas quando uma option pede.
 | `docs_build` | Reconstrói a documentação do projeto em `docs/` e `.specsfy/PACKAGES.md`; `check` só confere. | altera; `check` só lê |
 | `skills_list` | Lista as skills instaladas e as disponíveis no catálogo. | só lê |
 | `skills_detect` | Detecta os agentes e skills presentes no projeto. | só lê |
-| `specialists_suggest` | Sugere especialistas por sinal na spec, com modo, declaração e instalação. | só lê |
+| `specialists_suggest` | Sugere especialistas por sinal na spec, com modo, declaração, instalação e avisos opcionais `catalogWarning` e `stackWarning`. | só lê |
 | `framework_install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | altera |
 | `framework_update` | Deixa as skills do projeto iguais ao inventário do framework; `check` devolve só o plano. | altera |
 | `skills_install` | Instala um ou mais especialistas do catálogo. | altera |

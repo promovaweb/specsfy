@@ -10,8 +10,10 @@ const contracts = new Map([
     ['github-regressions', 'raiz do projeto exportado'],
   ]],
   ['Separar TDD de regressão pós-código', [['bdd-runners', 'regressão pós-código']]],
-  ['Validar as operações da interface', [['interface-contract', 'Contrato CRUD (aceita|exige)']]],
-  ['Usar apenas fontes locais', [['script-robustness', 'research aceita declaração|não mascara índice inválido']]],
+  ['Preservar predecessores TDD de planos legados', [['bdd-runners', 'plano aprovado sem tag TDD']]],
+  ['Contar os mínimos por aceite principal', [['bdd-runners', 'mínimos TDD contam']]],
+  ['Validar as operações da interface', [['interface-contract', 'Contrato CRUD (aceita|exige|vincula)']]],
+  ['Usar apenas fontes locais', [['script-robustness', 'research aceita declaração|não mascara índice inválido|research rejeita cada claim']]],
   ['Fechar setup com pré-condições de deploy', [['interface-contract', 'pendência de stack']]],
 ]);
 

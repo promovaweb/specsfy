@@ -37,6 +37,23 @@ página antiga para a do especialista que a substituiu.
   concretos, como schemas, SQL, `EXPLAIN` e migrations em Postgres. O limite
   é de 1024 caracteres, sem `<` ou `>`.
 
+## Campos do catálogo
+
+- Use `stack: true` quando uma sugestão nova depender de confirmação da
+  tecnologia. O campo é opcional e o padrão é `false`.
+- Use `aliases` para os nomes com que a tecnologia pode ser declarada
+  em `.specsfy/STACK.md`, como `PostgreSQL` e `Postgres`. A lista é opcional.
+- `detect.files` lista caminhos de marcadores e `detect.dependencies` lista
+  nomes de pacotes em `package.json` ou `composer.json`.
+- `detect.images` lista repositórios de imagens dos serviços de arquivos
+  `compose*.yml` e `docker-compose*.yml`, inclusive variantes `.yaml`. O
+  detector compara o repositório da imagem sem tag ou digest. Declare
+  `n8nio/n8n`, por exemplo.
+
+Os marcadores de detecção são alternativas. Interface e Arquitetura mantêm
+marcadores para `skills detect` e são elegíveis por sinal em
+`specialists suggest`.
+
 ## Corpo obrigatório
 
 Mantenha as seis seções do template. Os testes do catálogo verificam os

@@ -81,6 +81,13 @@ framework, catálogo de especialistas, lock, testes do projeto, milestones e
 GitHub. Os commands nativos chamam essas funções diretamente, sem passar por
 um script.
 
+Transições e migrações usam um lock SQLite por projeto e identificador da
+spec, em um arquivo no diretório temporário do sistema. O lock vale da
+resolução do estado até a escrita do status e dos vínculos no backlog.
+O sistema libera o lock quando o processo termina. Com a pasta como fonte
+do estado atual, a transição seguinte pode reescrever referências aos
+layouts legados e a qualquer estado anterior do mesmo identificador.
+
 `src/engine/` executa os scripts do framework embutidos. A árvore de
 `../skills/` é importada como texto em `skills.gen.ts`, gerado por
 `scripts/embed-skills.ts` com `bun run embed`. Na primeira execução de cada

@@ -135,6 +135,12 @@ Criação, captura e movimentação do trabalho pelo método.
 | `tasks check` | Marca ou desmarca uma tarefa, ou um item da checklist, no `spec.md`. | `<spec>`, `<task>`, `[item]`, `--undo`, `--project <dir>` |
 | `tasks delivery` | Monta o resumo de entrega: gates, IDs entregues, tarefas, provas e rollback. | `<spec>`, `--format markdown\|json`, `--preview`, `--project <dir>` |
 
+`specs transition` e `specs migrate` atualizam o campo `Spec promovida` do
+backlog. O campo aceita um caminho relativo à raiz do projeto, com ou sem
+crases, ou um link Markdown relativo ao arquivo de backlog. A atualização
+mantém o formato da célula. Uma nova transição, inclusive para o estado
+atual, corrige vínculos que ainda apontam para pastas anteriores da spec.
+
 `tasks check` aceita como `[item]` uma key de checklist (`PREP`, `EXECUTE`,
 `VERIFY`, `VISUAL`, `EVIDENCE`, `IMPROVE`) ou a posição do item, contando a
 partir de 1. Sem `[item]`, a própria linha da tarefa muda. `tasks delivery` sem
@@ -167,8 +173,11 @@ desconhecido no catálogo ou não está instalado em `.agents/skills/`, e se um
 sinal encontrado pede um especialista ainda não declarado. Em texto, os
 avisos vão para stderr. Com `--json`, aparecem em `data.warnings` com
 `severity: "warning"`, `kind`, `message` e, para avisos de uma spec, `spec`,
-`name` e o modo e sinal quando disponíveis. O resultado dos gates, o código
-de saída e o arquivo de atestação seguem a política de verificação.
+`name` e o modo e sinal quando disponíveis. A stack é calculada uma vez por
+execução. Se a detecção falhar, o aviso `stack-detection-failed` informa que a
+análise continua com as declarações disponíveis em `.specsfy/STACK.md`. O
+resultado dos gates, o código de saída e o arquivo de atestação seguem a
+política de verificação.
 
 ### Contexto
 
@@ -227,10 +236,14 @@ consulta a versão publicada. `skills` gerencia os especialistas do catálogo.
 Use `{{bin}} specialists suggest 0001` ao revisar o plano de uma spec. Cada
 linha mostra o nome, o modo quando existe, o sinal e se a skill foi declarada
 na spec e instalada em `.agents/skills/`. A consulta aceita número, slug,
-pasta ou caminho. Especialista de tecnologia só entra na sugestão quando a
-stack do projeto confirma a tecnologia, pela detecção do catálogo ou pelo
-`.specsfy/STACK.md`; o especialista declarado na spec aparece sempre. Com
-`--json`, `data` contém `project`, `spec` (caminho relativo) e `suggestions`
+pasta ou caminho. O CLI lê declarações em `Plano técnico` e `Tarefas` com ou
+sem a numeração dos títulos. Para especialistas com `stack: true` no catálogo,
+um sinal precisa de confirmação por detecção ou por um alias declarado em
+`.specsfy/STACK.md`. Uma declaração na própria spec também permite a sugestão
+quando um sinal coincide. Interface e Arquitetura podem ser sugeridas só
+pelo sinal. Entradas ausentes, pendentes e alternativas em `STACK.md` ficam
+fora da confirmação. Com `--json`, `data` contém `project`, `spec` (caminho
+relativo) e `suggestions`
 com `name`, `mode` opcional, `signal`, `declared` e `installed`. O comando
 sai com 0 após ler a spec, inclusive com a lista vazia, e com 6 quando a
 spec não puder ser encontrada ou lida.
@@ -239,6 +252,8 @@ O catálogo padrão para analisar specs está embutido. Um arquivo indicado por
 `SPECSFY_SPECIALISTS_CATALOG` ou um `catalog.repository` personalizado pode
 substituí-lo. Se a origem configurada falhar, o binário usa o catálogo embutido
 e informa o fallback em stderr ou no campo `catalogWarning` da saída JSON.
+Se a detecção da stack falhar, a consulta continua com `.specsfy/STACK.md`
+quando disponível e informa o aviso em stderr ou em `stackWarning` no JSON.
 
 `update` reconcilia o projeto com `skills/inventory.json` do framework, lido
 da tag `v<versão>` do binário (`--latest` usa a branch padrão). O `--json`

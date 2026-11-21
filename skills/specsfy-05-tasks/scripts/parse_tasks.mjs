@@ -33,3 +33,56 @@ export function parseTasks(text) {
   }
   return { tasks, orphans, others };
 }
+
+/** Lê tarefas e checklists da seção 14 para os gates de spec e de tarefas. */
+function taskSection(text) {
+  const lines = text.split(/\r?\n/);
+  const start = lines.findIndex((line) => /^#{1,6}\s+(?:14\.\s+)?Tarefas\s*$/i.test(line));
+  if (start < 0) return null;
+  const level = lines[start].match(/^#+/)[0].length;
+  const closingHeading = new RegExp(`^#{1,${level}}\\s`);
+  const end = lines.findIndex((line, index) => index > start && closingHeading.test(line));
+  return { lines: lines.slice(start + 1, end < 0 ? undefined : end), start };
+}
+
+export function parseGateTasks(text, errors = []) {
+  const section = taskSection(text);
+  if (!section) {
+    errors.push("Seção rígida 14. Tarefas ausente.");
+    return [];
+  }
+
+  const tasks = [];
+  let active;
+  for (const [offset, raw] of section.lines.entries()) {
+    const line = section.start + offset + 2;
+    const task = raw.match(/^\s*-\s+\[([ xX])\]\s+(T\d{3,})\s+(.+)$/);
+    if (task) {
+      const [, checked, id, content] = task;
+      const contract = content.match(/\s+[—-]\s+Refs:\s*(.*?)\s+[—-]\s+Depends:\s*(.+?)\s*$/);
+      if (!contract) errors.push(`Linha ${line} (${id}) não segue '— Refs: ... — Depends: ...'.`);
+      const prefix = content.match(/^(?:\[[A-Z]+(?:-\d{3,})?\][ \t]+)+/)?.[0] ?? "";
+      active = {
+        id,
+        complete: checked.toLowerCase() === "x",
+        raw,
+        description: content.slice(prefix.length, contract?.index),
+        tags: new Set([...prefix.matchAll(/\[([^\]]+)\]/g)].map((match) => match[1])),
+        refs: new Set(contract?.[1].match(/\b(?:US|AC|FR|NFR)-\d{3,}\b/g)),
+        depends: new Set(contract?.[2].match(/\bT\d{3,}\b/g)),
+        line,
+        checklist: [],
+      };
+      tasks.push(active);
+      continue;
+    }
+
+    const checklist = raw.match(/^\s{2,}-\s+\[([ xX])\]\s+\*\*(PREP|EXECUTE|VERIFY|VISUAL|EVIDENCE|IMPROVE)\*\*:\s+(.+?)\s*$/);
+    if (checklist && active) {
+      active.checklist.push({ key: checklist[2], complete: checklist[1].toLowerCase() === "x", text: checklist[3], line });
+    } else if (/^\s{2,}-\s+\[[ xX]\]\s+/.test(raw) && active) {
+      errors.push(`Linha ${line} (${active.id}) possui item de checklist fora do formato canônico.`);
+    }
+  }
+  return tasks;
+}

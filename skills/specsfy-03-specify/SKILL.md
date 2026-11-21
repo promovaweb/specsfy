@@ -207,8 +207,9 @@ Aplique a seção Especialistas ao preparar e escrever cada parte da spec.
   reestruture uma tela existente.
 - Carregue `$specsfy-specialist-interface` e o especialista da stack de
   interface. Não aceite uma descrição de CRUD que
-  tenha somente API, banco ou serviço. Em `Contrato CRUD`, declare as
-  operações incluídas e descreva os controles correspondentes.
+  tenha somente API, banco ou serviço. Em `Contrato CRUD`, liste as operações incluídas e
+  escreva uma entrada por operação com o controle de interface e o ID
+  reservado para a tarefa `[CODE]` da seção 14.
 - Em Laravel com React, registre explicitamente shadcn/ui e ReUI, todos os
   blocos React previstos, suas responsabilidades, arquivos, componentes de
   origem e regra de reuso. A página apenas compõe esses blocos.

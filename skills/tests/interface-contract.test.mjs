@@ -120,7 +120,7 @@ test('ReUI define a composição de CRUDs compatíveis', () => {
   includes(readSpecialist('ui-components').split(/\s+/).join(' '), ['Todo CRUD com interface React e Tailwind usa ReUI']);
 });
 
-const crudSpec = (operations, controls, taskDescriptions = []) => interfaceSpec(
+const crudSpec = (operations, controls, taskDescriptions = []) => '| Status | Defined |\n| Plan Gate | Pending |\n' + interfaceSpec(
   fixtures.complete + '\n#### Contrato CRUD\n\n' +
   (operations === null ? '' : `- **Operações**: ${operations}\n`) +
   controls + '\n\n### 14. Tarefas\n\n#### Fase de interface\n\n' +
@@ -132,32 +132,57 @@ const crudErrors = (root, operations, controls, tasks) =>
 
 test('Contrato CRUD aceita listar e criar, leitura e CRUD completo conforme as operações incluídas', t => {
   const root = temporary(t);
-  const list = 'PageHeader e DataGrid com coluna ID visível.';
-  const create = 'Formulário de criação.';
-  const detail = 'Link para a tela de detalhe.';
-  const edit = 'Ação de edição.';
-  const remove = 'Botão de exclusão com confirmação.';
+  const list = '- **listar**: DataGrid com coluna ID visível — Tarefa: T001';
+  const create = '- **criar**: Para criar, abra o formulário — Tarefa: T002';
+  const detail = '- **consultar**: Link para a tela de detalhe — Tarefa: T001';
+  const edit = '- **editar**: Ação de edição — Tarefa: T002';
+  const remove = '- **apagar**: Botão de exclusão com confirmação — Tarefa: T002';
+  const grid = 'Implementar DataGrid e link para o detalhe';
+  const form = 'Implementar formulário de criação, ação de edição e botão de exclusão';
   for (const [operations, controls, tasks] of [
-    ['listar, criar', [list, create], ['Implementar listagem e formulário para criar']],
-    ['listar, consultar', [list, detail], ['Implementar listagem e detalhe']],
-    ['consultar', ['PageHeader.', detail], ['Implementar detalhe']],
-    ['listar, consultar, criar, editar, apagar', [list, detail, create, edit, remove],
-      ['Implementar listagem e detalhe', 'Implementar criação, edição e exclusão']],
-    [null, [list, 'Botões de editar e apagar.'], []],
+    ['listar, criar', [list, create], [grid, form]],
+    ['listar, consultar', [list, detail], [grid]],
+    ['consultar', [detail], ['Implementar link para o detalhe']],
+    ['listar, consultar, criar, editar, apagar', [list, detail, create, edit, remove], [grid, form]],
+    [null, ['DataGrid com ID e botões de editar e apagar.'], []],
   ]) {
-    assert.deepEqual(crudErrors(root, operations, controls.join(' '), tasks), [], operations);
+    assert.deepEqual(crudErrors(root, operations, ['PageHeader.', ...controls].join('\n'), tasks), [], operations);
   }
 });
 
 test('Contrato CRUD exige controles e tarefas das operações declaradas, com fallback legado', t => {
   const root = temporary(t);
-  const list = 'PageHeader e DataGrid com coluna ID visível.';
-  const errors = crudErrors(root, 'listar, criar', list, ['Implementar listagem']);
-  assert.ok(errors.some(error => error.includes('criar') && error.includes('formulário')), errors.join('\n'));
-  assert.ok(errors.some(error => error.includes('criar') && error.includes('tarefa')), errors.join('\n'));
+  const list = 'PageHeader.\n- **listar**: DataGrid com coluna ID visível — Tarefa: T001';
+  const errors = crudErrors(root, 'listar, criar', list, ['Implementar DataGrid com ID']);
+  assert.ok(errors.some(error => error.includes('criar') && error.includes('formulário') && error.includes('tarefa')), errors.join('\n'));
   assert.ok(errors.every(error => !/apagar|editar/.test(error)));
   assert.notDeepEqual(crudErrors(root, null, list), []);
   assert.notDeepEqual(crudErrors(root, 'listar, inventar', list), []);
   assert.notDeepEqual(crudErrors(root, '', list), []);
-  assert.deepEqual(crudErrors(root, 'listar, criar', list + ' Formulário de criação.'), []);
+  const controls = list + '\n- **criar**: Formulário de criação — Tarefa: T002';
+  assert.deepEqual(crudErrors(root, 'listar, criar', controls), []);
+  const planned = crudSpec('listar, criar', controls).replace('Defined', 'Planned').replace('Pending', 'Passed');
+  assert.ok(validate(root, planned).some(error => error.includes('Contrato CRUD') && error.includes('T002')));
+});
+
+test('Contrato CRUD vincula cada controle afirmativo à tarefa de interface da seção 14', t => {
+  const root = temporary(t);
+  const positive = 'PageHeader.\n- **criar**: Para criar produtos, use o formulário — Tarefa: T001';
+  const negative = 'PageHeader.\n- **criar**: Não haverá botão para criar nem formulário de criação — Tarefa: T001';
+  const ui = ['Implementar o formulário para criar produtos'];
+  assert.deepEqual(crudErrors(root, 'criar', positive, ui), []);
+  assert.notDeepEqual(crudErrors(root, 'criar', negative, ui), []);
+  for (const endpoint of ['Implementar endpoint para criar produtos', 'Implementar endpoint de criação de produtos']) {
+    assert.notDeepEqual(crudErrors(root, 'criar', positive, [endpoint]), []);
+  }
+  const edit = 'PageHeader.\n- **editar**: Formulário para editar produtos — Tarefa: T001';
+  assert.notDeepEqual(crudErrors(root, 'editar', edit, ui), []);
+  assert.notDeepEqual(crudErrors(root, 'criar', positive.replace('T001', 'T999'), ui), []);
+  assert.notDeepEqual(crudErrors(root, 'criar', positive + '\n' + positive.split('\n')[1], ui), []);
+  assert.notDeepEqual(crudErrors(root, 'criar', positive + '\n- **editar**: Botão para editar — Tarefa: T001', ui), []);
+
+  const malformed = crudSpec('criar', positive, ui).replace('— Refs: FR-001', '— Ref: FR-001');
+  assert.ok(validate(root, malformed).some(error => error.includes('Contrato CRUD') && error.includes('T001')));
+  const unnumbered = crudSpec('criar', positive, ui).replace('### 14. Tarefas', '### Tarefas');
+  assert.deepEqual(validate(root, unnumbered).filter(error => error.includes('Contrato CRUD')), []);
 });

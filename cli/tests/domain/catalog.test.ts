@@ -82,6 +82,20 @@ describe("catálogo", () => {
 });
 
 describe("catalog source", () => {
+  test("rejects invalid detection and stack metadata during parsing", () => {
+    for (const fields of [
+      { detect: null }, { detect: [] }, { detect: "react" },
+      { detect: { dependencies: "react" } }, { detect: { files: [1] } },
+      { detect: { images: "n8nio/n8n" } }, { detect: { images: [""] } },
+      { stack: "true" }, { aliases: ["Next.js", null] },
+    ]) {
+      expect(() => Catalog.fromPayload({
+        schema_version: 1,
+        skills: [{ name: "specsfy-specialist-x", description: "X", category: "t", ...fields }],
+      })).toThrow("invalid");
+    }
+  });
+
   test("derives the contents API URL only for GitHub repositories", async () => {
     const { catalogApiUrl, DEFAULT_CATALOG_URL } = await import("../../src/domain/catalog.ts");
     expect(catalogApiUrl("https://github.com/acme/fork.git")).toBe(

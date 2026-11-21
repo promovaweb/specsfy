@@ -1,10 +1,13 @@
 /** Specialist declarations and suggestions through the domain, CLI and MCP. */
-import { afterAll, beforeAll, expect, test } from "bun:test";
+import { afterAll, beforeAll, expect, spyOn, test } from "bun:test";
 import { cpSync, readFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { HOME_VARIABLE } from "../src/config/paths.ts";
+import { ExitCode } from "../src/app/exit-codes.ts";
+import { runVerify } from "../src/cli/commands/gates.ts";
+import { specialistSuggestDef } from "../src/cli/commands/specialists.ts";
 import { Catalog } from "../src/domain/catalog.ts";
 import { FRAMEWORK_SKILLS } from "../src/domain/installer.ts";
 import { readSpecSpecialists } from "../src/domain/spec-specialists.ts";
@@ -14,6 +17,7 @@ const fixture = readFileSync(join(import.meta.dir, "fixtures/specialists/spec.md
 const entry = (shortName: string) => ({ name: `specsfy-specialist-${shortName}`, description: shortName, category: "test" });
 const interfaceEntry = {
   ...entry("interface"),
+  detect: { dependencies: ["axe-core"] },
   modes: [{ name: "ui", title: "Interface", absorbs: "specsfy-specialist-old-ui" }],
   triggers: [{ mode: "ui", signal: "Access", keywords: ["autorização", "catálogo"] }],
 };
@@ -49,6 +53,16 @@ test("reads unique specialist names from the metadata, plan and task annotations
   ]);
   expect(readSpecSpecialists(validSpec())).toEqual([]);
   expect(readSpecSpecialists(validSpec({ Especialistas: "" }))).toEqual([]);
+});
+
+test("reads unnumbered specialist sections and excludes their declarations from signals", async () => {
+  const spec = "specs/defined/0003-unnumbered/spec.md";
+  const markdown = fixture.replace("### 8. Plano técnico", "### Plano técnico").replace("### 14. Tarefas", "### Tarefas");
+  put(root, spec, markdown);
+  expect(readSpecSpecialists(markdown)).toEqual(readSpecSpecialists(fixture));
+  const run = await cli(["specialists", "suggest", spec, "--project", root, "--json"], home, env);
+  expect(run.code).toBe(0);
+  expect(run.json?.data.suggestions).toEqual(suggestions);
 });
 
 test("parses modes, absorbs and triggers, defaulting legacy entries to empty lists", () => {
@@ -87,7 +101,7 @@ test("returns success for an empty suggestion list and for a catalog fallback", 
   expect(fallback.code).toBe(0);
   expect(fallback.json?.data.catalogWarning).toContain("embedded catalog");
   const invalidCatalog = put(home, "invalid-catalog.json", JSON.stringify({
-    schema_version: 1, skills: [{ ...entry("invalid"), triggers: [{ signal: "Empty" }] }],
+    schema_version: 1, skills: [{ ...entry("invalid"), detect: { dependencies: "react" } }],
   }));
   const invalid = await cli(["specialists", "suggest", "2", "--project", root, "--json"], home, {
     SPECSFY_SPECIALISTS_CATALOG: invalidCatalog,
@@ -111,6 +125,90 @@ test("MCP registers specialists_suggest with the same data", async () => {
     expect(result.structuredContent).toEqual({ project: root, spec: relativeSpec, suggestions });
   } finally {
     await client.close();
+  }
+});
+
+test("uses concept signals and declared stack aliases with the default catalog", async () => {
+  const project = temporary("specsfy-specialist-stack-");
+  try {
+    put(project, relativeSpec, "# Tela de cadastro acessível com teclado. Contrato HTTP da API. Migration PostgreSQL. App Router de Next.js. Fila Redis.");
+    const args = ["specialists", "suggest", "1", "--project", project, "--json"];
+    const names = async () => {
+      const run = await cli(args, home, { SPECSFY_SPECIALISTS_CATALOG: "" });
+      expect(run.code).toBe(0);
+      return run.json?.data.suggestions.map(({ name }: { name: string }) => name);
+    };
+    expect(await names()).toEqual(expect.arrayContaining(["specsfy-specialist-interface", "specsfy-specialist-architecture"]));
+    put(project, ".specsfy/STACK.md", [
+      "# Stack", "| Camada | Tecnologia | Evidência |", "| --- | --- | --- |",
+      "| Banco | PostgreSQL | migrations |", "| Frontend | Next.js | package.json |",
+      "| Cache | A confirmar | Redis |",
+      "- Sem Redis neste ambiente", "- Não usa Redis", "- Redis: pendente", "- Redis: ausente",
+      "### Pendências de stack", "- Redis",
+    ].join("\n"));
+    const confirmed = await names();
+    expect(confirmed).toEqual(expect.arrayContaining(["specsfy-specialist-postgres", "specsfy-specialist-nextjs"]));
+    expect(confirmed).not.toContain("specsfy-specialist-redis");
+    put(project, ".specsfy/STACK.md", "# Stack\n\n- Valkey");
+    expect(await names()).toContain("specsfy-specialist-redis");
+  } finally {
+    rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test("suggest detects Laravel from artisan or its package and n8n from Compose services", async () => {
+  const project = temporary("specsfy-specialist-markers-");
+  try {
+    put(project, relativeSpec, "# Controller em Laravel e n8n em queue mode.");
+    put(project, "composer.json", JSON.stringify({ require: { "symfony/framework-bundle": "^7" } }));
+    put(project, "compose.dev.yaml", "x-example:\n  image: n8nio/n8n\nservices:\n  automation:\n    image: n8nio/n8n-helper\n");
+    const args = ["specialists", "suggest", "1", "--project", project, "--json"];
+    const suggestions = async () => {
+      const run = await cli(args, home, { SPECSFY_SPECIALISTS_CATALOG: "" });
+      expect(run.code).toBe(0);
+      return run.json?.data.suggestions;
+    };
+    expect(await suggestions()).toEqual([]);
+    put(project, "infra/docker-compose.prod.yml", "services:\n  automation:\n    image: 'n8nio/n8n:1.0' # pinned\n");
+    put(project, "artisan", "#!/usr/bin/env php\n");
+    expect(await suggestions()).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: "specsfy-specialist-laravel" }),
+      expect.objectContaining({ name: "specsfy-specialist-n8n", mode: "workflows" }),
+      expect.objectContaining({ name: "specsfy-specialist-n8n", mode: "self-hosting" }),
+    ]));
+    rmSync(join(project, "artisan"));
+    put(project, "composer.json", JSON.stringify({ require: { "laravel/framework": "^12" } }));
+    expect(await suggestions()).toEqual(expect.arrayContaining([expect.objectContaining({ name: "specsfy-specialist-laravel" })]));
+  } finally {
+    rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test("verify scans once and preserves a policy failure when detection throws", async () => {
+  const project = temporary("specsfy-specialist-failed-detection-");
+  const detect = spyOn(Catalog.prototype, "detect").mockRejectedValue(new Error("Detection failed"));
+  try {
+    put(project, ".specsfy/STACK.md", "# Stack\n\n- PostgreSQL\n");
+    put(project, relativeSpec, validSpec().replace("Conteúdo descrito.", "Migration PostgreSQL."));
+    put(project, "specs/defined/0002-other/spec.md", "# Invalid spec\n");
+    const result = await runVerify({ project, attestation: "attestation.json" });
+    expect(detect).toHaveBeenCalledTimes(1);
+    expect(result.code).toBe(ExitCode.GATE_FAILED);
+    expect(result.data.result).toEqual(JSON.parse(readFileSync(join(project, "attestation.json"), "utf8")));
+    expect(result.data.warnings).toEqual(expect.arrayContaining([
+      expect.objectContaining({ kind: "stack-detection-failed" }),
+      expect.objectContaining({ kind: "undeclared-specialist", name: "specsfy-specialist-postgres" }),
+    ]));
+    expect(result.data.warnings.filter(({ kind }) => kind === "stack-detection-failed")).toHaveLength(1);
+    const suggested = await specialistSuggestDef.execute(project, { spec: "1" });
+    expect(suggested.warning).toContain("stack");
+    expect(suggested.data).toMatchObject({
+      stackWarning: expect.any(String),
+      suggestions: expect.arrayContaining([expect.objectContaining({ name: "specsfy-specialist-postgres" })]),
+    });
+  } finally {
+    detect.mockRestore();
+    rmSync(project, { recursive: true, force: true });
   }
 });
 
@@ -139,6 +237,15 @@ test("verify reports specialist warnings for each checked spec without changing 
     expect(text.stdout).toContain("Specsfy verify: PASSED");
     expect(text.stderr).toContain("WARNING");
     expect(text.stderr).toContain(queueEntry.name);
+    const invalidCatalog = put(home, "invalid-verify-catalog.json", JSON.stringify({
+      schema_version: 1, skills: [{ ...entry("broken"), detect: { dependencies: "react" } }],
+    }));
+    const fallback = await cli(["verify", "--project", project, "--json"], home, {
+      SPECSFY_SPECIALISTS_CATALOG: invalidCatalog,
+    });
+    expect(fallback.code).toBe(ExitCode.SUCCESS);
+    expect(fallback.json?.data.result.result).toBe("passed");
+    expect(fallback.json?.data.warnings).toContainEqual(expect.objectContaining({ kind: "catalog-unavailable" }));
   } finally {
     rmSync(project, { recursive: true, force: true });
   }

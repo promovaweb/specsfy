@@ -77,8 +77,50 @@ else {
       artifacts.push(item);
     }
   }
-  const claims = []; const budgets = []; const critical = []; const claimRe = /^-\s+\*\*(R-\d{3,})\*\*\s+\[(critical|high|medium|low)\]\s+(.+?)\s+[—-]\s+Verdict:\s+(verified|refuted|unverifiable)\s+[—-]\s+Confidence:\s+(high|medium|low)\s+[—-]\s+Evidence:\s+(\S+)\s+[—-]\s+Budget:\s+(\d+\/\d+)\.?\s*$/gmi;
-  for (const match of section(text, "Researchs executados").matchAll(claimRe)) { const claim = { id: match[1], criticality: match[2].toLowerCase(), claim: match[3], verdict: match[4].toLowerCase(), confidence: match[5].toLowerCase(), evidence: match[6], budget: match[7] }; claims.push(claim); const [file, anchor] = claim.evidence.split("#"); const evidence = resolve(dirname(spec), file); if (!safeResearchPath(evidence, research) || !lstatSync(evidence).isFile()) errors.push(`${claim.id}: evidence local inexistente ou insegura: ${file}`); else if (anchor && !(await anchors(evidence)).has(anchor)) errors.push(`${claim.id}: âncora inexistente na evidence: #${anchor}`); const [used, limit] = claim.budget.split("/").map(Number); budgets.push([used, limit]); if (!limit || used > limit) errors.push(`${claim.id}: orçamento ${!limit ? "inválido" : "excedido"} (${used}/${limit})`); if (claim.criticality === "critical" && claim.verdict !== "verified") critical.push(`${claim.id}: critical claim não verificado (${claim.verdict})`); }
-  const counts = new Map(); claims.forEach((claim) => counts.set(claim.id, (counts.get(claim.id) ?? 0) + 1)); counts.forEach((count, id) => { if (count > 1) errors.push(`${id}: ID duplicado`); }); const limits = new Set(budgets.map(([, limit]) => limit)); if (limits.size > 1) errors.push("claims possuem limites de orçamento divergentes"); else if (budgets.length && budgets.reduce((total, [used]) => total + used, 0) > budgets[0][1]) errors.push(`orçamento total excedido (${budgets.reduce((total, [used]) => total + used, 0)}/${budgets[0][1]})`); if (text.includes("[critical]") && !claims.length) errors.push("critical claim não segue o contrato ResearchClaim"); errors.push(...critical); if (!indexed.length && (!noExternal || claims.length)) errors.push("nenhum artefato de research indexado"); const payload = { schema_version: 1, result: errors.length ? "failed" : "passed", artifacts, claims, errors };
+  const claims = [];
+  const budgets = [];
+  const claimPattern = /^-\s+\*\*(R-\d{3,})\*\*\s+\[(critical|high|medium|low)\]\s+(.+?)\s+[—-]\s+Verdict:\s+(verified|refuted|unverifiable)\s+[—-]\s+Confidence:\s+(high|medium|low)\s+[—-]\s+Evidence:\s+(\S+)\s+[—-]\s+Budget:\s+(\d+\/\d+)\.?[ \t]*$/i;
+  let hasClaim = false;
+  for (const line of section(text, "Researchs executados").split(/\r?\n/)) {
+    const candidate = line.trim().match(/^(?:[-*+]\s+)?(?:\*{1,2}|`)?(R-[\w-]+)(?:\*{1,2}|`)?[ \t]*(.*)$/i);
+    if (!candidate) continue;
+    const [, id, content] = candidate;
+    // A notação "R-NNN: pergunta → conclusão" também é usada para pesquisa local.
+    if (content.startsWith(":") && !/^:\s*\[(?:critical|high|medium|low)\]|\b(?:Verdict|Confidence|Evidence|Budget):/i.test(content)) continue;
+    hasClaim = true;
+    const match = line.trim().match(claimPattern);
+    if (!match) {
+      errors.push(`${id}: claim não segue o contrato ResearchClaim`);
+      continue;
+    }
+    const [, claimId, criticality, statement, verdict, confidence, locator, budget] = match;
+    const claim = { id: claimId, criticality: criticality.toLowerCase(), claim: statement,
+      verdict: verdict.toLowerCase(), confidence: confidence.toLowerCase(), evidence: locator, budget };
+    claims.push(claim);
+    const [file, anchor] = claim.evidence.split("#");
+    const evidence = resolve(dirname(spec), file);
+    if (!safeResearchPath(evidence, research) || !lstatSync(evidence).isFile()) {
+      errors.push(`${claim.id}: evidence local inexistente ou insegura: ${file}`);
+    } else if (anchor && !(await anchors(evidence)).has(anchor)) {
+      errors.push(`${claim.id}: âncora inexistente na evidence: #${anchor}`);
+    }
+    const [used, limit] = claim.budget.split("/").map(Number);
+    budgets.push([used, limit]);
+    if (!limit || used > limit) errors.push(`${claim.id}: orçamento ${!limit ? "inválido" : "excedido"} (${used}/${limit})`);
+  }
+  const counts = new Map();
+  for (const claim of claims) {
+    counts.set(claim.id, (counts.get(claim.id) ?? 0) + 1);
+    if (claim.criticality === "critical" && claim.verdict !== "verified") {
+      errors.push(`${claim.id}: critical claim não verificado (${claim.verdict})`);
+    }
+  }
+  for (const [id, count] of counts) if (count > 1) errors.push(`${id}: ID duplicado`);
+  const limits = new Set(budgets.map(([, limit]) => limit));
+  const total = budgets.reduce((sum, [used]) => sum + used, 0);
+  if (limits.size > 1) errors.push("claims possuem limites de orçamento divergentes");
+  else if (budgets.length && total > budgets[0][1]) errors.push(`orçamento total excedido (${total}/${budgets[0][1]})`);
+  if (!indexed.length && (!noExternal || hasClaim)) errors.push("nenhum artefato de research indexado");
+  const payload = { schema_version: 1, result: errors.length ? "failed" : "passed", artifacts, claims, errors };
   if (json) console.log(JSON.stringify(payload, null, 2)); else { console.log(`Research: ${payload.result.toUpperCase()}`); artifacts.forEach((item) => console.log(`- ${item.path}: ${item.bytes} bytes${item.truncated ? " (truncado)" : ""}`)); errors.forEach((error) => console.log(`ERRO: ${error}`)); } process.exitCode = payload.result === "passed" ? 0 : 1;
 }

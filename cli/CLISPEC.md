@@ -92,7 +92,7 @@ CI pelo `--json`.
 | `skills install` | Install specialists from the catalog, with their requirements. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 4, 5, 6, 7 | `github.token` |
 | `skills remove` | Remove Specsfy skills from the project; skills outside the Specsfy namespace are refused. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 6, 7 | `github.token` |
 | `skills update` | Bring the Specsfy skills of the project to the framework inventory; same as the top-level update. | `--check`, `--latest`, `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7, 10 | `github.token` |
-| `specialists suggest` | Suggest specialists from the spec and report mode, signal, declaration and installation. | `<spec>`, `--project <dir>`, `--json` | `project`, `spec`, `suggestions`, `catalogWarning` opcional | 6 | `github.token` para catálogo personalizado no GitHub |
+| `specialists suggest` | Suggest specialists from the spec and report mode, signal, declaration and installation. | `<spec>`, `--project <dir>`, `--json` | `project`, `spec`, `suggestions`, `catalogWarning` e `stackWarning` opcionais | 6 | `github.token` para catálogo personalizado no GitHub |
 | `skills suggest` | Same as `specialists suggest`. | `<spec>`, `--project <dir>`, `--json` | mesmos dados de `specialists suggest` | 6 | mesmas de `specialists suggest` |
 | `scripts list` | List the framework scripts embedded in the binary. | n/a | ver `--skill reference` | n/a | n/a |
 | `scripts run` | Run an embedded framework script by name, passing the remaining arguments unchanged. | `<script>`, `[args]`, `--project <dir>` | ver `--skill reference` | 6 | n/a |

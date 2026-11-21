@@ -142,11 +142,13 @@ plano técnico e aplique as atualizações de status e gates descritas abaixo.
 ### Testes e código
 
 - Para cada `AC`, crie uma tarefa `[TEST] [TDD]` distinta cujo desenho usa como
-  referência o Gherkin mantido na spec. O conjunto dessas tarefas materializa
-  pelo menos três casos TDD distintos para a feature inteira e para cada `US`,
-  `FR` e `NFR`.
+  referência o Gherkin mantido na spec. Em `Refs`, liste o `AC` principal
+  antes dos demais ACs. Os mínimos da feature, de cada `US`, `FR` e `NFR`
+  e dos predecessores de cada tarefa `[CODE]` contam ACs principais distintos.
 - Use `[TEST] [TDD]` para predecessores e `[TEST]` para aceite e regressão
-  pós-código. A regressão tem subtotal próprio no validador.
+  pós-código. Em planos legados sem nenhuma tag `[TDD]`, o validador
+  reconhece testes executáveis que antecedem o código correspondente e
+  contabiliza os testes que dependem do código como regressão.
 - O Gherkin da spec é contrato de referência: não crie tarefa para arquivo
   `.feature` ou step definition e não o execute.
 - Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
@@ -163,7 +165,8 @@ Quando `Interface para pessoas` for `Sim`:
 - crie tarefas explícitas para as telas, menus e navegação principal,
   formulário e ações descritos na seção 10, além da camada de dados ou API;
 - quando houver `Contrato CRUD`, nomeie nas tarefas `[CODE]` as operações
-  incluídas em `Operações`. Planeje controles e testes para esse recorte;
+  incluídas em `Operações` e seus controles de interface, e confirme na spec
+  o ID da tarefa associado a cada operação;
 - inclua testes de comportamento para navegação, estados, envio, validação,
   recuperação de erro e padrão de abertura que a interface declarar;
 - use somente os componentes, convenções e runners da stack de interface

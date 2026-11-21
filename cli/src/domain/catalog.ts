@@ -50,8 +50,11 @@ export interface CatalogEntryValue {
   description: string;
   category: string;
   tags: string[];
+  stack: boolean;
+  aliases: string[];
   files: string[];
   dependencies: string[];
+  images: string[];
   requires: string[];
   modes: CatalogMode[];
   triggers: CatalogTrigger[];
@@ -64,11 +67,21 @@ interface CatalogPayload {
     description: string;
     category: string;
     tags?: string[];
+    stack?: boolean;
+    aliases?: string[];
     requires?: string[];
     modes?: CatalogMode[];
     triggers?: CatalogTrigger[];
-    detect?: { files?: string[]; dependencies?: string[] };
+    detect?: { files?: string[]; dependencies?: string[]; images?: string[] };
   }>;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function isMarkerList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((marker) => typeof marker === "string" && marker.trim().length > 0);
 }
 
 /**
@@ -105,6 +118,15 @@ export class Catalog {
     }
     const source = payload as CatalogPayload;
     return new Catalog(source.skills.map((value) => {
+      const detect = value.detect;
+      if (detect !== undefined && (!isRecord(detect) || [detect.files, detect.dependencies, detect.images]
+        .some((markers) => markers !== undefined && !isMarkerList(markers)))) {
+        throw new AppError(ExitCode.NETWORK_OR_API, `invalid detect in specialist catalog: ${value.name}`);
+      }
+      if ((value.stack !== undefined && typeof value.stack !== "boolean") ||
+        (value.aliases !== undefined && !isMarkerList(value.aliases))) {
+        throw new AppError(ExitCode.NETWORK_OR_API, `invalid stack metadata in specialist catalog: ${value.name}`);
+      }
       const modes = value.modes ?? [];
       const triggers = value.triggers ?? [];
       if (!Array.isArray(modes) || !modes.every((mode) =>
@@ -121,8 +143,11 @@ export class Catalog {
         description: value.description,
         category: value.category,
         tags: value.tags ?? [],
-        files: value.detect?.files ?? [],
-        dependencies: value.detect?.dependencies ?? [],
+        stack: value.stack ?? false,
+        aliases: value.aliases ?? [],
+        files: detect?.files ?? [],
+        dependencies: detect?.dependencies ?? [],
+        images: detect?.images ?? [],
         requires: value.requires ?? [],
         modes,
         triggers,
@@ -238,8 +263,13 @@ export class Catalog {
   /** Detects technologies at the root and in subprojects, honoring Git ignores. */
   async detect(project: string): Promise<CatalogEntryValue[]> {
     const root = resolvePath(project);
-    const roots = await detectionRoots(root);
-    const dependencies = new Set((await Promise.all(roots.map(readDependencies))).flatMap((items) => [...items]));
+    const { roots, composeFiles } = await detectionSources(root, this.entries.some((entry) => entry.images.length > 0));
+    const [dependencyLists, imageLists] = await Promise.all([
+      Promise.all(roots.map(readDependencies)),
+      Promise.all(composeFiles.map(readImages)),
+    ]);
+    const dependencies = new Set(dependencyLists.flat());
+    const images = new Set(imageLists.flat());
     const detected: CatalogEntryValue[] = [];
     for (const entry of this.entries) {
       const matches = await Promise.all(
@@ -247,7 +277,8 @@ export class Catalog {
       );
       if (
         matches.some(Boolean) ||
-        entry.dependencies.some((dependency) => dependencies.has(dependency))
+        entry.dependencies.some((dependency) => dependencies.has(dependency)) ||
+        entry.images.some((image) => images.has(imageRepository(image)))
       ) {
         detected.push(entry);
       }
@@ -256,17 +287,18 @@ export class Catalog {
   }
 }
 
-async function readDependencies(project: string): Promise<Set<string>> {
-  const dependencies = new Set<string>();
+async function readDependencies(project: string): Promise<string[]> {
+  const dependencies: string[] = [];
   for (const filename of ["package.json", "composer.json"]) {
     const path = join(project, filename);
     if (!(await isFile(path))) continue;
-    let payload: Record<string, unknown>;
+    let payload: unknown;
     try {
-      payload = JSON.parse(await readFile(path, "utf8")) as Record<string, unknown>;
+      payload = JSON.parse(await readFile(path, "utf8"));
     } catch {
       continue;
     }
+    if (!isRecord(payload)) continue;
     for (const key of [
       "dependencies",
       "devDependencies",
@@ -275,20 +307,40 @@ async function readDependencies(project: string): Promise<Set<string>> {
       "peerDependencies",
     ]) {
       const value = payload[key];
-      if (value && typeof value === "object" && !Array.isArray(value)) {
-        for (const dependency of Object.keys(value)) dependencies.add(dependency);
-      }
+      if (isRecord(value)) dependencies.push(...Object.keys(value));
     }
   }
   return dependencies;
 }
 
+function imageRepository(image: string): string {
+  return image.trim().replace(/^docker\.io\//u, "").replace(/[:@][^/]*$/u, "");
+}
+
+async function readImages(path: string): Promise<string[]> {
+  const text = await readFile(path, "utf8");
+  let payload: unknown;
+  try {
+    payload = Bun.YAML.parse(text);
+  } catch {
+    return [];
+  }
+  if (!isRecord(payload) || !isRecord(payload.services)) return [];
+  return Object.values(payload.services).flatMap((service) =>
+    isRecord(service) && typeof service.image === "string" ? [imageRepository(service.image)] : [],
+  );
+}
+
 /** Visits subprojects without following symlinks, skill installs or dependencies. */
-async function detectionRoots(project: string): Promise<string[]> {
+async function detectionSources(project: string, includeCompose: boolean) {
   const roots: string[] = [project];
+  const composeFiles: string[] = [];
   const ignored = new Set([".git", ".agents", ".claude", ".specify", ".venv", "venv", "node_modules", "vendor", "dist", "build", "coverage", "__pycache__"]);
   const visit = async (directory: string): Promise<void> => {
     for (const entry of await readdir(directory, { withFileTypes: true })) {
+      if (includeCompose && entry.isFile() && /^(?:docker-)?compose.*\.ya?ml$/u.test(entry.name)) {
+        composeFiles.push(join(directory, entry.name));
+      }
       if (!entry.isDirectory() || ignored.has(entry.name) || entry.name.startsWith("venv_")) continue;
       const child = join(directory, entry.name);
       if (spawnSync("git", ["check-ignore", "--quiet", "--", child], { cwd: directory }).status === 0) continue;
@@ -297,5 +349,5 @@ async function detectionRoots(project: string): Promise<string[]> {
     }
   };
   await visit(project);
-  return roots;
+  return { roots, composeFiles };
 }

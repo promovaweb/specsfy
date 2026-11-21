@@ -17,7 +17,7 @@ function readSpec(markdown: string): { names: string[]; text: string } {
   const names = new Set<string>();
   const prose: string[] = [];
   let metadata = true;
-  let section = 0;
+  let section = "";
   let specialistPlan = false;
   let specialistTable = false;
   let fence: string | undefined;
@@ -40,10 +40,10 @@ function readSpec(markdown: string): { names: string[]; text: string } {
     const heading = /^ {0,3}(#{2,6})[ \t]+(.+)$/.exec(line);
     if (heading?.[1] === "##" || heading?.[1] === "###") {
       metadata = false;
-      section = heading[1] === "###" ? Number(/^(\d+)\./.exec(heading[2]!)?.[1] ?? 0) : 0;
+      section = heading[1] === "###" ? fold(heading[2]!.replace(/^\d+\.[ \t]+/u, "").trim()) : "";
       specialistPlan = false;
     } else if (heading) {
-      specialistPlan = section === 8 && heading[1] === "####" && /^Especialistas\s*#*\s*$/i.test(heading[2]!);
+      specialistPlan = section === "plano tecnico" && heading[1] === "####" && /^Especialistas\s*#*\s*$/i.test(heading[2]!);
       specialistTable = false;
     }
     const cells = /^\s*\|(.*)\|\s*$/.exec(line)?.[1]?.split("|").map((cell) => cell.trim());
@@ -61,7 +61,7 @@ function readSpec(markdown: string): { names: string[]; text: string } {
     }
     specialistTable = false;
 
-    const taskNote = section === 14 && /^\s*(?:[-*+]\s+)?\**Especialista\**:\**\s+([^\s(]+)/i.exec(line);
+    const taskNote = section === "tarefas" && /^\s*(?:[-*+]\s+)?\**Especialista\**:\**\s+([^\s(]+)/i.exec(line);
     if (taskNote) {
       declare(taskNote[1]!);
       continue;
@@ -92,11 +92,72 @@ function fold(text: string): string {
   return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 }
 
-function matchesKeyword(text: string, keyword: string): boolean {
+function keywordPattern(keyword: string): string | undefined {
   const tokens = fold(keyword).trim().split(/\s+/u).map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-  if (!tokens[0]) return false;
-  const phrase = tokens.join("\\s+");
-  return new RegExp(`(?<![\\p{L}\\p{N}_])${phrase}(?![\\p{L}\\p{N}_])`, "u").test(text);
+  if (!tokens[0]) return undefined;
+  return `(?<![\\p{L}\\p{N}_])${tokens.join("\\s+")}(?![\\p{L}\\p{N}_])`;
+}
+
+function matchesKeyword(text: string, keyword: string): boolean {
+  const pattern = keywordPattern(keyword);
+  return pattern !== undefined && new RegExp(pattern, "u").test(text);
+}
+
+function stackDeclarations(markdown: string): Array<{ technology: string; line: string }> {
+  const declarations: Array<{ technology: string; line: string }> = [];
+  let excludedLevel = 0;
+  let technologyColumn = -1;
+  let fence: string | undefined;
+  for (const raw of markdown.replace(/<!--[^]*?-->/gu, "").split(/\r?\n/u)) {
+    const line = fold(raw.trim());
+    const marker = /^(`{3,}|~{3,})(.*)$/u.exec(line);
+    if (fence) {
+      if (marker && marker[1]!.startsWith(fence) && !marker[2]!.trim()) fence = undefined;
+      continue;
+    }
+    if (marker) {
+      fence = marker[1];
+      continue;
+    }
+    const heading = /^(#{1,6})\s+(.+)$/u.exec(line);
+    if (heading) {
+      const level = heading[1]!.length;
+      if (excludedLevel && level <= excludedLevel) excludedLevel = 0;
+      if (!excludedLevel && /\b(?:pendencias?|ausencias?|alternativas?|a confirmar|nao adotad[ao]s?)\b/u.test(heading[2]!)) {
+        excludedLevel = level;
+      }
+      technologyColumn = -1;
+      continue;
+    }
+    if (excludedLevel) continue;
+    const text = line.replace(/[`*]/gu, "");
+    if (text.startsWith("|")) {
+      const cells = text.replace(/^\||\|$/gu, "").split(/(?<!\\)\|/u).map((cell) => cell.trim());
+      const header = cells.findIndex((cell) => /^tecnologias?$/u.test(cell));
+      if (header >= 0) {
+        technologyColumn = header;
+        continue;
+      }
+      const technology = cells[technologyColumn >= 0 ? technologyColumn : 0];
+      if (technology) declarations.push({ technology, line: text });
+      continue;
+    }
+    technologyColumn = -1;
+    if (text) declarations.push({ technology: text, line: text });
+  }
+  return declarations;
+}
+
+function declaresAlias(declarations: ReturnType<typeof stackDeclarations>, alias: string): boolean {
+  const pattern = keywordPattern(alias);
+  if (!pattern) return false;
+  const technology = new RegExp(pattern, "u");
+  const negative = new RegExp(
+    `\\b(?:sem|nao usa(?:mos|do|da)?|nao adota(?:mos|do|da)?|ausencia de)\\s+${pattern}|` +
+    `${pattern}\\s*[:|(–-]\\s*(?:pendente|ausente|a confirmar|a instalar|nao (?:usad[ao]|adotad[ao]|instalad[ao]))\\b`,
+    "u",
+  );
+  return declarations.some((row) => technology.test(row.technology) && !negative.test(row.line));
 }
 
 /** A catalog trigger matched by the spec, with the two independent states. */
@@ -110,22 +171,25 @@ export interface SpecialistSuggestion {
 
 /**
  * Specialists the project's stack confirms: detected by the catalog markers
- * or named in .specsfy/STACK.md. Technology specialists (entries with
- * detection markers) are suggested only when the stack confirms them.
+ * or declared in .specsfy/STACK.md. A failed scan leaves declarations available.
  */
-export async function projectStackSpecialists(project: string, catalog: Catalog): Promise<Set<string>> {
-  const confirmed = new Set((await catalog.detect(project)).map((entry) => entry.name));
-  let stack = "";
+export async function projectStackSpecialists(project: string, catalog: Catalog): Promise<{
+  stack: Set<string>;
+  stackWarning?: string;
+}> {
+  const stack = new Set<string>();
+  let stackWarning: string | undefined;
   try {
-    stack = fold(await readFile(join(project, ".specsfy", "STACK.md"), "utf8"));
+    for (const entry of await catalog.detect(project)) stack.add(entry.name);
   } catch {
-    // No STACK.md yet: detection alone decides.
+    stackWarning = "Could not detect the project stack. Using declarations in .specsfy/STACK.md when available.";
   }
+  const markdown = await readFile(join(project, ".specsfy", "STACK.md"), "utf8").catch(() => "");
+  const declarations = stackDeclarations(markdown);
   for (const entry of catalog.entries) {
-    const short = entry.name.replace(/^specsfy-specialist-/u, "");
-    if (stack && matchesKeyword(stack, short.replace(/-/gu, " "))) confirmed.add(entry.name);
+    if (entry.stack && entry.aliases.some((alias) => declaresAlias(declarations, alias))) stack.add(entry.name);
   }
-  return confirmed;
+  return { stack, stackWarning };
 }
 
 /**
@@ -139,8 +203,7 @@ export function analyzeSpecSpecialists(markdown: string, catalog: Catalog, insta
   const prose = fold(text);
   const suggestions: SpecialistSuggestion[] = [];
   for (const entry of catalog.entries) {
-    const technology = entry.files.length > 0 || entry.dependencies.length > 0;
-    if (stack && technology && !stack.has(entry.name) && !declared.has(entry.name)) continue;
+    if (stack && entry.stack && !stack.has(entry.name) && !declared.has(entry.name)) continue;
     for (const trigger of entry.triggers) {
       if (!trigger.keywords.some((keyword) => matchesKeyword(prose, keyword))) continue;
       suggestions.push({

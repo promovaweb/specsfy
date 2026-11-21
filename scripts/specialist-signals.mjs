@@ -47,26 +47,38 @@ export function signalsTable(catalog) {
 }
 
 /** Replaces the marked block, or the first signal table on the first run. */
-export function withTable(text, table) {
+export function withTable(text, table, path = "signal table") {
   const block = `${START}\n${table}\n${END}`;
-  if (text.includes(START)) return text.replace(new RegExp(`${START}[\\s\\S]*?${END}`, "u"), block);
+  const start = text.indexOf(START);
+  const end = text.indexOf(END);
+  if (start >= 0 || end >= 0) {
+    if (start < 0 || end < start || text.lastIndexOf(START) !== start || text.lastIndexOf(END) !== end) {
+      throw new Error(`${path}: expected exactly one start marker followed by one end marker`);
+    }
+    return text.slice(0, start) + block + text.slice(end + END.length);
+  }
   const match = /^\| Sinal na demanda[^\n]*\n(?:\|[^\n]*\n?)*/mu.exec(text);
-  if (!match) throw new Error("no signal table and no markers");
-  return text.replace(match[0], `${block}\n`);
+  if (!match) throw new Error(`${path}: no signal table and no markers`);
+  return text.replace(match[0], () => `${block}\n`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   const check = process.argv.includes("--check");
   const table = signalsTable(JSON.parse(readFileSync(join(ROOT, "specialists", "catalog.json"), "utf8")));
-  const stale = [];
-  for (const path of SIGNAL_FILES) {
-    const file = join(ROOT, path);
-    const current = readFileSync(file, "utf8");
-    const next = withTable(current, table);
-    if (next === current) continue;
-    stale.push(path);
-    if (!check) writeFileSync(file, next);
+  const changes = [];
+  try {
+    for (const path of SIGNAL_FILES) {
+      const file = join(ROOT, path);
+      const current = readFileSync(file, "utf8");
+      const next = withTable(current, table, path);
+      if (next !== current) changes.push({ path, file, next });
+    }
+  } catch (error) {
+    console.error(error.message);
+    process.exit(1);
   }
+  if (!check) for (const { file, next } of changes) writeFileSync(file, next);
+  const stale = changes.map(({ path }) => path);
   if (check && stale.length) {
     console.error(`Signal tables out of date (run node scripts/specialist-signals.mjs):\n${stale.map((path) => `  ${path}`).join("\n")}`);
     process.exit(1);
