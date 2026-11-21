@@ -4,6 +4,23 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.41.2] - 2026-11-21
+
+### Alterado
+
+- O ebook guarda só a edição atual e a anterior, por SemVer.
+  - No repositório, o build do ebook apaga do `ebook/` as edições mais
+    antigas (saíram a 0.40.3, a 0.40.4 e a 0.40.5).
+  - No site, a etapa do `scripts/release.mjs` roda
+    `media:podar-ebook-specsfy` depois do `media:publicar`. Ele apaga as
+    edições antigas do R2, do manifesto de mídia e dos downloads locais, e
+    confere que nenhuma página referencia uma edição removida.
+  - A primeira limpeza retirou 98 arquivos de `media.promovaweb.com`, das
+    edições 0.20.0 a 0.40.5 e da numeração 1.x antiga. Ficaram a 0.41.1 e a
+    0.41.0.
+- A etapa do site sincroniza as páginas direto no worktree limpo do website
+  (`--website-dir` no sincronizador do Hub), sem passar pelo checkout local.
+
 ## [0.41.1] - 2026-11-21
 
 ### Corrigido

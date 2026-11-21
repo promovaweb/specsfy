@@ -1,4 +1,4 @@
- ▌ Specsfy v0.41.1  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
+ ▌ Specsfy v0.41.2  │  ~/projects/loja-online                                                                         linux-x64 • Bun 1.4.4 
  ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── 
    Overview         Specs         Backlog      Milestones       Context         Gates          Tests         Skills          About          
  ╭─ Skills ─────────────────────────────────────────────╮╭─ Status ───────────────────────────────────────────────────────────────────────╮ 
