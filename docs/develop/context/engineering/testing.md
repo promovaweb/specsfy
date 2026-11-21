@@ -167,8 +167,10 @@ npm run build
 ```
 
 `composer ci:check` agrega as verificações declaradas pelos manifests do
-aplicativo. O CI de `example/` também valida sua documentação, rotas e
-comandos. Esses contratos não substituem a suíte Pest do produto.
+aplicativo. O job `example` do workflow Specsfy compila o CLI da revisão em
+teste e adiciona `cli/dist` ao `PATH` do Composer para executar
+`specsfy gate database` antes da migration de teste. O mesmo job valida a
+documentação, as rotas e os comandos do exemplo e roda a suíte Pest.
 
 ## Evidência
 
