@@ -4,6 +4,51 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.40.2] - 2026-11-20
+
+### Corrigido
+
+Resultado de três verificações independentes (Codex): um segundo ensaio de
+ponta a ponta, uma checagem de fatos e uma revisão dos especialistas novos.
+
+- Especialistas novos: 55 achados corrigidos, 17 deles graves, com as
+  receitas validadas.
+  - mysql: dump com GTID, XtraBackup incremental aplicado de fato e réplica
+    com seed.
+  - mongodb: dump com oplog, PITR e transferência que não credita sem debitar.
+  - cloudflare: modos de TLS, ambientes do wrangler e ordem do DNSSEC.
+  - n8n: Compose completo para queue mode, storage binário, filas Bull
+    isoladas, migração entre instâncias e isolamento do Code node.
+  - testing: Pest sem `RefreshDatabase`, `Http::preventStrayRequests`,
+    `testing/pest + laravel/app` e Playwright só com plano automatizado.
+- Checagem de fatos: 62 de 74 afirmações conferidas estavam corretas. As 12
+  restantes foram corrigidas, entre elas o fim da manutenção do MySQL 8.0, o
+  MongoDB 9.0 em disponibilidade geral, `unstable_catchError` no Next.js, as
+  RFCs 9110 e 9112 e as descontinuações do TypeScript 6.0.
+- `specialists suggest` e os avisos do `verify` agrupam por especialista e
+  modo, mostram o trecho da spec onde o sinal casou, ignoram frases negadas e
+  o que está fora de escopo, e também leem a subseção 8 e as tarefas.
+- Comandos novos: `tasks next --phase red`, que devolve o próximo RED
+  elegível antes do Plan Gate, e `verify --spec <id>`. O `inbox process`
+  atualiza as referências da captura no `.specsfy/DATABASE.md`.
+- Contrato CRUD:
+  - o Definition Gate confere a reserva do ID da tarefa e o planejamento
+    resolve a tarefa;
+  - os gates passaram a usar um parser de IDs comum;
+  - o menu precisa declarar rótulo e destino;
+  - os templates e os especialistas só cobram link de linha, editar e apagar
+    para as operações declaradas.
+- O monitor de contexto funciona sem `.git` e aceita lista vazia conhecida.
+- A seção "No Specsfy" de todos os especialistas passa a abrir com a fonte de
+  entrada por fase. OpenAPI e Problem Details ficam condicionados ao contrato,
+  com um exemplo Inertia. O `docs/packages` do Laravel fica condicional, e a
+  combinação de tenant com postgres ou supabase depende da stack.
+- Sinais novos: limite configurado separado do consumo de limite, validade por
+  data civil com relógio controlado, unicidade normalizada por equipe e
+  permissão por papel e operação.
+- O `example/` foi atualizado para o contrato atual. O `specsfy verify`
+  passa com 32 checks, e o `test:prepare` deixou de depender do monorepo.
+
 ## [0.40.1] - 2026-11-20
 
 ### Corrigido
