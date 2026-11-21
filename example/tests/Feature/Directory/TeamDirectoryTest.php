@@ -5,7 +5,7 @@ use App\Models\Team;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
-// SPECSFY: FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-001
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-001
 test('authenticated people can browse all active teams with member counts', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
     $member = User::factory()->create(['name' => 'Member']);
@@ -32,6 +32,7 @@ test('authenticated people can browse all active teams with member counts', func
         );
 });
 
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-002
 test('team directory presents an explicit empty result', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
     $viewer->personalTeam()?->delete();
@@ -41,11 +42,14 @@ test('team directory presents an explicit empty result', function () {
         ->get(route('directory.teams.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
+            ->component('directory/teams/index')
             ->has('teams.data', 0)
+            ->where('teams.meta.perPage', 15)
             ->where('teams.meta.total', 0),
         );
 });
 
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-003
 test('team directory paginates with a stable order', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
 
@@ -58,12 +62,26 @@ test('team directory paginates with a stable order', function () {
         ->get(route('directory.teams.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
+            ->component('directory/teams/index')
             ->has('teams.data', 15)
+            ->where('teams.data.0.name', 'Shared 01')
             ->where('teams.meta.total', 16)
             ->where('teams.meta.currentPage', 1),
         );
+
+    $this
+        ->actingAs($viewer)
+        ->get(route('directory.teams.index', ['page' => 2]))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('teams.data', 1)
+            ->where('teams.data.0.isPersonal', true)
+            ->where('teams.data.0.membersCount', 1)
+            ->where('teams.meta.currentPage', 2),
+        );
 });
 
+// SPECSFY: US-001 FR-001 AC-001
 test('team directory requires authentication', function () {
     $this
         ->get(route('directory.teams.index'))

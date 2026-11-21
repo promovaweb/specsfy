@@ -11,11 +11,18 @@ registra componentes, blocos e telas locais; as regras globais de SaaS vivem em
 ## Base observada
 
 - Stack: {{STACK_LABEL}}
-- Política: toda interface React é composta por componentes React.
-- Primitives: shadcn/ui.
-- Composições gratuitas: ReUI.
 
 {{STACK_GUIDANCE}}
+
+## Política de composição
+
+- Política: toda interface React é composta por componentes React.
+- Primitives previstas: shadcn/ui.
+- Composições gratuitas previstas: ReUI.
+
+Confirme cada item observado pelo arquivo e uso no código antes de registrá-lo
+como existente. Para uma composição prevista sem arquivo no projeto, registre
+a pendência em `STACK.md` e planeje a incorporação.
 
 ## Design system
 
@@ -26,7 +33,7 @@ registra componentes, blocos e telas locais; as regras globais de SaaS vivem em
 | Registry ReUI | A mapear | Itens gratuitos `@reui/c-*` |
 | PageHeader compartilhado | `DESIGNSYSTEM.MD` | Um componente reutilizável para lista, detalhe, criação e edição |
 | Padrão de dashboard | `DESIGNSYSTEM.MD` | `PageHeader`, filtros, `KPI`, visualização principal e investigação detalhada |
-| Padrão de linha | `DESIGNSYSTEM.MD` | `DataGrid` em largura total, coluna `ID`, detalhe clicável por linha e ações de editar e apagar |
+| Padrão de linha | `DESIGNSYSTEM.MD` | `DataGrid` em largura total e coluna `ID`, com links e ações definidos pelo Contrato CRUD |
 | Padrão de formulário | `DESIGNSYSTEM.MD` | Seções, coluna de contexto e painel em duas colunas responsivas |
 | Padrão de contexto | `DESIGNSYSTEM.MD` | `Breadcrumb` em todas as telas, com equipe, módulo e tela atual |
 | Primitives compartilhadas | A mapear | Componentes em `ui/` ou diretório equivalente |
@@ -66,9 +73,11 @@ vazio, upload ou ação em lote.
 6. Em CRUD, reutilize o mesmo `PageHeader` nas telas de lista, detalhe,
    criação e edição. Registre uma única implementação, suas props, variações e
    consumidores; não duplique markup de cabeçalho por página.
-7. Linhas de `DataGrid` com detalhe usam link acessível em toda a área; a
-   listagem ocupa a largura disponível, exibe a coluna `ID` e oferece ações de
-   editar e apagar. Ações internas usam `TableRowAction` ou equivalente e não
+7. A listagem ocupa a largura disponível e exibe a coluna `ID`. Siga
+   `Operações:` no Contrato CRUD. Use link acessível na linha somente para
+   `consultar`, ação de edição para `editar` e ação de exclusão para `apagar`.
+   Para `listar, criar`, use linhas informativas e uma ação de criação no
+   cabeçalho. Ações internas usam `TableRowAction` ou equivalente e não
    propagam a navegação.
 8. Formulários de criar e editar usam seções com coluna de contexto e painel
    em duas colunas nos breakpoints largos, refluindo para uma no mobile.

@@ -63,8 +63,9 @@ continua definindo roteamento e hidratação.
 
 Para um CRUD React e Tailwind, o agente consulta Data Grid ou List para
 consulta, Filters para filtros, Form e campos para criar e editar, Dialog
-ou Sheet para ações e Alert ou Badge para feedback. A linha abre o detalhe
-por clique e teclado, com botões, seleção e menus independentes. O
+ou Sheet para ações e Alert ou Badge para feedback. Quando `consultar` consta
+no Contrato CRUD, a linha abre o detalhe por clique e teclado, com botões,
+seleção e menus independentes. O
 `Breadcrumb` mostra equipe ativa, módulo e tela atual, reaproveitando o
 layout existente em Laravel.
 

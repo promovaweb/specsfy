@@ -245,6 +245,8 @@ tests/
 #### Menus e navegação principal
 
 - [Menu principal e menus secundários, seus itens, destinos ou rotas, permissões e comportamento responsivo. Se não houver menu, declare como a pessoa chega às telas e por que a navegação direta é suficiente.]
+- [Registre menu, rótulo visível e destino juntos nesta seção. Exemplo:
+  **Menu**: AppSidebar — **Rótulo**: Cupons — **Destino**: `/equipes/{equipe}/cupons`.]
 
 #### Formulários e ações
 
@@ -286,7 +288,8 @@ tests/
 - [As telas incluídas compartilham o mesmo `PageHeader` reutilizável.]
 - [Escreva uma entrada em uma única linha para cada operação declarada,
   com o controle de interface e o ID da tarefa `[CODE]` da seção 14.
-  Reserve os IDs na definição e confirme-os no planejamento.]
+  O Definition Gate confere a reserva dos IDs. No planejamento, resolva
+  cada ID em uma tarefa que implemente a operação e seu controle.]
 - [Formato da entrada: `- **listar**: DataGrid com a coluna ID visível — Tarefa: T005`.]
 - [Para consulta, descreva o acesso ao detalhe. Quando também houver
   listagem, a linha abre o detalhe por mouse e teclado.]
@@ -438,7 +441,7 @@ Cada tarefa possui exatamente este checklist, atualizado durante a execução:
   - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10.
   - [ ] **EXECUTE**: Implementar os blocos React, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `INTERFACE.md`.
   - [ ] **VERIFY**: Exercitar Breadcrumb, navegação, validações, feedback e teclado.
-  - [ ] **VISUAL**: Conferir PageHeader reutilizado, DataGrid em largura total, coluna `ID`, link da linha, ações de editar e apagar, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes.
+  - [ ] **VISUAL**: Conferir PageHeader reutilizado, DataGrid em largura total, coluna `ID`, bordas, espaçamentos, margens, padding e tipografia. Conforme `Operações:` no Contrato CRUD, confira link de linha para `consultar`, ação de edição para `editar` e exclusão para `apagar`.
   - [ ] **EVIDENCE**: Registrar arquivos, comando e resultado da interação.
   - [ ] **IMPROVE**: Aplicar melhoria de interface ou justificar nenhuma.
   <!-- specsfy:evidence {"task":"T005","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["src/features/recurso/ListaRecurso.tsx"],"commands":[{"run":"comando focal","exit":0}]} -->

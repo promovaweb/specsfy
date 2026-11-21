@@ -103,9 +103,9 @@ Regras do fluxo:
 - `DESIGNSYSTEM.MD` define a composição macro antes da seleção de assets.
 - O erro de campo aparece em vermelho abaixo do campo e leva foco ao primeiro
   erro sem apagar os valores já preenchidos.
-- A linha inteira do DataGrid abre o detalhe por clique e teclado; os controles
-  das operações incluídas (editar e apagar quando declaradas) usam uma camada
-  acima do link da linha e não propagam o clique.
+- Quando `consultar` constar no Contrato CRUD, a linha inteira do DataGrid
+  abre o detalhe por clique e teclado. Os controles de `editar` e `apagar`,
+  quando declarados, ficam acima do link e não propagam o clique.
 - A personalidade vem do domínio, dos dados, da linguagem e dos estados, não
   de uma sequência genérica de cards.
 

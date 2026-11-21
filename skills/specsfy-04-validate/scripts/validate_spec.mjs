@@ -3,7 +3,7 @@
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { parseGateTasks } from "../../specsfy-05-tasks/scripts/parse_tasks.mjs";
+import { parseGateTasks, parseSpecIds } from "../../specsfy-05-tasks/scripts/parse_tasks.mjs";
 
 const args = process.argv.slice(2);
 const input = args.find((arg) => !arg.startsWith("--"));
@@ -12,18 +12,16 @@ const asJson = args.includes("--json");
 const sections = ["Problema e resultado", "Research e esclarecimentos", "Escopo e atores", "Princípios e restrições do projeto", "Histórias de usuário", "Cenários BDD de aceite", "Requisitos", "Plano técnico", "Modelo de dados", "Interfaces e contratos", "Estratégia TDD", "Plano de testes e rastreabilidade", "Validações", "Tarefas", "Ordem de execução", "Dependências, riscos e suposições", "Decisões", "Definition of Done"];
 const escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const field = (body, key) => body.match(new RegExp(`^\\|\\s*${escape(key)}\\s*\\|\\s*(.+?)\\s*\\|\\s*$`, "im"))?.[1]?.trim();
-const identifiers = (body, kind) => [...new Set([...body.matchAll(new RegExp(`\\b${kind}-\\d{3,}\\b`, "g"))].map((match) => match[0]))];
-
-function minimumBddErrors(body) {
+function minimumBddErrors(body, declarations, ids) {
   const covered = new Map();
-  const matches = [...body.matchAll(/^####\s+(AC-\d{3,})\b/gm)];
-  for (const [index, match] of matches.entries()) {
-    const chunk = body.slice(match.index, matches[index + 1]?.index);
-    const ids = chunk.match(/\*\*Cobre\*\*:\s*([^\n]+)/i)?.[1]?.match(/\b(?:US|FR|NFR)-\d{3,}\b/g) ?? [];
-    for (const id of ids) covered.set(id, new Set([...(covered.get(id) ?? []), match[1]]));
+  for (const [index, id] of ids.AC.entries()) {
+    const next = declarations.get(ids.AC[index + 1]);
+    const chunk = body.slice(declarations.get(id).index, next?.index);
+    const refs = chunk.match(/\*\*Cobre\*\*:\s*([^\n]+)/i)?.[1]?.match(/\b(?:US|FR|NFR)-\d{3,}\b/g) ?? [];
+    for (const ref of refs) covered.set(ref, new Set([...(covered.get(ref) ?? []), id]));
   }
   const errors = [];
-  for (const kind of ["US", "FR", "NFR"]) for (const id of identifiers(body, kind)) {
+  for (const kind of ["US", "FR", "NFR"]) for (const id of ids[kind]) {
     const count = covered.get(id)?.size ?? 0;
     if (count < 3) errors.push(`${id} possui ${count} cenários BDD; mínimo exigido: 3.`);
   }
@@ -58,7 +56,7 @@ function affirmativeControl(text, pattern, extra = /.*/) {
     pattern.test(clause) && extra.test(clause) && !/\b(?:n(?:ã|a)o|nem|sem)\b/i.test(clause));
 }
 
-function crudErrors(content, body, status) {
+function crudErrors(content, body, status, tasks) {
   const prefix = "Interface para pessoas: Contrato CRUD";
   const declaration = /^[ \t]*(?:[-*][ \t]+)?(?:\*\*Operações\*\*:|\*\*Operações:\*\*|Operações:)[ \t]*(.*)$/gim;
   const declarations = [...content.matchAll(declaration)];
@@ -92,7 +90,6 @@ function crudErrors(content, body, status) {
     entries.get(operation).push(entry[3]);
   }
 
-  const tasks = parseGateTasks(body);
   const resolveTasks = tasks.length > 0 || !["Draft", "Defined"].includes(status) ||
     field(body, "Plan Gate") === "Passed";
   for (const operation of operations) {
@@ -122,8 +119,20 @@ function crudErrors(content, body, status) {
   return errors;
 }
 
+function hasMenuMapping(content) {
+  const text = content.replaceAll("**", "").replaceAll("`", "");
+  if (/\b(?:não há|não haverá|sem)\s+menus?\b/i.test(text)) {
+    return /\b(?:rota|link|tela|acesso|navegação|diretamente)\b/i.test(text);
+  }
+  const menu = /\b(?:menus?|\w*sidebar)\b/i;
+  const label = /\b(?:rótulo|item|itens)\b/i;
+  const destination = /\b(?:destino|rota)[ \t]*:?[ \t]+[^\s—–;|]|(?:^|[\s(])\/[\w{]|(?:→|\bpara)\s+(?:\/|a\s+tela\b|o\s+painel\b)/i;
+  return menu.test(text) && destination.test(text) &&
+    (label.test(text) || /\bmenus?\s+(?:(?:principal|secundário)\s+)?com\s+\S/i.test(text));
+}
+
 /** Exige o contrato de interface e, quando aplicável, o contrato CRUD. */
-function interfaceErrors(body, status) {
+function interfaceErrors(body, status, tasks) {
   const value = field(body, "Interface para pessoas");
   if (!value) return status === "Draft" ? [] : ["O cabeçalho deve informar se há Interface para pessoas."];
   if (status === "Draft" && /^(?:A definir|Pendente)\b/i.test(value)) return [];
@@ -157,14 +166,14 @@ function interfaceErrors(body, status) {
     if (/\[(?:Tela|Como|Menu|Campos|Hierarquia|Loading|Sim ou Não)/i.test(content) || !content.trim()) {
       errors.push(`Interface para pessoas: ${title} precisa descrever o comportamento real.`);
     }
-    if (title === "Menus e navegação principal" && (!/\bmenus?\b/i.test(content) || !/\b(?:item|rota|destino|tela|navega)/i.test(content))) {
+    if (title === "Menus e navegação principal" && !hasMenuMapping(content)) {
       errors.push("Interface para pessoas: Menus e navegação principal precisa mapear menus, itens e destinos, ou declarar por que não há menu.");
     }
     const visualChecks = [[/bordas/i, "bordas"], [/espaçamentos/i, "espaçamentos"], [/margens/i, "margens"], [/padding/i, "padding"], [/tipografia/i, "tipografia"]];
     if (title === "Revisão visual durante o desenvolvimento" && visualChecks.some(([pattern]) => !pattern.test(content))) {
       errors.push("Interface para pessoas: Revisão visual durante o desenvolvimento precisa conferir bordas, espaçamentos, margens, padding e tipografia.");
     }
-    if (title === "Contrato CRUD") errors.push(...crudErrors(content, body, status));
+    if (title === "Contrato CRUD") errors.push(...crudErrors(content, body, status, tasks));
   }
   return errors;
 }
@@ -187,12 +196,15 @@ if (!input || !existsSync(input)) {
   for (const name of ["definition", "plan"]) if (!['Pending', 'Failed', 'Passed'].includes(gates[name])) errors.push(`${name} Gate inválido.`);
   if (!['Pending', 'In Progress', 'Failed', 'Passed'].includes(gates.delivery)) errors.push("Delivery Gate inválido.");
   for (const title of sections) if (!new RegExp(`^###\\s+(?:\\d+\\.\\s+)?${escape(title)}\\s*$`, "im").test(body) && !(title === "Dependências, riscos e suposições" && /^###\s+(?:16\.\s+)?Dependências, falhas possíveis e suposições\s*$/imu.test(body))) errors.push(`Heading obrigatório ausente: ${title}.`);
-  const ids = Object.fromEntries(["US", "FR", "NFR", "AC", "DEC"].map((kind) => [kind, identifiers(body, kind)]));
+  const tasks = parseGateTasks(body);
+  const declarations = parseSpecIds(body, tasks);
+  const ids = Object.fromEntries(["US", "FR", "NFR", "AC", "DEC"].map((kind) =>
+    [kind, [...declarations.keys()].filter(id => id.startsWith(`${kind}-`))]));
   for (const kind of ["US", "FR", "NFR", "AC"]) if (!ids[kind].length) errors.push(`Nenhuma definição ${kind}-NNN encontrada.`);
-  errors.push(...minimumBddErrors(body));
-  if (status === "Complete" && /^\s*-\s+\[ \]\s+T\d{3,}/m.test(body)) errors.push("Status Complete não permite tarefas abertas na seção 14.");
+  errors.push(...minimumBddErrors(body, declarations, ids));
+  if (status === "Complete" && tasks.some(task => !task.complete)) errors.push("Status Complete não permite tarefas abertas na seção 14.");
   if ((/(?<![\p{L}\p{N}_])(?:TODO|TBD|FIXME)(?![\p{L}\p{N}_])/u.test(body) || /\[NEEDS CLARIFICATION/i.test(body)) && !(status === "Draft" && draft)) errors.push("Marcadores não resolvidos.");
-  errors.push(...interfaceErrors(body, status));
+  errors.push(...interfaceErrors(body, status, tasks));
   const result = { path, format: field(body, "Formato"), slug, status, gates, counts: Object.fromEntries(Object.entries(ids).map(([key, value]) => [key, value.length])), errors, warnings };
   if (asJson) console.log(JSON.stringify(result, null, 2));
   else { console.log(`Spec: ${path}`); errors.forEach((error) => console.log(`ERRO: ${error}`)); console.log(errors.length ? "RESULTADO: NOT READY" : status === "Draft" ? "RESULTADO: VALID DRAFT" : "RESULTADO: READY"); }

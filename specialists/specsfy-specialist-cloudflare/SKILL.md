@@ -37,31 +37,29 @@ no SLO do serviço.
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
-   `.specsfy/RULES.md`, e `.specsfy/DATABASE.md` quando o modo tocar D1.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
-2. Siga o modo indicado na spec ou na tarefa, no formato
+1. **Fonte de entrada por fase**
+   - `specsfy-02-backlog`: leia o item indicado em `specs/backlog/`. A fase
+     registra decisões e sinais no próprio item quando ainda não há spec.
+   - `specsfy-03-specify` e `specsfy-04-validate`: use a
+     spec aberta indicada pela fase.
+   - `specsfy-05-tasks`: sugira especialistas e modos para a fase sincronizar
+     plano e tarefas. A criação e a decomposição da seção 14 cabem à fase 05.
+   - `specsfy-06-implement`: limite a atuação à tarefa e ao passo carregado
+     pela fase. O modo tests conclui o checklist da tarefa em `prepare`.
+2. Quando houver spec, leia a spec aberta indicada pela fase chamadora. Se
+   receber um identificador inequívoco, resolva com
+   `specsfy specs show <id> --content`. Confira a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção em
+   elaboração. Consulte `.specsfy/STACK.md`, `.specsfy/RULES.md` e
+   `.specsfy/DATABASE.md` quando o modo tocar banco. Siga o modo indicado:
    `Especialista: $specsfy-specialist-cloudflare (dns)`, `(workers)` ou
-   `(security)`. Sem indicação, identifique a conta, a zona e o ambiente antes de
-   propor mudança.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
-4. Não mude o estado da spec nem marque gate: isso pertence a
-   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
-   `$specsfy-06-implement`.
-5. Registre na spec o nome do registro ou da rota, o modo de proxy, o modo
-   SSL/TLS, a política de acesso, o `compatibility_date` e o comando de deploy
-   usado. A zona e o ambiente fazem parte da mudança, não são detalhe da
-   conversa.
+   `(security)`. Sem indicação, confirme conta, zona, ambiente e objetivo.
+3. Entregue conclusão, lacunas e evidências à fase chamadora. A fase dona
+   registra a saída na spec ou no item de backlog. O especialista preserva
+   a spec, seus gates e a tarefa ativa.
+4. Inclua na devolutiva, quando aplicável, conta, zona, ambiente, rota, modo de
+   proxy e TLS, política de acesso, versão do Wrangler, `compatibility_date`,
+   comandos e evidência.
 
 ## Fluxo
 
@@ -71,9 +69,9 @@ no SLO do serviço.
 2. Classifique o pedido: dns para nome e TLS, workers para código e binding,
    security para filtro e acesso.
 3. Verifique o estado atual com consulta real (`dig`, `curl -I`, `wrangler
-   whoami`, `wrangler deployments list`) em vez de assumir o painel.
-4. Faça a mudança na ordem que não derruba o serviço: nome antes de proxy, proxy
-   antes de regra, regra em log antes de bloqueio.
+   whoami`, `wrangler deployments list --env staging`, se for o ambiente selecionado).
+4. Prepare nome e TLS, confira a configuração de proxy e valide regras em
+   staging antes de bloquear tráfego de produção.
 5. Valide com as comprovações da seção Validação e só então entregue o texto
    para a spec, com o efeito colateral declarado.
 
@@ -83,8 +81,9 @@ no SLO do serviço.
    cada origem, incluindo CNAME para serviço de terceiro.
 2. Decida proxy por tipo de tráfego: HTTP e HTTPS podem ser proxiados; SMTP, SSH
    e protocolo não HTTP usam DNS only.
-3. Configure SSL/TLS em Full (strict) com certificado de origem válido. Flexible
-   cria laço de redirecionamento e tráfego em claro entre Cloudflare e origem.
+3. Confira o modo TLS efetivo da zona. Recomende Full (strict) com certificado
+   de origem válido (regra da casa). Confira o certificado de borda para cada
+   hostname e configure AOP separadamente se a origem exigir certificado cliente.
 4. Aplique redirecionamento e cabeçalho no lugar certo: regra de redirecionamento
    para URL, Transform Rule para cabeçalho, HSTS só depois de confirmar HTTPS em
    todos os subdomínios.
@@ -93,8 +92,8 @@ no SLO do serviço.
 
 ### Modo workers
 
-1. Inspecione `wrangler.jsonc` ou `wrangler.toml`, `package.json`, o ambiente
-   declarado e o binding usado por cada handler.
+1. Inspecione `wrangler.jsonc` ou `wrangler.toml`, a versão local do Wrangler
+   no lockfile, o ambiente e os bindings usados por cada handler.
 2. Fixe `compatibility_date` e só mude com teste. Data antiga esconde mudança de
    runtime, data futura antecipa comportamento não testado.
 3. Separe `vars` de segredo. Segredo entra por `wrangler secret put` e nunca no
@@ -112,8 +111,8 @@ no SLO do serviço.
 2. Escolha o controle pelo objetivo: regra de WAF para requisição maliciosa,
    rate limiting para abuso de volume, Access para acesso restrito, Tunnel para
    serviço sem IP público.
-3. Escreva a expressão com os campos reais e teste em ação de log antes de
-   bloquear.
+3. Escreva a expressão com campos disponíveis no plano. Valide no hostname de
+   staging e use ação de log quando o plano oferecer.
 4. Defina resposta e observabilidade: status, página, contador e alerta quando a
    regra dispara.
 5. Garanta que existe um caminho de administração fora da regra e que o token de
@@ -122,8 +121,8 @@ no SLO do serviço.
 
 ## Padrões
 
-- SSL/TLS em Full (strict) com certificado de origem válido. Flexible nunca é
-  escolha para produção, porque o trecho Cloudflare até a origem viaja em claro.
+- Full (strict) com certificado de origem válido em produção (regra da casa).
+  Flexible mantém em claro o trecho Cloudflare até a origem.
 - Registro que não é HTTP nem HTTPS fica em DNS only. Proxiar protocolo não
   suportado quebra o serviço de forma silenciosa.
 - CNAME que aponta para serviço removido é risco de tomada de subdomínio. Revise
@@ -136,14 +135,15 @@ no SLO do serviço.
   tutorial.
 - Binding declarado por ambiente e conferido com o recurso real. Apontar KV de
   produção em ambiente de teste mistura dado.
-- WAF e rate limiting entram primeiro em ação de log, com prazo de observação,
-  depois em bloqueio. Regra sem observação derruba cliente legítimo.
-- Rate limiting conta por característica que identifica o abuso, como IP, caminho
-  e método, não por URL inteira com query string variável.
-- Cloudflare Tunnel dispensa porta de entrada aberta na origem. O token do túnel
-  é segredo, e o `cloudflared` roda com ele por arquivo ou variável protegida.
-- Zero Trust Access na frente de painel, wiki interna e endpoint administrativo,
-  com política por identidade e grupo, mais service token para máquina.
+- WAF e rate limiting passam por teste com escopo restrito antes de produção.
+  Ação Log em regras personalizadas requer Enterprise.
+- A expressão de rate limiting define quais requisições contam. A
+  característica escolhida no plano define quem compartilha a cota.
+- Cloudflare Tunnel dispensa porta pública na origem. Proteja a credencial JSON
+  no modo local e o token no modo remoto.
+- Access protege o painel por identidade. Rotas de máquina têm política
+  `Service Auth` que seleciona o token. Webhooks públicos validam a credencial
+  ou assinatura prevista no contrato.
 - Token de API tem escopo mínimo, validade e rotação. Token global em CI é acesso
   total à conta em um arquivo.
 
@@ -159,8 +159,7 @@ no SLO do serviço.
   no painel.
 - Rate limit aplicado em `/*` com contagem por IP único: bloqueia escritório
   inteiro atrás de NAT e não contém bot distribuído.
-- WAF em ação de bloqueio sem período de log: a primeira evidência de falso
-  positivo é reclamação de cliente.
+- WAF em bloqueio sem teste prévio de casos legítimos e de controle.
 - Access configurado apenas em um hostname, com outro nome do mesmo serviço
   aberto: a política protege a porta da frente e deixa a lateral livre.
 - `cloudflared` com token no `docker-compose.yml` versionado.
@@ -175,16 +174,17 @@ no SLO do serviço.
   ausência de redirecionamento em laço.
 - `curl -sv` mostrando TLS válido e versão mínima aplicada, sem certificado
   expirado.
-- `wrangler deploy --dry-run` para conferir bundle e binding antes de publicar,
-  `wrangler tail` durante o teste e `wrangler deployments list` depois.
-- Teste local do Worker com o runtime de teste da Cloudflare, cobrindo binding e
-  resposta de erro.
-- Regra de WAF com ação de log observada por um período declarado, com contagem
-  de disparo e amostra de requisição.
+- `wrangler deploy --dry-run` para bundle e configuração local. Preserve o
+  ambiente escolhido no dry-run, deploy, tail, listagem, rollback e operações D1.
+- Teste local do Worker e integração com bindings reais de staging para conferir
+  conta, permissões, operações e falhas.
+- WAF testado em staging, com requisições legítimas e de controle e eventos
+  disponíveis. Quando houver ação Log, registre a janela e os disparos.
 - Teste de rate limiting com laço controlado, confirmando o status de bloqueio e
   a recuperação depois da janela.
-- `cloudflared tunnel ingress validate` e `cloudflared tunnel --loglevel debug`
-  confirmando conexão e rota antes de desligar o acesso antigo.
+- No Tunnel local, valide o arquivo efetivo com `ingress validate` e confira
+  cada rota com `ingress rule`. Em ambos os modos, confirme conexão, resposta
+  de cada hostname e isolamento das portas da origem.
 - `curl -i` no endpoint administrativo sem credencial, confirmando que Access
   devolve desafio e não conteúdo.
 - Não declare zona segura, Worker saudável ou túnel estável sem essas evidências;

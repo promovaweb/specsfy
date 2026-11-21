@@ -23,9 +23,10 @@ histórico. Use o template `skills/templates/DESIGNSYSTEM.MD` no monorepo e
 
 A lista ganha busca, filtros, ordenação, paginação e seleção conforme volume
 e domínio. No detalhe, acrescente relações ou atividade quando forem úteis
-para a tarefa. A linha inteira abre o detalhe por clique ou teclado. Use
-`TableRowAction` ou equivalente para proteger botões, checkboxes e menus
-internos. Mantenha a lista em largura total com `ID` em coluna própria.
+para a tarefa. Quando `consultar` constar no Contrato CRUD, a linha inteira
+abre o detalhe por clique ou teclado. Use `TableRowAction` ou equivalente
+para proteger botões, checkboxes e menus internos. Sem `consultar`, a linha
+é informativa. Mantenha a lista em largura total com `ID` em coluna própria.
 
 No shell, use labels reais e links válidos para os itens anteriores e marque
 o item atual como página. A equipe e o título atual permanecem visíveis no

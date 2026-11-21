@@ -80,7 +80,7 @@
         ],
         "test:prepare": [
             "@php -r \"file_exists('database/testing.sqlite') || touch('database/testing.sqlite');\"",
-            "node ../skills/specsfy-setup/scripts/check_database_safety.mjs --project . --command \"php artisan migrate --env=testing\"",
+            "specsfy gate database --project . --command \"php artisan migrate --env=testing --no-interaction\"",
             "@php artisan migrate --env=testing --no-interaction"
         ],
         "post-autoload-dump": [

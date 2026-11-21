@@ -21,20 +21,24 @@ Não use para:
 
 ## No Specsfy
 
-1. Leia a spec aberta indicada pela fase ou por `specsfy status`. Consulte a
-   linha `| Especialistas |`, a subseção `#### Especialistas` em
-   `### 8. Plano técnico` e a seção trabalhada pela fase. Leia
-   `.specsfy/STACK.md` e `.specsfy/RULES.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção 8, seção em escrita) e escreva
-     nela; só `specsfy-05-tasks` escreve a seção 14, então apenas indique o que
-     a tarefa deve prever; em `specsfy-06-implement`, siga a tarefa indicada.
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e `.specsfy/RULES.md`.
 2. Siga o modo indicado na spec ou na tarefa, por exemplo
    `Especialista: $specsfy-specialist-mcp (laravel)`. Sem indicação,
    escolha pela tabela e consulte o modo `protocol` para o contrato HTTP comum.
-3. Devolva as conclusões e dúvidas abertas à seção da spec ou à tarefa em
-   andamento.
+3. Devolva as conclusões e dúvidas abertas no destino indicado no item 1.
 4. Deixe as transições de estado da spec e o registro dos gates a cargo das
    skills da fase.
 5. Registre URL, revisão do protocolo, clientes-alvo, recursos expostos,

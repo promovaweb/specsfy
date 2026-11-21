@@ -11,8 +11,8 @@ documentação de WAF, Zero Trust e Tunnel.
 ## Estado antes de mudança
 
 ```bash
-npx wrangler whoami
-npx wrangler deployments list
+npm exec --no -- wrangler whoami
+npm exec --no -- wrangler deployments list --env staging
 dig +short app.example.com
 curl -sI https://app.example.com
 ```
@@ -44,7 +44,7 @@ curl -sI https://app.example.com
 - Token de API tem escopo mínimo, conta correta, validade e rotação. Token global
   em pipeline é acesso administrativo à conta inteira.
 - Alteração de DNS e de proxy é feita na ordem que mantém o serviço no ar: nome
-  antes de proxy, TLS antes de HSTS, regra em log antes de bloqueio.
+  antes de proxy, TLS antes de HSTS e regra validada em staging antes de bloqueio.
 - Toda métrica de borda informa a janela e a origem do dado. Painel sem janela
   declarada não serve como prova.
 - Recurso de borda tem limite publicado. Confirme o limite vigente na página
@@ -75,17 +75,26 @@ na página de cada produto. Número copiado de tutorial envelhece.
 | Off | sem HTTPS | nunca em produção |
 | Flexible | HTTP em claro | legado sem suporte a TLS, com risco aceito e registrado |
 | Full | HTTPS sem validar certificado | transição, com prazo |
-| Full (strict) | HTTPS com certificado válido | padrão de produção |
-| Strict (SSL-Only Origin Pull) | HTTPS com certificado de cliente | origem que exige mTLS |
+| Full (strict) | HTTPS validado para solicitações HTTPS | recomendação de produção (regra da casa) |
+| Strict (SSL-Only Origin Pull) | HTTPS validado mesmo quando o visitante usa HTTP | origem que só aceita HTTPS |
 
 - Proxy laranja só para HTTP e HTTPS. Correio, SSH e protocolo binário ficam em
   DNS only.
-- Certificado de origem é emitido pela Cloudflare ou por CA própria, com
-  validade controlada. Certificado expirado em Full (strict) derruba o site.
-- HSTS só depois de confirmar HTTPS em todos os subdomínios. Cabeçalho
-  `max-age` longo é difícil de reverter.
-- Universal SSL cobre o domínio e o primeiro nível de subdomínio. Subdomínio mais
-  profundo precisa de certificado avançado ou de origem própria.
+- Confira o modo TLS efetivo da zona, inclusive seleção automática e regras que
+  o substituem por hostname.
+- O certificado de borda autentica a Cloudflare para o visitante. No setup
+  completo, Universal SSL cobre o domínio raiz e o primeiro nível. Para
+  hostnames mais profundos, confirme cobertura com certificado avançado ou
+  personalizado na borda. Em setup parcial a cobertura segue outras regras.
+- O certificado de servidor autentica a origem para a Cloudflare. Use uma CA
+  pública aceita ou Origin CA. Para CA privada, confirme disponibilidade e
+  configure a confiança no Custom Origin Trust Store da Cloudflare.
+- O certificado de cliente autentica a Cloudflare para a origem. Use
+  Authenticated Origin Pulls (AOP) e exija a verificação no servidor. Com o
+  certificado compartilhado, a origem autentica a rede Cloudflare. Para
+  restringir à sua implantação, use certificado de cliente próprio.
+- Ative HSTS depois de verificar HTTPS em todos os subdomínios que a política
+  inclui. Um `max-age` longo demora a reverter.
 
 ## Mudança segura
 
@@ -103,6 +112,9 @@ na página de cada produto. Número copiado de tutorial envelhece.
 - Status de proxy: https://developers.cloudflare.com/dns/proxy-status/
 - SSL/TLS: https://developers.cloudflare.com/ssl/
 - Modos SSL: https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/
+- AOP: https://developers.cloudflare.com/ssl/origin-configuration/authenticated-origin-pull/
+- CA de origem privada: https://developers.cloudflare.com/ssl/origin-configuration/custom-origin-trust-store/
+- Cobertura Universal SSL: https://developers.cloudflare.com/ssl/edge-certificates/universal-ssl/limitations/
 - Certificados de borda: https://developers.cloudflare.com/ssl/edge-certificates/
 - Regras: https://developers.cloudflare.com/rules/
 - Workers: https://developers.cloudflare.com/workers/

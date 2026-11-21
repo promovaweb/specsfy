@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { put, validSpec } from "../gates/helpers.ts";
 import { CLI_DIR, cliEnv, copyExample, removeCopy } from "./helpers.ts";
 
 let home: string;
@@ -48,6 +49,17 @@ describe("mcp lifecycle tools", () => {
     expect(bad.isError).toBe(true);
     const error = JSON.parse((bad.content as Array<{ text: string }>)[0]!.text);
     expect(error).toMatchObject({ code: 2, details: { accepted: ["draft", "defined", "planned"] } });
+  });
+
+  test("task_next selects RED work over MCP", async () => {
+    const markdown = validSpec({ Slug: "0042-red" }).replace(
+      "### 14. Tarefas\n\nConteúdo descrito.",
+      "### 14. Tarefas\n\n- [ ] T001 [TEST] [TDD] Prepare RED — Depends: none\n  - [ ] **PREP**: Read spec",
+    );
+    put(project, "specs/defined/0042-red/spec.md", markdown);
+    const run = await client.callTool({ name: "task_next", arguments: { spec: "0042", project, phase: "red" } });
+    expect(run.isError).toBe(false);
+    expect(run.structuredContent).toMatchObject({ result: { ready: [{ id: "T001", next_item: { key: "PREP", text: "Read spec" } }] } });
   });
 
   test("task_check unmarks and marks an item", async () => {

@@ -36,31 +36,31 @@ quando a latência atravessar aplicação, rede e banco.
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
-   `.specsfy/RULES.md` e `.specsfy/DATABASE.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
-2. Siga o modo indicado na spec ou na tarefa, no formato
-   `Especialista: $specsfy-specialist-mongodb (modeling)`, `(queries)` ou
-   `(operation)`. Sem indicação, confirme a versão do servidor e se o alvo é
-   réplica, shard ou instância isolada.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
-4. Não mude o estado da spec nem marque gate: isso pertence a
-   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
-   `$specsfy-06-implement`.
-5. Registre na spec o formato do documento, o validador aplicado, o índice com o
-   predicado que o justifica, o plano antes e depois, o write concern e o
-   procedimento de restauração. `.specsfy/DATABASE.md` é atualizado pela skill
-   `$specsfy-setup` no modo `database`.
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase. Se receber apenas um ID inequívoco, use
+   `specsfy specs show <id> --content`.
+   Leia também `.specsfy/STACK.md`, `.specsfy/RULES.md` e `.specsfy/DATABASE.md`.
+2. Siga o modo indicado, no formato `Especialista: $specsfy-specialist-mongodb (modeling)`, `(queries)` ou `(operation)`.
+   Sem indicação, confirme a versão do servidor e a topologia.
+3. Retorne conclusões e dúvidas à fase chamadora para registro no destino
+   indicado no item 1. Em `prepare`, a implementação no modo `tests`
+   conclui o checklist da tarefa. Estado e gates cabem à fase do método.
+   Entregue o formato do documento, o validador, o predicado que justifica o
+   índice, os planos comparados, o write concern e o procedimento de
+   restauração.
+   A atualização de `.specsfy/DATABASE.md` cabe a `$specsfy-setup` no modo
+   `database`.
 
 ## Fluxo
 
@@ -95,16 +95,18 @@ quando a latência atravessar aplicação, rede e banco.
 
 ### Modo queries
 
-1. Rode `explain("executionStats")` na consulta real e leia `winningPlan`,
+1. Rode `explain("executionStats")` na consulta real e leia a árvore inteira
+   de `winningPlan`, incluindo `queryPlan` no SBE, e compare
    `totalKeysExamined`, `totalDocsExamined`, `nReturned` e `executionTimeMillis`.
 2. Compare `COLLSCAN` com `IXSCAN` e confirme se o índice cobre os campos
    filtrados e os ordenados.
 3. Monte o composto pela regra equality, sort, range e confirme o prefixo usado
    em cada consulta.
-4. Para agregação, coloque `$match` e `$project` cedo, evite `$lookup` em coleção
-   grande sem índice no campo estrangeiro e meça com `allowDiskUse` desligado.
-5. Revise `db.collection.aggregate` com `$explain` e `$indexStats` antes de
-   concluir. Sintaxe, regra ESR e armadilhas em
+4. Para agregação, antecipe `$match` quando o filtro permitir. Defina a
+   projeção de saída, meça o `$lookup` e confira o índice estrangeiro em
+   junções de igualdade.
+5. Use `explain("executionStats").aggregate()` para o plano da agregação e
+   `$indexStats` para medir o uso de índices. Sintaxe, regra ESR e armadilhas em
    [references/queries.md](references/queries.md).
 
 ### Modo operation
@@ -176,8 +178,8 @@ quando a latência atravessar aplicação, rede e banco.
   declarada.
 - Teste de crescimento: o array respeita o limite e o fluxo que estoura tem
   caminho definido.
-- Teste de eleição em réplica: aplicação reconecta, `majority` não perde dado e
-  a leitura crítica continua no primário.
+- Teste de eleição em réplica: meça a reconexão, confira as escritas
+  confirmadas com o nível de persistência escolhido e reconcilie timeouts.
 - Restauração cronometrada a partir do backup real, com contagem por coleção e
   validação de documento crítico.
 - Não declare consulta rápida, dado íntegro ou operação recuperável sem essas

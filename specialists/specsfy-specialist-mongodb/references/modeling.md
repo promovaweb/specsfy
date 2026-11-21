@@ -27,13 +27,13 @@ pessoal sem consequência medida.
 ## Embutir
 
 ```javascript
-{
-  _id: ObjectId("..."),
+({
+  _id: ObjectId(),
   email: "ana@example.com",
   name: "Ana",
   address: { street: "Rua A", number: "10", city: "São Paulo" },
   preferences: { language: "pt-BR", timezone: "America/Sao_Paulo" }
-}
+});
 ```
 
 Bom para relação 1:1 lida sempre junto, 1:poucos com limite claro e valor que
@@ -45,11 +45,9 @@ reescreve o documento inteiro e array que cresce.
 ## Referenciar
 
 ```javascript
-// pedido
-{ _id: ObjectId("..."), customerId: ObjectId("..."), totalCents: 15990 }
-
-// cliente
-{ _id: ObjectId("..."), email: "ana@example.com", name: "Ana" }
+const customerId = ObjectId();
+const order = { _id: ObjectId(), customerId, totalCents: 15990 };
+const customer = { _id: customerId, email: "ana@example.com", name: "Ana" };
 ```
 
 Bom para cardinalidade alta, dado compartilhado, ciclo de vida próprio e escrita
@@ -65,7 +63,7 @@ limite.
 
 ```javascript
 // errado para histórico longo
-{ _id: 1, customerId: 42, events: [ { at: ISODate(), type: "login" }, ... ] }
+({ _id: 1, customerId: 42, events: [{ at: ISODate(), type: "login" }] });
 ```
 
 Consequências: documento se aproxima de 16 MB, cada `$push` reescreve o
@@ -77,13 +75,13 @@ Alternativas:
 - Padrão bucket: um documento por período com contagem controlada.
 
 ```javascript
-{
-  _id: ObjectId("..."),
+({
+  _id: ObjectId(),
   customerId: 42,
   bucketStart: ISODate("2026-11-01T00:00:00Z"),
-  count: 84,
-  events: [ { at: ISODate("2026-11-01T10:00:00Z"), type: "login" } ]
-}
+  count: 1,
+  events: [{ at: ISODate("2026-11-01T10:00:00Z"), type: "login" }]
+});
 ```
 
 O bucket é criado quando `count` chega ao limite definido, e a consulta lê o
@@ -113,46 +111,84 @@ db.createCollection("customer", {
 });
 ```
 
-- `validationLevel: "strict"` aplica a inserção e atualização.
-  `"moderate"` aplica só a documento que já estava válido, útil durante
-  migração de coleção legada.
+- `validationLevel: "strict"` valida inserções e atualizações. `"moderate"`
+  valida toda inserção nova e atualizações de documentos já válidos.
+  Atualizações de documentos legados inválidos ficam fora enquanto durar
+  a transição.
 - `validationAction: "error"` rejeita a escrita. `"warn"` registra no log e
   aceita, e só se justifica em transição com prazo.
 - `additionalProperties: false` fecha o contrato. Sem isso, campo novo entra sem
   revisão.
-- Depois de criar, atualize o validador com `collMod`:
+Insira com o tipo BSON declarado, usando `Int32` no mongosh:
 
 ```javascript
-db.runCommand({
-  collMod: "customer",
-  validator: { $jsonSchema: { /* contrato novo */ } },
-  validationLevel: "strict",
-  validationAction: "error"
+db.customer.insertOne({
+  email: "ana@example.com",
+  name: "Ana",
+  status: "active",
+  schemaVersion: Int32(1),
+  createdAt: ISODate()
 });
 ```
 
+Para mudar um validador existente, passe o contrato completo em
+`validator` no comando `collMod`.
+
 - O validador rejeita o documento novo, não corrige o antigo. Faça backfill
   antes de endurecer a regra, ou use `moderate` enquanto a janela existe.
-- Índice `unique` não substitui validador: documento sem o campo não entra na
-  checagem de unicidade.
+- Defina se o campo único é obrigatório. Para `email` obrigatório, combine
+  validador e índice unique simples. Em um índice unique simples comum,
+  ausência e `null` compartilham uma única chave nula. Unique sparse pula
+  ausentes e inclui `null` explícito. Se apenas strings presentes devem ser
+  únicas, valide que o campo é escalar e use unique parcial com
+  `partialFilterExpression: { email: { $type: "string" } }`.
+  Em composto, a restrição recai sobre a combinação completa.
 
 ## Evolução do formato
 
 - `schemaVersion` no documento permite consultar e migrar por versão, sem
   adivinhar pela forma.
-- Leia as duas versões durante a transição, com código que aceita campo ausente
-  e aplica default explícito.
-- Migração em lote:
+Para migrar do formato legado sem `schemaVersion` para a versão 1:
+
+1. Publique leitores que aceitam os dois formatos e usam o default
+   `"active"` somente quando `status` está ausente, se for a regra de
+   negócio. Passe todos os escritores para o novo formato antes do
+   backfill. Mantenha a leitura legada durante a transição.
+2. Em mongosh, processe lotes sobre o `_id` estável. O exemplo assume
+   `_id` do tipo ObjectId para toda a coleção. O update revalida a ausência
+   de versão na escrita e mantém `status` existente, inclusive `null`,
+   que deve ser tratado em separado caso seja inválido:
 
 ```javascript
-db.customer.updateMany(
-  { schemaVersion: { $exists: false } },
-  { $set: { schemaVersion: 1, status: "active" } }
-);
+const unversioned = { $exists: false };
+let after = null;
+
+while (true) {
+  const ids = db.customer.find({
+    schemaVersion: unversioned,
+    ...(after === null ? {} : { _id: { $gt: after } })
+  }, { _id: 1 }).sort({ _id: 1 }).limit(500).toArray().map(({ _id }) => _id);
+
+  if (ids.length === 0) break;
+
+  db.customer.updateMany(
+    { _id: { $in: ids }, schemaVersion: unversioned },
+    [{ $set: {
+      schemaVersion: Int32(1),
+      status: {
+        $cond: [{ $eq: [{ $type: "$status" }, "missing"] }, "active", "$status"]
+      }
+    } }]
+  );
+  after = ids.at(-1);
+}
 ```
 
-- Só endureça o validador depois que a contagem de documento fora do contrato
-  for zero, e registre a consulta que provou isso.
+3. Conte os documentos sem versão e os fora do validador. Corrija as
+   exceções e guarde as consultas como evidência. Endureça o validador e
+   retire a leitura legada quando as duas contagens forem zero. É possível
+   reiniciar o backfill desde o começo porque ele só atualiza documentos
+   sem versão.
 
 ## Padrões auxiliares
 

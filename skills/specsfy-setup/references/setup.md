@@ -44,9 +44,12 @@ Use quando outra skill carrega o setup ou quando há handoff automático.
      --project <raiz> --check
    ```
 
-   Em uma cópia sem metadados Git, forneça os caminhos alterados conhecidos com
+   Em uma cópia sem Git e sem lista informada, o monitor retorna `BASELINE`
+   com diagnóstico e recuperação. Reexecute com os caminhos realmente
+   alterados usando
    `specsfy context monitor --project <raiz> --check --paths <caminho1>,<caminho2>`.
-   No script, passe `--paths <caminho1> <caminho2>` após as outras opções.
+   No script, use `--paths <caminho1> <caminho2>`. Use `--paths '[]'` no CLI
+   ou no script quando souber que nenhum caminho mudou.
 
 3. Em Laravel, execute também `specsfy gate database --project <raiz>`
    (seção `Proteção do banco durante o setup`).
@@ -298,6 +301,12 @@ Esta regra é inegociável, porque um teste no banco errado apaga dados reais:
 Execute `specsfy context monitor --project <raiz> --check` no início e no fim de
 cada mudança. Não contorne um `PENDING`: atualize o documento indicado e rode o
 monitor de novo.
+
+Um `BASELINE` registra que nenhum diff foi verificado. Para comprovar o
+contexto antes de concluir, compare a cópia com sua origem e informe os
+caminhos alterados, ou volte a executar em uma cópia com Git. A saída JSON
+mantém `changed_paths` e `pending` como listas e informa `source`,
+`diagnostic` e `recovery`. `--check` bloqueia pendências detectadas.
 
 | Pendência | Responsável |
 | --- | --- |

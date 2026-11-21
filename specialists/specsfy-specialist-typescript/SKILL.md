@@ -19,28 +19,32 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, quando a mudança publicar ou alterar pacote,
    `.specsfy/PACKAGES.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-typescript`. Sem indicação, confirme
    pelo "Quando usar" acima qual contrato de tipos está em jogo.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
+3. Devolva a conclusão e as dúvidas abertas no destino indicado no item 1,
+   no próprio backlog, na spec ou na tarefa da fase.
 4. Não mude o estado da spec nem marque gate: isso pertence a
    `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
    `$specsfy-06-implement`.
-5. Registre o contrato público de tipos na seção 8 ou em
+5. Quando a fase trabalhar o plano técnico ou os contratos da spec, registre
+   o contrato público de tipos na seção 8 ou em
    `### 10. Interfaces e contratos` e cite o typecheck como verificação; ao
    publicar pacote, alinhe `.specsfy/PACKAGES.md`.
 
@@ -76,9 +80,10 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
   ativadas (`strict`, `strictNullChecks`, `noUncheckedIndexedAccess` quando
   viável); a partir do 6.0, `strict` já é `true` por default. Corrigir os
   erros revelados pelas flags, nunca silenciá-los com cast cosmético.
-- Respeitar o `moduleResolution` da geração instalada: `node`/`node10` e
-  `classic` foram removidos no 7.0; use `bundler` ou `nodenext`. `baseUrl`
-  também saiu, e `paths` passa a ser relativo à raiz do projeto.
+- Respeitar o `moduleResolution` da geração instalada. O TypeScript 6.0
+  depreciou `node`, `node10`, `classic` e `baseUrl`. O 7.0 rejeita essas
+  opções. Use `bundler` ou `nodenext` para `moduleResolution` e configure
+  `paths` em relação ao `tsconfig.json` ao remover `baseUrl`.
 - Lembrar que, a partir do 6.0, `module` default é `esnext`, `types` default é
   `[]`, `rootDir` default é `./` e `noUncheckedSideEffectImports` é `true`:
   projeto que depende de `@types` global precisa listar os pacotes.

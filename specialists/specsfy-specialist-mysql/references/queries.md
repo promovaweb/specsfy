@@ -16,9 +16,9 @@ Colunas que decidem:
 | `type` | Como a tabela é acessada | `ALL` em tabela grande com filtro seletivo |
 | `possible_keys` | Índices candidatos | Vazio com predicado seletivo |
 | `key` | Índice escolhido | `NULL` quando existia candidato melhor |
-| `key_len` | Quantas colunas do composto foram usadas | Menor que o esperado |
+| `key_len` | Comprimento da chave usada, em bytes | Interprete pelo tipo, tamanho e nulabilidade das colunas |
 | `rows` | Linhas estimadas por acesso | Muito acima do resultado real |
-| `filtered` | Fração estimada após o filtro | 1.00 com `rows` alto |
+| `filtered` | Percentual estimado após o filtro | `1.00` significa 1%; estime a saída com `rows * filtered / 100` |
 | `Extra` | Estratégia adicional | `Using temporary`, `Using filesort`, `Using where` com `type: ALL` |
 
 Ordem de acesso do melhor para o pior: `system`, `const`, `eq_ref`, `ref`,
@@ -30,7 +30,15 @@ operador. Use quando estimativa e realidade divergirem, em ambiente onde rodar a
 consulta é seguro.
 
 ```sql
-EXPLAIN ANALYZE SELECT ...;
+EXPLAIN ANALYZE SELECT id, total_cents FROM invoice
+WHERE tenant_id = 42 AND status = 'open'
+ORDER BY created_at DESC
+LIMIT 20;
+
+EXPLAIN SELECT id, total_cents FROM invoice
+WHERE tenant_id = 42 AND status = 'open'
+ORDER BY created_at DESC
+LIMIT 20;
 SHOW WARNINGS;
 ```
 
@@ -71,9 +79,15 @@ ALTER TABLE invoice
 | Conversão implícita | `WHERE code = 123` com `code VARCHAR` | Comparar com string |
 | Collation divergente | coluna `utf8mb4_0900_ai_ci` e literal `utf8mb4_unicode_ci` | Padronizar collation |
 | Curinga à esquerda | `LIKE '%termo'` | Índice de texto completo ou busca externa |
-| `OR` entre colunas diferentes | `a = 1 OR b = 2` | `UNION` de duas consultas indexadas |
+| `OR` entre colunas diferentes | `a = 1 OR b = 2` | Meça Index Merge e compare alternativas com cardinalidade equivalente |
 | Baixa seletividade | `WHERE active = 1` com 98% ativo | Composto ou coluna gerada |
 | Tipo incompatível | `BIGINT` comparado a `VARCHAR` | Alinhar tipo no schema |
+
+Se reescrever um `OR`, compare o multiconjunto retornado com o original.
+`UNION` pode eliminar linhas distintas com a mesma projeção. `UNION ALL`
+pode duplicar as que passam nos dois ramos. Para uma única tabela, unir
+chaves primárias com `UNION` e buscar as linhas por essas chaves preserva
+uma ocorrência por linha, inclusive quando a projeção tem duplicatas.
 
 `USE INDEX` e `FORCE INDEX` existem, mas escondem problema de estatística ou de
 índice mal desenhado. Só use com motivo medido e registro do motivo.
@@ -110,16 +124,39 @@ grande.
 - `READ COMMITTED` desabilita gap lock para busca e varredura, mantendo-o para
   checagem de FK e chave duplicada. É a escolha comum para reduzir deadlock em
   fila de trabalho.
-- Fila processada por vários workers:
+- Fila processada por vários workers. A tabela InnoDB `job` tem chave primária
+  `id`, estado `pending` ou `running`, `lease_until DATETIME(6) NULL`,
+  `claim_token CHAR(36) NULL` e índice `(status, id)`. Na mesma sessão,
+  reivindique uma tarefa e confirme antes de iniciar trabalho externo:
 
 ```sql
+SET @job_id = NULL, @claim_token = UUID();
 START TRANSACTION;
-SELECT id FROM job
+SELECT id INTO @job_id FROM job
 WHERE status = 'pending'
 ORDER BY id
-LIMIT 10
+LIMIT 1
 FOR UPDATE SKIP LOCKED;
+
+UPDATE job
+SET status = 'running',
+    lease_until = UTC_TIMESTAMP(6) + INTERVAL 5 MINUTE,
+    claim_token = @claim_token
+WHERE id = @job_id AND status = 'pending';
+SET @claimed = ROW_COUNT();
+COMMIT;
+
+SELECT @job_id AS job_id, @claim_token AS claim_token WHERE @claimed = 1;
 ```
+
+  Sem linha disponível, o resultado final é vazio. No worker, execute em
+  uma conexão e faça `ROLLBACK` em erro antes de devolver a conexão ao pool.
+  Faça retry limitado da transação inteira em deadlock ou timeout. Se o
+  resultado do commit for incerto, reconcilie o token antes de processar.
+  Recoloque tarefas com lease vencido em `pending` por atualização
+  condicional. Renove o lease ou conclua a tarefa somente se o token ainda
+  corresponder à reivindicação vigente. Use uma chave de idempotência para
+  efeitos externos, pois uma tarefa abandonada pode voltar à fila.
 
 - Transação longa: mantenha curta. Chamada HTTP, espera de usuário e
   processamento de arquivo dentro da transação seguram lock e inflam undo.
@@ -156,7 +193,9 @@ SELECT * FROM sys.statement_analysis ORDER BY total_latency DESC LIMIT 10;
 - Olhe latência total, não só média: uma consulta de 200 ms chamada milhares de
   vezes pesa mais que uma de 3 s executada uma vez por dia.
 - `performance_schema` precisa estar habilitado; `sys` é visão sobre ele.
-- `EXPLAIN` da consulta normalizada (`?` no lugar do literal) reproduz o plano
-  de produção sem o valor específico.
+- Parta do digest para localizar a consulta e recupere valores e tipos
+  representativos. Use literais no cliente SQL ou os parâmetros vinculados
+  pelo mecanismo preparado do driver. `?` só funciona em statement
+  preparado, e a seletividade de cada valor pode mudar o plano.
 - Compare antes e depois com a mesma massa de dados. Mudança de plano entre
   ambientes diferentes não é regressão nem melhora.

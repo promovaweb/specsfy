@@ -19,13 +19,16 @@ const interfaceEntry = {
   ...entry("interface"),
   detect: { dependencies: ["axe-core"] },
   modes: [{ name: "ui", title: "Interface", absorbs: "specsfy-specialist-old-ui" }],
-  triggers: [{ mode: "ui", signal: "Access", keywords: ["autorização", "catálogo"] }],
+  triggers: [
+    { mode: "ui", signal: "Access", keywords: ["autorização", "catálogo"] },
+    { mode: "ui", signal: "Flow", keywords: ["fluxo da equipe"] },
+  ],
 };
 const queueEntry = {
   ...entry("queue"),
   triggers: [
     { signal: "Async processing", keywords: ["fila assíncrona"] },
-    { signal: "Examples and partial words", keywords: ["bar", "termo de exemplo", "termo de declaração"] },
+    { signal: "Examples and partial words", keywords: ["bar", "termo de exemplo", "specsfy-specialist-delivery"] },
   ],
 };
 const catalog = { schema_version: 1, skills: [interfaceEntry, queueEntry, entry("laravel"), entry("modeling"), entry("delivery")] };
@@ -73,8 +76,14 @@ test("parses modes, absorbs and triggers, defaulting legacy entries to empty lis
 });
 
 const suggestions = [
-  { name: interfaceEntry.name, mode: "ui", signal: "Access", declared: true, installed: true },
-  { name: queueEntry.name, signal: "Async processing", declared: false, installed: false },
+  {
+    name: interfaceEntry.name, mode: "ui", signal: "Access", declared: true, installed: true,
+    signals: [{ signal: "Access", evidence: { line: 1, text: "# Catálogo com AUTORIZACAO" } }],
+  },
+  {
+    name: queueEntry.name, signal: "Async processing", declared: false, installed: false,
+    signals: [{ signal: "Async processing", evidence: { line: 11, text: "Publicar em FILA\n   ASSÍNCRONA e importar foobarbaz." } }],
+  },
 ];
 
 test("suggests signals and reports declarations and actual installs for all spec identifiers", async () => {
@@ -85,8 +94,8 @@ test("suggests signals and reports declarations and actual installs for all spec
   }
   const text = await cli(["skills", "suggest", "0001-lista", "--project", root], home, env);
   expect(text.code).toBe(0);
-  expect(text.stdout).toContain(`${interfaceEntry.name} (ui) <- Access [declared, installed]`);
-  expect(text.stdout).toContain(`${queueEntry.name} <- Async processing [not declared, not installed]`);
+  expect(text.stdout).toContain(`${interfaceEntry.name} (ui) <- Access (line 1: # Catálogo com AUTORIZACAO) [declared, installed]`);
+  expect(text.stdout).toContain(`${queueEntry.name} <- Async processing (line 11: Publicar em FILA ASSÍNCRONA e importar foobarbaz.) [not declared, not installed]`);
   expect((await cli(["specialists", "suggest", "missing", "--project", root], home, env)).code).toBe(6);
 });
 
@@ -218,7 +227,7 @@ test("verify reports specialist warnings for each checked spec without changing 
     for (const skill of FRAMEWORK_SKILLS) {
       cpSync(join(CLI_DIR, "../skills", skill), join(project, ".agents/skills", skill), { recursive: true });
     }
-    put(project, relativeSpec, validSpec({ Especialistas: "laravel, unknown" }).replace("Conteúdo descrito.", "Autorização."));
+    put(project, relativeSpec, validSpec({ Especialistas: "laravel, unknown" }).replace("Conteúdo descrito.", "Autorização no fluxo da equipe."));
     const second = "specs/defined/0002-other/spec.md";
     put(project, second, validSpec({ Slug: "0002-other" }).replace("Conteúdo descrito.", "Fila assíncrona."));
     const run = await cli(["verify", "--project", project, "--attestation", "attestation.json", "--json"], home, env);
@@ -228,7 +237,10 @@ test("verify reports specialist warnings for each checked spec without changing 
       expect.objectContaining({ spec: relativeSpec, kind: "specialist-not-installed", name: "specsfy-specialist-laravel" }),
       expect.objectContaining({ spec: relativeSpec, kind: "unknown-specialist", name: "specsfy-specialist-unknown" }),
       expect.objectContaining({ spec: relativeSpec, kind: "specialist-not-installed", name: "specsfy-specialist-unknown" }),
-      expect.objectContaining({ spec: relativeSpec, kind: "undeclared-specialist", name: interfaceEntry.name, mode: "ui", signal: "Access" }),
+      expect.objectContaining({ spec: relativeSpec, kind: "undeclared-specialist", name: interfaceEntry.name, mode: "ui", signal: "Access", signals: [
+        expect.objectContaining({ signal: "Access", evidence: expect.objectContaining({ line: expect.any(Number) }) }),
+        expect.objectContaining({ signal: "Flow", evidence: expect.objectContaining({ text: "Autorização no fluxo da equipe." }) }),
+      ] }),
       expect.objectContaining({ spec: second, kind: "undeclared-specialist", name: queueEntry.name, signal: "Async processing" }),
     ]);
     expect(JSON.parse(readFileSync(join(project, "attestation.json"), "utf8"))).toEqual(run.json?.data.result);
@@ -246,6 +258,64 @@ test("verify reports specialist warnings for each checked spec without changing 
     expect(fallback.code).toBe(ExitCode.SUCCESS);
     expect(fallback.json?.data.result.result).toBe("passed");
     expect(fallback.json?.data.warnings).toContainEqual(expect.objectContaining({ kind: "catalog-unavailable" }));
+  } finally {
+    rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test("groups signals by mode with source lines and ignores negated and out-of-scope matches", async () => {
+  const project = temporary("specsfy-rehearsal-signals-");
+  try {
+    put(project, "package.json", '{"dependencies":{"react":"*"}}');
+    put(project, ".specsfy/STACK.md", "# Stack\n\n- Pest\n");
+    const markdown = [
+      "# Cupons",
+      "| Especialistas | testing, architecture |",
+      "<!-- Comment", "Contrato HTTP ignorado", "-->",
+      "### 3. Escopo e atores",
+      "#### Fora de escopo",
+      "Redis, fila assíncrona e rollout.",
+      "##### Subescopo",
+      "Pipeline GitHub Actions.",
+      "#### Incluído",
+      "Listagem e cadastro. Jornada de navegação.",
+      "Não haverá rollout, deploy ou OpenAPI. Interface com teclado, sem versão pública.",
+      "Exportação via webhook está fora de escopo.",
+      "### 8. Plano técnico",
+      "#### Especialistas",
+      "| Especialista | Modo | Sinal que o puxou | Fases |",
+      "| --- | --- | --- | --- |",
+      "| interface | discovery | Inventário do shell e das telas | Specify |",
+      "| architecture | web-api | Contratos Inertia e paginação | Specify |",
+      "| testing | pest | Testes Pest HTTP por cenário e regressão | Tasks |",
+      "### 14. Tarefas",
+      "- [ ] T001 [CODE] Implementar página React em resources/js/pages/coupons.tsx — Depends: none",
+      "  - Especialista: $specsfy-specialist-ui-components (components)",
+      "- [ ] T002 [TEST] Rodar regressão Pest — Depends: T001",
+      "  - [ ] **VERIFY**: Rodar Playwright para teste de navegador.",
+      "- [ ] T003 [OPS] Configurar runtime como pré-condição do deploy — Depends: none",
+      "  - [ ] **EVIDENCE**: Registrar versão resolvida, processo e healthcheck.",
+      "#### Métricas de sucesso",
+      "Todos os cenários de aceite passam.",
+    ].join("\n");
+    put(project, relativeSpec, markdown);
+    const run = await cli(["specialists", "suggest", "1", "--project", project, "--json"], home, { SPECSFY_SPECIALISTS_CATALOG: "" });
+    expect(run.code).toBe(0);
+    const found = run.json?.data.suggestions;
+    const find = (name: string, mode: string) => found.filter((item: { name: string; mode?: string }) =>
+      item.name === `specsfy-specialist-${name}` && item.mode === mode);
+    expect(find("interface", "ux")).toEqual([expect.objectContaining({ signals: [
+      expect.objectContaining({ evidence: { line: 12, text: expect.stringContaining("Jornada") } }),
+      expect.objectContaining({ evidence: { line: 12, text: expect.stringContaining("Listagem") } }),
+    ] })]);
+    for (const [name, mode, line] of [["interface", "discovery", 19], ["architecture", "web-api", 20], ["ui-components", "components", 23]] as const) {
+      expect(find(name, mode)).toEqual([expect.objectContaining({ declared: true, signals: [
+        expect.objectContaining({ evidence: { line, text: markdown.split("\n")[line - 1] } }),
+      ] })]);
+    }
+    expect(find("testing", "pest")[0].declared).toBe(true);
+    expect(find("testing", "playwright")[0].declared).toBe(false);
+    expect(found.filter(({ name }: { name: string }) => /(?:debugging|delivery|observability)$/.test(name))).toEqual([]);
   } finally {
     rmSync(project, { recursive: true, force: true });
   }

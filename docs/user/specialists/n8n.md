@@ -27,7 +27,21 @@ O agente confirma versão, modo de execução, banco e broker antes de recomenda
 Instância em SQLite, instância em queue mode e instância gerenciada têm limites
 diferentes.
 
-## Como ele trabalha
+## No Specsfy
+
+**Fonte de entrada por fase**
+
+- Em backlog, leia o item em `specs/backlog/`. A fase registra ali o resultado.
+- Em specify e validate, use a spec aberta indicada pela fase.
+- Em tasks, o especialista sugere modos e a fase sincroniza essa escolha com
+  o plano. A seção 14 é escrita por `specsfy-05-tasks`.
+- Em implement, siga a tarefa e o passo carregado. No modo tests, a fase
+  conclui o checklist em `prepare`.
+
+Quando houver spec, leia a spec aberta, confira o modo indicado e entregue as
+evidências à fase responsável pelo registro.
+
+## Fluxo
 
 1. Descobre versão, modo de execução, banco, broker, volume de execução e o
    contrato de entrada do workflow.
@@ -48,7 +62,9 @@ O modo Workflows mantém o fluxo legível e o efeito previsível.
 - `onError` escolhe entre parar, continuar no fluxo normal e seguir pela saída de
   erro.
 - Retry só em operação idempotente.
-- Erro não tratado chega ao Error Workflow, com `execution.id` no alerta.
+- Configure o Error Workflow com Error Trigger, normalização e alerta.
+  Selecione-o nas configurações do workflow de origem. Use o ID e a URL da
+  execução quando existirem. Teste uma falha automática.
 - Sub-workflow tem contrato de entrada, saída e erro.
 - Loop processa em lote com tamanho medido, e falha parcial tem tratamento.
 
@@ -63,13 +79,23 @@ O modo Self-hosting define a instância que roda em produção.
 - Imagem com versão fixa e volume em `/home/node/.n8n`.
 - Processo roda como usuário `node`, e o volume precisa de permissão correta.
 - `N8N_ENCRYPTION_KEY` é estável, está em cofre e entra no backup.
-- Postgres em produção. SQLite só em desenvolvimento declarado.
-- `N8N_WEBHOOK_URL` aponta para a URL pública, com o nome da variável conforme a
-  versão instalada.
-- `N8N_PROXY_HOPS` e cabeçalho de proxy precisam combinar.
-- Queue mode separa main, worker e webhook, com a mesma chave e a mesma base.
+- O Compose de referência fixa n8n 2.48.7. Use Postgres em produção e
+  `EXECUTIONS_MODE=regular` para execução no main.
+- `N8N_WEBHOOK_URL` funciona desde 2.30.0 e `WEBHOOK_URL` é o nome legado.
+  Use `N8N_EDITOR_BASE_URL` para o editor. Se faltar a URL pública do webhook,
+  a instância pode gerar um endereço com a porta interna.
+- Configure `N8N_PROXY_HOPS` pelo caminho real. O último proxy envia
+  `X-Forwarded-Host`, `X-Forwarded-For` e `X-Forwarded-Proto`.
+- Queue mode compartilha Postgres, Redis e chave de criptografia entre main,
+  worker e processador opcional de webhook. A URL de teste continua no main.
+- Binários da fila precisam de Postgres ou storage externo acessível aos
+  processos. Em instalações com dados sensíveis, use runners externos
+  (regra da casa), com a mesma versão da instância e um runner por worker.
+  Se o main rodar execuções manuais, ele também precisa de runner.
 - Poda de execução configurada evita banco crescendo sem limite.
-- Backup cobre banco, chave, volume e configuração efetiva.
+- Backup cobre banco, chave, volumes, configuração e storage externo.
+  Migração SQLite para Postgres usa export e import de entidades com
+  destino vazio. Promoção de workflow usa export seletivo.
 - Atualização tem nota de release lida, backup testado e staging antes de
   produção.
 
@@ -82,22 +108,37 @@ de atualização estão em
 O modo Integration define como outro sistema conversa com o n8n.
 
 - API pública usa `/api/v1` e cabeçalho `X-N8N-API-KEY`.
-- Listagem é paginada por cursor, e `429` pede espera progressiva.
-- `POST` repetido usa chave de idempotência.
+- Listagem é paginada por cursor. O limite por chave da API existe desde
+  2.47.0, começa desligado e, quando habilitado, devolve `429` com
+  `Retry-After`.
+- A API pública aceita `Idempotency-Key` em `POST` desde 2.45.0 e guarda
+  respostas bem-sucedidas por 12 horas. Webhooks de usuário têm contrato
+  próprio.
 - Chave de API tem escopo mínimo, dono e rotação.
 - Webhook é contrato: método, caminho, autenticação, corpo, resposta, status e
   prazo.
 - URL de teste responde só com o workflow em escuta; produção usa outra URL.
-- Assinatura é calculada sobre o corpo bruto.
-- Promoção exporta JSON, revisa diff, reassocia credencial e executa caso de
-  fumaça.
-- Workflow exportado vive no Git, com README de contrato e dono.
+- Para HMAC no fluxo, habilite Raw Body e valide o cabeçalho e os bytes
+  exigidos pelo provedor antes do efeito.
+- Para deduplicar webhooks, reserve atomicamente o ID do evento ou uma chave
+  estável e persista o resultado. Use `$execution.id` para correlação.
+- Exporte a revisão validada com `--published` ou `--version`. Revise o JSON,
+  incluindo nomes de credenciais, dados fixados e headers literais. Confira
+  IDs, projeto e credenciais antes de importar. Publique a revisão pretendida
+  no destino e teste o webhook.
 
 Os comandos de API, a tabela de contrato de webhook, o fluxo de promoção e a
 validação de integração estão em
 [integration.md](../../../specialists/specsfy-specialist-n8n/references/integration.md).
 
-## Erros que ele evita
+## Padrões
+
+- Fixe versão da imagem e guarde a chave de criptografia no cofre.
+- Versione o JSON revisado com o contrato e o dono do workflow.
+- Defina o prazo pelo menor limite entre provedor, borda e proxy. Responda de
+  forma assíncrona se o contrato permitir e a execução exigir mais tempo.
+
+## Antipadrões
 
 - `latest` como versão da imagem.
 - Container recriado sem chave de criptografia.
@@ -110,13 +151,15 @@ validação de integração estão em
 - Execução sem poda e sem mascaramento.
 - API pública ligada sem consumidor e com chave total.
 
-## Como conferir o resultado
+## Validação
 
 - Execução com dado fixado e execução com entrada inválida pelo caminho de erro.
 - `curl` no webhook com e sem credencial, conferindo status e corpo.
-- Retry com falha simulada, sem efeito duplicado.
+- Entregas concorrentes e repetidas com a mesma chave e falha simulada no
+  retry. Confira o efeito persistido no sistema de destino.
 - `docker compose config` validando variável obrigatória.
-- Endpoint de saúde do worker e log de conexão com banco e Redis.
+- Liveness e prontidão no main e no worker, logs de banco e Redis e um
+  webhook publicado respondendo conforme o contrato.
 - Restauração de backup com workflow abrindo e credencial funcionando.
 - Promoção entre ambientes com diff esperado e versão validada.
 
@@ -127,7 +170,7 @@ npx skills add https://github.com/promovaweb/specsfy \
   --skill specsfy-specialist-n8n --agent universal --copy --full-depth
 ```
 
-## Especialistas relacionados
+## Skills relacionadas
 
 - [Docker](docker.md) cuida da imagem, do Compose e da stack.
 - [PostgreSQL](postgres.md) opera o banco que guarda workflow e execução.

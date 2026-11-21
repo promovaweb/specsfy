@@ -36,29 +36,33 @@ Não use para:
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, como a tarefa compõe telas, `INTERFACE.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-ui-components (components|reui|shadcn)`.
    Sem indicação, escolha o modo pelo "Quando usar" acima.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
+3. Devolva a conclusão e as dúvidas abertas no destino indicado no item 1,
+   no próprio backlog, na spec ou na tarefa da fase.
 4. Não mude o estado da spec nem marque gate: isso pertence a
    `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
    `$specsfy-06-implement`.
-5. Confirme componentes, primitives e telas em `INTERFACE.md` e descreva a
-   composição na subseção `Views e experiência` da seção 8, sem trocar
-   primitive já registrada nem instalar registry novo sem decisão.
+5. Confirme componentes, primitives e telas em `INTERFACE.md` e, quando a fase
+   trabalhar o plano técnico da spec, descreva a composição em
+   `Views e experiência` na seção 8. Preserve a primitive já registrada e
+   instale um registry novo somente após decisão explícita.
 
 ## Fluxo
 
@@ -161,9 +165,10 @@ a interação. (regra da casa)
   operações incluídas declaradas no campo `Operações:` do Contrato CRUD da
   spec; uma tela só de listagem e cadastro não ganha editar/apagar. Para CRUD
   React e Tailwind, consulte ReUI gratuito primeiro: Data Grid ou List,
-  Filters, Form e campos, Dialog ou Sheet, Alert e Badge. Adapte à tarefa,
-  inclusive clique e teclado na linha com controles independentes,
-  `Breadcrumb` do shell e erro de campo associado abaixo do controle.
+  Filters, Form e campos, Dialog ou Sheet, Alert e Badge. Se `consultar`
+  constar no Contrato CRUD, habilite o link da linha por clique e teclado com
+  controles independentes. Adapte o `Breadcrumb` do shell e associe o erro
+  de campo abaixo do controle.
   (regra da casa)
 - Centralize CSS variables e variantes. Preserve semântica, labels,
   `aria-*`, `sr-only`, `alt`, tema claro/escuro, breakpoints, foco inicial,

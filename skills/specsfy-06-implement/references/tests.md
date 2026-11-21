@@ -89,13 +89,17 @@ a configuração do projeto e [test-levels.md](test-levels.md). Depois:
    pelo `AC` e seus `FR/NFR`.
 3. Resolva o runner de testes pela stack antes de escrever testes:
    - projeto PHP (`composer.json` ou `artisan`), inclusive PHP + Node: use
-     Pest;
+     Pest. Em Laravel, aplique `testing/pest + laravel/app`;
    - projeto Node sem PHP: pergunte ao usuário qual runner adotar antes de
      instalar ou configurar e recomende Vitest por padrão. Considere a decisão
      materializada quando `package.json` expuser o script `test:tdd`; não
      escolha nem instale dependência silenciosamente;
    - outra stack: preserve o runner existente ou pergunte quando não houver
-     decisão reproduzível.
+     decisão reproduzível;
+   - Playwright exige um plano automatizado de navegador com stack
+     compatível confirmada ou decisão explícita de instalar o runner para o
+     plano. Para inspeção manual de teclado, use `interface/accessibility`
+     e registre a evidência visual na tarefa.
 4. Confira o ambiente e o comando com `specsfy gate database`. Se o estado
    não for `SAFE`, não execute teste algum e mantenha a etapa pendente.
 5. Escolha com [test-levels.md](test-levels.md) o nível mais baixo que ainda prova o
@@ -140,6 +144,19 @@ a configuração do projeto e [test-levels.md](test-levels.md). Depois:
    repita.
 5. Se passar antes da mudança, o teste não demonstra o gap: refine-o ou prove
    que a funcionalidade já existe.
+
+Em uma rota nova, um `404` pode ser RED quando o teste chega à aplicação
+com URL, sessão, escopo e dados válidos e a rota ainda não existe. Mantenha a
+asserção do contrato, por exemplo, `403` para quem não tem permissão de criar,
+mesmo que a resposta observada antes da implementação seja `404`. Confirme a
+causa no roteamento. Um erro de bootstrap, fixture, dependência ou schema de
+base exige correção antes de repetir o teste.
+
+Separe a verificação HTTP da asserção que depende da tabela nova. Registre
+no plano a asserção de persistência, como a ausência de gravação após o
+`403`, e execute-a quando a migration da fatia estiver aplicada no banco de
+teste. Uma asserção que falha apenas porque a tabela nova ainda não existe
+fica pendente de schema e não conta como RED da regra de persistência.
 
 Registre o RED observado na tabela `Evidência RED-GREEN-REFACTOR`.
 

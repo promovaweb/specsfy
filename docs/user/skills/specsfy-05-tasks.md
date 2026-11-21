@@ -41,6 +41,11 @@ T002 [ ] Criar caso TDD para e-mail desconhecido — cobre AC-002
 T003 [ ] Implementar solicitação sem revelar existência do cadastro
 ```
 
+Em uma spec cuja linha `Operações:` inclui somente `listar, criar`, use os
+IDs reservados para as tarefas da grade e do formulário. As linhas da grade
+exibem dados e a ação de criação fica no cabeçalho. Link para detalhe, editar
+e apagar dependem das respectivas operações no Contrato CRUD.
+
 Quando a spec declara uma interface, o plano inclui tarefas para telas,
 menus, navegação, formulário, ações e seus testes de navegação, validação e recuperação de erro.
 Uma tarefa de API ou persistência não substitui essas tarefas.

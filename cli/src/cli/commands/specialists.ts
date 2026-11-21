@@ -6,7 +6,7 @@ import { ExitCode } from "../../app/exit-codes.ts";
 import { manifest } from "../../app/manifest.ts";
 import { resolveSpecPath } from "../../core/project.ts";
 import { Catalog } from "../../domain/catalog.ts";
-import { analyzeSpecSpecialists, projectStackSpecialists, installedSpecSpecialists } from "../../domain/spec-specialists.ts";
+import { formatSpecialistSignals, analyzeSpecSpecialists, projectStackSpecialists, installedSpecSpecialists } from "../../domain/spec-specialists.ts";
 import { toCommand, type NativeProjectCommandDef } from "../../engine/script-command.ts";
 import { frameworkSettings } from "./framework.ts";
 
@@ -27,7 +27,7 @@ export const specialistSuggestDef: NativeProjectCommandDef = {
   name: "suggest",
   tool: "specialists_suggest",
   description: "Suggest specialists based on signals in a spec.",
-  longDescription: "Matches catalog keywords and reports the mode, signal, declaration and installation for each suggestion.",
+  longDescription: "Matches catalog keywords and reports the signals and source lines for each specialist and mode, with declaration and installation status.",
   params: [{ name: "spec", kind: "spec", description: "Spec ID, slug, folder name or path.", required: true }],
   effect: "read",
   exitCodes: [ExitCode.NOT_FOUND],
@@ -50,8 +50,8 @@ export const specialistSuggestDef: NativeProjectCommandDef = {
         ...(catalogWarning ? { catalogWarning } : {}),
         ...(stackWarning ? { stackWarning } : {}),
       },
-      text: () => suggestions.map(({ name, mode, signal, declared, installed }) =>
-        `${name}${mode ? ` (${mode})` : ""} <- ${signal} [${declared ? "declared" : "not declared"}, ${installed ? "installed" : "not installed"}]`
+      text: () => suggestions.map(({ name, mode, signals, declared, installed }) =>
+        `${name}${mode ? ` (${mode})` : ""} <- ${formatSpecialistSignals(signals)} [${declared ? "declared" : "not declared"}, ${installed ? "installed" : "not installed"}]`
       ).join("\n") || "No specialist suggestions.",
       warning: warnings.map((message) => `WARNING: ${message}`).join("\n") || undefined,
     };

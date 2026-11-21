@@ -74,6 +74,10 @@ Antes de formular qualquer pergunta, leia e aplique o
      --project <raiz> --check
    ```
 
+   Em uma cópia sem Git, recupere de `BASELINE` informando `--paths` com
+   as alterações conhecidas ou `--paths '[]'` para uma lista vazia
+   confirmada. Siga [Monitorar e resolver pendências](setup.md#monitorar-e-resolver-pendências).
+
    Se nenhuma regra nova for necessária, registre a justificativa na tarefa e
    reconheça explicitamente a revisão.
 

@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-mysql
-description: Modelar, consultar e operar MySQL com schema consistente, índices justificados pelo plano e operação recuperável. Use no modo schema para tipos, chave primária, índices compostos, charset utf8mb4, collation, constraints e DDL online; no modo queries para EXPLAIN, plano real, índice composto, locks InnoDB, isolation level, deadlock e consulta lenta; no modo operation para backup com mysqldump e XtraBackup, point-in-time recovery, replicação com GTID, upgrade 8.x e configuração do servidor. Não use para PostgreSQL (`$specsfy-specialist-postgres`), para decidir entidade e relação (`$specsfy-specialist-modeling`) nem para coordenar release e deploy (`$specsfy-specialist-delivery`).
+description: Modelar, consultar e operar MySQL com schema consistente, índices justificados pelo plano e operação recuperável. Use no modo schema para tipos, chave primária, índices compostos, charset utf8mb4, collation, constraints e DDL online; no modo queries para EXPLAIN, plano real, índice composto, locks InnoDB, isolation level, deadlock e consulta lenta; no modo operation para backup com mysqldump e XtraBackup, point-in-time recovery, replicação com GTID, upgrade do servidor e configuração do servidor. Não use para PostgreSQL (`$specsfy-specialist-postgres`), para decidir entidade e relação (`$specsfy-specialist-modeling`) nem para coordenar release e deploy (`$specsfy-specialist-delivery`).
 ---
 
 # MySQL
@@ -16,7 +16,7 @@ operation trata backup, replicação, upgrade e configuração.
 | --- | --- | --- |
 | Criar ou revisar tabela, escolher tipo, chave primária, índice composto, charset `utf8mb4`, collation, constraint ou DDL em tabela grande | schema | [Tipos, charset, índices e DDL](references/schema.md) |
 | Consulta lenta, `EXPLAIN`, plano com `ALL`/`filesort`/`temporary`, lock esperando, deadlock, `innodb_lock_wait_timeout` ou escolha de isolation level | queries | [Plano, índices e concorrência InnoDB](references/queries.md) |
-| Backup, restore, point-in-time recovery, réplica com GTID, upgrade de 8.0 para 8.4, parâmetro de servidor ou papel de privilégio | operation | [Backup, replicação, upgrade e configuração](references/operation.md) |
+| Backup, restore, point-in-time recovery, réplica com GTID, upgrade por caminho suportado, parâmetro de servidor ou papel de privilégio | operation | [Backup, replicação, upgrade e configuração](references/operation.md) |
 
 Não use para:
 
@@ -29,39 +29,40 @@ Não use para:
   `$specsfy-specialist-delivery`; este especialista entrega o schema, o plano e
   o procedimento de banco que a entrega consome.
 
-Combine com `$specsfy-specialist-laravel` quando a origem for Eloquent ou
-migration Laravel, com `$specsfy-specialist-redis` quando houver cache na frente
-da consulta e com `$specsfy-specialist-observability` quando a latência
-atravessar aplicação, rede e banco.
+Em Laravel, confirme a engine da conexão usada pelo fluxo. Encaminhe
+schema, índice e plano ao especialista da engine observada. Use
+`$specsfy-specialist-laravel` para domínio, Eloquent e migrations do framework.
+Para implementar o teste indicado pelo método, use
+`$specsfy-specialist-testing` e o runner instalado. Combine com
+`$specsfy-specialist-redis` para cache e
+`$specsfy-specialist-observability` para latência entre aplicação e banco.
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
-   `.specsfy/RULES.md` e `.specsfy/DATABASE.md`, porque toda decisão daqui
-   altera dado persistido.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
-2. Siga o modo indicado na spec ou na tarefa, no formato
-   `Especialista: $specsfy-specialist-mysql (schema)`, `(queries)` ou
-   `(operation)`. Sem indicação, confirme primeiro que o banco é MySQL e qual
-   versão responde em `SELECT VERSION()`.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
-4. Não mude o estado da spec nem marque gate: isso pertence a
-   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
-   `$specsfy-06-implement`.
-5. Registre na spec o DDL com `ALGORITHM` e `LOCK`, o índice com o predicado que
-   o justifica, o plano antes e depois, a política de backup e o RPO/RTO que a
-   operação assume. A tarefa `[MIGRATION]` aponta o arquivo versionado, e
-   `.specsfy/DATABASE.md` é atualizado pela skill `$specsfy-setup` no modo
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase. Se receber apenas um ID inequívoco, use
+   `specsfy specs show <id> --content`.
+   Leia também `.specsfy/STACK.md`, `.specsfy/RULES.md` e `.specsfy/DATABASE.md`.
+2. Siga o modo indicado, no formato `Especialista: $specsfy-specialist-mysql (schema)`, `(queries)` ou `(operation)`.
+   Sem indicação, confirme a engine MySQL e a versão com `SELECT VERSION()`.
+3. Retorne conclusões e dúvidas à fase chamadora para registro no destino
+   indicado no item 1. Em `prepare`, a implementação no modo `tests`
+   conclui o checklist da tarefa. Estado e gates cabem à fase do método.
+   Entregue o DDL com algoritmo e lock aplicável, o predicado que justifica
+   o índice, os planos comparados e o RPO/RTO. Aponte o arquivo versionado
+   para a tarefa `[MIGRATION]`.
+   A atualização de `.specsfy/DATABASE.md` cabe a `$specsfy-setup` no modo
    `database`.
 
 ## Fluxo
@@ -145,9 +146,10 @@ atravessar aplicação, rede e banco.
 - Índice parcial não existe no MySQL: para subconjunto pequeno, use índice em
   coluna gerada com valor nulo no resto e filtre por `IS NOT NULL` quando o
   plano justificar.
-- DDL em tabela grande declara `ALGORITHM` e `LOCK` e é validado antes em cópia
-  com volume equivalente. `ALGORITHM=INSTANT` só vale para as operações que a
-  versão suporta.
+- Em DDL de tabela grande, escolha `ALGORITHM` e confirme reconstrução,
+  DML concorrente e metadata lock em cópia representativa. Use `LOCK=NONE`
+  quando a operação aceitar e a concorrência for requisito. `INSTANT` usa
+  o comportamento padrão de `LOCK`.
 - Papéis separados: aplicação com `SELECT`/`INSERT`/`UPDATE`/`DELETE`, migration
   com DDL, relatório com leitura. A aplicação nunca conecta com usuário que pode
   `DROP TABLE`.
@@ -170,12 +172,14 @@ atravessar aplicação, rede e banco.
   segura lock, impede purge de versão antiga e multiplica deadlock.
 - Paginação por `OFFSET` alto em tabela que cresce: o custo cresce com o
   deslocamento; prefira keyset por chave ordenada.
-- `mysqldump` sem `--single-transaction` em tabela InnoDB: o dump sai
-  inconsistente entre tabelas e não serve para recuperação pontual.
-- Réplica promovida sem validar `read_only`, GTID executado e atraso real: a
-  promoção perde transação que ainda não tinha chegado.
+- Dump InnoDB sem snapshot consistente ou com GTIDs globais em uma exportação
+  parcial.
+- Réplica promovida sem conciliar os GTIDs e isolar o primário antigo.
 
 ## Validação
+
+Em Laravel, confirme que `.env.testing` aponta para um banco separado.
+Use `RefreshDatabase` ou `migrate:fresh` somente em banco descartável.
 
 - `EXPLAIN` e `EXPLAIN ANALYZE` antes e depois, com a mesma massa de dados e o
   mesmo predicado da aplicação; anexe `rows` e `filtered` comparados.
@@ -200,8 +204,9 @@ atravessar aplicação, rede e banco.
   do schema; este especialista materializa em tabela, tipo e constraint.
 - `$specsfy-specialist-postgres` cobre o outro banco relacional; semântica de
   índice, lock e DDL não é transportável entre os dois.
-- `$specsfy-specialist-laravel` define migration, Eloquent e transação na
-  aplicação; a decisão de tipo, índice e plano continua aqui.
+- `$specsfy-specialist-laravel` trata domínio, Eloquent, migrations e
+  transações da aplicação. Use MySQL para tipo, índice e plano se essa
+  for a engine observada.
 - `$specsfy-specialist-redis` cuida do cache na frente da consulta; o MySQL
   permanece a fonte de verdade que o cache não substitui.
 - `$specsfy-specialist-docker` empacota e opera o servidor MySQL em container,

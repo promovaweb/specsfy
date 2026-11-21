@@ -13,12 +13,13 @@
  * NOT_FOUND and a spec without the Definition Gate passed is GATE_FAILED.
  */
 
-import { mkdir, readFile, readdir, rename } from "node:fs/promises";
+import { lstat, mkdir, readFile, readdir, rename } from "node:fs/promises";
 import { basename, join, relative } from "node:path";
 import { AppError, error } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
-import { isFile, pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
+import { isFile, listFiles, pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
 import { resolveSpec, SPEC_FOLDERS, type ResolvedSpec } from "./lifecycle.ts";
+import { readHeaderField } from "./spec-header.ts";
 
 export const INBOX_FOLDER = "inbox";
 export const INBOX_PROCESSED_FOLDER = "processed";
@@ -79,7 +80,7 @@ export async function scanInboxCaptures(
 /**
  * Moves a capture to `specs/inbox/processed/` when every given spec has the
  * Definition Gate passed. Keeps the original text, records the derived specs
- * and updates the references in `specs/`.
+ * and updates references in specs, backlog and project context.
  */
 export async function processInboxCapture(
   project: string,
@@ -163,31 +164,6 @@ async function assertDefinitionGatePassed(spec: ResolvedSpec): Promise<void> {
   }
 }
 
-/** Reads only the first table before the sections, ignoring fenced examples. */
-function readHeaderField(content: string, field: string): string | undefined {
-  const matches: string[] = [];
-  let inTable = false;
-  let fence: { marker: string; length: number } | undefined;
-  for (const line of content.split(/\r?\n/u)) {
-    const delimiter = /^\s{0,3}(`{3,}|~{3,})(.*)$/u.exec(line);
-    if (delimiter) {
-      if (!fence) fence = { marker: delimiter[1]![0]!, length: delimiter[1]!.length };
-      else if (delimiter[1]![0] === fence.marker && delimiter[1]!.length >= fence.length && !delimiter[2]!.trim()) fence = undefined;
-      continue;
-    }
-    if (fence) continue;
-    if (/^\s{0,3}#{2,6}\s/u.test(line)) break;
-    const row = TABLE_ROW.exec(line);
-    if (!row) {
-      if (inTable) break;
-      continue;
-    }
-    inTable = true;
-    if (row[1]!.trim().toLowerCase() === field.toLowerCase()) matches.push(row[2]!.trim());
-  }
-  return matches.length === 1 ? matches[0] : undefined;
-}
-
 async function listCaptures(directory: string, processed: boolean): Promise<InboxCapture[]> {
   let names: string[];
   try {
@@ -215,18 +191,24 @@ async function rewriteReferences(root: string, name: string): Promise<string[]> 
   const files = [
     ...(await listMarkdown(join(root, "specs", "backlog"))),
     ...(await listSpecFiles(root)),
+    ...(await listFiles(join(root, ".specsfy"))).filter((path) => path.endsWith(".md")),
+    ...(await isFile(join(root, "PROJECT.md")) ? [join(root, "PROJECT.md")] : []),
   ];
   const pattern = new RegExp(
-    `${escapeRegExp(INBOX_FOLDER)}/(?!${escapeRegExp(INBOX_PROCESSED_FOLDER)}/)${escapeRegExp(name)}`,
+    `${escapeRegExp(INBOX_FOLDER)}/${escapeRegExp(name)}(?![\\p{L}\\p{N}_.%/-])`,
     "gu",
   );
   const replacement = `${INBOX_FOLDER}/${INBOX_PROCESSED_FOLDER}/${name}`;
   const updated: string[] = [];
   for (const path of files) {
+    if (!(await lstat(path).catch((cause) => {
+      if (cause.code !== "ENOENT") throw cause;
+      return undefined;
+    }))?.isFile()) continue;
     const content = await readFile(path, "utf8");
-    if (!pattern.test(content)) continue;
-    pattern.lastIndex = 0;
-    await writeTextAtomic(path, content.replace(pattern, replacement));
+    const rewritten = content.replace(pattern, replacement);
+    if (rewritten === content) continue;
+    await writeTextAtomic(path, rewritten);
     updated.push(toPosix(relative(root, path)));
   }
   return updated.sort();

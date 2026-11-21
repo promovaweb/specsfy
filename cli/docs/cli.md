@@ -129,9 +129,9 @@ Criação, captura e movimentação do trabalho pelo método.
 | `specs research` | Lista e carrega a pesquisa local indexada pela spec e confere as afirmações. | `<spec>`, `--emit-content`, `--max-bytes <bytes>`, `--project <dir>` |
 | `specs change` | Compara a spec no Git com a versão do worktree: IDs e seções alterados e gates a reabrir. | `<spec>`, `--base <rev>`, `--mode impact\|changelog`, `--project <dir>` |
 | `inbox capture` | Registra uma captura em `specs/inbox/` a partir do texto original, sem interação. | `--input <text>`, `--title <title>`, `--slug <slug>`, `--summary`, `--problem`, `--people`, `--value`, `--signals`, `--data`, `--risks`, `--directions`, `--review`, `--session`, `--turn`, `--sources`, `--project <dir>` |
-| `inbox process` | Move a captura para `specs/inbox/processed/` quando specs com o Definition Gate aprovado a cobrem. | `<capture>`, `--spec <ids>`, `--project <dir>` |
+| `inbox process` | Move a captura para `specs/inbox/processed/` quando specs com o Definition Gate aprovado a cobrem. Atualiza os vínculos em specs, backlog, `PROJECT.md` e documentos Markdown de `.specsfy/`. | `<capture>`, `--spec <ids>`, `--project <dir>` |
 | `backlog start` | Cria um item numerado em `specs/backlog/` sem promover uma spec. | `--title <title>`, `--idea <text>`, `--problem`, `--person`, `--result`, `--context`, `--slug <slug>`, `--project <dir>` |
-| `tasks next` | Mostra a próxima tarefa pronta da spec com o próximo item da checklist. | `<spec>`, `--all`, `--project <dir>` |
+| `tasks next` | Mostra a próxima tarefa pronta da spec com o próximo item da checklist. | `<spec>`, `--all`, `--phase red`, `--project <dir>` |
 | `tasks check` | Marca ou desmarca uma tarefa, ou um item da checklist, no `spec.md`. | `<spec>`, `<task>`, `[item]`, `--undo`, `--project <dir>` |
 | `tasks delivery` | Monta o resumo de entrega: gates, IDs entregues, tarefas, provas e rollback. | `<spec>`, `--format markdown\|json`, `--preview`, `--project <dir>` |
 
@@ -140,6 +140,12 @@ backlog. O campo aceita um caminho relativo à raiz do projeto, com ou sem
 crases, ou um link Markdown relativo ao arquivo de backlog. A atualização
 mantém o formato da célula. Uma nova transição, inclusive para o estado
 atual, corrige vínculos que ainda apontam para pastas anteriores da spec.
+
+`tasks next 0001 --phase red` seleciona a primeira tarefa aberta com as tags
+`[TEST]` e `[TDD]` cujas dependências estejam concluídas. A ordem é a da seção
+14. Use em Defined com Definition Gate aprovado e Plan Gate pendente. Nesse
+modo, `--all` também devolve no máximo uma tarefa pronta. A saída inclui as
+tarefas RED bloqueadas e retorna 1 se nenhuma tarefa aberta estiver pronta.
 
 `tasks check` aceita como `[item]` uma key de checklist (`PREP`, `EXECUTE`,
 `VERIFY`, `VISUAL`, `EVIDENCE`, `IMPROVE`) ou a posição do item, contando a
@@ -161,19 +167,24 @@ Cada gate sai com 0 quando aprova e com 10 quando encontra problemas. O
 | `gate evidence` | Confere as provas materiais das tarefas no Evidence Contract 1. | `<spec>`, `--delivery`, `--task <id>`, `--attestation <file>`, `--project <dir>` |
 | `gate findings` | Valida os achados de produto, arquitetura e segurança registrados na spec. | `<spec>`, `--project <dir>` |
 | `gate database` | Confere que os testes usam um banco separado e que um comando não apaga dados. | `--command <command>`, `--project <dir>` |
-| `verify` | Roda a política inteira do Specsfy e devolve o payload de atestação. É a entrada do CI. | `--boundary local\|git\|ci`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` |
+| `verify` | Roda a política do projeto ou diagnostica uma spec. | `--spec <id>`, `--boundary local\|git\|ci`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` |
 
 `verify` usa os scripts de `.agents/skills/` do projeto. Quando essa pasta
 não existe, usa os scripts embutidos no binário e a checagem de skills falha.
 O Node.js não é necessário. O `--self-test` exercita a política e os canários
 sem olhar as specs.
 
+Use `verify --spec 0001` para aplicar as checagens do estado a uma única
+spec. O resultado inclui o caminho em `data.result.spec`. A consulta focal
+dispensa a checagem geral das skills e gera avisos só para a spec selecionada.
+O uso no CI continua com `verify` sem filtro.
+
 Para cada spec verificada, o relatório avisa se um especialista declarado é
 desconhecido no catálogo ou não está instalado em `.agents/skills/`, e se um
-sinal encontrado pede um especialista ainda não declarado. Em texto, os
+sinal encontrado indica um par nome e modo ainda sem declaração. Em texto, os
 avisos vão para stderr. Com `--json`, aparecem em `data.warnings` com
 `severity: "warning"`, `kind`, `message` e, para avisos de uma spec, `spec`,
-`name` e o modo e sinal quando disponíveis. A stack é calculada uma vez por
+`name`, o modo quando houver e `signals` com as evidências. A stack é calculada uma vez por
 execução. Se a detecção falhar, o aviso `stack-detection-failed` informa que a
 análise continua com as declarações disponíveis em `.specsfy/STACK.md`. O
 resultado dos gates, o código de saída e o arquivo de atestação seguem a
@@ -233,20 +244,25 @@ consulta a versão publicada. `skills` gerencia os especialistas do catálogo.
 | `specialists suggest` | Sugere especialistas a partir das palavras-chave encontradas na spec. | `<spec>`, `--project <dir>`, `--json` |
 | `skills suggest` | Também executa `specialists suggest`. | `<spec>`, `--project <dir>`, `--json` |
 
-Use `{{bin}} specialists suggest 0001` ao revisar o plano de uma spec. Cada
-linha mostra o nome, o modo quando existe, o sinal e se a skill foi declarada
-na spec e instalada em `.agents/skills/`. A consulta aceita número, slug,
-pasta ou caminho. O CLI lê declarações em `Plano técnico` e `Tarefas` com ou
-sem a numeração dos títulos. Para especialistas com `stack: true` no catálogo,
-um sinal precisa de confirmação por detecção ou por um alias declarado em
-`.specsfy/STACK.md`. Uma declaração na própria spec também permite a sugestão
-quando um sinal coincide. Interface e Arquitetura podem ser sugeridas só
-pelo sinal. Entradas ausentes, pendentes e alternativas em `STACK.md` ficam
-fora da confirmação. Com `--json`, `data` contém `project`, `spec` (caminho
-relativo) e `suggestions`
-com `name`, `mode` opcional, `signal`, `declared` e `installed`. O comando
-sai com 0 após ler a spec, inclusive com a lista vazia, e com 6 quando a
-spec não puder ser encontrada ou lida.
+Use `{{bin}} specialists suggest 0001` ao revisar o plano de uma spec. O
+comando aceita número, slug, pasta ou caminho. Cada linha reúne os sinais de
+um par nome e modo e mostra a primeira linha e o trecho da spec que sustentam
+cada sinal. A declaração do modo vem da subseção Especialistas do plano
+técnico ou das anotações da seção Tarefas. O cabeçalho também permite declarar
+um especialista sem modo. O texto negado, as seções fora de escopo e os
+exemplos em blocos de código ficam fora da busca.
+
+A instalação é conferida em `.agents/skills/`. Para especialistas com
+`stack: true`, o sinal precisa de confirmação da tecnologia pela detecção ou
+por um alias em `.specsfy/STACK.md`. Uma declaração do mesmo par na spec
+também permite a sugestão. Interface e Arquitetura podem ser sugeridas pelo
+sinal. Entradas ausentes, pendentes e alternativas em `STACK.md` ficam fora
+da confirmação. Em `--json`, cada item em `data.suggestions` inclui
+`name`, `mode` quando houver, `signals` (com `signal` e `evidence.line`
+e `evidence.text`), `declared` e `installed`. O campo `signal` no nível do
+item contém o primeiro sinal para compatibilidade. O comando sai com 0
+ao ler a spec, mesmo com uma lista vazia, e com 6 caso ela esteja ausente
+ou ilegível.
 
 O catálogo padrão para analisar specs está embutido. Um arquivo indicado por
 `SPECSFY_SPECIALISTS_CATALOG` ou um `catalog.repository` personalizado pode

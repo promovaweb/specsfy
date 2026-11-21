@@ -31,9 +31,12 @@ limite entre servidor e cliente.
 3. Mantém os componentes no servidor e marca `"use client"` só no componente
    folha que usa hooks, eventos ou APIs do navegador. `params`, `searchParams`,
    `cookies()` e `headers()` são assíncronos e precisam de `await`.
-4. Declara cache, revalidação e tags de cada fonte de conteúdo. O cache é
-   opt-in: `"use cache"` na função, `cacheLife` para a duração e `cacheTag`
-   para a invalidação; sem a diretiva, o código roda a cada requisição.
+4. Declara cache, revalidação e tags de cada fonte de conteúdo. Com Cache
+   Components, código e interface estáticos podem entrar no HTML pré-renderizado
+   sem `"use cache"`. Dados dinâmicos sem cache e APIs que dependem da requisição
+   são processados quando ela chega. Para configurar o cache, usa `"use cache"`
+   na função ou no componente, `cacheLife` para a duração e `cacheTag` para a
+   invalidação. [Documentação de cache do Next.js](https://nextjs.org/docs/app/getting-started/caching)
 5. Valida a entrada e confere a autorização dentro de cada Server Action e
    route handler. Uma ação que muda dado cacheado chama `updateTag` ou
    `revalidateTag(tag, "max")` antes de retornar.

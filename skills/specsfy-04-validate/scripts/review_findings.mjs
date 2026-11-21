@@ -3,9 +3,9 @@
 
 import { lstat, readFile, realpath, stat } from "node:fs/promises";
 import { basename, dirname, relative, resolve } from "node:path";
+import { parseSpecIds, specReferences } from "../../specsfy-05-tasks/scripts/parse_tasks.mjs";
 
 const finding = /^-\s+\*\*(FIND-(PROD|ARCH|SEC)-\d{3,})\*\*\s+\[(P[123])\]\s+\[(Open|Resolved|Accepted)\]\s+(.+?)\s+—\s+Refs:\s+(.+?)\s+—\s+Evidence:\s+(.+?)\s+—\s+Effect:\s+(.+?)\s+—\s+Suggestion:\s+(.+?)\s*$/gmu;
-const defined = /^(?:####\s+((?:US|AC)-\d{3,})\b|-\s+\*\*((?:FR|NFR)-\d{3,})\*\*\s*:)/gmu;
 
 function argumentsMap(argv) {
   const values = { json: false };
@@ -54,9 +54,9 @@ async function analyze(text, root) {
   const counts = new Map();
   for (const item of findings) counts.set(item.id, (counts.get(item.id) ?? 0) + 1);
   for (const [id, count] of [...counts].sort()) if (count > 1) errors.push(`${id}: ID duplicado`);
-  const definitions = new Set([...text.matchAll(defined)].flatMap((match) => [match[1], match[2]]).filter(Boolean));
+  const definitions = parseSpecIds(text);
   for (const item of findings) {
-    const refs = [...new Set(item.refs.match(/\b(?:US|FR|NFR|AC)-\d{3,}\b/gu) ?? [])].sort();
+    const refs = [...specReferences(item.refs)].sort();
     const invalid = refs.filter((reference) => !definitions.has(reference));
     if (!refs.length) errors.push(`${item.id}: refs ausentes`);
     else if (invalid.length) errors.push(`${item.id}: refs inexistentes: ${invalid.join(", ")}`);

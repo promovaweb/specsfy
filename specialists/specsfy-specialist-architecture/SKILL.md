@@ -32,27 +32,31 @@ Não use para:
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` antes de propor boundary, serviço ou contrato.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-architecture (system|web-api)`. Sem
    indicação, escolha o modo pelo "Quando usar" acima.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
+3. Devolva a conclusão e as dúvidas abertas no destino indicado no item 1,
+   no próprio backlog, na spec ou na tarefa da fase.
 4. Não mude o estado da spec nem marque gate: isso pertence a
    `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
    `$specsfy-06-implement`.
-5. Registre a escolha na subseção `Arquitetura e módulos` da seção 8 e em
+5. Quando a fase trabalhar o plano técnico ou as decisões da spec, registre
+   a escolha na subseção `Arquitetura e módulos` da seção 8 e em
    `### 17. Decisões`, com o cenário de qualidade que comprova a escolha; ADR
    em arquivo separado só quando o projeto já mantiver esse diretório.
 
@@ -95,16 +99,28 @@ Não use para:
    tabelas ou objetos internos como contrato por conveniência.
 2. Definir operações, schemas, headers e status, com a semântica de retry
    registrada por operação.
-3. Modelar erro com RFC 9457 (`type` estável, `title`, `status`, `detail`
-   seguro, `instance`), sem stack trace, SQL ou segredo.
+3. Definir o formato de erro do contrato. Quando ele usar Problem Details
+   (RFC 9457), documentar `type` estável, `title`, `status`, `detail` seguro
+   e `instance` quando útil. Preservar stack trace, SQL e segredos no servidor.
 4. Projetar autenticação, autorização por recurso e tenant, idempotência,
    precondições e concorrência antes de implementar handlers.
 5. Especificar paginação, filtros, ordenação determinística, limites, rate
    limiting e comportamento diante de dados mutáveis.
-6. Materializar OpenAPI/JSON Schema e contract tests positivos, negativos e de
-   compatibilidade executados contra a implementação.
+6. Materializar OpenAPI e JSON Schema quando o contrato adotar esses formatos.
+   Executar testes positivos, negativos e de compatibilidade contra a
+   implementação seguindo o contrato observado pelo consumidor.
 7. Definir logs, métricas, correlação, depreciação, migração e condições para
    remover comportamento antigo sem quebrar consumidores conhecidos.
+
+Exemplo de contrato interno Laravel/Inertia. A sessão autentica a pessoa e
+a policy autoriza o acesso à equipe. `GET /equipes/{equipe}/cupons` entrega
+uma página Inertia com props paginadas. Um `POST` válido redireciona para a
+lista. Um `POST` com campo inválido redireciona de volta ao formulário, com
+erros temporários na sessão expostos em `page.props.errors`. O contrato
+define página, props, permissões e destinos dos redirects. OpenAPI e
+Problem Details ficam fora desse contrato, que segue o protocolo Inertia.
+[Validação](https://inertiajs.com/docs/v3/the-basics/validation) e
+[redirects](https://inertiajs.com/docs/v3/the-basics/redirects) no Inertia.
 
 ## Padrões
 
@@ -172,14 +188,15 @@ Não use para:
   testado, não apenas descrito.
 - Impactos em segurança, dados e operação foram revisados como parte da
   escolha, não como reflexão posterior.
-- Executar contract tests de request, response, headers e Problem Details
-  contra exemplos válidos e inválidos da descrição.
+- Executar contract tests de request, response e headers contra exemplos
+  válidos e inválidos. Incluir Problem Details quando o contrato usar RFC 9457.
 - Provar autorização por recurso e tenant com identidade correta, identidade
   cruzada, credencial expirada e escopo insuficiente.
 - Simular retry, duplicação, timeout após commit, corrida de atualização e
   paginação enquanto itens entram e saem.
-- Fazer lint e validação estrutural de OpenAPI/JSON Schema e comparar breaking
-  changes contra a última versão publicada.
+- Quando o contrato usar OpenAPI ou JSON Schema, fazer lint e validação
+  estrutural. Comparar mudanças incompatíveis com a última versão publicada
+  no formato adotado pelo contrato.
 - Não declarar uma arquitetura "escalável" ou "resiliente" sem o cenário
   mensurável que o comprova: linguagem absoluta sem prova é proibida.
   (regra da casa)

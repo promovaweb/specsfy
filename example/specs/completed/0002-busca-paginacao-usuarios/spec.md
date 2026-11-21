@@ -10,7 +10,9 @@
 | Plan Gate | Passed |
 | Delivery Gate | Passed |
 | Evidence Contract | 1 |
-| Atualizada em | 2026-07-25 |
+| Interface para pessoas | Sim |
+| Especialistas | specsfy-specialist-interface, specsfy-specialist-laravel, specsfy-specialist-react, specsfy-specialist-testing, specsfy-specialist-typescript |
+| Atualizada em | 2026-11-20 |
 
 ## Ato I — Definir
 
@@ -43,7 +45,7 @@ páginas preservando o termo e entende claramente quando não há resultados.
 #### Fontes e contexto consultados
 
 - `specs/backlog/0001-listagem-gestao-usuarios.md`.
-- `specs/specs/0001-diretorio-global-usuarios/spec.md`.
+- `specs/completed/0001-diretorio-global-usuarios/spec.md`.
 - `app/Models/User.php` e convenções de páginas Inertia.
 
 #### Documentação consultada
@@ -54,7 +56,7 @@ páginas preservando o termo e entende claramente quando não há resultados.
 
 #### Artefatos de pesquisa armazenados
 
-- `specs/0002-busca-paginacao-usuarios/research/phpstan-type-errors.md`: URLs, data de acesso e impacto da
+- `specs/completed/0002-busca-paginacao-usuarios/research/phpstan-type-errors.md`: URLs, data de acesso e impacto da
   documentação PHPStan; nenhuma reprodução de conteúdo externo.
 
 #### Dúvidas respondidas
@@ -117,11 +119,34 @@ Feature: Busca e paginação de usuários
     Given existem usuários com nomes semelhantes e diferentes
     When uma pessoa autenticada busca parte de um nome em caixa diferente
     Then recebe somente os nomes correspondentes e o filtro normalizado
+```
 
-  Scenario: Busca sem correspondência
-    Given nenhum usuário corresponde ao termo informado
-    When uma pessoa autenticada realiza a busca
-    Then recebe uma página vazia com o termo preservado
+#### AC-002 — Paginar a busca
+
+**Cobre**: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002
+
+```gherkin
+@US-001 @FR-001 @FR-002 @FR-003 @NFR-001 @NFR-002 @AC-002
+Feature: Paginar a busca
+
+  Scenario: Paginar a busca
+    Given dezesseis usuários correspondem ao termo
+    When uma pessoa autenticada pesquisa seus nomes
+    Then a página apresenta quinze resultados e o link seguinte mantém o termo
+```
+
+#### AC-003 — Tratar uma busca sem correspondências
+
+**Cobre**: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002
+
+```gherkin
+@US-001 @FR-001 @FR-002 @FR-003 @NFR-001 @NFR-002 @AC-003
+Feature: Tratar uma busca sem correspondências
+
+  Scenario: Tratar uma busca sem correspondências
+    Given nenhum nome corresponde à busca
+    When uma pessoa autenticada envia o termo pelo formulário GET rotulado
+    Then a tabela recebe zero itens e mantém o filtro, com opção de limpá-lo
 ```
 
 ### 7. Requisitos
@@ -149,6 +174,18 @@ Feature: Busca e paginação de usuários
 ## Ato II — Projetar e provar
 
 ### 8. Plano técnico
+
+#### Especialistas
+
+| Especialista | Modo | Sinal que o puxou | Fases |
+| --- | --- | --- | --- |
+| specsfy-specialist-interface | accessibility | Semântica, mensagens textuais e navegação | validate |
+| specsfy-specialist-interface | ui | Composição, estados e ações das telas | validate |
+| specsfy-specialist-interface | ux | Busca no diretório de usuários | validate |
+| specsfy-specialist-laravel | app | Rotas, controllers, Eloquent e props Inertia | validate |
+| specsfy-specialist-react | padrão | Páginas e navegação Inertia em React | validate |
+| specsfy-specialist-testing | pest | Testes HTTP focais e marcadores por critério | validate |
+| specsfy-specialist-typescript | padrão | Tipos das props da página | validate |
 
 #### Contexto existente
 
@@ -189,7 +226,7 @@ Feature: Busca e paginação de usuários
 #### Estrutura de arquivos
 
 ```text
-specs/specs/0002-busca-paginacao-usuarios/spec.md
+specs/completed/0002-busca-paginacao-usuarios/spec.md
 app/Http/Controllers/Directory/UserDirectoryController.php
 resources/js/pages/directory/users/index.tsx
 tests/Feature/Directory/UserSearchTest.php
@@ -217,6 +254,46 @@ tests/features/directory_user_search.feature
 
 ### 10. Interfaces e contratos
 
+#### Interface para pessoas
+
+A listagem oferece busca parcial por nome e mantém o filtro durante a paginação.
+
+#### Stack e convenções de interface
+
+Laravel e Inertia entregam props tipadas em TypeScript. A página React usa o layout autenticado, Wayfinder e os estilos Tailwind existentes.
+
+#### Telas e responsabilidades
+
+- Busca no diretório de usuários em `resources/js/pages/directory/users/index.tsx`.
+
+#### Fluxo de informação e navegação
+
+O formulário envia `q` à rota de listagem. A página mostra o filtro aplicado e mantém o termo nos links de paginação.
+
+#### Menus e navegação principal
+
+O rótulo Users no menu lateral autenticado tem como destino a rota `directory.users.index`. A busca permanece nessa rota.
+
+#### Formulários e ações
+
+O formulário GET usa o campo `q`. A pessoa pode enviar ou limpar o termo e avançar pelas páginas.
+
+#### Composição e disposição
+
+O campo de busca fica acima da tabela e a paginação abaixo. A tabela mantém a rolagem horizontal em telas estreitas.
+
+#### Blocos React e componentes selecionados
+
+`Input`, `Label` e `Button` formam a busca, e `Link` navega entre páginas.
+
+#### Estados e acessibilidade
+
+O campo tem rótulo e aceita submissão por teclado. A lista vazia exibe mensagem textual com o filtro ativo.
+
+#### Revisão visual durante o desenvolvimento
+
+Conferir bordas, espaçamentos, margens, padding e tipografia na página e nos estados aplicáveis em telas estreitas e largas.
+
 #### APIs expostas
 
 - `GET /directory/users?q={texto}&page={n}` na rota
@@ -238,7 +315,7 @@ tests/features/directory_user_search.feature
 
 - **Unidade**: não aplicável; normalização e query são provadas no boundary HTTP.
 - **Integração/contrato**: Pest cobre caixa, trim, limite, página e estado vazio.
-- **BDD/aceite**: Behave executa AC-001 usando o teste focal.
+- **BDD/aceite**: os três critérios da seção 6 são rastreados na suíte Pest focal. O arquivo `.feature` preserva a jornada histórica e é exercitado pelo adaptador Node do exemplo.
 - **E2E**: não aplicável para esta fatia.
 - **Verificação manual**: inspeção do label e controles após build.
 
@@ -248,32 +325,39 @@ tests/features/directory_user_search.feature
 | --- | --- | --- | --- | --- | --- |
 | FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 | `tests/features/directory_user_search.feature` | `tests/Feature/Directory/UserSearchTest.php` | Behave exit 1 e Pest exit 2: rota `directory.users.index` ausente | Pest: 4/4; Behave: 2/2 | `composer ci:check`: 100/100; Behave: 11/11; build passou |
 
+A tabela acima preserva o RED histórico de AC-001. A decomposição posterior
+registrou AC-002 e AC-003 sobre o comportamento entregue. A seção 12 registra
+a execução focal atual e a inspeção complementar do JSX para NFR-002.
+
 ### 12. Plano de testes e rastreabilidade
 
 | Requisito | Cenário BDD | Nível | Arquivo/comando esperado | Evidência |
 | --- | --- | --- | --- | --- |
-| FR-001, FR-002, FR-003, NFR-001 | AC-001 | Integração | `php artisan test --compact tests/Feature/Directory/UserSearchTest.php` | Passed: 3 testes |
+| FR-001, FR-002, FR-003, NFR-001 | AC-001 | Integração | `php artisan test --compact tests/Feature/Directory/UserSearchTest.php` | Passed: suíte focal |
 | NFR-002 | AC-001 | Estático | `npm run types:check && npm run lint:check` | Passed |
+| US-001, FR-001, FR-002, FR-003, NFR-001 | AC-002 | Integração | `php artisan test --compact tests/Feature/Directory/UserSearchTest.php` | Passed: suíte focal |
+| US-001, FR-001, FR-002, FR-003, NFR-001 | AC-003 | Integração | `php artisan test --compact tests/Feature/Directory/UserSearchTest.php` | Passed: suíte focal |
+| NFR-002 | AC-002, AC-003 | Estático | JSX da página; `npm run types:check && npm run lint:check` | Passed |
 
 ### 13. Validações
 
 #### Gate do Ato I — Definição
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-04-validate/scripts/validate_spec.py specs/specs/0002-busca-paginacao-usuarios/spec.md`
+- **Comando**: `specsfy gate spec 0002 --project .`
 - **Achados**: READY; filtro, limite, vazio e persistência de query definidos; nenhum P1 aberto.
 
 #### Gate do Ato II — Plano
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-05-tasks/scripts/validate_tasks.py specs/specs/0002-busca-paginacao-usuarios/spec.md`
+- **Comando**: `specsfy gate tasks 0002 --project .`
 - **Achados**: tarefas válidas; T001/T002 concluídas após RED Behave/Pest pela rota ausente.
 
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-06-implement/scripts/check_traceability.py specs/specs/0002-busca-paginacao-usuarios/spec.md . --full-chain`
-- **Achados**: rastreabilidade 4/4; QA passou; regressão, checks e build verdes.
+- **Comando**: `specsfy gate trace 0002 --project . --full-chain`
+- **Achados**: rastreabilidade 9/9 na suíte Pest focal e matriz de aceite completa.
 
 ### 14. Tarefas
 
@@ -284,21 +368,38 @@ tests/features/directory_user_search.feature
   - [x] **VISUAL**: Não aplicável; a tarefa materializa somente o caso de teste.
   - [x] **EVIDENCE**: Comando e falha registrados na seção 11.
   - [x] **IMPROVE**: Limites e estado vazio foram cobertos.
-- [x] T002 [TEST] [US-001] Criar integração RED em tests/Feature/Directory/UserSearchTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T001
+- [x] T002 [TEST] [TDD] [US-001] Criar integração RED em tests/Feature/Directory/UserSearchTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T001
   - [x] **PREP**: Contrato de filtro e paginação confirmado.
   - [x] **EXECUTE**: Testes de match, normalização e ausência criados.
   - [x] **VERIFY**: Pest exit 2 pela rota ausente comprovou RED válido.
   - [x] **VISUAL**: Não aplicável; a tarefa materializa somente o caso de teste.
   - [x] **EVIDENCE**: Saída focal e IDs registrados.
   - [x] **IMPROVE**: Cobertura de caixa, persistência e vazio foi incluída.
-- [x] T003 [CODE] [US-001] Implementar busca em app/Http/Controllers/Directory/UserDirectoryController.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T001, T002
+- [x] T005 [TEST] [TDD] [US-001] Paginar a busca em tests/Feature/Directory/UserSearchTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-002 — Depends: none
+  - [x] **PREP**: Critério da seção 6 e contrato Inertia conferidos.
+  - [x] **EXECUTE**: Caso Pest rastreado com marcador próprio.
+  - [x] **VERIFY**: Comando focal da seção 12 executado.
+  - [x] **VISUAL**: Não aplicável ao caso HTTP. A seção 12 registra a verificação do JSX.
+  - [x] **EVIDENCE**: Resultado da suíte focal na seção 12.
+  - [x] **IMPROVE**: A suíte focal mantém um marcador próprio para este critério.
+- [x] T006 [TEST] [TDD] [US-001] Tratar uma busca sem correspondências em tests/Feature/Directory/UserSearchTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-003 — Depends: none
+  - [x] **PREP**: Critério da seção 6 e contrato Inertia conferidos.
+  - [x] **EXECUTE**: Caso Pest rastreado com marcador próprio.
+  - [x] **VERIFY**: Comando focal da seção 12 executado.
+  - [x] **VISUAL**: Não aplicável ao caso HTTP. A seção 12 registra a verificação do JSX.
+  - [x] **EVIDENCE**: Resultado da suíte focal na seção 12.
+  - [x] **IMPROVE**: A suíte focal mantém um marcador próprio para este critério.
+
+#### Fase de interface
+
+- [x] T003 [CODE] [US-001] Implementar busca em app/Http/Controllers/Directory/UserDirectoryController.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001, AC-002, AC-003 — Depends: T001, T002, T005, T006 — Inventário: INTERFACE.md
   - [x] **PREP**: RED BDD/TDD e dependências foram confirmados.
   - [x] **EXECUTE**: Filtro, props e controles React foram implementados.
   - [x] **VERIFY**: Pest focal, Behave, tipos, lint e Prettier passaram.
   - [x] **VISUAL**: Bordas, espaçamentos, margens, padding e tipografia conferidos nos estados e viewports da tela.
   - [x] **EVIDENCE**: GREEN e arquivos foram registrados.
   - [x] **IMPROVE**: Normalização ficou limitada, estável e refletida na URL.
-  <!-- specsfy:evidence {"task":"T003","refs":["US-001","FR-001","FR-002","FR-003","NFR-001","NFR-002","AC-001"],"files":["app/Http/Controllers/Directory/UserDirectoryController.php","resources/js/pages/directory/users/index.tsx"],"commands":[{"run":"php artisan test --compact tests/Feature/Directory/UserSearchTest.php","exit":0}]} -->
+  <!-- specsfy:evidence {"task":"T003","refs":["US-001","FR-001","FR-002","FR-003","NFR-001","NFR-002","AC-001","AC-002","AC-003"],"files":["app/Http/Controllers/Directory/UserDirectoryController.php","resources/js/pages/directory/users/index.tsx"],"commands":[{"run":"php artisan test --compact tests/Feature/Directory/UserSearchTest.php","exit":0}]} -->
 - [x] T004 [TEST] [US-001] Executar regressão em tests/Feature/Directory/UserSearchTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T003
   - [x] **PREP**: Suites e rastreabilidade foram identificadas.
   - [x] **EXECUTE**: Pest, Behave, checks frontend e build executaram.
@@ -309,7 +410,7 @@ tests/features/directory_user_search.feature
 
 ### 15. Ordem de execução
 
-- Caminho crítico: T001 → T002 → T003 → T004.
+- Caminho crítico: T001 precede T002. T002, T005 e T006 precedem T003 no grafo de cobertura. T004 depende de T003.
 - Tarefas paralelas: nenhuma; a fatia estende arquivos da spec 0001.
 - Estratégia de MVP: busca por nome com URL compartilhável e estado vazio.
 
@@ -343,7 +444,7 @@ tests/features/directory_user_search.feature
 - [x] `Definition Gate` está `Passed`.
 - [x] `Plan Gate` está `Passed`.
 - [x] `Delivery Gate` está `Passed`.
-- [x] AC-001 passa em Behave e Pest.
+- [x] AC-001 a AC-003 passam na suíte Pest focal. O histórico de aceite de AC-001 está na seção 11.
 - [x] Todos os FR/NFR possuem evidência.
-- [x] T001 a T004 estão concluídas.
+- [x] T001 a T006 estão concluídas.
 - [x] Testes e checks estáticos passam.

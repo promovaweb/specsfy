@@ -82,7 +82,7 @@ O comentário é obrigatório para tarefa `[CODE]` concluída quando a spec decl
   - [ ] **PREP**: Confirmar stack, tela atual, fluxo, formulário e estados definidos na seção 10.
   - [ ] **EXECUTE**: Implementar os blocos React, tela, ações e formulário conforme a composição acordada; registrar cada bloco e componente em `INTERFACE.md`.
   - [ ] **VERIFY**: Exercitar menus, navegação, validações, feedback e teclado.
-  - [ ] **VISUAL**: Conferir PageHeader reutilizado, DataGrid em largura total, coluna `ID`, link da linha, ações de editar e apagar, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes.
+  - [ ] **VISUAL**: Conferir PageHeader reutilizado, DataGrid em largura total, coluna `ID`, bordas, espaçamentos, margens, padding e tipografia nos estados e viewports relevantes. Confira o link da linha se `Operações:` no Contrato CRUD incluir `consultar`, a ação de edição se incluir `editar` e a ação de exclusão se incluir `apagar`. Para `listar, criar`, confira a grade informativa e a entrada para criação.
   - [ ] **EVIDENCE**: Registrar arquivos, comando e resultado da interação.
   - [ ] **IMPROVE**: Aplicar melhoria de interface ou justificar nenhuma.
   <!-- specsfy:evidence {"task":"T006","refs":["US-001","FR-001","NFR-001","AC-001","AC-002","AC-003"],"files":["src/features/recurso/ListaRecurso.tsx"],"commands":[{"run":"comando focal","exit":0}]} -->

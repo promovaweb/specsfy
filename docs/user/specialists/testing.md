@@ -19,100 +19,134 @@ o teste na ferramenta escolhida.
 - Um teste Playwright está intermitente, com timeout ou `strict mode violation`.
 - Você vai escrever unit ou teste de componente em TypeScript e React, simular
   rede, controlar timer ou medir cobertura.
-- Você precisa escolher a ferramenta de teste para a stack do projeto.
+- Você precisa confirmar qual runner instalado atende ao teste definido no plano.
 
 O agente confirma versão do runner, configuração, banco de teste e comando
 declarado no projeto antes de escrever o primeiro teste. Não introduz um segundo
 runner sem decisão registrada na spec.
 
-## Como ele trabalha
+## No Specsfy
 
-1. Descobre versão, configuração, ambiente de CI e comando de teste do projeto.
-2. Recebe do método o comportamento e o nível do teste.
-3. Escolhe o modo pela ferramenta que o projeto já usa.
-4. Escreve o teste pelo comportamento observável, com nome que descreve a regra.
-5. Executa o caso focal, observa a falha esperada e registra a saída literal.
-6. Roda a suíte relacionada e entrega comando, arquivo, nome e saída.
+O agente usa a spec indicada pela fase que pediu o teste e recebe o passo,
+a tarefa, o critério de aceite (AC), o nível e o runner. O lockfile ajuda a
+confirmar a ferramenta instalada. Um `composer.json` pode pertencer a um
+projeto PHPUnit sem Laravel. Um projeto Laravel também pode usar Playwright.
+
+No passo `prepare`, o agente devolve o ID da tarefa, o comando, o arquivo, o
+nome do teste, o marcador `SPECSFY:` e a falha que demonstra o comportamento
+ausente. O modo `tests` registra esse RED e conclui o checklist da tarefa
+com o Plan Gate ainda pendente. Em `cycle`, o agente devolve a evidência das
+execuções focais e de regressão. Em `verify`, devolve o resultado e as lacunas
+da conferência de rastreabilidade e aceite. A fase responsável registra a saída.
+
+Antes de cada teste focal, suíte ou regressão, o comando exato precisa obter
+`SAFE` no [gate de banco](../cli-reference.md#specsfy-gate),
+mesmo para casos que parecem independentes de banco.
+
+## Fluxo
+
+### Modo pest
+
+Confirme o runner PHP e siga a [receita Pest](#pest).
+
+### Modo playwright
+
+Confirme que o plano prevê navegador automatizado e siga a
+[receita Playwright](#playwright).
+
+### Modo vitest
+
+Confirme o ambiente de execução e siga a [receita Vitest](#vitest).
 
 ## Pest
 
-O modo Pest cobre teste PHP e Laravel.
+Para testar comportamento da aplicação Laravel, use
+`testing/pest + laravel/app`. O primeiro modo implementa o teste com o runner
+instalado. O segundo trata o comportamento da aplicação, o domínio e as
+migrations do framework. Para schema SQL, índices ou planos de execução,
+encaminhe à skill da engine em uso.
 
-- `tests/Unit` roda sem framework; `tests/Feature` sobe aplicação e cobre rota,
-  controller, policy e job.
-- `tests/Pest.php` liga `TestCase` e trait de banco por diretório.
-- `.env.testing` com `APP_ENV=testing` e banco separado é pré-requisito.
-- Factory cria só o registro do caso, com estado nomeado.
-- `DatabaseTransactions` quando a regra do projeto proíbe `RefreshDatabase`.
-- Dataset nomeado cobre matriz de entrada, com um caso por linha no relatório.
-- `Event::fake`, `Queue::fake`, `Http::fake` e `Storage::fake` cortam efeito
-  externo.
-- Teste de autorização usa usuário com papel diferente.
-- `--parallel` exige banco por worker configurado.
+Em Laravel, use `.env.testing` com `APP_ENV=testing` e banco separado do
+desenvolvimento. Confirme que a configuração efetiva aponta para esse banco.
+O método veda `RefreshDatabase`, `DatabaseMigrations`, `migrate:fresh` e
+equivalentes destrutivos no fluxo de testes. Use `DatabaseTransactions` com
+schema já migrado e factories que criem só os dados do caso.
 
-Os exemplos de feature, dataset, fake, paralelo e o diagnóstico de falha estão em
-[pest.md](../../../specialists/specsfy-specialist-testing/references/pest.md).
+- `tests/Unit` roda sem subir a aplicação Laravel. Em `tests/Feature`, a
+  configuração do Pest vincula os casos à base `Tests\TestCase`.
+- Dataset nomeado cobre variações de entrada e identifica cada caso no relatório.
+- Com fake HTTP parcial, use `Http::preventStrayRequests()`, cubra URLs
+  específicas e confira a requisição enviada. Integração que precisa provar
+  compatibilidade com o provedor usa uma sandbox declarada.
+- Para rodar em paralelo, confira a versão de ParaTest no lockfile e o banco
+  de cada processo antes de obter `SAFE` para o comando.
+
+Veja [configuração e exemplos de Pest e Laravel](../../../specialists/specsfy-specialist-testing/references/pest.md).
 
 ## Playwright
 
-O modo Playwright cobre jornada no navegador.
+Use quando o plano prevê teste automatizado de navegador e o Playwright já está
+confirmado na stack ou há decisão explícita de instalar o runner em uma stack
+compatível. A verificação manual de teclado cabe a `interface/accessibility`.
 
-- `baseURL` evita URL absoluta no teste.
-- Locator por papel, rótulo ou texto. Classe CSS é última opção.
-- Asserção de espera do Playwright, sem `waitForTimeout`.
-- Fixture prepara e limpa estado com `use()`.
-- Projeto `setup` grava `storageState` e os testes reaproveitam a sessão.
-- `storageState` fica fora do Git.
-- `trace: 'on-first-retry'` guarda evidência sem pesar toda execução.
-- Retry em CI e zero local.
-- CI instala navegador com `--with-deps`, divide por shard e publica relatório
-  sempre.
-- `page.route` simula erro e borda em caso específico, sem interceptar tudo.
+- Use `baseURL` e configure `webServer` para iniciar o app de teste ou declare
+  o endereço de um ambiente já iniciado.
+- Localize elementos por papel, rótulo ou texto e espere uma condição observável.
+- Valide as credenciais no projeto de setup e mantenha o `storageState` fora
+  do Git. Compartilhe sessão só em testes que podem rodar simultaneamente com
+  a mesma conta sem interferência. Para mutações, isole os dados com fixtures
+  ou use uma conta por worker, inclusive entre shards.
+- Use `trace: 'retain-on-failure'` para guardar o trace da falha original,
+  mesmo com retries. `on-first-retry` grava a primeira repetição.
+- Publique um blob por shard e reúna todos com `merge-reports`. Restrinja
+  acesso e retenção dos artefatos, que podem conter DOM e tráfego.
 
-A configuração completa, o setup de autenticação, o exemplo de rota e a tabela de
-falhas estão em
-[playwright.md](../../../specialists/specsfy-specialist-testing/references/playwright.md).
+Veja [configuração, autenticação e CI de Playwright](../../../specialists/specsfy-specialist-testing/references/playwright.md).
 
 ## Vitest
 
-O modo Vitest cobre unidade e componente em TypeScript.
+- Use `node` para funções puras e `jsdom` compatível com o Node para
+  componentes. Preserve a transformação JSX do projeto. Se usar
+  `vitest.config.ts` separado, use `mergeConfig` para aproveitar plugins e
+  aliases do Vite. Use `projects` no Vitest 5.x para separar ambientes.
+- Em `tests/setup.ts`, importe `@testing-library/jest-dom/vitest` e registre
+  `afterEach(cleanup)` com globals desativados. Importe as APIs de teste
+  quando usar esse modo.
+- `clearMocks` limpa chamadas. `mockReset` também reinicia implementações.
+  `restoreMocks` restaura spies de `vi.spyOn`. Automocks e `vi.fn()`
+  exigem a limpeza ou o reset adequado ao caso.
+- Aguarde cada interação de usuário. Com timer falso, configure
+  `userEvent.setup({ advanceTimers: vi.advanceTimersByTime })`.
+- Na cobertura com V8, use `@vitest/coverage-v8` na versão do Vitest e
+  confira os arquivos e caminhos de decisão alterados.
 
-- Configuração separada quando o teste precisa de ambiente diferente do build.
-- `jsdom` ou `happy-dom` para componente; função pura roda em `node`.
-- `restoreMocks` evita mock vazando entre testes.
-- `toBe`, `toEqual` e `toStrictEqual` têm semântica diferente.
-- Componente é consultado por papel e rótulo, com `userEvent.setup()`.
-- `await` na interação assíncrona, e `findBy*` para esperar elemento.
-- `vi.mock` substitui módulo; mock do próprio módulo sob teste invalida o teste.
-- Timer falso exige ajuste para interagir com `userEvent`.
-- MSW intercepta rede sem substituir o cliente HTTP.
-- Cobertura é lida por arquivo alterado e por caminho de decisão.
+Veja [configuração e exemplos de Vitest](../../../specialists/specsfy-specialist-testing/references/vitest.md).
 
-Os exemplos de unidade, componente, mock, timer, MSW e cobertura estão em
-[vitest.md](../../../specialists/specsfy-specialist-testing/references/vitest.md).
+## Padrões
 
-## Erros que ele evita
+- Dê ao caso um nome que explicite a regra e o resultado esperado.
+- Use dados próprios do teste e preserve a fronteira que o AC precisa provar.
+- Use o mesmo comando e a mesma versão do runner no terminal e no CI.
 
-- `sleep` e `waitForTimeout` como sincronização.
+## Antipadrões
+
+- `sleep` e `waitForTimeout` para sincronização.
 - Snapshot de página inteira como prova de comportamento.
-- Mock do módulo sob teste.
+- Mock do módulo sob teste ou da fronteira que o cenário precisa provar.
 - E2E para cada variação de unidade.
-- Teste que depende de dado criado por outro teste.
-- Teste sem asserção.
-- Banco de teste apontando para o banco de desenvolvimento.
-- Retry escondendo corrida em teste de unidade.
-- Sessão real versionada no repositório.
-- Cobertura perseguida com teste vazio.
+- Teste que depende de dado criado por outro caso.
+- Banco de teste apontando para desenvolvimento.
+- Retry escondendo corrida ou sessão real versionada no Git.
+- Cobertura perseguida com teste sem asserção.
 
-## Como conferir o resultado
+## Validação
 
-- Saída do caso focal com nome e resultado.
-- Falha esperada observada quando o método pede RED.
-- Suíte relacionada verde, sem reduzir cobertura do arquivo alterado.
-- Execução repetida mantendo o mesmo resultado, ou instabilidade registrada.
-- Banco de desenvolvimento intacto, com contagem antes e depois.
-- Trace e relatório disponíveis no artefato da execução que falhou.
-- Mesmo comando no terminal e no CI, com a mesma versão de runner.
+- Saída do caso focal com nome, resultado e marcador de rastreabilidade.
+- Falha de comportamento observada quando o método pede RED.
+- Suíte relacionada verde e cobertura avaliada nos arquivos alterados.
+- Execução repetida com o mesmo resultado ou instabilidade registrada.
+- `SAFE` para cada comando, com destinos por processo conferidos em paralelo.
+- Trace da falha original acessível no relatório consolidado de CI.
 
 ## Como instalar
 
@@ -121,13 +155,15 @@ npx skills add https://github.com/promovaweb/specsfy \
   --skill specsfy-specialist-testing --agent universal --copy --full-depth
 ```
 
-## Especialistas relacionados
+## Skills relacionadas
 
-- [Laravel](laravel.md) define aplicação, Eloquent, fila e regra de negócio.
+- [Laravel](laravel.md) define aplicação, migrations do framework e domínio.
+- [PostgreSQL](postgres.md) e [MySQL](mysql.md) tratam schema SQL, índices e
+  planos de execução conforme a engine.
 - [React](react.md) define componente, hook e estado.
 - [Next.js](nextjs.md) define rota, cache e fronteira server/client.
 - [TypeScript](typescript.md) define tipo e configuração do projeto.
-- [Interface](interface.md) define acessibilidade e semântica que o teste chama.
+- [Interface](interface.md) trata acessibilidade, incluindo teclado manual.
 - [Delivery](delivery.md) monta pipeline e promoção.
 - [Debugging](debugging.md) investiga a causa quando a falha não é do teste.
 

@@ -73,6 +73,11 @@ describe("saída da Inbox para processed", () => {
       `# Backlog: Avisos\n\n- specs/inbox/${CAPTURE} (origem)\n`,
     );
 
+    const database = await write(project, ".specsfy/DATABASE.md", `| Fonte | [captura](../specs/inbox/${CAPTURE}) |`);
+    const notes = await write(project, ".specsfy/research/notes.md", `Fonte: ../../specs/inbox/${CAPTURE}`);
+    const overview = await write(project, "PROJECT.md", `Fonte: specs/inbox/${CAPTURE}`);
+    const unrelated = await write(project, ".specsfy/RULES.md", `Outra fonte: specs/inbox/${CAPTURE}.bak`);
+
     const result = await processInboxCapture(
       project,
       CAPTURE,
@@ -90,6 +95,9 @@ describe("saída da Inbox para processed", () => {
       expect.objectContaining({ identifier: "0007-avisos-de-atraso", folder: "defined" }),
     ]);
     expect(result.updated_references.sort()).toEqual([
+      ".specsfy/DATABASE.md",
+      ".specsfy/research/notes.md",
+      "PROJECT.md",
       "specs/backlog/0003-avisos-de-atraso.md",
       "specs/defined/0007-avisos-de-atraso/spec.md",
     ]);
@@ -109,6 +117,11 @@ describe("saída da Inbox para processed", () => {
     expect(spec).not.toContain(`specs/inbox/${CAPTURE}`);
     const backlog = await readFile(join(project, "specs/backlog/0003-avisos-de-atraso.md"), "utf8");
     expect(backlog).toContain(`specs/inbox/processed/${CAPTURE}`);
+
+    for (const path of [database, notes, overview]) {
+      expect(await readFile(path, "utf8")).toContain(`specs/inbox/processed/${CAPTURE}`);
+    }
+    expect(await readFile(unrelated, "utf8")).toContain(`specs/inbox/${CAPTURE}.bak`);
 
     const active = await scanInboxCaptures(project);
     expect(active.map((capture) => capture.name)).toEqual([

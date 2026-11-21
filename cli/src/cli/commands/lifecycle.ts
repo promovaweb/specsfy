@@ -3,8 +3,8 @@
  *
  * Script-backed: `inbox capture` (capturar_inbox), `backlog start`
  * (iniciar_backlog), `specs new` (iniciar_spec), `specs research`
- * (load_research), `specs change` (analyze_change), `tasks next`
- * (next_task) and `tasks delivery` (render_delivery). Each one is a
+ * (load_research), `specs change` (analyze_change), the default mode of
+ * `tasks next` (next_task) and `tasks delivery` (render_delivery). Each one is a
  * `ScriptCommandDef`, shared with the MCP tools in
  * `src/mcp/tools/lifecycle.ts`.
  *
@@ -24,10 +24,11 @@ import { resolveProject, resolveSpecPath } from "../../core/project.ts";
 import { migrateSpecs, SPEC_FOLDERS, transitionSpec, updateSpecEffort, type SpecFolder, type SpecTransition } from "../../domain/lifecycle.ts";
 import { processInboxCapture } from "../../domain/inbox.ts";
 import { syncMilestones } from "../../domain/milestones.ts";
+import { nextRedTask } from "../../domain/red-tasks.ts";
 import { setTaskCheck } from "../../domain/progress.ts";
 import { clickUpfyHandoff, type ClickUpfyHandoff } from "../../domain/clickupfy.ts";
 import { writeTextAtomic } from "../../domain/filesystem.ts";
-import { projectOption, toCommand, type ScriptCommandDef } from "../../engine/script-command.ts";
+import { executeScriptCommand, projectOption, renderScriptText, toCommand, type NativeProjectCommandDef, type ScriptCommandDef } from "../../engine/script-command.ts";
 import type { Command, Context } from "../registry.ts";
 
 const bin = manifest.bin;
@@ -150,6 +151,36 @@ export const taskNextDef: ScriptCommandDef = {
   examples: [`${bin} tasks next 0001`, `${bin} tasks next 0001 --all --json`],
 };
 
+/** Adds pre-gate RED selection while retaining the framework's default task selection. */
+export const taskNextCommandDef: NativeProjectCommandDef = {
+  name: taskNextDef.name,
+  tool: taskNextDef.tool,
+  description: taskNextDef.description,
+  longDescription: taskNextDef.longDescription + " Use --phase red for the first ready TDD test before the Plan Gate passes.",
+  effect: "read",
+  exitCodes: [ExitCode.NOT_FOUND],
+  params: [
+    ...taskNextDef.params,
+    { name: "phase", kind: "option", values: ["red"], placeholder: "phase", description: "Select one ready TDD test in Defined with Plan Gate Pending. In this phase --all still returns at most one." },
+  ],
+  examples: [...taskNextDef.examples!, `${bin} tasks next 0001 --phase red --json`],
+  async execute(project, values) {
+    if (values.phase !== "red") {
+      const { data, run, code } = await executeScriptCommand(taskNextDef, values, project);
+      return { data: { ...data }, text: () => renderScriptText(taskNextDef, run), code };
+    }
+    const path = await resolveSpecPath(project, String(values.spec));
+    const result = nextRedTask(await readFile(path, "utf8"));
+    const ok = result.state !== "blocked";
+    const code = ok ? ExitCode.SUCCESS : ExitCode.GENERIC_ERROR;
+    return {
+      data: { project, exitCode: code, ok, result, stderr: "" },
+      text: () => JSON.stringify(result, null, 2),
+      code,
+    };
+  },
+};
+
 /** `tasks delivery`: delivery summary of a spec. */
 export const deliveryRenderDef: ScriptCommandDef = {
   name: "delivery",
@@ -169,14 +200,14 @@ export const deliveryRenderDef: ScriptCommandDef = {
   examples: [`${bin} tasks delivery 0001`, `${bin} tasks delivery 0001 --preview --json`],
 };
 
-/** Script definitions of this spec, in tool registration order. */
-export const lifecycleScriptDefs: readonly ScriptCommandDef[] = [
+/** Definitions shared with MCP, in tool registration order. */
+export const lifecycleCommandDefs: readonly (ScriptCommandDef | NativeProjectCommandDef)[] = [
   inboxCaptureDef,
   backlogStartDef,
   specCreateDef,
   specResearchDef,
   specChangeDef,
-  taskNextDef,
+  taskNextCommandDef,
   deliveryRenderDef,
 ];
 
@@ -366,4 +397,4 @@ export const specsWriteCommands: Command[] = [
 ];
 export const inboxWriteCommands: Command[] = [toCommand(inboxCaptureDef), inboxProcess];
 export const backlogWriteCommands: Command[] = [toCommand(backlogStartDef)];
-export const tasksCommands: Command[] = [toCommand(taskNextDef), tasksCheck, deliveryCommand()];
+export const tasksCommands: Command[] = [toCommand(taskNextCommandDef), tasksCheck, deliveryCommand()];

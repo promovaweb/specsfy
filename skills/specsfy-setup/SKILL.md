@@ -82,7 +82,9 @@ GitHub Spec Kit (`sync_speckit_context.mjs`) roda dentro do
 - Em Laravel, nenhum teste roda antes de `specsfy gate database` retornar
   `SAFE`, e comandos que apagam banco ou schema são sempre ignorados.
 - Feche cada modo com `specsfy context monitor --project <raiz> --check` e
-  resolva todo `PENDING` antes de devolver o controle.
+  resolva todo `PENDING` antes de devolver o controle. Em cópia sem Git,
+  siga a recuperação de `BASELINE` descrita em
+  [Monitorar e resolver pendências](references/setup.md#monitorar-e-resolver-pendências).
 - No modo `setup`, registre Laravel Octane com Open Swoole ausente e, em
   Laravel com React, ausência de shadcn/ui ou ReUI em `Pendências de stack`.
   Aprove o setup quando os demais critérios passarem e encaminhe a instalação

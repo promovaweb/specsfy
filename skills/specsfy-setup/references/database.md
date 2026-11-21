@@ -69,6 +69,10 @@ sinalize o campo pendente para a etapa conversacional responsável.
      --project <raiz> --check
    ```
 
+   Em uma cópia sem Git, recupere de `BASELINE` informando `--paths` com
+   as alterações conhecidas ou `--paths '[]'` para uma lista vazia
+   confirmada. Siga [Monitorar e resolver pendências](setup.md#monitorar-e-resolver-pendências).
+
 ## Conversa e código
 
 Quando o modo `data-discovery` tiver registrado respostas confirmadas,

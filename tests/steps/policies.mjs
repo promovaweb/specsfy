@@ -10,7 +10,7 @@ const contextModes = { stack: 'STACK', rules: 'RULES', database: 'DATABASE' };
 const design = () => read('skills/templates/DESIGNSYSTEM.MD');
 
 const expectations = [
-  ['o Definition Gate exige três ACs distintos por feature US FR e NFR', 'validator', ['function minimumBddErrors(body)', 'for (const kind of ["US", "FR", "NFR"])', 'if (count < 3)']],
+  ['o Definition Gate exige três ACs distintos por feature US FR e NFR', 'validator', ['function minimumBddErrors(', 'for (const kind of ["US", "FR", "NFR"])', 'if (count < 3)']],
   ['a rastreabilidade exige três marcadores de caso por feature US FR e NFR', 'trace', ['option("--minimum-tests", "3")', 'option("--kinds", "US,FR,NFR,AC")', 'feature_cases_missing']],
   ['cada AC continua exigindo ao menos um caso TDD', 'trace', ['id.startsWith("AC-") ? 1 : minimum']],
   ['o fluxo exige os documentos mantenedores correspondentes', 'monitor', ['.specsfy/STACK.md', '.specsfy/DATABASE.md', 'PROJECT.md', '.specsfy/RULES.md']],

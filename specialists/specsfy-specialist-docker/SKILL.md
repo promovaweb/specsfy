@@ -34,30 +34,31 @@ Não use para:
 
 ## No Specsfy
 
-Este especialista trabalha dentro do fluxo do método: a spec decide, a fase
-escreve e a conclusão volta para a spec.
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
 
-1. Antes de agir, ler a spec aberta, cujo caminho vem da skill que chamou ou de
-   `specsfy status`, em especial a linha `| Especialistas |`, a subseção
-   `#### Especialistas` dentro de `### 8. Plano técnico` e a seção que a fase
-   está escrevendo, mais `.specsfy/STACK.md` e `.specsfy/RULES.md`. Abrir
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e `.specsfy/RULES.md`. Abrir
    `.specsfy/DATABASE.md` quando o trabalho tocar volume, persistência ou
    serviço de dados.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, ler e
-     registrar no item de `specs/backlog/`; em specify e validate, ler a spec
-     aberta (linha `| Especialistas |`, subseção 8, seção em escrita); só
-     `specsfy-05-tasks` escreve a seção 14, então apenas indicar o que a tarefa
-     deve prever; em `specsfy-06-implement`, seguir a tarefa indicada.
 2. Seguir o modo indicado na spec ou na tarefa
    (`Especialista: $specsfy-specialist-docker (compose)`, `(swarm)` ou `(proxy)`);
    sem indicação, escolher pelo "Quando usar".
-3. Devolver as conclusões para a seção da spec ou para a tarefa que a fase está
-   escrevendo, nunca em arquivo paralelo. Se faltar informação, registrar como
-   dúvida aberta da spec.
+3. Devolver as conclusões e dúvidas abertas no destino indicado no item 1,
+   no próprio backlog, na spec ou na tarefa da fase.
 4. Nunca mudar o estado da spec nem marcar gates: isso é de
    `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks` e
    `specsfy-06-implement`.
-5. Registrar na spec os artefatos que a fase escreve (Dockerfile, Compose,
+5. Quando a fase registrar a solução na spec, incluir os artefatos previstos (Dockerfile, Compose,
    stack), a referência imutável da imagem e o contrato de healthcheck, sinal e
    rollout que o deploy vai consumir.
 

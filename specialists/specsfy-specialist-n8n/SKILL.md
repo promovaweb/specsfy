@@ -37,35 +37,34 @@ repositório.
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
-   `.specsfy/RULES.md` e `.specsfy/DATABASE.md` quando o modo tocar banco.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
-2. Siga o modo indicado na spec ou na tarefa, no formato
+1. **Fonte de entrada por fase**
+   - `specsfy-02-backlog`: leia o item indicado em `specs/backlog/`. A fase
+     registra decisões e sinais no próprio item quando ainda não há spec.
+   - `specsfy-03-specify` e `specsfy-04-validate`: use a
+     spec aberta indicada pela fase.
+   - `specsfy-05-tasks`: sugira especialistas e modos para a fase sincronizar
+     plano e tarefas. A criação e a decomposição da seção 14 cabem à fase 05.
+   - `specsfy-06-implement`: limite a atuação à tarefa e ao passo carregado
+     pela fase. O modo tests conclui o checklist da tarefa em `prepare`.
+2. Quando houver spec, leia a spec aberta indicada pela fase chamadora. Se
+   receber um identificador inequívoco, resolva com
+   `specsfy specs show <id> --content`. Confira a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção em
+   elaboração. Consulte `.specsfy/STACK.md`, `.specsfy/RULES.md` e
+   `.specsfy/DATABASE.md` quando o modo tocar banco. Siga o modo indicado:
    `Especialista: $specsfy-specialist-n8n (workflows)`, `(self-hosting)` ou
-   `(integration)`. Sem indicação, descubra a versão do n8n e o modo de execução
-   antes de propor mudança.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
-4. Não mude o estado da spec nem marque gate: isso pertence a
-   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
-   `$specsfy-06-implement`.
-5. Registre na spec o workflow e a versão, o contrato do webhook, as variáveis de
-   ambiente, o banco e a fila usados, o caminho de backup e o procedimento de
-   atualização. Credencial não aparece na spec, só o nome da credencial e o dono.
+   `(integration)`. Sem indicação, confirme versão, modo de execução e objetivo.
+3. Entregue conclusão, lacunas e evidências à fase chamadora. A fase dona
+   registra a saída na spec ou no item de backlog. O especialista preserva
+   a spec, seus gates e a tarefa ativa.
+4. Inclua na devolutiva, quando aplicável, versão do n8n, revisão do workflow,
+   contrato de webhook, configuração efetiva, banco, fila, backup e evidência.
+   Identifique a credencial pelo nome e dono, preservando o segredo.
 
 ## Fluxo
 
 1. Leia [references/standards.md](references/standards.md) e descubra versão,
-   modo de execução (single ou queue), banco, broker, volume de execução e o
+   modo de execução (`regular` ou `queue`), banco, broker, volume de execução e o
    contrato de entrada antes de recomendar.
 2. Classifique o pedido: workflows para lógica e erro, self-hosting para
    instalação e operação, integration para contrato e promoção.
@@ -84,8 +83,8 @@ repositório.
    `binary`, e expressão é avaliada por item.
 3. Escreva expressão referenciando o nó anterior pelo nome, e teste com dado
    fixado. Expressão que depende de índice de item quebra quando a ordem muda.
-4. Escolha entre `onError: stop`, `continue` e saída de erro, e configure retry
-   só para chamada idempotente. Detalhe em
+4. Escolha `stopWorkflow`, `continueRegularOutput` ou `continueErrorOutput`
+   para `onError`. Configure retry só com garantia de idempotência. Detalhe em
    [references/workflows.md](references/workflows.md).
 5. Extraia lógica repetida para sub-workflow com entrada e saída declaradas, e
    deixe o workflow pai legível.
@@ -97,8 +96,9 @@ repositório.
 3. Configure variável de ambiente por ambiente, com segredo fora do arquivo
    versionado. `N8N_ENCRYPTION_KEY` precisa ser estável e igual em todos os
    processos que leem credencial.
-4. Quando o volume exigir, ative queue mode com Redis e processos separados de
-   main, worker e webhook.
+4. Quando o volume exigir, use queue mode com Postgres e Redis compartilhados,
+   main, worker e, se necessário, processador de webhook. Configure runners
+   externos nos processos que executam Code se houver dados sensíveis.
 5. Configure URL pública e proxy reverso com o caminho de webhook correto, e
    valide a URL que o n8n gera, não só a que você digita.
 6. Teste backup, restauração e atualização de versão. Passo a passo em
@@ -112,8 +112,9 @@ repositório.
    usa.
 3. Autentique a API pública com chave de escopo adequado e trate `429` com
    espera progressiva.
-4. Garanta idempotência em `POST` com chave própria quando o cliente puder
-   repetir a chamada.
+4. Confira o suporte da API pública a `Idempotency-Key` desde 2.45.0. Nos
+   webhooks de usuário, reserve uma chave estável de forma atômica e persista
+   o resultado para repetição. Use o ID de execução para correlação.
 5. Versione o workflow exportado no Git e promova a mesma versão entre ambientes.
    Detalhe em [references/integration.md](references/integration.md).
 
@@ -127,18 +128,22 @@ repositório.
   concorrente.
 - Queue mode separa `main`, `worker` e, quando necessário, `webhook`; concurrency
   por worker é declarada, não deixada no acaso.
-- `N8N_WEBHOOK_URL` (ou `WEBHOOK_URL` na versão anterior) aponta para a URL
-  pública correta. Valor errado gera link de webhook apontando para `localhost`.
-- `N8N_PROXY_HOPS` e cabeçalho de proxy coerentes com o proxy reverso, senão IP e
-  protocolo chegam errados e o cookie seguro falha.
+- `N8N_WEBHOOK_URL` desde 2.30.0 e `N8N_EDITOR_BASE_URL` apontam aos endereços
+  públicos correspondentes. Com a variável de webhook ausente, a URL pode
+  incluir a porta interna. `WEBHOOK_URL` é o nome legado.
+- `N8N_PROXY_HOPS` segue o caminho real. O último proxy encaminha
+  `X-Forwarded-For`, `X-Forwarded-Host` e `X-Forwarded-Proto`.
+- Em queue mode, use armazenamento binário legível por todos os processos.
+- Configure runner externo para Code em instância com dados sensíveis
+  (regra da casa), com a mesma versão do n8n e segredo do broker.
 - Webhook com caminho próprio e nome estável, autenticação por cabeçalho ou
   assinatura e validação de corpo antes do efeito externo.
 - Toda chamada externa com retry é idempotente ou usa chave de idempotência.
   Retry cego em criação de pedido duplica registro.
 - Execução com erro tem destino: Error Workflow configurado, alerta entregue e
   retenção de dado de execução definida.
-- Workflow exportado em JSON no Git, com nome e versão, sem credencial embutida.
-  Credencial é referência por identificador, não valor no arquivo.
+- Publique no Git o export sanitizado da revisão validada. Revise nomes de
+  credenciais, parâmetros, headers literais e dados fixados.
 - Retenção de execução configurada (`EXECUTIONS_DATA_PRUNE`, idade e quantidade).
   Banco que cresce sem poda para de responder.
 - Backup cobre banco, chave de criptografia, arquivo de workflow e configuração.
@@ -150,8 +155,7 @@ repositório.
   não anda.
 - Container recriado sem `N8N_ENCRYPTION_KEY`: credencial existente vira erro de
   descriptografia e o workflow para.
-- URL de webhook apontando para `localhost` porque `WEBHOOK_URL` não foi
-  configurada atrás do proxy.
+- URL de webhook gerada com host ou porta interna atrás do proxy.
 - Editor exposto sem TLS, sem autenticação e sem restrição de rede.
 - Retry infinito em API de terceiro: amplifica incidente e pode bloquear a conta.
 - Lógica de negócio só no canvas, sem export: não há revisão, diff nem rollback.
@@ -172,8 +176,9 @@ repositório.
   duplicado.
 - `docker compose config` valida interpolação e variável obrigatória antes de
   subir.
-- Worker e main respondem ao endpoint de saúde quando o health check está
-  habilitado, e o log mostra conexão com banco e Redis.
+- Main e worker respondem a `/healthz` e `/healthz/readiness`. Confira conexão
+  com banco e Redis e rode um webhook publicado em staging.
+- Falha automática aciona o Error Workflow configurado e entrega o alerta.
 - Restauração de backup em instância descartável, com workflow abrindo e
   credencial funcionando.
 - Promoção entre ambientes gera diff apenas no que é esperado, e a versão

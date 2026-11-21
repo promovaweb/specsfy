@@ -60,8 +60,9 @@ defaults do projeto ou registra a regra substituída e o alcance da exceção.
 O documento mantém política, estados, cenários e histórico.
 
 Em um CRUD, o mesmo `PageHeader` aparece na lista, no detalhe e nos
-formulários. A lista usa `DataGrid` em largura total com a coluna `ID`, link
-para o detalhe na linha e ações independentes de editar e apagar. O detalhe
+formulários. A lista usa `DataGrid` em largura total com a coluna `ID`. A
+linha abre o detalhe quando `consultar` consta no Contrato CRUD. As ações
+de editar e apagar aparecem quando as operações forem declaradas. O detalhe
 usa `DetailLists` para organizar atributos e status. Criar e editar usam
 seções com uma coluna de contexto e um painel com duas colunas de campos em
 telas largas e uma no celular.

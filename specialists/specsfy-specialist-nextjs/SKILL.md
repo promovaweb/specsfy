@@ -22,29 +22,33 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, quando a rota renderizar tela, `INTERFACE.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-nextjs`. Sem indicação, confirme pelo
    "Quando usar" acima se o projeto depende de `next` antes de propor rota.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
+3. Devolva a conclusão e as dúvidas abertas no destino indicado no item 1,
+   no próprio backlog, na spec ou na tarefa da fase.
 4. Não mude o estado da spec nem marque gate: isso pertence a
    `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
    `$specsfy-06-implement`.
-5. Registre router, fronteira server/client, cache e revalidação da rota na
-   subseção `Arquitetura e módulos` da seção 8; mudança de contrato de
-   dados passa por `### 10. Interfaces e contratos`.
+5. Quando a fase trabalhar o plano técnico da spec, registre router,
+   fronteira server/client, cache e revalidação da rota em
+   `Arquitetura e módulos` na seção 8. Quando a fase tratar uma mudança de
+   contrato de dados, use `### 10. Interfaces e contratos`.
 
 ## Fluxo
 
@@ -62,10 +66,11 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
    componente folha que realmente precisa de hook, evento ou API do
    navegador, nunca no layout ou página inteira por conveniência.
 4. Definir explicitamente cache, revalidação e tags de cada fonte de dado.
-   No modelo Cache Components o cache é opt-in: `"use cache"` na função ou
-   componente, com `cacheLife` e `cacheTag`; sem a diretiva, o código roda em
-   request time. Tratar o comportamento padrão como contrato da versão
-   instalada, não como suposição.
+   Com Cache Components, o Next.js pode pré-renderizar código e UI estáticos
+   sem `"use cache"`. Dados dinâmicos sem cache e APIs da requisição são
+   processados em tempo de requisição. Para cache explícito, usar `"use cache"`
+   na função ou no componente, com `cacheLife` e `cacheTag`. Confirmar o
+   comportamento na versão instalada.
 5. Validar entrada e checar autorização dentro de cada Server Action e route
    handler, como se fosse um endpoint HTTP público, porque é.
 6. Projetar metadata, streaming (`loading.js`/`Suspense`), imagens/fontes e o
@@ -117,8 +122,8 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 - Criar `middleware.ts` em projeto Next.js 16: o arquivo correto é
   `proxy.ts`, com função `proxy`; o nome antigo sobrevive só para Edge e será
   removido.
-- Assumir cache implícito de `fetch` ou de página como default: no modelo
-  Cache Components nada é cacheado sem `"use cache"`.
+- Assumir cache implícito para dados dinâmicos de `fetch`. No modelo Cache
+  Components, declare `"use cache"` no trecho que deve reutilizar esses dados.
 - Confiar em variável de ambiente sem prefixo público (`NEXT_PUBLIC_`) dentro
   de um Client Component: ela não existirá no bundle do navegador.
 - Tratar uma Server Action como "só acessível pela UI" e pular autorização:

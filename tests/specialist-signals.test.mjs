@@ -65,3 +65,14 @@ test('marcadores incompletos, duplicados ou invertidos falham em leitura e escri
     }
   }
 });
+
+test('sinais distinguem configuração, consumo e verificação de regras por equipe', () => {
+  const table = signalsTable(catalog);
+  assert.match(table, /Limite de uso configurado[^\n]*\| `modeling\` \| `data\` \|/);
+  assert.match(table, /Consumo de limite ou resgate concorrente[^\n]*\| `modeling\` \| `domain\` \|/);
+  assert.match(table, /Consumo de limite ou resgate concorrente[^\n]*\| `modeling\` \| `data\` \|/);
+  assert.match(table, /Validade por data civil com relógio controlado[^\n]*\| `testing\` \| `pest\` \|/);
+  assert.match(table, /Unicidade normalizada por equipe[^\n]*\| `modeling\` \| `data\` \|/);
+  assert.match(table, /Permissão por papel e operação[^\n]*\| `application-security\`/);
+  assert.match(table, /Teste automatizado de navegador[^\n]*\| `testing\` \| `playwright\` \|/);
+});

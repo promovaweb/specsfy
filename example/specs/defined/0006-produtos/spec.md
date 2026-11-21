@@ -10,7 +10,9 @@
 | Plan Gate | Pending |
 | Delivery Gate | Pending |
 | Evidence Contract | 1 |
-| Atualizada em | 2026-07-25 |
+| Interface para pessoas | Sim |
+| Especialistas | specsfy-specialist-application-security, specsfy-specialist-architecture, specsfy-specialist-interface, specsfy-specialist-laravel, specsfy-specialist-modeling, specsfy-specialist-react, specsfy-specialist-tailwind-css, specsfy-specialist-testing, specsfy-specialist-typescript, specsfy-specialist-ui-components |
+| Atualizada em | 2026-11-20 |
 
 ## Ato I — Definir
 
@@ -255,23 +257,13 @@ Feature: Edição de produto
     Then a alteração é rejeitada e o erro aparece no campo SKU
 ```
 
-#### AC-005 — Confirmar ou cancelar exclusão
+#### AC-005 — Exigir confirmação no servidor
 
 **Cobre**: US-003, FR-007, NFR-001, NFR-002
 
 ```gherkin
 @US-003 @FR-007 @NFR-001 @NFR-002 @AC-005
 Feature: Exclusão permanente de produto
-
-  Scenario: Membro cancela a confirmação
-    Given existe um produto na equipe ativa e a confirmação está aberta
-    When o membro cancela a exclusão
-    Then o produto permanece no catálogo sem alteração
-
-  Scenario: Requisição não contém confirmação explícita
-    Given existe um produto na equipe ativa
-    When o membro solicita sua exclusão sem confirmed igual a true
-    Then a aplicação rejeita a requisição e preserva o produto
 
   Scenario: Membro confirma a exclusão
     Given existe um produto na equipe ativa e a confirmação está aberta
@@ -288,21 +280,133 @@ Feature: Exclusão permanente de produto
 @US-001 @US-002 @US-003 @FR-001 @FR-008 @NFR-001 @AC-006
 Feature: Isolamento de produtos por equipe
 
-  Scenario Outline: Produto de outra equipe não é exposto
+  Scenario: Rejeitar atualização de produto de outra equipe
     Given o identificador pertence a um produto de outra equipe
-    When o membro tenta <ação> esse produto pela rota da equipe ativa
+    When o membro tenta salvar esse produto pela rota da equipe ativa
     Then a aplicação responde como recurso não encontrado e não altera dados
-
-    Examples:
-      | ação   |
-      | editar |
-      | salvar |
-      | excluir |
 
   Scenario: Pessoa não pertence à equipe da rota
     Given uma pessoa autenticada não pertence à equipe solicitada
     When tenta abrir a listagem de produtos dessa equipe
     Then o acesso é recusado sem expor produtos
+```
+
+#### AC-007 — Paginar resultados da própria equipe
+
+**Cobre**: US-001, FR-001, FR-002, FR-003, NFR-001
+
+```gherkin
+@US-001 @FR-001 @FR-002 @FR-003 @NFR-001 @AC-007
+Feature: Paginar resultados da própria equipe
+
+  Scenario: Paginar uma busca com mais de quinze resultados
+    Given há mais de quinze produtos correspondentes na equipe ativa e em outra equipe
+    When um membro autenticado navega para a página seguinte
+    Then o termo é preservado e os resultados da própria equipe continuam ordenados por nome e ID
+```
+
+#### AC-008 — Limpar o filtro do catálogo
+
+**Cobre**: US-001, FR-002, FR-003, NFR-001, NFR-002
+
+```gherkin
+@US-001 @FR-002 @FR-003 @NFR-001 @NFR-002 @AC-008
+Feature: Limpar o filtro do catálogo
+
+  Scenario: Limpar uma busca sem correspondência
+    Given a busca da equipe ativa não retornou produtos
+    When o membro aciona a opção de limpar
+    Then a listagem paginada volta a mostrar os produtos da equipe ativa na ordem padrão
+```
+
+#### AC-009 — Manter dados do formulário ao corrigir campos
+
+**Cobre**: US-002, FR-004, FR-006, FR-009, NFR-002
+
+```gherkin
+@US-002 @FR-004 @FR-006 @FR-009 @NFR-002 @AC-009
+Feature: Manter dados do formulário ao corrigir campos
+
+  Scenario: Corrigir o SKU no cadastro
+    Given o membro preencheu nome e descrição e informou apenas espaços no SKU
+    When envia o cadastro
+    Then o erro identifica o SKU e os demais valores permanecem no formulário
+
+  Scenario: Corrigir a descrição na edição
+    Given o membro alterou o nome e informou uma descrição acima de dois mil caracteres
+    When envia a edição
+    Then o erro identifica a descrição, os valores informados permanecem disponíveis e a gravação não ocorre
+```
+
+#### AC-010 — Validar SKU por equipe e preservar o SKU do próprio produto
+
+**Cobre**: US-002, FR-004, FR-005, FR-006, FR-009, NFR-001
+
+```gherkin
+@US-002 @FR-004 @FR-005 @FR-006 @FR-009 @NFR-001 @AC-010
+Feature: Validar SKU por equipe e preservar o SKU do próprio produto
+
+  Scenario: Cadastrar SKU usado somente em outra equipe
+    Given uma equipe diferente já usa o SKU informado
+    When o membro cria o produto na equipe ativa
+    Then o cadastro é aceito sem alterar o produto da outra equipe
+
+  Scenario: Manter o SKU do produto editado
+    Given o membro alterou apenas o nome e a descrição
+    When salva com o próprio SKU
+    Then a edição é aceita e nenhum erro de unicidade é associado ao SKU
+
+  Scenario: Rejeitar colisão de SKU na edição
+    Given outro produto da equipe ativa usa o SKU normalizado informado
+    When o membro tenta salvar a edição
+    Then o formulário identifica o erro no SKU e mantém os dados informados
+```
+
+#### AC-011 — Bloquear o formulário de edição cruzado
+
+**Cobre**: US-002, FR-001, FR-008, NFR-001
+
+```gherkin
+@US-002 @FR-001 @FR-008 @NFR-001 @AC-011
+Feature: Bloquear o formulário de edição cruzado
+
+  Scenario: Abrir o formulário de um produto de outra equipe
+    Given a pessoa é membro de ambas as equipes e o produto pertence à equipe diferente da rota
+    When tenta abrir o formulário de edição pela rota da equipe ativa
+    Then recebe 404 sem dados do produto
+```
+
+#### AC-012 — Bloquear exclusão cruzada mesmo com confirmação
+
+**Cobre**: US-003, FR-001, FR-007, FR-008, NFR-001
+
+```gherkin
+@US-003 @FR-001 @FR-007 @FR-008 @NFR-001 @AC-012
+Feature: Bloquear exclusão cruzada mesmo com confirmação
+
+  Scenario: Confirmar exclusão com identificador de outra equipe
+    Given a pessoa é membro de ambas as equipes e o produto pertence à equipe diferente da rota
+    When envia a exclusão pela rota da equipe ativa com confirmed igual a true
+    Then recebe 404 e o produto da outra equipe permanece intacto
+```
+
+#### AC-013 — Preservar produto sem confirmação
+
+**Cobre**: US-003, FR-007, NFR-002
+
+```gherkin
+@US-003 @FR-007 @NFR-002 @AC-013
+Feature: Preservar produto sem confirmação
+
+  Scenario: Requisição não contém confirmação explícita
+    Given existe um produto na equipe ativa
+    When o membro solicita sua exclusão sem confirmed igual a true
+    Then a aplicação rejeita a requisição e preserva o produto
+
+  Scenario: Cancelar sem gravar
+    Given existe um produto na equipe ativa e o diálogo de confirmação está aberto
+    When o membro cancela a exclusão
+    Then o diálogo fecha sem requisição e o produto permanece no catálogo
 ```
 
 ### 7. Requisitos
@@ -359,6 +463,26 @@ Feature: Isolamento de produtos por equipe
 ## Ato II — Projetar e provar
 
 ### 8. Plano técnico
+
+#### Especialistas
+
+| Especialista | Modo | Sinal que o puxou | Fases |
+| --- | --- | --- | --- |
+| specsfy-specialist-application-security | padrão | Sessão e dados expostos nas props Inertia | specify, validate |
+| specsfy-specialist-architecture | web-api | Rotas HTTP e contrato Inertia | specify, validate |
+| specsfy-specialist-interface | accessibility | Semântica, mensagens textuais e navegação | specify, validate |
+| specsfy-specialist-interface | ui | Composição, estados e ações das telas | specify, validate |
+| specsfy-specialist-interface | ux | Catálogo, formulários e confirmação de exclusão | specify, validate |
+| specsfy-specialist-laravel | app | Rotas, controllers, Eloquent e props Inertia | specify, validate |
+| specsfy-specialist-modeling | data | Tabela de produtos, vínculo com equipe e índice composto | specify, validate |
+| specsfy-specialist-modeling | domain | Normalização e unicidade do SKU por equipe | specify, validate |
+| specsfy-specialist-react | padrão | Páginas e navegação Inertia em React | specify, validate |
+| specsfy-specialist-tailwind-css | padrão | Composição responsiva com os tokens do projeto | specify, validate |
+| specsfy-specialist-testing | pest | Testes HTTP focais e marcadores por critério | specify, validate |
+| specsfy-specialist-typescript | padrão | Tipos das props da página | specify, validate |
+| specsfy-specialist-ui-components | components | Seleção de componentes da listagem, formulários e diálogo | specify, validate |
+| specsfy-specialist-ui-components | reui | Seleção prevista de cabeçalho e grade para o catálogo | specify, validate |
+| specsfy-specialist-ui-components | shadcn | Reutilização dos componentes locais baseados em Radix | specify, validate |
 
 #### Contexto existente
 
@@ -451,7 +575,7 @@ Feature: Isolamento de produtos por equipe
 #### Estrutura de arquivos
 
 ```text
-specs/specs/0006-produtos/spec.md
+specs/defined/0006-produtos/spec.md
 routes/web.php
 app/Http/Controllers/ProductController.php
 app/Http/Requests/Products/StoreProductRequest.php
@@ -470,7 +594,6 @@ resources/js/pages/products/edit.tsx
 resources/js/pages/products/index.tsx
 resources/js/types/product.ts
 tests/Feature/Products/ProductManagementTest.php
-tests/features/product_management.feature
 ```
 
 ### 9. Modelo de dados
@@ -500,6 +623,58 @@ tests/features/product_management.feature
   unicidade no banco; `sku` preserva a caixa informada após trim para exibição.
 
 ### 10. Interfaces e contratos
+
+#### Interface para pessoas
+
+Membros autenticados da equipe ativa operam o catálogo no layout da aplicação.
+
+#### Stack e convenções de interface
+
+Laravel e Inertia entregam props tipadas em TypeScript. React, Tailwind CSS 4 e Wayfinder seguem os componentes e tokens locais.
+
+#### Telas e responsabilidades
+
+- Catálogo em `products/index`, com busca, lista e paginação.
+- Cadastro em `products/create`, com nome, SKU e descrição.
+- Edição em `products/edit`, com dados existentes e ação de exclusão.
+
+#### Fluxo de informação e navegação
+
+A listagem abre os formulários de cadastro e edição. Uma mutação bem-sucedida volta à listagem da mesma equipe com mensagem de sucesso.
+
+#### Menus e navegação principal
+
+O menu lateral autenticado usa o rótulo Produtos para a rota `products.index` no contexto da equipe ativa.
+
+#### Formulários e ações
+
+Nome e SKU são obrigatórios e descrição é opcional. Formulários preservam valores em falhas de validação. A ação de excluir abre um diálogo que permite cancelar ou confirmar.
+
+#### Composição e disposição
+
+O cabeçalho fica acima da busca e da listagem. Os formulários ocupam páginas próprias, com as mensagens junto aos campos. O diálogo de exclusão fica na página de edição.
+
+#### Blocos React e componentes selecionados
+
+Reutilizar `AppLayout`, `Form`, `Link`, `Input`, `Label`, `Button` e componentes locais de diálogo. A seleção do `PageHeader` e do `DataGrid` para o catálogo fica no plano, com registro em `INTERFACE.md`.
+
+#### Estados e acessibilidade
+
+Exibir carregamento, vazio, ausência de resultados, erro e sucesso. Usar labels, foco visível e operação por teclado. O diálogo controla foco e anuncia a consequência da exclusão.
+
+#### Revisão visual durante o desenvolvimento
+
+Conferir bordas, espaçamentos, margens, padding e tipografia no catálogo, nos formulários e no diálogo em telas estreitas e largas.
+
+#### Contrato CRUD
+
+Operações: listar, criar, editar, apagar
+
+- Reutilizar um `PageHeader` no catálogo e nos formulários.
+- Listar: `DataGrid` de largura total com coluna ID, nome, SKU, descrição e paginação — Tarefa: T020.
+- Criar: formulário com ação de cadastro e erros por campo — Tarefa: T021.
+- Editar: ação de edição que abre o formulário com os dados do produto da equipe — Tarefa: T022.
+- Apagar: ação de exclusão com diálogo e confirmação explícita — Tarefa: T023.
 
 #### APIs expostas
 
@@ -545,7 +720,7 @@ tests/features/product_management.feature
 - **Integração/contrato**: Pest cobre rotas, autorização, escopo, validação,
   unicidade, busca, paginação, props Inertia, rejeição de exclusão sem
   `confirmed=true`, exclusão confirmada e persistência.
-- **BDD/aceite**: os blocos Gherkin de AC-001 a AC-006 permanecem nesta spec
+- **BDD/aceite**: os blocos Gherkin de AC-001 a AC-013 permanecem nesta spec
   como referência para o usuário e para o desenho dos testes TDD; não serão
   copiados para `.feature` nem executados.
 - **Runner TDD**: Pest, executado por `php artisan test --compact`, pois este é
@@ -560,7 +735,7 @@ tests/features/product_management.feature
 
 | IDs | BDD de referência | Teste TDD informado pelo BDD | RED observado | GREEN observado | Refactor/regressão |
 | --- | --- | --- | --- | --- | --- |
-| FR-001 a FR-009, NFR-001, NFR-002, AC-001 a AC-006 | AC-001 a AC-006 na seção 6 | `tests/Feature/Products/ProductManagementTest.php` com marcadores `SPECSFY` | Pending | Pending | Pending |
+| FR-001 a FR-009, NFR-001, NFR-002, AC-001 a AC-013 | AC-001 a AC-013 na seção 6 | `tests/Feature/Products/ProductManagementTest.php` com marcadores `SPECSFY` | Pending | Pending | Pending |
 
 ### 12. Plano de testes e rastreabilidade
 
@@ -573,6 +748,13 @@ tests/features/product_management.feature
 | FR-007, NFR-001, NFR-002 | AC-005 | Integração e inspeção complementar | `php artisan test --compact tests/Feature/Products/ProductManagementTest.php --filter=delete` | Pending |
 | FR-001, FR-008, NFR-001 | AC-006 | Segurança/integração | `php artisan test --compact tests/Feature/Products/ProductManagementTest.php --filter=isolation` | Pending |
 | NFR-002 | AC-001 a AC-005 | Estático | `npm run types:check && npm run lint:check && npm run format:check` | Pending |
+| US-001, FR-001, FR-002, FR-003, NFR-001 | AC-007 | Integração | Pest da listagem e busca paginada | Pending |
+| US-001, FR-002, FR-003, NFR-001, NFR-002 | AC-008 | Integração e inspeção | Pest da listagem sem filtro e ação de limpar no JSX | Pending |
+| US-002, FR-004, FR-006, FR-009, NFR-002 | AC-009 | Integração e inspeção | Pest de validação de cadastro e edição e revisão dos erros associados aos campos | Pending |
+| US-002, FR-004, FR-005, FR-006, FR-009, NFR-001 | AC-010 | Integração | Pest de normalização, escopo e unicidade de SKU | Pending |
+| US-002, FR-001, FR-008, NFR-001 | AC-011 | Segurança/integração | Pest do acesso ao formulário de outra equipe | Pending |
+| US-003, FR-001, FR-007, FR-008, NFR-001 | AC-012 | Segurança/integração | Pest da exclusão confirmada de produto de outra equipe | Pending |
+| US-003, FR-007, NFR-002 | AC-013 | Integração e inspeção | Pest da exclusão sem confirmação e inspeção do cancelamento do diálogo | Pending |
 
 ### 13. Validações
 
@@ -580,36 +762,36 @@ tests/features/product_management.feature
 
 - **Resultado**: Passed
 - **Data**: 2026-07-25
-- **Comando**: `python3 .agents/skills/specsfy-04-validate/scripts/validate_spec.py specs/specs/0006-produtos/spec.md`
+- **Comando**: `specsfy gate spec 0006 --project .`
 - **Achados**: `READY`; estrutura, requisitos e findings estão válidos, e o
   enforcement local selecionou e executou Pest com sucesso.
-- **FIND-PROD-001** [P1] [Resolved] a exclusão agora exige `confirmed=true` no servidor e AC-005 possui comando Pest que prova preservação sem confirmação e remoção confirmada — Refs: US-003, FR-007, NFR-002, AC-005 — Evidence: specs/0006-produtos/spec.md#11-estratégia-tdd — Effect: a proteção destrutiva possui RED e prova automatizada sem nova dependência — Suggestion: manter a inspeção do cancelamento do diálogo como complemento à garantia do servidor
-- **FIND-ARCH-001** [P2] [Resolved] o plano converte violação concorrente do unique composto em erro de validação do SKU — Refs: FR-005, FR-009, AC-003, AC-004 — Evidence: specs/0006-produtos/spec.md#controllers-e-casos-de-uso — Effect: colisões tardias preservam o resultado observável em vez de erro de servidor — Suggestion: materializar teste focal da fronteira de persistência no Ato II
-- **FIND-SEC-001** [P2] [Resolved] `scopeBindings()` tornou-se obrigatório para resolução por equipe e a Policy permanece como defesa adicional nas mutações — Refs: FR-001, FR-008, NFR-001, AC-006 — Evidence: specs/0006-produtos/spec.md#queries-e-repositórios — Effect: leitura e mutação possuem fronteiras explícitas e complementares — Suggestion: manter casos negativos para usuário membro de ambas as equipes
-- **FIND-ARCH-002** [P1] [Resolved] o BDD permanece como referência na spec e os testes TDD usam Pest, runner já reproduzível no projeto PHP; o enforcement executou `php artisan test --compact` com sucesso — Refs: AC-001, AC-002, AC-003, AC-004, AC-005, AC-006 — Evidence: specs/0006-produtos/spec.md#11-estratégia-tdd — Effect: os cenários dão contexto aos testes sem exigir Behave ou execução de `.feature` — Suggestion: manter a rastreabilidade dos testes TDD com marcadores `SPECSFY`
+- **FIND-PROD-001** [P1] [Resolved] o contrato de exclusão exige `confirmed=true` no servidor e AC-005 e AC-013 preveem testes Pest para provar remoção confirmada e preservação sem confirmação — Refs: US-003, FR-007, NFR-002, AC-005, AC-013 — Evidence: specs/defined/0006-produtos/spec.md#11-estratégia-tdd — Effect: a proteção destrutiva possui um teste Pest focal previsto — Suggestion: manter a inspeção do cancelamento do diálogo como complemento à garantia do servidor
+- **FIND-ARCH-001** [P2] [Resolved] o plano converte violação concorrente do unique composto em erro de validação do SKU — Refs: FR-005, FR-009, AC-003, AC-004 — Evidence: specs/defined/0006-produtos/spec.md#controllers-e-casos-de-uso — Effect: colisões tardias preservam o resultado observável em vez de erro de servidor — Suggestion: materializar teste focal da fronteira de persistência no Ato II
+- **FIND-SEC-001** [P2] [Resolved] `scopeBindings()` tornou-se obrigatório para resolução por equipe e a Policy permanece como defesa adicional nas mutações — Refs: FR-001, FR-008, NFR-001, AC-006 — Evidence: specs/defined/0006-produtos/spec.md#queries-e-repositórios — Effect: leitura e mutação possuem fronteiras explícitas e complementares — Suggestion: manter casos negativos para usuário membro de ambas as equipes
+- **FIND-ARCH-002** [P1] [Resolved] o BDD permanece como referência na spec e os testes TDD usam Pest, runner já reproduzível no projeto PHP; o enforcement executou `php artisan test --compact` com sucesso — Refs: AC-001, AC-002, AC-003, AC-004, AC-005, AC-006 — Evidence: specs/defined/0006-produtos/spec.md#11-estratégia-tdd — Effect: os cenários dão contexto aos testes sem exigir Behave ou execução de `.feature` — Suggestion: manter a rastreabilidade dos testes TDD com marcadores `SPECSFY`
 
 #### Gate do Ato II — Plano
 
 - **Resultado**: Pending
-- **Comando**: `python3 .agents/skills/specsfy-05-tasks/scripts/validate_tasks.py specs/specs/0006-produtos/spec.md`
+- **Comando**: `specsfy gate tasks 0006 --project .`
 - **Achados**: tarefas ainda não foram geradas; o planejamento depende do
   Definition Gate.
 
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Pending
-- **Comando**: `python3 .agents/skills/specsfy-06-implement/scripts/check_traceability.py specs/specs/0006-produtos/spec.md .`
+- **Comando**: `specsfy gate trace 0006 --project . --full-chain`
 - **Achados**: implementação e evidências ainda não iniciadas.
 
 ### 14. Tarefas
 
-- As tarefas executáveis ainda não foram decompostas. Após o Definition Gate,
-  `$specsfy-05-tasks` preencherá esta seção com IDs, dependências, checklists e
-  referências aos requisitos e cenários, sem criar arquivo paralelo.
+- As tarefas executáveis ainda não foram decompostas. `$specsfy-05-tasks`
+  preencherá esta seção com dependências, checklists e referências de aceite.
+  Os IDs T020 a T023 da seção 10 ficam reservados às operações de interface.
 
 ### 15. Ordem de execução
 
-- Caminho crítico previsto: BDD Pest executável → RED Pest → persistência e
+- Caminho crítico previsto: cenários da seção 6 → RED Pest → persistência e
   autorização → endpoints → interface → GREEN → regressão.
 - Tarefas paralelas: serão decididas somente após a decomposição da seção 14.
 - Estratégia de MVP: entregar US-001, US-002 e US-003 como um CRUD isolado por
@@ -677,7 +859,7 @@ tests/features/product_management.feature
 - [ ] `Definition Gate` está `Passed`.
 - [ ] `Plan Gate` está `Passed`.
 - [ ] `Delivery Gate` está `Passed`.
-- [ ] Os testes Pest informados por AC-001 a AC-006 passam no runner TDD.
+- [ ] Os testes Pest informados por AC-001 a AC-013 passam no runner TDD.
 - [ ] FR-001 a FR-009 e NFR-001 a NFR-002 possuem evidência de verificação.
 - [ ] Todas as tarefas futuras da seção 14 estão concluídas.
 - [ ] Testes focais, regressão, Pint, Larastan, lint, tipos, formatação e build

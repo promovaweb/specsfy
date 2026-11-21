@@ -112,10 +112,10 @@ npm run build
 ## Qualidade e testes
 
 O contrato de backend e frontend está em [`tests/`](tests/). A verificação
-principal `composer test` exige [`.env.testing`](.env.testing), confere que o
-banco SQLite de teste é separado, aplica somente migrations de avanço que não
-apagam estruturas e então executa lint PHP, análise estática e testes. A suíte
-usa transações e não recria o banco:
+principal `composer test` exige [`.env.testing`](.env.testing) e o executável
+`specsfy` disponível no `PATH`. A preparação usa `specsfy gate database` para
+validar o destino SQLite e o comando de migration antes de aplicá-lo. O Composer
+então executa lint PHP, análise estática e testes. A suíte usa transações:
 
 ```bash
 composer test

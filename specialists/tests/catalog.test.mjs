@@ -33,6 +33,24 @@ test('templates publicam o padrão de autoria e de referências', () => {
   includes(read('specialists/templates/SKILL.template.md'), [...headings.map(heading => `## ${heading}`), 'references/standards.md']);
   includes(read('specialists/templates/GUIDE.md'), ['## Estrutura de `references/`', '## Padrão de qualidade por seção']);
 });
+test('especialistas do segundo ensaio escolhem a fonte antes de pedir a spec', () => {
+  for (const name of expected.filter(name => !name.endsWith('-cloudflare') && !name.endsWith('-n8n'))) {
+    const guidance = content(name).split('## No Specsfy\n\n')[1]?.split('\n## ')[0] ?? '';
+    assert.match(guidance, /^1\. \*\*Fonte de entrada por fase\*\*/, name);
+    assert.match(guidance, /specsfy-02-backlog.*\n.*decisões e sinais/, name);
+    assert.match(guidance, /specsfy-03-specify.*specsfy-04-validate.*\n.*spec aberta/, name);
+    assert.match(guidance, /specsfy-05-tasks.*sincronizar.*\n.*seção 14/, name);
+    assert.match(guidance, /specsfy-06-implement.*tarefa.*passo carregado/, name);
+  }
+});
+test('o link de detalhe depende de consultar no Contrato CRUD', () => {
+  for (const source of [
+    content('specsfy-specialist-interface'),
+    read('specialists/specsfy-specialist-ui-components/references/reui-catalog-free.md'),
+  ]) {
+    assert.match(source, /`consultar`.*Contrato CRUD[^.]*linha[^.]*detalhe/s);
+  }
+});
 test('referências entre especialistas possuem correspondência recíproca', () => {
   for (const source of expected) {
     const related = content(source).split('## Skills relacionadas').slice(1).join('## Skills relacionadas');

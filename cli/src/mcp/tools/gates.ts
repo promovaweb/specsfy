@@ -15,15 +15,16 @@ import type { Registrar } from "../server.ts";
 export function registerGatesTools(registrar: Registrar): void {
   registerScriptTools(registrar, gateDefinitions);
   const { server, catalog } = registrar;
-  catalog.tools.push({ name: "verify", description: "Run the whole Specsfy policy on the project (CI entry point)." });
+  catalog.tools.push({ name: "verify", description: "Run the Specsfy policy on the project or diagnose one spec." });
   server.registerTool(
     "verify",
     {
-      title: "Run the whole Specsfy policy on the project (CI entry point).",
+      title: "Run the Specsfy policy on the project or diagnose one spec.",
       description:
         "Runs verify_repo: validates every spec by status and the skills contract, and returns the attestation payload under result " +
-        "(result.result is passed or failed, result.checks lists each check). Specialist warnings are returned in warnings without affecting the policy. Uses .agents/skills/ of the project or, when missing, the embedded scripts. A failed policy returns isError.",
+        "(result.result is passed or failed, result.checks lists each check). Pass spec to check only that spec. Specialist warnings are returned in warnings without affecting the policy. Uses .agents/skills/ of the project or, when missing, the embedded scripts. A failed policy returns isError.",
       inputSchema: {
+        spec: z.string().min(1).optional().describe("Diagnose one spec by ID, folder name, slug or path."),
         boundary: z.enum(VERIFY_BOUNDARIES).optional().describe("Verification boundary. Default: local."),
         attestation: z.string().min(1).optional().describe("Write the attestation JSON to this file, relative to the project root."),
         "timeout-seconds": z.number().int().positive().optional().describe("Time limit of each check. Default: setting gate.timeoutSeconds."),
@@ -37,6 +38,7 @@ export function registerGatesTools(registrar: Registrar): void {
       try {
         const { data } = await runVerify({
           project: input.project,
+          spec: input.spec,
           boundary: input.boundary,
           attestation: input.attestation,
           timeoutSeconds: input["timeout-seconds"],

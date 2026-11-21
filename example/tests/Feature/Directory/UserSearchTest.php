@@ -3,7 +3,7 @@
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
-// SPECSFY: FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-001
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-001
 test('user search matches names case insensitively and normalizes the query', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
     User::factory()->create(['name' => 'Ana Clara']);
@@ -22,6 +22,7 @@ test('user search matches names case insensitively and normalizes the query', fu
         );
 });
 
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-002
 test('user search preserves its query while paginating', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
 
@@ -40,6 +41,7 @@ test('user search preserves its query while paginating', function () {
         );
 });
 
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-003
 test('user search returns an explicit empty result', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
 

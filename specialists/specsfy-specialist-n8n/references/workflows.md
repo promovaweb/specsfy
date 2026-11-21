@@ -5,10 +5,10 @@
 Cada nó recebe e devolve uma lista de itens. Cada item tem:
 
 ```javascript
-{
+const item = {
   json: { orderId: 42, totalCents: 15990 },
-  binary: { invoice: { data: "...", mimeType: "application/pdf" } }
-}
+  binary: { invoice: { data: "...", mimeType: "application/pdf" } },
+};
 ```
 
 - A lista é a unidade de passagem. "Executar uma vez" e "executar por item" são
@@ -46,8 +46,12 @@ Cada nó recebe e devolve uma lista de itens. Cada item tem:
 
 - Prefira `$json` do item atual e `$node["Nome"].json` para outro nó. Índice de
   item (`$items()[0]`) quebra quando a ordem ou a quantidade muda.
-- `$execution.id` serve como chave de idempotência e de correlação de log.
-- Expressão longa vai para nó `Code` com nome claro, e o motivo registrado.
+- Use `$execution.id` para correlação da execução. Para deduplicar entregas,
+  use a chave estável do [contrato de webhook](integration.md#webhook-como-contrato).
+- Quando a transformação justificar um nó Code, dê um nome claro ao nó.
+  Em produção com dados sensíveis, use runners externos (regra da casa).
+  Revise quem pode editar e publicar o workflow com Segurança de Aplicações
+  e configure os runners conforme [self-hosting.md](self-hosting.md).
 - `$env` é bloqueado por padrão quando `N8N_BLOCK_ENV_ACCESS_IN_NODE` está
   ligado. Configuração sensível entra por credencial ou variável do processo, não
   por expressão no canvas.
@@ -57,8 +61,10 @@ Cada nó recebe e devolve uma lista de itens. Cada item tem:
 
 - Credencial é criada no n8n, com nome que identifica ambiente e dono:
   `stripe-prod`, `stripe-staging`.
-- O nó referencia a credencial por identificador. O JSON exportado guarda o
-  identificador, não o segredo.
+- O export inclui nomes e IDs de credenciais. Antes de publicar no Git,
+  revise dados fixados e parâmetros, inclusive headers literais de HTTP Request
+  e configurações importadas de cURL. Veja a
+  [promoção entre ambientes](integration.md#promoção-entre-ambientes).
 - Credencial de produção não é usada em workflow de teste.
 - Rotação de credencial é feita no n8n e no provedor, com o workflow atualizado no
   mesmo passo.
@@ -86,25 +92,25 @@ Configuração por nó:
   caminhos.
 - Falha de dependência externa usa retry com espera progressiva e limite. Laço
   infinito amplia o incidente.
-- Erro não tratado deve chegar ao Error Workflow:
+### Error Workflow
 
-```javascript
-{
-  "name": "Alerta de falha",
-  "nodes": [
-    {
-      "parameters": { "workflowId": "{{ $json.workflow.id }}" },
-      "name": "Registrar falha",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [0, 0]
-    }
-  ]
-}
-```
+1. Crie um workflow com **Error Trigger**, conectado a um nó **Edit Fields**
+   que normalize os dados e depois ao nó que envia o alerta.
+2. No Edit Fields, adicione `workflowId` com `{{ $json.workflow.id }}`,
+   `executionId` com `{{ $json.execution?.id ?? '' }}` e `message` com
+   `{{ $json.execution?.error?.message ?? $json.trigger?.error?.message ?? 'Falha sem mensagem' }}`.
+   Para o link, use `execution.url` quando houver ID e URL. Se o gatilho falhar
+   antes de criar execução, envie o ID do workflow e a mensagem sem link.
+   Remova dados sensíveis do alerta.
+3. Salve. Em **Settings → Error Workflow** do workflow de origem, selecione
+   esse workflow de alerta. Salve e publique o workflow de origem.
+4. Dispare uma execução automática em staging e provoque uma falha não
+   tratada, por exemplo com **Stop And Error** temporário. Confira que o alerta
+   chega com a mensagem e o link, quando disponível. Teste também a
+   normalização com payload de falha no gatilho sem ID de execução.
 
-- Error Workflow recebe `workflow`, `execution`, `trigger` e `error`. Registre o
-  `execution.id` no alerta, porque é ele que leva à execução completa.
+Veja os formatos oficiais de
+[payload de erro](https://docs.n8n.io/build/flow-logic/handle-errors-gracefully.md).
 
 ## Sub-workflow
 
@@ -140,8 +146,10 @@ Configuração por nó:
   exige aceitar que a falha posterior não chega ao cliente.
 - Execução longa em queue mode ocupa worker. Dimensione concurrency pelo consumo
   de memória e de conexão com banco.
-- Dado binário grande em queue mode trafega pelo broker ou por storage externo.
-  Configure `N8N_DEFAULT_BINARY_DATA_MODE` antes de processar arquivo grande.
+- Em queue mode, Redis entrega o ID da execução e transmite respostas de
+  webhook. Os dados binários do workflow usam Postgres ou storage externo
+  acessível a todos. Para resposta grande, siga a
+  [configuração de offload](self-hosting.md#queue-mode).
 
 ## Teste
 

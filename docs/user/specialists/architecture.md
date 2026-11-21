@@ -62,16 +62,21 @@ discussão é um conceito de negócio ainda não modelado, o especialista
    objetos internos como contrato.
 3. Define operações, schemas, headers e status, com a semântica de retry de cada
    operação.
-4. Modela erros com RFC 9457, com `type` estável, `title`, `status`, `detail`
-   seguro e `instance`, sem stack trace, SQL ou segredo.
+4. Segue o formato de erro do contrato. Quando ele usa Problem Details
+   (RFC 9457), documenta os campos que os consumidores recebem.
 5. Desenha autenticação, autorização por recurso e tenant, idempotência,
    precondições e concorrência antes dos handlers.
 6. Especifica paginação, filtros, ordenação determinística, limites e rate
    limiting para coleções que mudam durante a leitura.
-7. Escreve a descrição OpenAPI ou JSON Schema e os contract tests positivos,
-   negativos e de compatibilidade.
+7. Escreve a descrição OpenAPI ou JSON Schema quando adotados pelo contrato
+   e executa testes positivos, negativos e de compatibilidade.
 8. Define logs, métricas, correlação, depreciação, migração e as condições para
    remover um comportamento antigo.
+
+Num formulário interno Laravel/Inertia, a sessão identifica a pessoa. O
+envio válido redireciona para a lista. Um campo inválido volta ao formulário,
+com o erro guardado temporariamente na sessão e entregue nas props. Esse
+contrato segue Inertia. OpenAPI e Problem Details ficam fora dessa definição.
 
 ## Padrões aplicados
 
@@ -121,14 +126,14 @@ discussão é um conceito de negócio ainda não modelado, o especialista
   ferramenta permite.
 - A migração foi ensaiada, com rollback testado.
 - Os impactos em segurança, banco de dados e operação fazem parte da escolha.
-- Contract tests cobrem request, response, headers e Problem Details com
-  exemplos válidos e inválidos.
+- Contract tests cobrem requests, responses, headers e o formato de erro
+  adotado, com exemplos válidos e inválidos.
 - A autorização foi provada com identidade correta, identidade de outro tenant,
   credencial expirada e escopo insuficiente.
 - Retry, duplicação, timeout depois do commit, atualização concorrente e
   paginação com itens entrando e saindo foram simulados.
-- A descrição OpenAPI passou por lint e foi comparada com a última versão
-  publicada em busca de mudanças incompatíveis.
+- Quando o contrato usa OpenAPI, a descrição passa por lint e é comparada com
+  a última versão publicada em busca de mudanças incompatíveis.
 
 ## Como instalar
 

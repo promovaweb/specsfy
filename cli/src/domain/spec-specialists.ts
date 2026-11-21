@@ -13,22 +13,44 @@ function normalizeName(value: string): string | undefined {
   return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) ? SPECIALIST_PREFIX + slug : undefined;
 }
 
-function readSpec(markdown: string): { names: string[]; text: string } {
+interface SourceLine {
+  line: number;
+  text: string;
+  prose: string;
+  heading: string;
+  taskTags: string;
+}
+
+function modeKey(value?: string): string {
+  const mode = fold(value ?? "").replace(/[`*]/gu, "").trim();
+  return mode === "padrao" || mode === "default" || mode === "-" || mode === "—" ? "" : mode;
+}
+
+function readSpec(markdown: string) {
   const names = new Set<string>();
-  const prose: string[] = [];
+  const pairs = new Set<string>();
+  const lines: SourceLine[] = [];
   let metadata = true;
   let section = "";
-  let specialistPlan = false;
+  let subsection = "";
+  let excludedLevel = 0;
+  let specialistPlanLevel = 0;
   let specialistTable = false;
+  let taskTags = "";
   let fence: string | undefined;
 
-  function declare(value: string) {
+  function declare(value: string, mode?: string) {
     const name = normalizeName(value);
-    if (name) names.add(name);
+    if (!name) return;
+    names.add(name);
+    pairs.add(`${name}/${modeKey(mode)}`);
   }
 
-  for (const line of markdown.replace(/<!--[^]*?-->/g, "").split(/\r?\n/)) {
-    const marker = /^\s*(`{3,}|~{3,})(.*)$/.exec(line);
+  const original = markdown.split(/\r?\n/u);
+  const withoutComments = markdown.replace(/<!--[^]*?-->/gu, (comment) => comment.replace(/[^\r\n]/gu, " "));
+  const source = withoutComments.split(/\r?\n/u);
+  for (const [index, line] of source.entries()) {
+    const marker = /^\s*(`{3,}|~{3,})(.*)$/u.exec(line);
     if (fence) {
       if (marker && marker[1]!.startsWith(fence) && !marker[2]!.trim()) fence = undefined;
       continue;
@@ -37,38 +59,58 @@ function readSpec(markdown: string): { names: string[]; text: string } {
       fence = marker[1];
       continue;
     }
-    const heading = /^ {0,3}(#{2,6})[ \t]+(.+)$/.exec(line);
-    if (heading?.[1] === "##" || heading?.[1] === "###") {
+    const heading = /^ {0,3}(#{2,6})[ \t]+(.+)$/u.exec(line);
+    if (heading) {
       metadata = false;
-      section = heading[1] === "###" ? fold(heading[2]!.replace(/^\d+\.[ \t]+/u, "").trim()) : "";
-      specialistPlan = false;
-    } else if (heading) {
-      specialistPlan = section === "plano tecnico" && heading[1] === "####" && /^Especialistas\s*#*\s*$/i.test(heading[2]!);
+      const level = heading[1]!.length;
+      const title = fold(heading[2]!.replace(/^\d+\.[ \t]+|\s+#+$/gu, "").trim());
+      if (excludedLevel && level <= excludedLevel) excludedLevel = 0;
+      if (/\b(?:fora (?:d[eo] )?escopo|out of scope)\b/u.test(title)) excludedLevel ||= level;
+      if (level <= 3) {
+        section = title;
+        subsection = title;
+        taskTags = "";
+      } else {
+        subsection = title;
+      }
+      if (specialistPlanLevel && level <= specialistPlanLevel) specialistPlanLevel = 0;
+      if (section === "plano tecnico" && title === "especialistas") specialistPlanLevel = level;
       specialistTable = false;
     }
-    const cells = /^\s*\|(.*)\|\s*$/.exec(line)?.[1]?.split("|").map((cell) => cell.trim());
+    if (excludedLevel) continue;
+    const cells = /^\s*\|(.*)\|\s*$/u.exec(line)?.[1]?.split(/(?<!\\)\|/u).map((cell) => cell.trim());
     if (metadata && cells?.[0]?.toLowerCase() === "especialistas") {
-      cells[1]?.split(",").forEach(declare);
+      cells[1]?.split(",").forEach((name) => declare(name));
       continue;
     }
-    if (specialistPlan && cells?.[0]?.toLowerCase() === "especialista" && cells[1]?.toLowerCase() === "modo") {
+    if (specialistPlanLevel && cells?.[0]?.toLowerCase() === "especialista" && cells[1]?.toLowerCase() === "modo") {
       specialistTable = true;
       continue;
     }
-    if (specialistTable && specialistPlan && cells) {
-      declare(cells[0] ?? "");
+    if (specialistTable && cells) {
+      declare(cells[0] ?? "", cells[1]);
+      if (cells[2] && !/^[-:\s]+$/u.test(cells[2])) {
+        lines.push({ line: index + 1, text: original[index]!, prose: cells[2], heading: subsection, taskTags });
+      }
       continue;
     }
     specialistTable = false;
 
-    const taskNote = section === "tarefas" && /^\s*(?:[-*+]\s+)?\**Especialista\**:\**\s+([^\s(]+)/i.exec(line);
-    if (taskNote) {
-      declare(taskNote[1]!);
-      continue;
+    if (section === "tarefas") {
+      if (heading) taskTags = "";
+      const task = /^\s*[-*+]\s+\[[ xX]\]\s+T\d+\b\s+((?:\[[^\]]+\]\s+)+)/u.exec(line);
+      if (task) taskTags = task[1]!;
+      const annotation = /^\s*(?:[-*+]\s+)?\**Especialista\**:\**\s+(.+)$/iu.exec(line);
+      if (annotation) {
+        const pair = /^([`*$\w-]+)(?:\s*\(([^)]+)\))?/u.exec(annotation[1]!);
+        if (pair) declare(pair[1]!, pair[2]);
+        continue;
+      }
     }
-    prose.push(line);
+    const tableHeader = cells && /^\s*\|[|:\s-]+\|\s*$/u.test(source[index + 1] ?? "");
+    if (line.trim() && !tableHeader) lines.push({ line: index + 1, text: original[index]!, prose: line, heading: subsection, taskTags });
   }
-  return { names: [...names], text: prose.join("\n") };
+  return { names: [...names], pairs, lines };
 }
 
 /** Extracts unique, prefixed specialist names from the three declaration locations. */
@@ -96,11 +138,6 @@ function keywordPattern(keyword: string): string | undefined {
   const tokens = fold(keyword).trim().split(/\s+/u).map((token) => token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   if (!tokens[0]) return undefined;
   return `(?<![\\p{L}\\p{N}_])${tokens.join("\\s+")}(?![\\p{L}\\p{N}_])`;
-}
-
-function matchesKeyword(text: string, keyword: string): boolean {
-  const pattern = keywordPattern(keyword);
-  return pattern !== undefined && new RegExp(pattern, "u").test(text);
 }
 
 function stackDeclarations(markdown: string): Array<{ technology: string; line: string }> {
@@ -160,13 +197,28 @@ function declaresAlias(declarations: ReturnType<typeof stackDeclarations>, alias
   return declarations.some((row) => technology.test(row.technology) && !negative.test(row.line));
 }
 
-/** A catalog trigger matched by the spec, with the two independent states. */
+/** A matched catalog signal with its first affirmative occurrence. */
+export interface SpecialistSignal {
+  signal: string;
+  evidence: { line: number; text: string };
+}
+
+/** One specialist/mode pair, with independent declaration and installation states. */
 export interface SpecialistSuggestion {
   name: string;
   mode?: string;
+  /** First signal, retained for consumers of the original response. */
   signal: string;
+  signals: SpecialistSignal[];
   declared: boolean;
   installed: boolean;
+}
+
+/** Renders grouped signals and evidence on one text line. */
+export function formatSpecialistSignals(signals: readonly SpecialistSignal[]): string {
+  return signals.map(({ signal, evidence }) =>
+    `${signal} (line ${evidence.line}: ${evidence.text.trim().replace(/\r?\n\s*/gu, " ")})`
+  ).join("; ");
 }
 
 /**
@@ -192,28 +244,91 @@ export async function projectStackSpecialists(project: string, catalog: Catalog)
   return { stack, stackWarning };
 }
 
-/**
- * Finds one suggestion per matched catalog trigger, in catalog order. When
- * `stack` is given, a technology specialist the stack does not confirm is
- * left out unless the spec already declares it.
- */
+function affirmativeClauses(text: string): string[] {
+  return fold(text.replace(/[`*]/gu, ""))
+    .split(/(?<=[.!?;])[ \t]+|[, \t]+\b(?:mas|porem|contudo|but)\b\s+/u)
+    .filter((clause) => !/\b(?:fora (?:d[eo] )?escopo|out of scope|nao sera(?:o)? (?:implementad[ao]s?|usad[ao]s?|adotad[ao]s?))\b/u.test(clause))
+    .map((clause) => clause.split(/\b(?:sem|nao(?!\s+(?:so|apenas)\b)|nenhum[ao]s?|nem|without|will not)\s+/u, 1)[0]!.trim());
+}
+
+function matchSignal(source: SourceLine, text: string, name: string, mode: string, patterns: readonly RegExp[]): boolean {
+  if (name === "debugging" && /\bregressao\b/u.test(text) &&
+    !/\bregressao\s+(?:observad[ao]s?|detectad[ao]s?|reproduzid[ao]s?|ocorreu|introduzid[ao]s?)\b/u.test(text) &&
+    !/\b(?:bug|falha intermitente|erro em producao)\b/u.test(text)) return false;
+  if (name === "delivery" && mode === "deploy") {
+    const conditional = /\b(?:pre-condicao|antes d[eo]|eventual|condicao (?:futura|de entrega))\b/u.test(text);
+    const actualDeploy = /\b(?:executar|realizar|efetuar)\s+(?:o\s+)?deploy\b/u.test(text);
+    if (conditional && !actualDeploy) return false;
+    if (/\bproducao\b/u.test(text) &&
+      !/\b(?:deploy|rollout|rollback|publicar|implantar|publicacao|implantacao)\b/u.test(text)) return false;
+  }
+  if (name === "delivery" && mode === "versioning" && /\bversao resolvida\b/u.test(text) &&
+    !/\b(?:semver|tag de release|changelog)\b/u.test(text)) return false;
+  if (name === "observability" && mode === "signals" &&
+    /\b(?:metricas d[eo] (?:sucesso|aceite)|criterios de aceite)\b/u.test(`${source.heading} ${text}`) &&
+    !/\b(?:observabilidade|tracing|slo|alertas)\b/u.test(text)) return false;
+
+  if (patterns.some((pattern) => pattern.test(text))) return true;
+  switch (`${name}/${mode}`) {
+    case "architecture/web-api":
+      return /\b(?:contratos? (?:web )?inertia|(?:operacoes|respostas|rotas|contratos?)\b[^.;]*\b(?:inertia\s*\/\s*http|http\s*inertia)|inertia\s*\/\s*http)\b/u.test(text);
+    case "interface/discovery":
+      return /\b(?:descoberta (?:d[aeo] )?(?:interface|telas?)|inventario\b[^.;]*\b(?:shell|telas?)|interface existente)\b/u.test(text);
+    case "ui-components/components":
+      return /\b(?:componentes?|blocos?|telas?|paginas?|composicao)\s+(?:visua(?:l|is)\s+)?react\b/u.test(text) ||
+        (/\[CODE\]/u.test(source.taskTags) && /\b(?:react|[\w/-]+\.tsx)\b/u.test(text));
+    default:
+      return false;
+  }
+}
+
+function findEvidence(lines: readonly SourceLine[], name: string, mode: string, patterns: readonly RegExp[]) {
+  for (const [index, source] of lines.entries()) {
+    const matches = (text: string) => affirmativeClauses(text).some((clause) => matchSignal(source, clause, name, mode, patterns));
+    if (matches(source.prose)) return { line: source.line, text: source.text };
+    const next = lines[index + 1];
+    if (next?.line === source.line + 1 && /^\s+\S/u.test(next.prose) &&
+      !/^\s*[-*+|#]/u.test(next.prose) && !matches(next.prose) &&
+      matches(`${source.prose} ${next.prose.trim()}`)) {
+      return { line: source.line, text: `${source.text}\n${next.text}` };
+    }
+  }
+  return undefined;
+}
+
+/** Finds one suggestion per specialist and mode, in catalog order. */
 export function analyzeSpecSpecialists(markdown: string, catalog: Catalog, installed: ReadonlySet<string>, stack?: ReadonlySet<string>) {
-  const { names, text } = readSpec(markdown);
-  const declared = new Set(names);
-  const prose = fold(text);
+  const { names, pairs, lines } = readSpec(markdown);
   const suggestions: SpecialistSuggestion[] = [];
   for (const entry of catalog.entries) {
-    if (stack && entry.stack && !stack.has(entry.name) && !declared.has(entry.name)) continue;
+    const shortName = entry.name.slice(SPECIALIST_PREFIX.length);
+    const modes = new Map<string, SpecialistSuggestion>();
     for (const trigger of entry.triggers) {
-      if (!trigger.keywords.some((keyword) => matchesKeyword(prose, keyword))) continue;
-      suggestions.push({
-        name: entry.name,
-        ...(trigger.mode ? { mode: trigger.mode } : {}),
-        signal: trigger.signal,
-        declared: declared.has(entry.name),
-        installed: installed.has(entry.name),
+      const mode = modeKey(trigger.mode);
+      const declared = pairs.has(`${entry.name}/${mode}`);
+      if (stack && entry.stack && !stack.has(entry.name) && !declared) continue;
+      const patterns = trigger.keywords.flatMap((keyword) => {
+        const pattern = keywordPattern(keyword);
+        return pattern ? [new RegExp(pattern, "u")] : [];
       });
+      const evidence = findEvidence(lines, shortName, mode, patterns);
+      if (!evidence) continue;
+      const match = { signal: trigger.signal, evidence };
+      const existing = modes.get(mode);
+      if (existing) {
+        if (!existing.signals.some(({ signal }) => signal === trigger.signal)) existing.signals.push(match);
+      } else {
+        modes.set(mode, {
+          name: entry.name,
+          ...(trigger.mode ? { mode: trigger.mode } : {}),
+          signal: trigger.signal,
+          signals: [match],
+          declared,
+          installed: installed.has(entry.name),
+        });
+      }
     }
+    suggestions.push(...modes.values());
   }
   return { names, suggestions };
 }

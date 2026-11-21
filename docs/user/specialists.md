@@ -149,9 +149,10 @@ existentes, orienta o reaproveitamento ou a adaptação e mantém `INTERFACE.md`
 alinhado ao código. Se a skill estiver ausente, o agente propõe a instalação
 e pede autorização antes de escrever JSX ou TSX.
 
-Nas superfícies CRUD, o padrão é `PageHeader` e `DataGrid` para listas,
-com a linha inteira abrindo o detalhe por clique ou teclado; `PageHeader` e
-`DetailLists` para detalhes, além de `PageHeader` com seções de formulário em duas
+Nas superfícies CRUD, listas usam `PageHeader` e `DataGrid`. A linha abre o
+detalhe por clique ou teclado quando `consultar` consta no Contrato CRUD. Uma
+grade de `listar, criar` tem linhas informativas. Detalhes usam `PageHeader`
+e `DetailLists`, e os formulários usam `PageHeader` com seções em duas
 colunas responsivas para criar e editar. Botões, checkboxes e menus internos
 ficam independentes da navegação da linha. Erros de campo ficam vermelhos e
 recebem mensagem abaixo do campo. Toda tela também exibe `Breadcrumb` com o
@@ -232,17 +233,18 @@ O especialista declarado na spec aparece sempre, mesmo que a detecção não o
 encontre no projeto. O `specsfy verify` avisa sobre especialistas desconhecidos,
 sem instalação ou sugeridos por um sinal e ainda sem declaração.
 
-- **Backlog** identifica sinais no pedido e anota os especialistas prováveis
-  no item refinado.
+- **Backlog** usa o próprio item em `specs/backlog/` para registrar decisões,
+  sinais e especialistas prováveis.
 - **Especificação (`specify`)** confirma os sinais, preenche o cabeçalho e a
   tabela e carrega a skill ao escrever a seção que depende dela.
 - **Validação (`validate`)** confere a instalação, as exigências aplicáveis e
   os sinais cobertos e registra os achados no gate.
-- **Planejamento de tarefas (`tasks`)** carrega as orientações aplicáveis e
-  anota cada tarefa que precisa de um especialista com o nome e o modo, por
+- **Planejamento de tarefas (`tasks`)** recebe sugestões dos especialistas e
+  sincroniza nomes e modos entre cabeçalho, seção 8 e tarefas. Só essa fase
+  escreve a seção 14. Cada tarefa recebe a indicação aplicável, por
   exemplo, `Especialista: $specsfy-specialist-ui-components (components)`.
-- **Implementação e testes (`implement`)** carregam, antes de cada tarefa,
-  os especialistas aplicáveis da spec e da tarefa nos modos indicados.
+- **Implementação e testes (`implement`)** carregam os modos indicados e
+  aplicam as orientações à tarefa e ao passo em execução.
 - **Atualização da spec (`update-spec`)** atualiza o cabeçalho e a tabela da
   seção 8 quando a mudança traz um novo sinal.
 

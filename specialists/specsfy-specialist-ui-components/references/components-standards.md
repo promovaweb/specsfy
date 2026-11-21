@@ -66,9 +66,9 @@ Não crie estados sem relevância para o caso real; documente quando um estado
 foi deliberadamente excluído.
 
 Para formulários, mantenha a coluna de contexto separada do painel de campos,
-refluindo para uma coluna no mobile. Para listas, dê à linha um link de detalhe
-inteiro e mantenha os controles das operações incluídas (editar e apagar
-quando declaradas) acima dessa camada. Toda tela mantém um
+refluindo para uma coluna no mobile. Quando `consultar` constar no Contrato
+CRUD, dê à linha um link de detalhe e mantenha os controles de `editar` e
+`apagar`, quando declarados, acima dessa camada. Toda tela mantém um
 `Breadcrumb` com equipe, módulo e título atual; em Laravel, reaproveite o
 componente existente e seus tipos.
 

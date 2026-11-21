@@ -2,88 +2,121 @@
 
 ## Configuração de projeto
 
+Neste exemplo, produção fica na raiz e staging em `env.staging`. Use o Wrangler
+local do projeto, com versão no `package.json` e no lockfile. A referência em
+20/11/2026 é 4.166.0. Em um projeto novo, `npm install -D -E wrangler@4.166.0`
+fixa essa versão. Em projeto existente, use a versão do lockfile e rode
+`npm ci`. Os comandos usam `npm exec --no` para impedir instalação automática.
+
+Salve como `wrangler.jsonc` e troque os IDs, nomes e domínios de exemplo pelos
+recursos provisionados na conta. Crie os bancos, buckets e namespaces de cada
+ambiente antes da integração remota.
+
 ```jsonc
 {
   "name": "app-api",
   "main": "src/index.ts",
   "compatibility_date": "2026-10-01",
-  "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
   "vars": { "APP_ENV": "production" },
   "kv_namespaces": [
-    { "binding": "CACHE", "id": "<id-de-producao>" }
+    { "binding": "CACHE", "id": "11111111111111111111111111111111" }
   ],
   "d1_databases": [
-    { "binding": "DB", "database_name": "app", "database_id": "<id>" }
+    { "binding": "DB", "database_name": "app", "database_id": "11111111-1111-4111-8111-111111111111" }
   ],
   "r2_buckets": [
     { "binding": "MEDIA", "bucket_name": "app-media" }
   ],
   "routes": [
     { "pattern": "api.example.com/*", "zone_name": "example.com" }
-  ]
-}
-```
-
-- `wrangler.toml` faz o mesmo papel. Escolha um formato por projeto e não
-  mantenha os dois.
-- `compatibility_date` define o comportamento do runtime. Fixe a data, suba com
-  teste e registre a mudança no changelog do projeto.
-- `compatibility_flags` habilita comportamento específico, como `nodejs_compat`.
-  Flag que não é necessária amplia superfície de mudança.
-- `main` aponta o entrypoint real. Build que gera arquivo em `dist/` precisa de
-  `main` coerente com o artefato publicado.
-- Ambiente separado:
-
-```jsonc
-{
+  ],
   "env": {
     "staging": {
       "vars": { "APP_ENV": "staging" },
-      "kv_namespaces": [{ "binding": "CACHE", "id": "<id-de-staging>" }],
-      "routes": [{ "pattern": "staging-api.example.com/*", "zone_name": "example.com" }]
+      "kv_namespaces": [
+        { "binding": "CACHE", "id": "22222222222222222222222222222222" }
+      ],
+      "d1_databases": [
+        { "binding": "DB", "database_name": "app-staging", "database_id": "22222222-2222-4222-8222-222222222222" }
+      ],
+      "r2_buckets": [
+        { "binding": "MEDIA", "bucket_name": "app-media-staging" }
+      ],
+      "routes": [
+        { "pattern": "staging-api.example.com/*", "zone_name": "example.com" }
+      ]
     }
   }
 }
 ```
 
-## Comandos
+Para um projeto de exemplo, salve como `src/index.ts`:
 
-```bash
-npx wrangler dev
-npx wrangler deploy --dry-run --outdir=dist
-npx wrangler deploy --env staging
-npx wrangler tail --env staging
-npx wrangler deployments list
-npx wrangler rollback <version-id>
+```typescript
+export default {
+  fetch(): Response {
+    return Response.json({ ok: true });
+  },
+};
 ```
 
-- `--dry-run` monta o bundle sem publicar e revela binding e arquivo não
-  resolvido antes do deploy.
-- `wrangler dev` roda local com runtime simulado; `--remote` usa recurso real, com
-  efeito em dado de verdade.
-- `wrangler tail` mostra requisição e `console.log` em tempo real, filtrado por
-  status e amostra.
-- Deploy cria versão. `wrangler versions` e deploy gradual permitem dividir
-  tráfego antes de promover.
-- Rollback devolve versão anterior, mas não desfaz migração de banco nem escrita
-  em storage. Compatibilidade de dado continua sendo decisão do projeto.
+- Use um formato por projeto (`wrangler.jsonc` ou `wrangler.toml`). Aponte
+  `main` para o entrypoint real e revise `compatibility_date` com teste.
+- `vars` e bindings de KV, D1 e R2 precisam ser declarados em cada ambiente.
+- Para uma [Worker Route](https://developers.cloudflare.com/workers/configuration/routing/routes/),
+  cada hostname precisa de registro DNS proxiado existente. Se o Worker for a
+  própria origem, use
+  [Custom Domain](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)
+  com padrão de hostname exato, por exemplo
+  `{ "pattern": "api.example.com", "custom_domain": true }`.
+
+## Comandos
+
+Staging, sempre com `--env staging`. Use terminais separados para `dev` e `tail`.
+Rode o rollback só se precisar reverter e informe uma versão do mesmo ambiente
+em `VERSION_ID`, consultada em `versions list`.
+
+```bash
+npm exec --no -- wrangler dev --env staging
+npm exec --no -- wrangler deploy --env staging --dry-run --outdir dist/staging
+npm exec --no -- wrangler deploy --env staging
+npm exec --no -- wrangler tail --env staging
+npm exec --no -- wrangler deployments list --env staging
+npm exec --no -- wrangler versions list --env staging
+npm exec --no -- wrangler rollback "${VERSION_ID:?}" --env staging
+```
+
+Para aplicar a mesma sequência em produção, troque `--env staging` por
+`--env=""` em todos os comandos para selecionar explicitamente a raiz. Use
+`dist/production` no dry-run e selecione um ID de versão da raiz. Confirme conta, Worker e destino antes de
+escrever. Rollback de código preserva as alterações já feitas em banco e storage.
+
+- Dry-run monta o bundle e verifica a configuração local. Para comprovar conta,
+  permissões e funcionamento de cada binding, rode integração com recursos reais
+  de staging e dados descartáveis.
+- `wrangler dev` usa runtime local. Para conectar só um binding ao recurso real
+  de staging, use `remote: true` no binding quando suportado. `wrangler dev
+  --remote` executa o Worker inteiro na infraestrutura remota.
+- `wrangler tail` acompanha requisições e logs em tempo real. Deploy gradual
+  divide tráfego entre versões do mesmo Worker.
 
 ## Segredo e variável
 
+A primeira dupla aponta para produção na raiz com `--env=""`. A segunda aponta
+para staging. Informe o valor pelo prompt de `secret put`.
+
 ```bash
-npx wrangler secret put STRIPE_KEY --env production
-npx wrangler secret list --env production
+npm exec --no -- wrangler secret put STRIPE_KEY --env=""
+npm exec --no -- wrangler secret list --env=""
+npm exec --no -- wrangler secret put STRIPE_KEY --env staging
+npm exec --no -- wrangler secret list --env staging
 ```
 
-- `vars` é visível no painel e no arquivo. Nunca guarde token, senha ou chave.
-- Segredo é por ambiente. Segredo de produção não aparece em staging nem em
-  preview.
-- Segredo publicado não volta a ser lido pela API; rotacione e atualize o
-  consumidor quando houver suspeita.
-- `.dev.vars` guarda segredo local e fica no `.gitignore`.
-- Código que imprime `env` no log vaza segredo. Revise `console.log` antes de
-  publicar.
+- Guarde segredo local em `.dev.vars` ou `.dev.vars.staging` e exclua os
+  arquivos do Git. `vars` serve a valores públicos de configuração.
+- Restrinja segredos ao ambiente e rotacione quando houver suspeita de vazamento.
+  Revise logs para garantir que o código preserva os valores.
 
 ## Bindings
 
@@ -111,22 +144,37 @@ npx wrangler secret list --env production
 
 ## D1
 
+Use o binding `DB` declarado na configuração. Crie a migração uma vez,
+usando staging para selecionar a configuração:
+
 ```bash
-npx wrangler d1 create app
-npx wrangler d1 migrations create app add_invoice
-npx wrangler d1 migrations apply app --local
-npx wrangler d1 migrations apply app --remote --env staging
-npx wrangler d1 execute app --remote --command "SELECT COUNT(*) FROM invoice"
+npm exec --no -- wrangler d1 migrations create DB create_invoice --env staging
 ```
 
-- `--local` usa banco de desenvolvimento em Miniflare; `--remote` toca o banco
-  real.
-- Migração aplicada não é revertida por rollback de Worker. Escreva migração
-  compatível com as duas versões durante a janela de deploy.
-- Índice e plano importam como em qualquer SQL: use `EXPLAIN QUERY PLAN` antes de
-  aceitar consulta pesada.
-- Escrita concorrente intensa em D1 pede revisão de desenho; a arquitetura
-  concentra escrita e não substitui banco transacional de alto volume.
+No arquivo SQL gerado em `migrations/`, escreva:
+
+```sql
+CREATE TABLE invoice (id INTEGER PRIMARY KEY);
+```
+
+Depois aplique e consulte a mesma base em cada etapa. Os comandos remotos
+exigem bancos provisionados e credencial para a conta correta.
+
+```bash
+npm exec --no -- wrangler d1 migrations apply DB --local --env staging
+npm exec --no -- wrangler d1 execute DB --local --env staging --command 'SELECT COUNT(*) FROM invoice'
+npm exec --no -- wrangler d1 migrations apply DB --remote --env staging
+npm exec --no -- wrangler d1 execute DB --remote --env staging --command 'SELECT COUNT(*) FROM invoice'
+```
+
+Para promover a migração a produção, repita os dois comandos remotos com
+`--env=""` no lugar de `--env staging`. O binding então aponta para `app`.
+
+- `--local` seleciona Miniflare e `--remote` seleciona o recurso provisionado.
+- Mantenha a migração compatível com as duas versões durante a janela de deploy.
+  Rollback do Worker preserva o schema já migrado.
+- Use `EXPLAIN QUERY PLAN` para avaliar consulta pesada. Escrita concorrente
+  intensa pede revisão do desenho, pois o D1 concentra as escritas por banco.
 
 ## Pages
 
@@ -162,5 +210,5 @@ frequência maior que o ciclo de vida do projeto.
   inspeção pontual, não para histórico.
 - Métrica de Worker mostra requisição, erro, CPU e duração. Alerta sem ação
   definida é ruído.
-- Erro 1101 e 1102 indicam exceção no Worker; o log correspondente é a evidência,
-  não o status.
+- Erro 1101 indica exceção JavaScript. Erro 1102 indica que o Worker excedeu
+  o limite de CPU. Confira a execução nos logs e métricas.

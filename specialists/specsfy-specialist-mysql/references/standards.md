@@ -9,9 +9,11 @@ Percona XtraBackup; e `util.checkForServerUpgrade` do MySQL Shell.
 
 ## Versão antes de regra
 
-O manual cobre a linha 8.4 como LTS e mantém 8.0 em manutenção. A linha de
-inovação mudou de numeração mais de uma vez (9.x e a linha anual 26.x), então
-nenhuma recomendação aqui substitui `SELECT VERSION()`. Descubra também:
+8.4 e 9.7 são linhas LTS. A série 8.0 chegou ao fim de vida no ciclo
+público em abril de 2026, com 8.0.46. Para suporte comercial, confira a
+modalidade contratada. A série 9.7 encerrou a numeração sequencial.
+A partir de 26.7.0, Innovation e LTS usam `YY.M.P`, com ano, mês e patch.
+Identifique a linha e a versão efetivas antes de aplicar as regras:
 
 ```sql
 SELECT VERSION(), @@version_comment, @@sql_mode;
@@ -93,8 +95,8 @@ release da versão instalada antes de aplicar receita de blog ou de outra linha.
   index` no plano). Cobrir a consulta quente evita leitura da tabela.
 - Coluna de baixa cardinalidade isolada raramente acelera: o otimizador prefere
   varredura. Combine com outra coluna ou use índice em coluna gerada.
-- Índice em expressão exige coluna gerada (virtual ou stored) e índice nela;
-  `WHERE lower(email) = ?` não usa índice em `email`.
+- Use índice funcional ou uma coluna gerada indexada para expressão.
+  Um índice simples em `email` não atende diretamente `LOWER(email)`.
 - Revise `sys.schema_unused_indexes` e o número de índices por tabela: cada um
   custa escrita, buffer e tempo de DDL.
 
@@ -112,6 +114,10 @@ release da versão instalada antes de aplicar receita de blog ou de outra linha.
   novo, remove o antigo depois que nenhuma versão em produção usa.
 
 ## Fontes oficiais
+
+- Fim de vida da série 8.0: https://dev.mysql.com/doc/relnotes/mysql/8.0/en/news-8-0-46.html
+- Numeração e linhagens: https://dev.mysql.com/doc/refman/26.7/en/mysql-releases.html
+- Upgrade para 9.7: https://dev.mysql.com/doc/refman/9.7/en/upgrade-paths.html
 
 - Manual 8.4: https://dev.mysql.com/doc/refman/8.4/en/
 - Tipos de dados: https://dev.mysql.com/doc/refman/8.4/en/data-types.html

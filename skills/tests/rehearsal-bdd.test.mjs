@@ -15,6 +15,9 @@ const contracts = new Map([
   ['Validar as operações da interface', [['interface-contract', 'Contrato CRUD (aceita|exige|vincula)']]],
   ['Usar apenas fontes locais', [['script-robustness', 'research aceita declaração|não mascara índice inválido|research rejeita cada claim']]],
   ['Fechar setup com pré-condições de deploy', [['interface-contract', 'pendência de stack']]],
+  ['Distinguir baseline de lista vazia conhecida', [['github-regressions', 'lista explicitamente vazia']]],
+  ['Compartilhar declarações entre spec e findings', [['github-regressions', 'mesmas declarações']]],
+  ['Mapear o menu na seção de navegação', [['interface-contract', 'mapeamento do menu exige rótulo']]],
 ]);
 
 const scenarios = parseFeature(read('skills/tests/features/ensaio_metodologia.feature'));

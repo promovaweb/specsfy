@@ -14,6 +14,8 @@
 CREATE DATABASE app
   CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
+USE app;
+
 CREATE TABLE customer (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   email VARCHAR(254) NOT NULL,
@@ -25,10 +27,10 @@ CREATE TABLE customer (
   DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
-- `utf8mb4` é o único charset que representa os quatro bytes do padrão Unicode,
-  incluindo emoji e diversos caracteres CJK e símbolos.
+- `utf8mb4` representa toda a faixa Unicode em UTF-8, inclusive emoji e
+  caracteres CJK que precisam de quatro bytes.
 - `utf8` é alias depreciado de `utf8mb3`: três bytes, sem emoji. Em 8.x ele
-  emite aviso e não aceita ser default de schema novo.
+  continua aceito em 8.4, inclusive na definição de schema, mas está depreciado.
 - A conexão precisa do mesmo charset. Driver antigo que abre em `latin1` grava
   byte errado e a corrupção só aparece na leitura.
 - Verificação:
@@ -69,25 +71,31 @@ oportunista.
 
 - `VARCHAR(n)` em `utf8mb4` reserva até `4 * n` bytes na linha temporária, então
   `n` grande encarece ordenação e tabela temporária.
-- `TEXT` e `BLOB` não têm default e limitação de índice por prefixo. Índice de
-  prefixo (`email(20)`) só cobre igualdade quando o prefixo é seletivo o
-  bastante.
-- Coluna gerada indexada para consultar `JSON`:
+- `TEXT` e `BLOB` aceitam default expresso como expressão em 8.4, mesmo
+  para literal, como `TEXT DEFAULT ('')`. Índices B-tree nesses tipos exigem
+  prefixo. Em uma igualdade, confirme o valor completo após filtrar pelo
+  prefixo.
+- Coluna gerada indexada para consultar `JSON`. O exemplo parte de uma
+  tabela InnoDB `event` com coluna `payload JSON` no schema selecionado:
 
 ```sql
 ALTER TABLE event
   ADD COLUMN tenant_id VARCHAR(64)
-    GENERATED ALWAYS AS (JSON_UNQUOTE(json_extract(payload, '$.tenant.id'))) STORED,
+    GENERATED ALWAYS AS (JSON_UNQUOTE(JSON_EXTRACT(payload, '$.tenant.id'))) VIRTUAL,
   ADD KEY event_tenant_idx (tenant_id);
 ```
 
-Virtual não ocupa espaço em disco, stored ocupa e permite índice clusterizado.
-Escolha stored quando a coluna entra em índice usado com frequência.
+InnoDB aceita índice secundário sobre coluna gerada virtual. O valor
+materializado ocupa espaço no índice, enquanto `STORED` também o guarda na
+linha. Escolha `STORED` se houver requisito que a coluna virtual não atende
+ou se a medição justificar o custo.
 
 - `TIMESTAMP` e `DATETIME` com `ON UPDATE CURRENT_TIMESTAMP` são úteis para
   `updated_at`, desde que a aplicação aceite a regra no banco.
 
 ## Chave primária e índices
+
+Os comandos com `invoice` usam a tabela criada na seção Constraints.
 
 - InnoDB organiza a tabela pela chave primária. Secundária guarda a chave
   primária como ponteiro, então chave primária larga engorda todos os índices.
@@ -121,12 +129,17 @@ WHERE tenant_id = 42 AND status = 'open';
 ## Constraints
 
 ```sql
+CREATE TABLE IF NOT EXISTS tenant (
+  id BIGINT UNSIGNED PRIMARY KEY
+) ENGINE=InnoDB;
+
 CREATE TABLE invoice (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   tenant_id BIGINT UNSIGNED NOT NULL,
   status VARCHAR(16) NOT NULL,
   total_cents BIGINT NOT NULL,
   issued_on DATE NOT NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   PRIMARY KEY (id),
   KEY invoice_tenant_idx (tenant_id),
   CONSTRAINT invoice_status_check
@@ -146,15 +159,21 @@ CREATE TABLE invoice (
 
 ## DDL online
 
-| Operação | Algoritmo possível | Escreve na tabela | Observação |
-| --- | --- | --- | --- |
-| Adicionar coluna no fim | `INSTANT` | não | Rápido desde 8.0.12, com limite de posição |
-| Renomear coluna | `INSTANT` | não | Desde 8.0.28 |
-| Adicionar índice secundário | `INPLACE`, `LOCK=NONE` | sim, concorrente | Ainda consome I/O e espaço |
-| Remover índice | `INPLACE` | sim | Metadado, mas espera transação aberta |
-| Alterar tipo de coluna | `COPY` na maioria | bloqueia | Reescreve a tabela |
-| Converter charset | `COPY` | bloqueia | Reescreve e pode aumentar tamanho |
-| Adicionar coluna `NOT NULL` com default | `INSTANT` se default for constante | não | Default volátil força `COPY` |
+| Operação | Algoritmo possível | Reconstrói a tabela? | DML concorrente? | Metadata lock |
+| --- | --- | --- | --- | --- |
+| Adicionar coluna elegível | `INSTANT` | Não | Sim | Breve, sujeito a espera |
+| Renomear coluna elegível | `INSTANT` | Não | Sim | Breve, sujeito a espera |
+| Adicionar índice secundário comum | `INPLACE` | Não, constrói o índice | Sim com `LOCK=NONE` | Exclusivo ao publicar a definição |
+| Remover índice secundário comum | `INPLACE` | Não | Sim com `LOCK=NONE` | Exclusivo ao publicar a definição |
+| Alterar tipo, na maioria dos casos | `COPY` | Sim | Não | Bloqueia escrita durante a cópia |
+| Converter charset de colunas com dados | `COPY` | Sim | Não | Bloqueia escrita durante a cópia |
+
+Desde 8.0.29, `INSTANT` pode adicionar coluna em qualquer posição quando a
+operação é elegível. Confira restrições de formato de linha, índices, tipo
+de default e versão. Para `INSTANT`, omita `LOCK` ou use `LOCK=DEFAULT`.
+Para operações que aceitam `LOCK=NONE`, declare-o quando DML concorrente
+for requisito. Mesmo DDL online pode esperar transações que seguram metadata
+lock e bloquear acessos enquanto aguarda. Meça em cópia representativa.
 
 ```sql
 ALTER TABLE invoice ADD COLUMN paid_at DATETIME(6) NULL,

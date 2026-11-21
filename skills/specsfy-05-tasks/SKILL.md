@@ -98,6 +98,12 @@ configurações do repositório. Depois siga a ordem:
      --project .
    ```
 
+   Se a cópia estiver sem Git, `BASELINE` indica a falta de comparação.
+   Reexecute com `--paths` e a lista de caminhos alterados (vírgulas no CLI,
+   espaços no script). Quando souber que a lista está vazia, use
+   `--paths '[]'`. Trate o baseline como diagnóstico até obter uma lista
+   conhecida ou rodar em uma cópia com Git.
+
    Use os sinais de stack, aplicação, regras e persistência para planejar a
    documentação junto da mudança, sem inferir requisito novo.
 5. Se faltar uma decisão que mude arquitetura, dados ou aceite, anuncie e
@@ -165,8 +171,8 @@ Quando `Interface para pessoas` for `Sim`:
 - crie tarefas explícitas para as telas, menus e navegação principal,
   formulário e ações descritos na seção 10, além da camada de dados ou API;
 - quando houver `Contrato CRUD`, nomeie nas tarefas `[CODE]` as operações
-  incluídas em `Operações` e seus controles de interface, e confirme na spec
-  o ID da tarefa associado a cada operação;
+  incluídas em `Operações` e seus controles de interface, resolvendo cada ID
+  reservado no Definition Gate em uma tarefa da seção 14;
 - inclua testes de comportamento para navegação, estados, envio, validação,
   recuperação de erro e padrão de abertura que a interface declarar;
 - use somente os componentes, convenções e runners da stack de interface

@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-testing
-description: Escrever e executar testes nas três ferramentas da stack com isolamento, determinismo e falha diagnosticável. Use no modo pest para Pest e PHPUnit em Laravel, teste de feature e unit, dataset, factory, banco de teste, fake e parallel; no modo playwright para E2E, locator por papel, fixture, auth state, trace, retry e CI; no modo vitest para unit e componente em TypeScript e React com Testing Library, mock, fake timer e cobertura. Não decide o que testar nem substitui o BDD da spec, porque isso pertence a $specsfy-06-implement no modo tests; não use para revisar acessibilidade (`$specsfy-specialist-interface`), para a lógica do framework (`$specsfy-specialist-laravel`, `$specsfy-specialist-react`) nem para montar o pipeline de entrega (`$specsfy-specialist-delivery`).
+description: Escrever e executar testes nas três ferramentas da stack com isolamento, determinismo e falha diagnosticável. Use no modo pest para PHP com Pest ou PHPUnit, com ou sem Laravel, teste de feature e unit, dataset, factory, banco de teste, fake e parallel; no modo playwright para E2E automatizado previsto no plano, com runner compatível confirmado ou instalação decidida na spec; no modo vitest para unit e componente em TypeScript e React com Testing Library, mock, fake timer e cobertura. Implemente o teste designado por $specsfy-06-implement no modo tests, no nível informado e com o runner instalado; não use para revisar acessibilidade (`$specsfy-specialist-interface`), para a lógica do framework (`$specsfy-specialist-laravel`, `$specsfy-specialist-react`) nem para montar o pipeline de entrega (`$specsfy-specialist-delivery`).
 ---
 
 # Testes
@@ -14,8 +14,8 @@ sendo decisão do método.
 
 | Situação | Modo | Abra |
 | --- | --- | --- |
-| Escrever teste de feature ou unit em Laravel com Pest, dataset, factory, banco de teste, fake de fila, evento e HTTP, ou executar suíte em paralelo | pest | [Pest e Laravel](references/pest.md) |
-| Escrever E2E de navegador, escolher locator, montar fixture, reutilizar sessão autenticada, capturar trace ou rodar em CI com retry e shard | playwright | [Playwright e E2E](references/playwright.md) |
+| Escrever teste PHP com Pest ou PHPUnit, incluindo testes Laravel com factories, banco de teste e fakes, ou executar suíte em paralelo | pest | [Pest e Laravel](references/pest.md) |
+| Escrever E2E automatizado previsto no plano, com Playwright confirmado na stack ou decisão explícita de instalar o runner em stack compatível | playwright | [Playwright e E2E](references/playwright.md) |
 | Escrever unit ou teste de componente em TypeScript e React, simular rede, controlar timer, medir cobertura ou organizar projeto com Vitest | vitest | [Vitest e componente React](references/vitest.md) |
 
 Não use para:
@@ -24,89 +24,99 @@ Não use para:
   `$specsfy-06-implement` no modo `tests`, que lê o Gherkin da spec e o
   `test-levels.md`; este especialista escreve e executa o teste na ferramenta
   escolhida.
-- Revisar semântica, foco, contraste e leitor de tela. Use
-  `$specsfy-specialist-interface`; aqui o teste chama a verificação, não define o
-  padrão de acessibilidade.
+- Revisar semântica, foco, contraste e leitor de tela ou verificar teclado
+  manualmente. Use `$specsfy-specialist-interface` no modo `accessibility`.
 - Corrigir a lógica de Eloquent, React, Next.js ou TypeScript. Use o especialista
   do framework; o teste apenas revela o comportamento.
 - Montar pipeline, promoção e rollback de entrega. Use
   `$specsfy-specialist-delivery` e traga só o comando de teste que o pipeline
   executa.
 
-Combine com `$specsfy-specialist-laravel` no modo pest e com
-`$specsfy-specialist-react` ou `$specsfy-specialist-nextjs` no modo vitest ou
-playwright, sempre que a falha estiver no código e não no teste.
+Para um teste de comportamento da aplicação Laravel, combine
+`testing/pest + laravel/app`. Use `$specsfy-specialist-testing` em `pest` para
+o teste e `$specsfy-specialist-laravel` em `app` para comportamento, migrations
+do framework e domínio. Para schema SQL, índices e plano de execução, use o
+especialista da engine observada, como PostgreSQL ou MySQL.
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a subseção `#### Especialistas` em
-   `### 8. Plano técnico`, a seção de critério de aceite e a tarefa `[TEST]` que
-   está em execução. Leia também `.specsfy/STACK.md` e `.specsfy/RULES.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
-2. Siga o modo indicado na spec ou na tarefa, no formato
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase. Consulte os critérios de aceite (ACs) relevantes. Se receber
+   apenas um ID inequívoco, use `specsfy specs show <id> --content`.
+   Leia também `.specsfy/STACK.md` e `.specsfy/RULES.md`.
+2. Em `$specsfy-06-implement` no modo `tests`, receba passo, tarefa, AC, nível
+   e runner. Em `prepare`, a tarefa `[TEST] [TDD]` indicada ainda está aberta.
+   Use o modo registrado como
    `Especialista: $specsfy-specialist-testing (pest)`, `(playwright)` ou
-   `(vitest)`. Sem indicação, resolva a ferramenta pela stack: projeto com
-   `artisan` ou `composer.json` usa Pest; projeto Node sem PHP usa o runner já
-   declarado no `package.json`.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
-4. Não mude o estado da spec nem marque gate: isso pertence a
-   `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
-   `$specsfy-06-implement`. Quem exige RED, GREEN e rastreabilidade é o método.
-5. Entregue o comando exato, o nome do teste e a saída que comprova o resultado,
-   para que a fase registre a evidência na tabela `Evidência RED-GREEN-REFACTOR`.
-   Antes de executar qualquer suíte que toque banco, confirme a proteção exigida
-   pelo método com `specsfy gate database` e nunca rode comando destrutivo em
-   banco de desenvolvimento.
+   `(vitest)`. Em caso de dúvida, confira configuração, scripts e lockfiles.
+   Devolva divergências ao chamador para decisão.
+3. Devolva a saída à fase chamadora para registro no destino do item 1.
+   No passo `prepare`, o modo `tests` registra o RED, conclui o checklist
+   da tarefa e retorna a `$specsfy-05-tasks` com o Plan Gate ainda `Pending`.
+   Estado e gates permanecem sob responsabilidade do método.
+4. Antes de cada comando focal, suíte ou regressão, obtenha `SAFE` para o
+   comando exato com `specsfy gate database`, mesmo se o teste parecer
+   independente de banco. Siga a [proteção obrigatória](references/standards.md#banco-de-teste).
 
 ## Fluxo
 
-1. Leia [references/standards.md](references/standards.md) e descubra versão do
-   runner, configuração, banco de teste, ambiente de CI e comando declarado no
-   projeto antes de escrever o primeiro teste.
-2. Receba do método o comportamento e o nível do teste. Se o pedido chegar sem
-   esse recorte, registre a dúvida e não invente comportamento.
-3. Escolha o modo pela ferramenta que o projeto já usa. Não introduza um segundo
-   runner sem decisão registrada na spec.
-4. Escreva o teste pelo comportamento observável, com nome que descreve a regra e
-   uma asserção principal.
-5. Execute o teste focal, observe a falha esperada quando o método pedir RED, e
-   registre a saída literal.
-6. Rode a suíte relacionada e confirme que nenhum teste vizinho quebrou.
-7. Entregue comando, arquivo, nome do teste e saída para a spec.
+1. Leia [references/standards.md](references/standards.md) e a referência do
+   modo. Confirme versão, configuração, ambiente e comando do runner instalado.
+2. Escreva o teste conforme o AC e no nível recebido. Dê ao caso um nome que
+   descreva o comportamento observável e coloque o marcador `SPECSFY:` com os
+   IDs da spec junto à definição do teste. Preserve a fronteira que o AC prova.
+3. Em `prepare`, devolva ID da tarefa, comando exato, nome, arquivo, marcador
+   e saída literal da falha de comportamento que comprova RED. Corrija falhas
+   de sintaxe, importação, fixture ou ambiente antes de entregar o retorno.
+4. Em `cycle`, devolva os resultados focais e das suítes relacionadas para o
+   registro de RED, GREEN e REFACTOR. Em `verify`, devolva os resultados e
+   lacunas solicitados para a conferência de rastreabilidade e aceite.
 
 ### Modo pest
 
-1. Confirme Pest e PHPUnit instalados, `phpunit.xml`, `tests/Pest.php` e o banco
-   de teste em `.env.testing` com `APP_ENV=testing`.
-2. Escolha entre teste de unidade e teste de aplicação: unidade não sobe
-   framework, aplicação usa `$this->get`, `$this->post` e `actingAs`.
-3. Isole dado com factory e `DatabaseTransactions`, com factory que cria só o
-   registro do caso. Não use `RefreshDatabase` quando a regra do projeto proíbe.
-4. Use dataset para variação de entrada, `Event::fake`, `Queue::fake`,
-   `Http::fake` e `Storage::fake` para cortar efeito externo. Detalhe em
-   [references/pest.md](references/pest.md).
-5. Rode o teste focal com `--filter`, depois a suíte, e confirme que o banco de
-   desenvolvimento não foi tocado.
+1. Confirme o runner e a configuração no `composer.lock` e no `phpunit.xml`.
+   Use a API de Pest quando instalado ou preserve o estilo da suíte PHPUnit
+   existente. Confirme Laravel pelo framework instalado e pelo bootstrap.
+2. Implemente o nível recebido. Unidade roda sem carregar a aplicação Laravel.
+   Para Feature, use a base do framework e os helpers de HTTP/autenticação.
+3. Em Laravel, exija `.env.testing` com `APP_ENV=testing` e banco separado.
+   Use `DatabaseTransactions` em schema já migrado, com factories restritas
+   ao caso. A proteção do método veda `RefreshDatabase`, `DatabaseMigrations`
+   e equivalentes destrutivos no fluxo de testes.
+4. Use datasets para variar entradas e fakes para efeitos fora da fronteira
+   do teste. Com fake HTTP parcial, habilite `Http::preventStrayRequests()`,
+   restrinja o padrão e confira a requisição enviada.
+5. Execute o teste focal com `--filter` e a suíte correspondente após obter
+   `SAFE` para cada comando. Em paralelo, confira a compatibilidade de
+   ParaTest e os bancos por processo. Veja [references/pest.md](references/pest.md).
 
 ### Modo playwright
 
-1. Confirme `playwright.config.ts`, `baseURL`, projeto de navegador e o script de
-   teste no `package.json`.
+1. Confirme o plano de teste automatizado no navegador e o runner compatível.
+   Se ele ainda não estiver instalado, a spec precisa registrar essa decisão.
+   Confira `playwright.config.ts`, `baseURL`, servidor de teste, projeto de
+   navegador e o script no `package.json`.
 2. Escreva locator por papel, rótulo ou texto, com `getByRole` como primeira
    escolha. `getByTestId` entra quando o texto é dinâmico ou traduzido.
 3. Use asserção de espera do próprio Playwright. Remova `waitForTimeout` e espera
    fixa.
-4. Reaproveite autenticação com projeto de setup e `storageState`, e mantenha o
-   arquivo de estado fora do Git.
-5. Configure trace em primeira tentativa, retry em CI e relatório como artefato.
+4. Reaproveite `storageState` só em casos que podem executar simultaneamente
+   com a mesma conta sem interferência. Separe conta por worker ou dados por
+   fixture quando houver mutação de estado. Mantenha o estado fora do Git.
+5. Use `retain-on-failure` para preservar o trace da tentativa que falhou,
+   inclusive a inicial. Em CI, publique um blob protegido por shard e gere
+   um relatório com todos os blobs.
    Detalhe em [references/playwright.md](references/playwright.md).
 
 ### Modo vitest
@@ -130,8 +140,8 @@ playwright, sempre que a falha estiver no código e não no teste.
   aceitáveis quando descrevem o mesmo efeito.
 - Teste atravessa a interface pública do módulo. Teste que chama método privado
   trava a implementação.
-- Determinismo é obrigatório: sem relógio real, sem rede real e sem ordem
-  aleatória quando o resultado depende dela.
+- Controle relógio, dados e ordem. Preserve a fronteira real que o teste deve
+  provar e use uma sandbox declarada ao integrar com um provedor externo.
 - Dado de teste nasce do próprio teste ou de factory explícita, com estado
   inicial conhecido. Teste que depende de massa criada por outro teste é
   dependente de ordem.
@@ -178,9 +188,10 @@ playwright, sempre que a falha estiver no código e não no teste.
   alterado.
 - Teste repetido em execução paralela ou repetida não muda de resultado; quando
   muda, a instabilidade está registrada com dono e prazo.
-- Banco de desenvolvimento intacto depois da execução, comprovado pelo gate de
-  banco do método e pela contagem antes e depois.
-- E2E com trace ou relatório disponível no artefato de CI da execução que falhou.
+- Resultado `SAFE` registrado para cada comando focal, suíte e regressão,
+  incluindo os bancos por processo quando houver paralelismo.
+- E2E com trace da falha original acessível no relatório consolidado de CI,
+  sob acesso restrito e retenção definida.
 - Mesmo comando executa local e em CI, com a mesma versão de runner.
 - Não declare suíte confiável ou cobertura suficiente sem essas evidências;
   execução verde não mede qualidade do teste.
@@ -188,7 +199,7 @@ playwright, sempre que a falha estiver no código e não no teste.
 ## Skills relacionadas
 
 - `$specsfy-specialist-laravel` define aplicação, Eloquent, fila e regra de
-  negócio; este especialista escreve e executa o teste Pest que a prova.
+  negócio e migrations do framework; aqui se implementa o teste designado.
 - `$specsfy-specialist-react` define componente, hook e estado; aqui se testa o
   comportamento visível com Testing Library.
 - `$specsfy-specialist-nextjs` define rota, cache e fronteira server/client; aqui

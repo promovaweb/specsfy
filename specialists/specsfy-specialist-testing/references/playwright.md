@@ -2,48 +2,70 @@
 
 ## Configuração
 
+Use a receita quando o plano pede teste automatizado no navegador e a stack
+já tem Playwright, ou quando a spec registra a decisão de instalar o runner
+em uma stack compatível. O exemplo pressupõe `@playwright/test` no lockfile
+e um script `npm run dev` que serve a aplicação de teste em
+`http://localhost:3000`, com a rota `/login` disponível e dados isolados.
+
 ```ts
 // playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
+
+const localURL = 'http://localhost:3000';
+const baseURL = process.env.BASE_URL || localURL;
+const authFile = 'tests/.auth/user.json';
 
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? [['blob'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI ? 'blob' : 'list',
+  webServer: process.env.BASE_URL ? undefined : {
+    command: 'npm run dev',
+    url: `${localURL}/login`,
+    reuseExistingServer: !process.env.CI,
+  },
   use: {
-    baseURL: process.env.BASE_URL ?? 'http://localhost:3000',
-    trace: 'on-first-retry',
+    baseURL,
+    trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   projects: [
-    { name: 'setup', testMatch: /auth\.setup\.ts/ },
+    { name: 'setup', testMatch: /auth\.setup\.ts$/ },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'], storageState: 'tests/.auth/user.json' },
+      testIgnore: /auth\.setup\.ts$/,
+      use: { ...devices['Desktop Chrome'], storageState: authFile },
       dependencies: ['setup'],
     },
   ],
 });
 ```
 
-- `baseURL` evita URL absoluta espalhada no teste e permite rodar contra staging.
-- `trace: 'on-first-retry'` guarda evidência sem pesar toda execução que passa.
-- `retries` em CI e zero local: retry em máquina local esconde corrida.
-- Projeto `setup` gera `storageState` uma vez; os testes de jornada reaproveitam.
-- `tests/.auth/` entra no `.gitignore`. Sessão real não vai para o repositório.
+- Com `BASE_URL`, a aplicação de teste precisa estar iniciada e acessível no
+  endereço indicado. Sem essa variável, `webServer` inicia o servidor e
+  aguarda a rota local. Ao reutilizar porta local, confirme qual app está nela.
+- Use a conta compartilhada desse exemplo só em testes que podem executar
+  simultaneamente, inclusive entre shards, sem interferir na sessão ou nos dados.
+- `retain-on-failure` preserva o trace de cada tentativa que falha, incluindo
+  a inicial. `on-first-retry` grava a primeira repetição.
+- Ignore `/tests/.auth/` no Git. Confira que o estado nunca foi versionado.
+- Em uma execução pelo modo `tests`, obtenha `SAFE` para cada comando de teste.
 
 ```bash
 npx playwright test
 npx playwright test --ui
 npx playwright test --headed --project=chromium
-npx playwright test -g "finaliza compra"
+npx playwright test -g 'finaliza compra'
+npx playwright test --reporter=html
 npx playwright show-report
 ```
 
 ## Locator
 
-Ordem de preferência:
+Use os exemplos de ação e asserção dentro de um teste com `page` e `expect`
+do Playwright. Ordem de preferência:
 
 | Locator | Uso | Robustez |
 | --- | --- | --- |
@@ -89,7 +111,15 @@ await expect(page.getByRole('row')).toHaveCount(3);
 ## Fixture
 
 ```ts
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, type Page } from '@playwright/test';
+
+class OrderPage {
+  constructor(private readonly page: Page) {}
+
+  async goto() {
+    await this.page.goto('/orders');
+  }
+}
 
 type Fixtures = { orderPage: OrderPage };
 
@@ -118,9 +148,14 @@ export { expect };
 import { test as setup, expect } from '@playwright/test';
 
 setup('autentica usuário de teste', async ({ page }) => {
+  const { E2E_USER, E2E_PASSWORD } = process.env;
+  if (!E2E_USER?.trim() || !E2E_PASSWORD?.trim()) {
+    throw new Error('Defina E2E_USER e E2E_PASSWORD para a conta de teste.');
+  }
+
   await page.goto('/login');
-  await page.getByLabel('E-mail').fill(process.env.E2E_USER!);
-  await page.getByLabel('Senha').fill(process.env.E2E_PASSWORD!);
+  await page.getByLabel('E-mail').fill(E2E_USER);
+  await page.getByLabel('Senha').fill(E2E_PASSWORD);
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByRole('heading', { name: 'Painel' })).toBeVisible();
   await page.context().storageState({ path: 'tests/.auth/user.json' });
@@ -130,9 +165,18 @@ setup('autentica usuário de teste', async ({ page }) => {
 - Projeto `setup` roda antes e grava cookie e storage.
 - `storageState` por projeto permite usuário anônimo, cliente e administrador.
 - Sessão expira. Setup com dado de teste precisa renovar antes da suíte.
-- Credencial de teste vem de variável de ambiente, nunca do arquivo versionado.
+- Credenciais vêm de variáveis de ambiente. Na interface `--ui`, rode o
+  projeto `setup` manualmente quando precisar renovar a sessão.
+- Caso que altera estado no servidor usa conta por worker ou fixture que
+  isola os dados por teste. Ao separar contas por worker, reserve uma conta
+  por shard e índice paralelo em um ambiente compartilhado e grave o estado
+  em caminho exclusivo. Veja a
+  [receita oficial de autenticação por worker](https://playwright.dev/docs/auth#moderate-one-account-per-parallel-worker).
 
 ## Rede
+
+Dentro de um caso com `page` e `expect`, supondo um formulário que envia o
+pedido para `/api/orders` e exibe o ID da resposta:
 
 ```ts
 await page.route('**/api/orders', async route => {
@@ -157,10 +201,11 @@ await expect(page.getByText('Pedido 42 criado')).toBeVisible();
 
 ```bash
 npx playwright test --trace on
-npx playwright show-trace test-results/<teste>/trace.zip
+find test-results -name trace.zip -exec npx playwright show-trace {} \;
 ```
 
-- Trace mostra passo, captura de tela, DOM e rede de cada ação.
+- Trace inclui passos, capturas, DOM e tráfego de rede. Restrinja quem
+  pode baixar os artefatos e limite o prazo de retenção.
 - `--ui` permite linha do tempo e reexecução de passo.
 - `DEBUG=pw:api` mostra chamada interna do Playwright.
 - Falha de locator mostra a árvore de acessibilidade; leia antes de trocar o
@@ -169,27 +214,89 @@ npx playwright show-trace test-results/<teste>/trace.zip
 
 ## CI
 
+Exemplo para GitHub Actions em um repositório privado, com Node 24, lockfile
+npm e a configuração acima. Cadastre `E2E_USER` e `E2E_PASSWORD` como
+segredos de uma conta de teste. Use o workflow para casos que podem compartilhar
+essa conta entre shards. Se estiver executando pelo modo `tests`, aplique o
+gate de banco ao comando exato de cada shard antes da execução.
+
 ```yaml
-- run: npm ci
-- run: npx playwright install --with-deps
-- run: npx playwright test --shard=${{ matrix.shard }}/4
-- uses: actions/upload-artifact@v4
-  if: always()
-  with:
-    name: report-${{ matrix.shard }}
-    path: |
-      playwright-report/
-      test-results/
+name: Playwright
+on: workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
+        env:
+          E2E_USER: ${{ secrets.E2E_USER }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+      - uses: actions/upload-artifact@v5
+        if: ${{ !cancelled() }}
+        with:
+          name: blob-report-${{ github.run_attempt }}-${{ matrix.shard }}
+          path: blob-report/
+          if-no-files-found: error
+          retention-days: 5
+
+  merge:
+    needs: test
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - run: npm ci
+      - uses: actions/download-artifact@v5
+        with:
+          pattern: blob-report-${{ github.run_attempt }}-*
+          path: all-blob-reports
+          merge-multiple: true
+      - name: Confere os quatro relatórios
+        working-directory: all-blob-reports
+        run: |
+          shopt -s nullglob
+          reports=(report-*.zip)
+          test "${#reports[@]}" -eq 4
+      - run: npx playwright merge-reports --reporter html ./all-blob-reports
+        env:
+          PLAYWRIGHT_HTML_OPEN: never
+      - uses: actions/upload-artifact@v5
+        with:
+          name: playwright-report-${{ github.run_attempt }}
+          path: playwright-report/
+          retention-days: 5
 ```
 
-- `install --with-deps` instala navegador e biblioteca de sistema. Sem isso, o
-  job falha por dependência ausente.
-- Shard divide por teste, não por arquivo manual. Relatório blob é mesclado
-  depois com `npx playwright merge-reports`.
-- Artefato em `if: always()` garante trace da execução que falhou.
-- Worker conta pela CPU do runner. Worker demais gera timeout por contenção.
-- Servidor de aplicação sobe no CI com `webServer` no config ou passo explícito, e
-  o teste espera a porta responder.
+- Cada shard publica `blob-report/` mesmo quando há teste vermelho. Se o
+  job falhar antes de gerar o blob, a CI sinaliza a ausência e a consolidação
+  exige os quatro relatórios da mesma tentativa. Ao repetir uma execução,
+  reinicie todos os jobs para gerar o conjunto completo.
+- O job de merge usa a mesma versão e o mesmo sistema operacional dos shards.
+  O HTML consolidado inclui os anexos, sem precisar publicar um HTML por shard.
+- Proteja blobs e HTML como artefatos sensíveis. Eles podem incluir DOM, tráfego
+  e anexos de autenticação. Restrinja o acesso ao repositório e use retenção curta.
+- Ajuste workers à CPU do runner. Contenção pode causar timeout.
+
+Fontes: [webServer](https://playwright.dev/docs/test-webserver),
+[sharding](https://playwright.dev/docs/test-sharding) e
+[modos de trace](https://playwright.dev/docs/test-use-options#trace-modes).
 
 ## Falhas comuns
 

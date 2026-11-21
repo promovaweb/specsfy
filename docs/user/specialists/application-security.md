@@ -12,8 +12,8 @@ segredos. A proteção declarada só vale com um teste que comprove o controle.
 - Uma nova funcionalidade abre superfície de ataque, como um endpoint público,
   uma integração ou um novo tipo de usuário, com a modelagem de ameaças
   ainda no planejamento.
-- O acesso por linha ou por tenant depende do banco. Combine com os
-  especialistas PostgreSQL ou Supabase.
+- Para acesso por linha ou por tenant, combine com PostgreSQL ou Supabase
+  quando a stack confirmar a tecnologia correspondente.
 
 Credenciais de pipeline e de deploy ficam com o especialista Engenharia de
 Entrega. Este guia trata da aplicação e das informações que ela guarda.
@@ -91,7 +91,7 @@ npx skills add https://github.com/promovaweb/specsfy \
 - [Observabilidade](observability.md) registra sinais de abuso sem expor
   informações sensíveis.
 - [PostgreSQL](postgres.md) e [Supabase](supabase.md) modelam o acesso por
-  linha e por tenant.
+  linha e por tenant quando a tecnologia faz parte da stack.
 - [Entrega](delivery.md) protege credenciais de pipeline e a cadeia de
   suprimentos.
 - [Arquitetura](architecture.md) revisa a exposição que vem do contrato HTTP.

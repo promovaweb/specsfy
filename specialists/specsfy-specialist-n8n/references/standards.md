@@ -13,13 +13,17 @@ webhook.
 
 ```bash
 n8n --version
-docker exec -it n8n n8n --version
+docker compose exec n8n n8n --version
 ```
 
-- Versão fixa na imagem. Atualização é mudança de comportamento, com nota de
-  release lida e backup testado.
-- `EXECUTIONS_MODE=single` roda tudo no processo principal.
-  `EXECUTIONS_MODE=queue` separa gatilho, fila e execução.
+- Descubra a versão no manifest e valide na instância. Os exemplos fixam
+  2.48.7, canal estável em 20/11/2026. Na mesma data, o beta é 2.49.3 e
+  3.0 está em early access. Atualize somente após revisar release e testar
+  restauração.
+  [Changelog](https://docs.n8n.io/changelog)
+  · [3.0](https://docs.n8n.io/changelog/v30-breaking-changes)
+- `EXECUTIONS_MODE=regular` executa no processo principal.
+  `EXECUTIONS_MODE=queue` separa fila e execução.
 - `DB_TYPE=postgresdb` em produção. SQLite serve desenvolvimento e instância
   pessoal.
 - Volume de execução e retenção definem o tamanho do banco. Instância sem poda
@@ -37,8 +41,10 @@ docker exec -it n8n n8n --version
 
 - Workflow é código de produção. Tem contrato de entrada, tratamento de erro,
   versão e caminho de reversão.
-- Credencial nunca aparece no JSON exportado. O nó referencia credencial por
-  identificador, e o valor mora no banco cifrado pela chave de criptografia.
+- O nó referencia credenciais pelo nome e ID. Revise nomes, dados fixados e
+  parâmetros de nós, inclusive headers de autenticação literais, antes de
+  versionar o JSON. Exporte a revisão validada com `--published` ou
+  `--version` e confira IDs, projeto e credenciais antes de importar.
 - `N8N_ENCRYPTION_KEY` é segredo de longa duração. Guarde em cofre, replique nos
   workers e inclua no backup.
 - Efeito externo roda uma vez. Retry só entra em operação idempotente ou com
@@ -54,19 +60,21 @@ docker exec -it n8n n8n --version
 
 | Processo | Papel | Escala |
 | --- | --- | --- |
-| `main` | API, editor, gatilho, agendamento | Um em single; mais de um em multi-main com plano que suporta |
+| `main` | API, editor, gatilho, agendamento | Um em modo regular; mais de um em multi-main com plano que suporta |
 | `worker` | Executa workflow da fila | Horizontal, com concurrency declarada |
 | `webhook` | Recebe webhook e encaminha execução ao worker | Horizontal, atrás de balanceador |
 
-- Queue mode exige Redis e banco relacional. Todos os processos compartilham a
-  mesma chave de criptografia.
+- Queue mode usa Redis e Postgres com credenciais e chave de criptografia
+  consistentes entre os processos. Webhook processor é opcional.
 - Webhook processor precisa de balanceador que encaminhe `/webhook/*` e
   `/webhook-waiting/*` para o pool de webhook, e o resto para o main.
 - Concurrency muito baixa com muitos workers esgota o pool do banco. A
   documentação recomenda 5 ou mais por worker.
-- Multi-main exige plano que ofereça o recurso, sessão persistente no
-  balanceador e prefixo de Redis distinto quando duas instalações compartilham o
-  mesmo Redis.
+- Multi-main exige licença e afinidade de sessão no balanceador. Em Redis
+  compartilhado, dê a cada instalação `QUEUE_BULL_PREFIX` para as filas e
+  `N8N_REDIS_KEY_PREFIX` para outras chaves e canais, com o mesmo par de
+  valores em todos os seus processos. Antes de 2.3.0, pub/sub não segue o
+  segundo prefixo. Use Redis dedicado nessas versões.
 
 ## Variáveis que decidem comportamento
 
@@ -92,8 +100,13 @@ docker exec -it n8n n8n --version
 - Editor não exposto publicamente sem necessidade. Painel administrativo entra
   atrás de VPN, Access ou rede restrita.
 - Chave de API pública com escopo mínimo e rotação.
-- Webhook com autenticação por cabeçalho, assinatura ou token na URL, e validação
-  de corpo antes de qualquer efeito.
+- Autentique webhooks por cabeçalho ou assinatura de acordo com o contrato.
+  Em HMAC, valide os bytes brutos e as marcas do provedor antes de produzir
+  qualquer efeito. Evite credenciais na URL, que pode aparecer em logs.
+- Em produção com dados sensíveis, execute Code em runners externos compatíveis
+  com a imagem do n8n (regra da casa), com segredo de broker e runner por
+  processo executor. Docker define a topologia. Segurança de Aplicações define
+  quem pode editar e usar credenciais.
 - Redaction de dado de execução quando o payload contém dado pessoal ou segredo.
 - Pacote comunitário instalado é código de terceiro no processo. Instale só o
   necessário e revise origem.

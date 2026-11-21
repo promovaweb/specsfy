@@ -53,12 +53,12 @@ CI pelo `--json`.
 | `specs migrate` | Move specs from the legacy layouts (`specs/<slug>/`, `specs/specs/<slug>/`) to the state folders, by their Status. | `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `specs research` | List and load the local research indexed by a spec and check its claims. | `<spec>`, `--emit-content`, `--max-bytes <bytes>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `specs change` | Analyze the impact between the spec in Git and the worktree version: changed IDs, sections and gates to reopen. | `<spec>`, `--base <rev>`, `--mode <value>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
-| `tasks next` | Show the next ready task of a spec, with its next checklist item; --all lists every ready task. | `<spec>`, `--all`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
+| `tasks next` | Show the next ready task of a spec, with its next checklist item, or select a TDD test before the Plan Gate. | `<spec>`, `--all`, `--phase <phase>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `tasks check` | Mark (or with --undo unmark) a task or one item of its checklist in spec.md. | `<spec>`, `<task>`, `[item]`, `--undo`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `tasks delivery` | Render the delivery summary of a spec: gates, delivered IDs, tasks, evidence and rollback. | `<spec>`, `--format <value>`, `--preview`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `inbox list` | List captures in specs/inbox/; --all includes processed ones. | `--all`, `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `inbox capture` | Record a capture in specs/inbox/ from the original text, without interaction. | `--input <text>`, `--title <title>`, `--slug <slug>`, `--summary <text>`, `--problem <text>`, `--people <text>`, `--value <text>`, `--signals <text>`, `--data <text>`, `--risks <text>`, `--directions <text>`, `--review <text>`, `--session <text>`, `--turn <text>`, `--sources <text>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
-| `inbox process` | Move a capture out of the active inbox queue once specs with the Definition Gate passed cover it. | `<capture>`, `--spec <ids>`, `--project <dir>` | ver `--skill reference` | 6, 10 | n/a |
+| `inbox process` | Move a capture out of the active inbox queue once specs with the Definition Gate passed cover it, and update its links. | `<capture>`, `--spec <ids>`, `--project <dir>` | ver `--skill reference` | 6, 10 | n/a |
 | `backlog list` | List backlog items in specs/backlog/. | `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `backlog start` | Create a numbered backlog item in specs/backlog/ without promoting a spec. | `--title <title>`, `--idea <text>`, `--problem <text>`, `--person <text>`, `--result <text>`, `--context <text>`, `--slug <slug>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `progress` | Report progress of every spec or of one spec; --watch keeps refreshing on changes. | `--spec <spec>`, `--watch`, `--project <dir>` | ver `--skill reference` | 6, 130 | n/a |
@@ -70,7 +70,7 @@ CI pelo `--json`.
 | `gate evidence` | Verify the material evidence of the tasks of a spec (Evidence Contract 1). | `<spec>`, `--delivery`, `--task <id>`, `--attestation <file>`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
 | `gate findings` | Validate the product, architecture and security findings recorded in a spec. | `<spec>`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
 | `gate database` | Check that tests use a separate database and that a command cannot wipe data. | `--command <command>`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
-| `verify` | Run the project policy for CI and report informational specialist warnings. | `--boundary <boundary>`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` | ver `--skill reference`, `data.warnings` | 10, 6 | n/a |
+| `verify` | Run the policy for the project or a single spec and report specialist warnings. | `--spec <id>`, `--boundary <boundary>`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` | ver `--skill reference`, `data.warnings` | 10, 6 | n/a |
 | `test` | Run the project test suite. | `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
 | `context setup` | Create the minimum project context (PROJECT.md, .specsfy/STACK.md, RULES.md, DATABASE.md...) without overwriting existing files. | `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `context inspect` | Summarize the relevant sources of the project by group (instructions, manifests, routes, persistence, tests...) without changing files. | `--project <dir>` | ver `--skill reference` | 6 | n/a |
@@ -92,7 +92,7 @@ CI pelo `--json`.
 | `skills install` | Install specialists from the catalog, with their requirements. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 4, 5, 6, 7 | `github.token` |
 | `skills remove` | Remove Specsfy skills from the project; skills outside the Specsfy namespace are refused. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 6, 7 | `github.token` |
 | `skills update` | Bring the Specsfy skills of the project to the framework inventory; same as the top-level update. | `--check`, `--latest`, `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7, 10 | `github.token` |
-| `specialists suggest` | Suggest specialists from the spec and report mode, signal, declaration and installation. | `<spec>`, `--project <dir>`, `--json` | `project`, `spec`, `suggestions`, `catalogWarning` e `stackWarning` opcionais | 6 | `github.token` para catálogo personalizado no GitHub |
+| `specialists suggest` | Suggest specialists from the spec and report grouped signals with source lines, declaration and installation. | `<spec>`, `--project <dir>`, `--json` | `project`, `spec`, `suggestions`, `catalogWarning` e `stackWarning` opcionais | 6 | `github.token` para catálogo personalizado no GitHub |
 | `skills suggest` | Same as `specialists suggest`. | `<spec>`, `--project <dir>`, `--json` | mesmos dados de `specialists suggest` | 6 | mesmas de `specialists suggest` |
 | `scripts list` | List the framework scripts embedded in the binary. | n/a | ver `--skill reference` | n/a | n/a |
 | `scripts run` | Run an embedded framework script by name, passing the remaining arguments unchanged. | `<script>`, `[args]`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
@@ -159,7 +159,7 @@ aberto segue na versão que carregou até ser reaberto.
 | tool | `spec_change_analyze` | Analyze the impact between the spec in Git and the worktree version: changed IDs, sections and gates to reopen. | `read` |
 | tool | `task_next` | Show the next ready task of a spec, with its next checklist item; --all lists every ready task. | `read` |
 | tool | `delivery_render` | Render the delivery summary of a spec: gates, delivered IDs, tasks, evidence and rollback. | `read` |
-| tool | `inbox_process` | Move a capture to specs/inbox/processed/ once specs with the Definition Gate passed cover it. | `write` |
+| tool | `inbox_process` | Move a capture to specs/inbox/processed/ once specs with the Definition Gate passed cover it, and update its links. | `write` |
 | tool | `spec_transition` | Move a spec to another state folder and update its Status and backlog links. | `write` |
 | tool | `spec_effort` | Record the effort (1 to 10) of a spec with a rationale. | `write` |
 | tool | `specs_migrate` | Move legacy specs to the state folders by their Status. | `write` |
@@ -248,6 +248,7 @@ aberto segue na versão que carregou até ser reaberto.
 | 0021 | Navegação e mais ações na TUI | done |
 | 0022 | Aviso de versão instalada na TUI | done |
 | 0023 | Especialistas na spec | done |
+| 0024 | Ajustes do segundo ensaio | done |
 
 ## Notes
 
@@ -296,3 +297,4 @@ aberto segue na versão que carregou até ser reaberto.
 - 2026-11-20: spec 0021 (Navegação e mais ações na TUI) closed.
 - 2026-11-20: spec 0022 (Aviso de versão instalada na TUI) closed.
 - 2026-11-20: spec 0023 (Especialistas na spec) closed.
+- 2026-11-20: spec 0024 (Ajustes do segundo ensaio) closed.

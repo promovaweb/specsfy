@@ -63,8 +63,9 @@ Para listas, formulários, ações e breadcrumb do shell, aplique o
 2. Confirme que o item pertence ao catálogo gratuito e usa prefixo `c-*`.
 3. Leia a página da API, as dependências e exemplos reais.
 4. Instale com `npx shadcn@latest add @reui/<nome-c->`.
-5. Troque dados demonstrativos por dados do produto, torne a linha de detalhe
-   clicável por mouse e teclado e cubra todos os estados.
+5. Troque dados demonstrativos por dados do produto e cubra todos os estados.
+   Quando `consultar` constar no Contrato CRUD, habilite o link de detalhe na
+   linha por clique e teclado.
 
 Itens premium, blocks pagos, templates e ícones pagos não entram nesta skill.
 O registry público resolve primitives públicas necessárias aos componentes

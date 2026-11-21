@@ -3,6 +3,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { put, validSpec } from "../gates/helpers.ts";
 import { ExitCode } from "../../src/app/exit-codes.ts";
 import { copyExample, removeCopy, runCli } from "./helpers.ts";
 
@@ -119,6 +120,36 @@ describe("tasks", () => {
     const r = await cli("tasks", "next", "0004", "--json");
     expect(r.code).toBe(0);
     expect(r.json.data.result.state).toBe("complete");
+  });
+
+  test("tasks next --phase red returns one eligible TDD task in a pending plan", async () => {
+    const path = "specs/defined/0042-red/spec.md";
+    const task = (id: string, tags: string, depends: string, check = " ") =>
+      `- [${check}] ${id} ${tags} Task — Depends: ${depends}\n` +
+      ["PREP", "EXECUTE", "VERIFY", "VISUAL", "EVIDENCE", "IMPROVE"]
+        .map((key) => `  - [${check}] **${key}**: ${key}\n`).join("");
+    const fixtures = [
+      task("T001", "[TEST] [TDD]", "T005"),
+      task("T002", "[CODE]", "none"),
+      task("T003", "[TEST]", "none"),
+      task("T005", "[TEST] [TDD]", "none"),
+      task("T004", "[TEST] [TDD]", "none"),
+    ];
+    const writePlan = (body: string, planGate = "Pending") =>
+      put(project, path, validSpec({ Slug: "0042-red", "Plan Gate": planGate })
+        .replace("### 14. Tarefas\n\nConteúdo descrito.", `### 14. Tarefas\n\n${body}`));
+    writePlan(fixtures.join("\n"));
+    expect((await cli("tasks", "next", "42")).code).toBe(2);
+    const next = async (...args: string[]) => cli("tasks", "next", "42", "--phase", "red", "--json", ...args);
+    const first = await next("--all");
+    expect(first.code).toBe(0);
+    expect(first.json.data.result.ready).toMatchObject([{ id: "T005", next_item: { key: "PREP" } }]);
+    expect(first.json.data.result.blocked).toMatchObject([{ id: "T001", waiting_for: ["T005"] }]);
+    fixtures[3] = task("T005", "[TEST] [TDD]", "none", "x");
+    writePlan(fixtures.join("\n"));
+    expect((await next()).json.data.result.ready).toMatchObject([{ id: "T001" }]);
+    writePlan(fixtures.join("\n"), "Passed");
+    expect((await next()).code).toBe(2);
   });
 
   test("tasks delivery returns JSON with --json", async () => {

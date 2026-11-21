@@ -107,7 +107,8 @@ pip-audit
 trivy fs --scanners vuln,secret,misconfig .
 
 # Secrets vazados no histórico completo do repositório, não só no HEAD
-# (gitleaks 8.19+ substituiu `detect`/`protect` por `git`, `dir` e `stdin`)
+# Desde a v8.19.0, `detect` e `protect` estão depreciados. Continuam disponíveis,
+# ocultos no `--help`. Os modos documentados são `git`, `dir` e `stdin`.
 gitleaks git --log-opts="--all" .
 
 # SAST genérico com regras da comunidade
@@ -142,5 +143,5 @@ autorização específica do domínio.
   https://pages.nist.gov/800-63-4/
 - SLSA v1.2: https://slsa.dev/spec/v1.2/
 - OpenSSF (supply chain e boas práticas): https://openssf.org/
-- gitleaks (detecção de secret): https://github.com/gitleaks/gitleaks
+- gitleaks (comandos de detecção de secrets): https://github.com/gitleaks/gitleaks#commands
 - Semgrep CLI: https://semgrep.dev/docs/cli-reference

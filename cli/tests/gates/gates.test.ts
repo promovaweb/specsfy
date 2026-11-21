@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { existsSync, mkdirSync, rmSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
 import { gateCommands, gateDefinitions, gateTopLevelCommands } from "../../src/cli/commands/gates.ts";
-import { EXAMPLE_DIR, cli, projectWithSpec, temporary, validSpec } from "./helpers.ts";
+import { EXAMPLE_DIR, cli, projectWithSpec, put, temporary, validSpec } from "./helpers.ts";
 
 let home: string;
 const cleanup: string[] = [];
@@ -44,7 +44,7 @@ describe("gate definitions", () => {
     expect(options("evidence")).toEqual(["--delivery", "--task", "--attestation", "--project"]);
     expect(options("database")).toEqual(["--command", "--project"]);
     const verify = gateTopLevelCommands[0]!.options!.map((option) => option.name);
-    expect(verify).toEqual(["--boundary", "--attestation", "--timeout-seconds", "--max-output-bytes", "--self-test", "--project"]);
+    expect(verify).toEqual(["--spec", "--boundary", "--attestation", "--timeout-seconds", "--max-output-bytes", "--self-test", "--project"]);
   });
 });
 
@@ -80,9 +80,9 @@ describe("gate spec", () => {
     expect(run.code).toBe(6);
   });
 
-  test("the legacy specs of example/ fail the current contract", async () => {
+  test("the completed example spec passes the current contract", async () => {
     const run = await cli(["gate", "spec", "0001", "--project", EXAMPLE_DIR, "--json"], home);
-    expect(run.code).toBe(10);
+    expect(run.code).toBe(0);
     expect(run.json?.data.result.status).toBe("Complete");
   });
 });
@@ -109,8 +109,9 @@ describe("other gates on example/", () => {
     }
   });
 
-  test("tasks fails on the legacy spec with 10", async () => {
-    const run = await cli(["gate", "tasks", "0001", "--project", EXAMPLE_DIR, "--json"], home);
+  test("tasks fails on a spec with no task plan", async () => {
+    const root = project(validSpec({ Status: "Planned", "Plan Gate": "Passed" }));
+    const run = await cli(["gate", "tasks", "0001", "--project", root, "--json"], home);
     expect(run.code).toBe(10);
     expect(run.json?.data.result.errors.length).toBeGreaterThan(0);
   });
@@ -126,6 +127,24 @@ describe("other gates on example/", () => {
 });
 
 describe("verify", () => {
+  test("diagnoses just one spec even when other specs fail the project policy", async () => {
+    const spec = "specs/defined/0001-lista/spec.md";
+    const project = temporary();
+    put(project, "specs/defined/0002-invalid/spec.md", "# Invalid spec");
+    try {
+      put(project, spec, validSpec().replace("Conteúdo descrito.", "Contrato HTTP."));
+      const run = await cli(["verify", "--spec", "lista", "--project", project, "--json"], home);
+      expect(run.code).toBe(0);
+      expect(run.json?.data.result.spec).toBe(spec);
+      expect(run.json?.data.result.checks.map(({ name }: { name: string }) => name)).toEqual(["spec:0001-lista"]);
+      expect(run.json?.data.warnings).toContainEqual(expect.objectContaining({ spec, mode: "web-api" }));
+      expect((await cli(["verify", "--spec", "9999", "--project", project], home)).code).toBe(6);
+      expect((await cli(["verify", "--project", project], home)).code).toBe(10);
+    } finally {
+      rmSync(project, { recursive: true, force: true });
+    }
+  });
+
   test("--self-test --json passes", async () => {
     const root = project(validSpec());
     const run = await cli(["verify", "--self-test", "--project", root, "--json"], home);
@@ -135,11 +154,11 @@ describe("verify", () => {
     expect(run.json?.data.timeoutSeconds).toBe(300);
   });
 
-  test("--json on example/ returns result and exits with 10", async () => {
+  test("--json on example/ reports the project policy including skills and acceptance", async () => {
     const run = await cli(["verify", "--project", EXAMPLE_DIR, "--json"], home);
-    expect(run.code).toBe(10);
+    expect(run.code).toBe(0);
     expect(run.json?.data.skillsSource).toBe("project");
-    expect(run.json?.data.result.result).toBe("failed");
+    expect(run.json?.data.result.result).toBe("passed");
     const checks: Array<{ name: string; status: string }> = run.json?.data.result.checks;
     expect(checks.find((check) => check.name === "skills")?.status).toBe("passed");
     expect(checks.find((check) => check.name === "acceptance:0001-diretorio-global-usuarios")?.status).toBe("passed");
@@ -151,7 +170,7 @@ describe("verify", () => {
     const git = Bun.which("git");
     if (git) symlinkSync(git, join(bin, "git"));
     const run = await cli(["verify", "--project", EXAMPLE_DIR, "--json"], home, { PATH: bin });
-    expect(run.code).toBe(10);
+    expect(run.code).toBe(0);
     const checks: Array<{ name: string; status: string; detail: string }> = run.json?.data.result.checks;
     const acceptance = checks.find((check) => check.name === "acceptance:0001-diretorio-global-usuarios");
     expect(acceptance?.status).toBe("passed");

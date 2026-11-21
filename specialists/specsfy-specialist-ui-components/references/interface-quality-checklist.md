@@ -23,9 +23,10 @@ Use antes de finalizar uma tela ou componente.
   configuração sem duplicar a marcação.
 - Listas usam `DataGrid` em largura total, com a coluna `ID` visível, para
   comparação, filtros, ordenação e paginação.
-- A linha inteira do `DataGrid` abre o detalhe por clique e teclado; as ações das
-  operações incluídas no Contrato CRUD permanecem independentes dentro da linha,
-  e uma tela só de listagem e cadastro não ganha editar e apagar.
+- Quando `consultar` constar no Contrato CRUD, a linha inteira do `DataGrid`
+  abre o detalhe por clique e teclado. As ações de `editar` e `apagar`
+  permanecem independentes quando declaradas. Em `listar, criar`, as linhas
+  são informativas e o foco fica nos controles disponíveis.
 - Detalhes usam `DetailLists` para organizar atributos e status.
 - Criar e editar usam seções com coluna de contexto e painel em duas colunas
   responsivas; no mobile, os campos refluem para uma coluna.

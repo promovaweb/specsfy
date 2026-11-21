@@ -114,9 +114,15 @@ para próxima etapa com comentário do ponto onde parou. Na entrega, use
   `[MIGRATION]` com arquivo
   versionado. A implementação aplica a migration no banco de teste e registra
   uma consulta de estado antes de concluir a tarefa ou o Delivery Gate.
-- Executar
+- Executar `specsfy context monitor --project . --check` no início, após
+  cada tarefa de implementação e antes do Delivery Gate. Pelo MCP, usar
+  `context_monitor`. Sem o binário, executar
   `.agents/skills/specsfy-setup/scripts/monitor_context.mjs --project . --check`
-  no início, após cada tarefa de implementação e antes do Delivery Gate.
+  com Node. Fora do Git, `BASELINE` indica que não houve comparação.
+  Reexecutar com os caminhos realmente alterados em `--paths` (separados
+  por vírgulas no CLI, por espaços no script). Usar `--paths '[]'` somente
+  quando a lista vazia for conhecida. Antes de fechar a verificação de
+  contexto, obter `CURRENT` com Git ou com a lista conhecida.
 - Executar `$specsfy-documentator` depois de cada tarefa de implementação e
   sempre que o usuário pedir uma reconstrução técnica. A skill lê todo o
   projeto e mantém a projeção completa em `docs/` e `.specsfy/PACKAGES.md`,
@@ -216,7 +222,8 @@ incluídas, com variações por props ou configuração.
 - Ao criar ou editar, descreva o formulário e como abrir a ação de cada operação.
 - Ao apagar, use uma ação independente que respeite a permissão e confirme a
   consequência antes de executar.
-- Na seção 14, registre as tarefas das operações incluídas.
+- Reserve os IDs das tarefas de interface no Definition Gate. No planejamento,
+  resolva esses IDs nas tarefas `[CODE]` da seção 14.
 - Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
   estados e feedback são registrados em `INTERFACE.md` e reaproveitados antes
   de uma nova implementação.

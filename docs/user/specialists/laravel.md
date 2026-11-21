@@ -30,8 +30,9 @@ Packagist ficam fora deste especialista.
    Scout.
 2. Identifica se a tarefa envolve a aplicação, um pacote Composer ou um
    servidor MCP por HTTP.
-3. Lê `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas existentes
-   antes de propor pacote, comando ou abstração.
+3. Confere os pacotes instalados nos manifests e em `.specsfy/PACKAGES.md`
+   quando disponível. No modo app, consulta `docs/packages/` se o diretório
+   existir ou o pedido envolver um pacote.
 4. Registra a consequência operacional quando a ação exigir autorização
    externa.
 

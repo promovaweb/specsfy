@@ -10,7 +10,7 @@
 | Tipo | Funcionalidade |
 | Prioridade | Não priorizado |
 | Criado em | 2026-07-25 |
-| Spec promovida | `specs/specs/0001-diretorio-global-usuarios/spec.md` |
+| Spec promovida | `specs/completed/0001-diretorio-global-usuarios/spec.md` |
 
 ## Ideia original
 
@@ -101,7 +101,7 @@ definir.
 
 ## Próximo passo
 
-Promovido para `specs/specs/0001-diretorio-global-usuarios/spec.md` e dividido
+Promovido para `specs/completed/0001-diretorio-global-usuarios/spec.md` e dividido
 nas fatias complementares
-`specs/specs/0002-busca-paginacao-usuarios/spec.md` e
-`specs/specs/0003-perfil-publico-usuario/spec.md`.
+`specs/completed/0002-busca-paginacao-usuarios/spec.md` e
+`specs/completed/0003-perfil-publico-usuario/spec.md`.

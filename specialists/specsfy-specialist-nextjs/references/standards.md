@@ -21,10 +21,11 @@ Revisado em 2026-11-20 contra: Next.js 16.4 (blog de 16, 16.3 e 16.4 e docs de c
 ## Data fetching e cache
 
 - No modelo Cache Components (`cacheComponents: true`, recomendado desde o
-  Next.js 16.4 e padrão em projeto novo), o cache é opt-in: sem diretiva, todo
-  código roda em request time. Declare por função ou componente se ele é
-  cacheado (`"use cache"`), com que vida (`cacheLife("hours"|"days"|"max")`) e
-  com que tag (`cacheTag("posts")`).
+  Next.js 16.4 e padrão em projeto novo), código e UI estáticos podem entrar
+  no HTML pré-renderizado sem `"use cache"`. Dados dinâmicos sem cache e APIs
+  de requisição são processados em tempo de requisição. Para cache explícito,
+  declare `"use cache"` na função ou no componente, configure a duração com
+  `cacheLife("hours"|"days"|"max")` e a tag com `cacheTag("posts")`.
 - `"use cache"` só vale em função assíncrona. Argumentos e variáveis capturadas
   do escopo entram no cache key; para dado por usuário, inclua o identificador
   como argumento. Quando a função precisa ler `cookies`, `headers` ou
@@ -66,7 +67,10 @@ Revisado em 2026-11-20 contra: Next.js 16.4 (blog de 16, 16.3 e 16.4 e docs de c
   shell estático chegue antes do dado dinâmico (Partial Prerendering).
 - `error.js` captura erro do segmento e deve oferecer caminho de
   recuperação (retry, voltar); não deve derrubar a aplicação inteira.
-  `catchError` cria boundary no nível do componente.
+  Para criar uma boundary no nível do componente, use o export estável
+  `catchError` de `next/error` a partir do Next.js 16.3. Na versão 16.2,
+  o export experimental era `unstable_catchError`, importado como `catchError`
+  em exemplos da documentação da época.
 - `not-found.js` cobre tanto rota inexistente quanto `notFound()` chamado
   explicitamente por um Server Component que não achou o recurso.
 
@@ -121,6 +125,7 @@ Revisado em 2026-11-20 contra: Next.js 16.4 (blog de 16, 16.3 e 16.4 e docs de c
 - `updateTag`: https://nextjs.org/docs/app/api-reference/functions/updateTag
 - Server Functions (`"use server"`): https://nextjs.org/docs/app/api-reference/directives/use-server
 - Error handling: https://nextjs.org/docs/app/getting-started/error-handling
+- `catchError` e histórico de versões: https://nextjs.org/docs/app/api-reference/functions/catchError#version-history
 - Metadata API: https://nextjs.org/docs/app/api-reference/functions/generate-metadata
 - Proxy: https://nextjs.org/docs/app/getting-started/proxy
 - Build output: https://nextjs.org/docs/app/guides/building

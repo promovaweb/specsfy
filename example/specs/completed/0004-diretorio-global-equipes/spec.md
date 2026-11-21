@@ -10,7 +10,9 @@
 | Plan Gate | Passed |
 | Delivery Gate | Passed |
 | Evidence Contract | 1 |
-| Atualizada em | 2026-07-25 |
+| Interface para pessoas | Sim |
+| Especialistas | specsfy-specialist-application-security, specsfy-specialist-interface, specsfy-specialist-laravel, specsfy-specialist-react, specsfy-specialist-testing, specsfy-specialist-typescript |
+| Atualizada em | 2026-11-20 |
 
 ## Ato I — Definir
 
@@ -53,7 +55,7 @@ leitura, distingue equipes pessoais de compartilhadas e conhece seu tamanho.
 
 #### Artefatos de pesquisa armazenados
 
-- `specs/0004-diretorio-global-equipes/research/phpstan-type-errors.md`: URLs, data de acesso e impacto da
+- `specs/completed/0004-diretorio-global-equipes/research/phpstan-type-errors.md`: URLs, data de acesso e impacto da
   documentação PHPStan; nenhuma reprodução de conteúdo externo.
 
 #### Dúvidas respondidas
@@ -118,11 +120,34 @@ Feature: Diretório global de equipes
     Given existem equipes pessoais e compartilhadas com membros
     When uma pessoa autenticada abre o diretório de equipes
     Then vê todas as equipes ordenadas com tipo e contagem de membros
+```
 
-  Scenario: Diretório sem equipes
-    Given não existe equipe persistida
-    When uma pessoa autenticada abre o diretório de equipes
-    Then vê um estado vazio sem erro
+#### AC-002 — Consultar o diretório vazio
+
+**Cobre**: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002
+
+```gherkin
+@US-001 @FR-001 @FR-002 @FR-003 @NFR-001 @NFR-002 @AC-002
+Feature: Consultar o diretório vazio
+
+  Scenario: Consultar o diretório vazio
+    Given a pessoa autenticada não tem equipes ativas e não há outras equipes ativas
+    When abre o diretório de equipes
+    Then a página apresenta o estado vazio e informa zero resultados
+```
+
+#### AC-003 — Paginar equipes ativas
+
+**Cobre**: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002
+
+```gherkin
+@US-001 @FR-001 @FR-002 @FR-003 @NFR-001 @NFR-002 @AC-003
+Feature: Paginar equipes ativas
+
+  Scenario: Paginar equipes ativas
+    Given existem dezesseis equipes ativas
+    When uma pessoa autenticada consulta o diretório
+    Then a primeira página tem quinze equipes e a próxima página contém a equipe restante
 ```
 
 ### 7. Requisitos
@@ -149,6 +174,19 @@ Feature: Diretório global de equipes
 ## Ato II — Projetar e provar
 
 ### 8. Plano técnico
+
+#### Especialistas
+
+| Especialista | Modo | Sinal que o puxou | Fases |
+| --- | --- | --- | --- |
+| specsfy-specialist-application-security | padrão | Sessão e dados expostos nas props Inertia | validate |
+| specsfy-specialist-interface | accessibility | Semântica, mensagens textuais e navegação | validate |
+| specsfy-specialist-interface | ui | Composição, estados e ações das telas | validate |
+| specsfy-specialist-interface | ux | Diretório global de equipes | validate |
+| specsfy-specialist-laravel | app | Rotas, controllers, Eloquent e props Inertia | validate |
+| specsfy-specialist-react | padrão | Páginas e navegação Inertia em React | validate |
+| specsfy-specialist-testing | pest | Testes HTTP focais e marcadores por critério | validate |
+| specsfy-specialist-typescript | padrão | Tipos das props da página | validate |
 
 #### Contexto existente
 
@@ -190,7 +228,7 @@ Feature: Diretório global de equipes
 #### Estrutura de arquivos
 
 ```text
-specs/specs/0004-diretorio-global-equipes/spec.md
+specs/completed/0004-diretorio-global-equipes/spec.md
 app/Http/Controllers/Directory/TeamDirectoryController.php
 resources/js/pages/directory/teams/index.tsx
 tests/Feature/Directory/TeamDirectoryTest.php
@@ -217,6 +255,46 @@ tests/features/directory_teams.feature
 
 ### 10. Interfaces e contratos
 
+#### Interface para pessoas
+
+A listagem mostra equipes ativas, tipo e contagem de membros.
+
+#### Stack e convenções de interface
+
+Laravel e Inertia entregam props tipadas em TypeScript. A página React usa o layout autenticado, Wayfinder e os estilos Tailwind existentes.
+
+#### Telas e responsabilidades
+
+- Diretório global de equipes em `resources/js/pages/directory/teams/index.tsx`.
+
+#### Fluxo de informação e navegação
+
+A pessoa abre a listagem pelo menu lateral, percorre as páginas e usa o nome para abrir o detalhe da equipe.
+
+#### Menus e navegação principal
+
+O rótulo Teams no menu lateral autenticado tem como destino a rota `directory.teams.index`. O nome de uma equipe leva a `directory.teams.show`.
+
+#### Formulários e ações
+
+Ações anterior e próxima percorrem os resultados. A listagem é somente leitura.
+
+#### Composição e disposição
+
+O título antecede a tabela com rolagem horizontal em telas estreitas. A paginação fica abaixo dos resultados.
+
+#### Blocos React e componentes selecionados
+
+`AppLayout`, `Head`, tabela HTML, `Button` e `Link`.
+
+#### Estados e acessibilidade
+
+Os cabeçalhos identificam as colunas, o estado vazio tem mensagem textual e a navegação de paginação tem nome acessível.
+
+#### Revisão visual durante o desenvolvimento
+
+Conferir bordas, espaçamentos, margens, padding e tipografia na página e nos estados aplicáveis em telas estreitas e largas.
+
 #### APIs expostas
 
 - `GET /directory/teams` (`directory.teams.index`), sessão autenticada, query
@@ -239,7 +317,7 @@ tests/features/directory_teams.feature
 
 - **Unidade**: não aplicável.
 - **Integração/contrato**: Pest cobre autenticação, tipos, contagem e paginação.
-- **BDD/aceite**: Behave executa AC-001.
+- **BDD/aceite**: os três critérios da seção 6 são rastreados na suíte Pest focal. O arquivo `.feature` preserva a jornada histórica e é exercitado pelo adaptador Node do exemplo.
 - **E2E**: não aplicável.
 - **Verificação manual**: tabela e badges após build.
 
@@ -249,32 +327,39 @@ tests/features/directory_teams.feature
 | --- | --- | --- | --- | --- | --- |
 | FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 | `tests/features/directory_teams.feature` | `tests/Feature/Directory/TeamDirectoryTest.php` | Behave exit 1 e Pest exit 2: rota `directory.teams.index` ausente | Pest: 4/4; Behave: 2/2 | `composer ci:check`: 100/100; Behave: 11/11; build passou |
 
+A tabela acima preserva o RED histórico de AC-001. A decomposição posterior
+registrou AC-002 e AC-003 sobre o comportamento entregue. A seção 12 registra
+a execução focal atual e a inspeção complementar do JSX para NFR-002.
+
 ### 12. Plano de testes e rastreabilidade
 
 | Requisito | Cenário BDD | Nível | Arquivo/comando esperado | Evidência |
 | --- | --- | --- | --- | --- |
-| FR-001, FR-002, FR-003, NFR-001 | AC-001 | Integração | `php artisan test --compact tests/Feature/Directory/TeamDirectoryTest.php` | Passed: 3 testes |
+| FR-001, FR-002, FR-003, NFR-001 | AC-001 | Integração | `php artisan test --compact tests/Feature/Directory/TeamDirectoryTest.php` | Passed: suíte focal |
 | NFR-002 | AC-001 | Estático | `npm run types:check && npm run lint:check` | Passed |
+| US-001, FR-001, FR-002, FR-003, NFR-001 | AC-002 | Integração | `php artisan test --compact tests/Feature/Directory/TeamDirectoryTest.php` | Passed: suíte focal |
+| US-001, FR-001, FR-002, FR-003, NFR-001 | AC-003 | Integração | `php artisan test --compact tests/Feature/Directory/TeamDirectoryTest.php` | Passed: suíte focal |
+| NFR-002 | AC-002, AC-003 | Estático | JSX da página; `npm run types:check && npm run lint:check` | Passed |
 
 ### 13. Validações
 
 #### Gate do Ato I — Definição
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-04-validate/scripts/validate_spec.py specs/specs/0004-diretorio-global-equipes/spec.md`
+- **Comando**: `specsfy gate spec 0004 --project .`
 - **Achados**: READY; tipos, soft delete, contagem e paginação definidos; nenhum P1 aberto.
 
 #### Gate do Ato II — Plano
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-05-tasks/scripts/validate_tasks.py specs/specs/0004-diretorio-global-equipes/spec.md`
+- **Comando**: `specsfy gate tasks 0004 --project .`
 - **Achados**: tarefas válidas; T001/T002 concluídas após RED Behave/Pest pela rota ausente.
 
 #### Gate do Ato III — Entrega
 
 - **Resultado**: Passed
-- **Comando**: `python3 -B .agents/skills/specsfy-06-implement/scripts/check_traceability.py specs/specs/0004-diretorio-global-equipes/spec.md . --full-chain`
-- **Achados**: rastreabilidade 4/4; QA passou; regressão, checks e build verdes.
+- **Comando**: `specsfy gate trace 0004 --project . --full-chain`
+- **Achados**: rastreabilidade 9/9 na suíte Pest focal e matriz de aceite completa.
 
 ### 14. Tarefas
 
@@ -285,21 +370,38 @@ tests/features/directory_teams.feature
   - [x] **VISUAL**: Não aplicável; a tarefa materializa somente o caso de teste.
   - [x] **EVIDENCE**: Comando e causa registrados.
   - [x] **IMPROVE**: Tipo, contagem e vazio foram cobertos.
-- [x] T002 [TEST] [US-001] Criar integração RED em tests/Feature/Directory/TeamDirectoryTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T001
+- [x] T002 [TEST] [TDD] [US-001] Criar integração RED em tests/Feature/Directory/TeamDirectoryTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T001
   - [x] **PREP**: Query e props confirmadas.
   - [x] **EXECUTE**: Testes de auth, listagem, contagem e paginação criados.
   - [x] **VERIFY**: Pest exit 2 pela rota ausente comprovou RED válido.
   - [x] **VISUAL**: Não aplicável; a tarefa materializa somente o caso de teste.
   - [x] **EVIDENCE**: Saída focal e IDs registrados.
   - [x] **IMPROVE**: Cobertura de equipe pessoal e soft delete foi incluída.
-- [x] T003 [CODE] [US-001] Implementar diretório em app/Http/Controllers/Directory/TeamDirectoryController.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T001, T002
+- [x] T005 [TEST] [TDD] [US-001] Consultar o diretório vazio em tests/Feature/Directory/TeamDirectoryTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-002 — Depends: none
+  - [x] **PREP**: Critério da seção 6 e contrato Inertia conferidos.
+  - [x] **EXECUTE**: Caso Pest rastreado com marcador próprio.
+  - [x] **VERIFY**: Comando focal da seção 12 executado.
+  - [x] **VISUAL**: Não aplicável ao caso HTTP. A seção 12 registra a verificação do JSX.
+  - [x] **EVIDENCE**: Resultado da suíte focal na seção 12.
+  - [x] **IMPROVE**: A suíte focal mantém um marcador próprio para este critério.
+- [x] T006 [TEST] [TDD] [US-001] Paginar equipes ativas em tests/Feature/Directory/TeamDirectoryTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-003 — Depends: none
+  - [x] **PREP**: Critério da seção 6 e contrato Inertia conferidos.
+  - [x] **EXECUTE**: Caso Pest rastreado com marcador próprio.
+  - [x] **VERIFY**: Comando focal da seção 12 executado.
+  - [x] **VISUAL**: Não aplicável ao caso HTTP. A seção 12 registra a verificação do JSX.
+  - [x] **EVIDENCE**: Resultado da suíte focal na seção 12.
+  - [x] **IMPROVE**: A suíte focal mantém um marcador próprio para este critério.
+
+#### Fase de interface
+
+- [x] T003 [CODE] [US-001] Implementar diretório em app/Http/Controllers/Directory/TeamDirectoryController.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001, AC-002, AC-003 — Depends: T001, T002, T005, T006 — Inventário: INTERFACE.md
   - [x] **PREP**: REDs e contrato foram confirmados.
   - [x] **EXECUTE**: Rota, controller, tipos, página e navegação foram criados.
   - [x] **VERIFY**: Pest focal, Behave, Pint e checks frontend passaram.
   - [x] **VISUAL**: Bordas, espaçamentos, margens, padding e tipografia conferidos nos estados e viewports da tela.
   - [x] **EVIDENCE**: GREEN e arquivos foram registrados.
   - [x] **IMPROVE**: Query passou a usar `withCount`, whitelist e ordem estável.
-  <!-- specsfy:evidence {"task":"T003","refs":["US-001","FR-001","FR-002","FR-003","NFR-001","NFR-002","AC-001"],"files":["routes/web.php","app/Http/Controllers/Directory/TeamDirectoryController.php","resources/js/types/directory.ts","resources/js/pages/directory/teams/index.tsx","resources/js/components/app-sidebar.tsx"],"commands":[{"run":"php artisan test --compact tests/Feature/Directory/TeamDirectoryTest.php","exit":0}]} -->
+  <!-- specsfy:evidence {"task":"T003","refs":["US-001","FR-001","FR-002","FR-003","NFR-001","NFR-002","AC-001","AC-002","AC-003"],"files":["routes/web.php","app/Http/Controllers/Directory/TeamDirectoryController.php","resources/js/types/directory.ts","resources/js/pages/directory/teams/index.tsx","resources/js/components/app-sidebar.tsx"],"commands":[{"run":"php artisan test --compact tests/Feature/Directory/TeamDirectoryTest.php","exit":0}]} -->
 - [x] T004 [TEST] [US-001] Executar regressão em tests/Feature/Directory/TeamDirectoryTest.php — Refs: US-001, FR-001, FR-002, FR-003, NFR-001, NFR-002, AC-001 — Depends: T003
   - [x] **PREP**: Suites e checks foram identificados.
   - [x] **EXECUTE**: Pest, Behave, lint, tipos, formatter, build e rastreabilidade executaram.
@@ -310,7 +412,7 @@ tests/features/directory_teams.feature
 
 ### 15. Ordem de execução
 
-- Caminho crítico: T001 → T002 → T003 → T004.
+- Caminho crítico: T001 precede T002. T002, T005 e T006 precedem T003 no grafo de cobertura. T004 depende de T003.
 - Tarefas paralelas: pode avançar após a fundação de tipos compartilhados.
 - Estratégia de MVP: tabela global com tipo, tamanho e link.
 
@@ -344,7 +446,7 @@ tests/features/directory_teams.feature
 - [x] `Definition Gate` está `Passed`.
 - [x] `Plan Gate` está `Passed`.
 - [x] `Delivery Gate` está `Passed`.
-- [x] AC-001 passa em Behave e Pest.
+- [x] AC-001 a AC-003 passam na suíte Pest focal. O histórico de aceite de AC-001 está na seção 11.
 - [x] Todos os FR/NFR possuem evidência.
-- [x] T001 a T004 estão concluídas.
+- [x] T001 a T006 estão concluídas.
 - [x] Testes e checks estáticos passam.

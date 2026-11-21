@@ -47,6 +47,12 @@ quando a comprovação relaciona o arquivo versionado da migration, o comando
 que a aplicou no banco de teste e o comando que consultou o estado depois da
 aplicação. Uma tarefa `[MIGRATION]` ainda aberta também impede o Delivery Gate.
 
+Para um CRUD, o Definition Gate confere um ID reservado por controle
+declarado. A tarefa com esse ID será escrita e conferida no planejamento.
+Na seção de menus, inclua onde a entrada aparece, o rótulo que a pessoa vê e
+o destino. Por exemplo, registre o item Cupons no menu lateral e a rota
+`/cupons` na mesma seção.
+
 Uma falha de parser, fixture ou ambiente não serve como prova de requisito
 ausente.
 

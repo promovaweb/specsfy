@@ -50,3 +50,21 @@ test('setup cria o design system e preserva conteúdo local',t=>{
  const local='# Direção local\n\nEste conteúdo pertence ao produto.\n';put(root,'DESIGNSYSTEM.MD',local);
  const second=node(script,['--project',root]);assert.equal(second.status,0,second.stderr);assert.equal(readFileSync(join(root,'DESIGNSYSTEM.MD'),'utf8'),local);
 });
+
+test('defaults gerados respeitam um CRUD de listar e criar e deixam ReUI como política', t => {
+  const root = temporary(t);
+  put(root, '.specsfy/templates/Interface.md', read('skills/templates/Interface.md'));
+  put(root, '.specsfy/templates/DESIGNSYSTEM.MD', template);
+  put(root, 'package.json', '{"dependencies":{"react":"1"}}');
+  const result = node(join(ROOT, 'skills/specsfy-setup/scripts/setup_context.mjs'), ['--project', root]);
+  assert.equal(result.status, 0, result.stderr);
+  const inventory = readFileSync(join(root, 'INTERFACE.md'), 'utf8');
+  const design = readFileSync(join(root, 'DESIGNSYSTEM.MD'), 'utf8');
+  const tasks = read('skills/templates/Tasks.md');
+  for (const source of [inventory, design, tasks]) {
+    includes(source, ['Operações:', '`consultar`', '`editar`', '`apagar`', '`listar, criar`', 'informativ']);
+  }
+  assert.doesNotMatch(inventory.split('## Política de composição')[0], /ReUI/);
+  includes(inventory, ['Composições gratuitas previstas: ReUI', 'arquivo e uso no código']);
+  assert.doesNotMatch(inventory, /\| ReUI \|/);
+});

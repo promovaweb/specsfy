@@ -4,17 +4,74 @@ import { spawnSync } from "node:child_process";
 import { existsSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 const STACK = ".specsfy/STACK.md", RULES = ".specsfy/RULES.md", DATABASE = ".specsfy/DATABASE.md", PACKAGES = ".specsfy/PACKAGES.md", USER_PROFILE = ".specsfy/USER-PROFILE.md", PROJECT = "PROJECT.md"; const context = new Set([STACK, RULES, DATABASE, PACKAGES, USER_PROFILE, PROJECT]);
-const args = process.argv.slice(2); const project = resolve(args.includes("--project") ? args[args.indexOf("--project") + 1] : process.cwd()); const provided = args.includes("--paths") ? args.slice(args.indexOf("--paths") + 1).filter((arg) => !arg.startsWith("--")) : null; const check = args.includes("--check"), json = args.includes("--json"), ackProject = args.includes("--acknowledge-project-no-change"), ackRules = args.includes("--acknowledge-rules-no-change");
+const args = process.argv.slice(2);
+const projectIndex = args.indexOf("--project");
+const project = resolve(projectIndex >= 0 ? args[projectIndex + 1] : process.cwd());
+const pathsIndex = args.indexOf("--paths");
+const nextOption = args.findIndex((arg, index) => index > pathsIndex && arg.startsWith("--"));
+const provided = pathsIndex < 0 ? null : args.slice(pathsIndex + 1, nextOption < 0 ? undefined : nextOption);
+const check = args.includes("--check"), json = args.includes("--json");
+const ackProject = args.includes("--acknowledge-project-no-change"), ackRules = args.includes("--acknowledge-rules-no-change");
+
 /** Consulta o projeto confirmado ou seus repositórios filhos diretos. */
 function gitPaths() {
   const own = spawnSync("git", ["rev-parse", "--is-inside-work-tree"], { cwd: project, encoding: "utf8" });
-  const roots = own.status === 0 ? [{ directory: project, prefix: "" }]
-    : readdirSync(project, { withFileTypes: true }).filter((entry) => entry.isDirectory() && existsSync(join(project, entry.name, ".git")))
+  if (own.error && own.error.code !== "ENOENT") throw own.error;
+  const roots = own.status === 0 && own.stdout.trim() === "true"
+    ? [{ directory: project, prefix: "" }]
+    : readdirSync(project, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && existsSync(join(project, entry.name, ".git")))
       .map((entry) => ({ directory: join(project, entry.name), prefix: entry.name + "/" }));
-  if (!roots.length) throw new Error("nenhum repositório Git encontrado no projeto ou nos filhos diretos");
+  if (!roots.length || own.error?.code === "ENOENT") return null;
+
   const found = new Set();
-  for (const { directory, prefix } of roots) for (const command of [["diff", "--name-only", "-z"], ["diff", "--cached", "--name-only", "-z"], ["ls-files", "--others", "--exclude-standard", "-z"]]) { const result = spawnSync("git", command, { cwd: directory, encoding: "buffer" }); if (result.status) throw new Error(result.stderr?.toString().trim() || `falha ao executar git ${command.join(" ")}`); result.stdout.toString().split("\0").filter(Boolean).forEach((path) => found.add(prefix + path)); } return [...found]; }
-const paths = [...new Set((provided ?? gitPaths()).filter(Boolean).map((path) => path.replaceAll("\\", "/").replace(/^\.\//, "")))].sort(); const inspected = paths.filter((path) => !context.has(path)); const name = (path) => path.split("/").at(-1).toLowerCase(); const parts = (path) => new Set(path.toLowerCase().split("/"));
-const stack = inspected.filter((path) => new Set(["composer.json", "composer.lock", "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "pyproject.toml", "uv.lock", "requirements.txt", "go.mod", "go.sum", "cargo.toml", "cargo.lock", "dockerfile", "compose.yaml", "compose.yml", "docker-compose.yml"]).has(name(path)) || /^(next|astro|vite)\.config\./.test(name(path))); const packages = inspected.filter((path) => new Set(["composer.json", "composer.lock", "package.json", "package-lock.json"]).has(name(path))); const database = inspected.filter((path) => { const set = parts(path); return ["db", "database", "databases", "migration", "migrations", "prisma"].some((item) => set.has(item)) || name(path) === "schema.prisma" || name(path).startsWith("drizzle.config.") || path.toLowerCase().endsWith(".sql") || ((set.has("models") || set.has("entities")) && ["app", "src", "server"].includes(path.split("/")[0].toLowerCase())); }); const app = inspected.filter((path) => { const set = parts(path), suffix = `.${name(path).split(".").slice(1).join(".")}`; return !["test", "tests", "spec", "specs", "fixtures"].some((item) => set.has(item)) && ["api", "app", "components", "lib", "pages", "resources", "routes", "server", "src"].some((item) => set.has(item)) && new Set([".php", ".py", ".js", ".jsx", ".ts", ".tsx", ".vue", ".astro", ".rb", ".go", ".rs"]).has(suffix); }); const rules = inspected.filter((path) => ["agents.md", "claude.md", ".editorconfig"].includes(name(path)) || /^(eslint\.config\.|biome\.json|phpstan\.|pint\.json)/.test(name(path))); const docs = paths.filter((path) => path.startsWith("docs/")); const pending = []; const add = (document, skill, reason, evidence, mode) => pending.push({ document, skill, ...(mode ? { mode } : {}), reason, evidence }); if (stack.length && !paths.includes(STACK)) add(STACK, "specsfy-setup", "stack estrutural alterado", stack, "stack"); if (packages.length && !paths.includes(PACKAGES)) add(PACKAGES, "specsfy-documentator", "dependências alteradas exigem reconstrução do inventário", packages); if (database.length && !paths.includes(DATABASE)) add(DATABASE, "specsfy-setup", "persistência alterada", database, "database"); if (app.length && !paths.includes(PROJECT) && !ackProject) add(PROJECT, "specsfy-setup", "mudança de aplicação exige revisão narrativa", app); if (rules.length && !paths.includes(RULES) && !ackRules) add(RULES, "specsfy-setup", "instrução ou convenção alterada exige revisão", rules, "rules"); if ((app.length || database.length || packages.length) && !docs.length) add("docs/", "specsfy-documentator", "aplicação, persistência ou dependências alteradas exigem reconstrução documental", [...new Set([...app, ...database, ...packages])].sort()); const report = { changed_paths: paths, stack_changes: stack, package_changes: packages, database_changes: database, application_changes: app, rules_changes: rules, documentation_changes: docs, project_review_required: Boolean(app.length), project_review_acknowledged: ackProject, rules_review_required: Boolean(rules.length), rules_review_acknowledged: ackRules, documentation_review_required: Boolean(app.length || database.length || packages.length), pending, status: pending.length ? "pending" : "current" };
-if (json) console.log(JSON.stringify(report, null, 2)); else { console.log(`Context monitor: ${report.status.toUpperCase()}`); if (!pending.length) console.log("Documentação compatível com os caminhos alterados."); pending.forEach((item) => console.log(`- ${item.document} via ${item.skill}${item.mode ? ` (modo ${item.mode})` : ""}: ${item.reason} (${item.evidence.join(", ")})`)); if (report.project_review_required) console.log("- PROJECT.md foi revisado ou a ausência de impacto deve ser registrada na evidência da tarefa."); if (report.rules_review_required) console.log("- RULES.md foi revisado ou a ausência de nova regra deve ser registrada na evidência da tarefa."); if (report.documentation_review_required) console.log("- docs/ e .specsfy/PACKAGES.md foram reconstruídos por $specsfy-documentator após a mudança."); }
+  const commands = [
+    ["diff", "--name-only", "-z"],
+    ["diff", "--cached", "--name-only", "-z"],
+    ["ls-files", "--others", "--exclude-standard", "-z"],
+  ];
+  for (const { directory, prefix } of roots) {
+    for (const command of commands) {
+      const result = spawnSync("git", command, { cwd: directory, encoding: "utf8" });
+      if (result.error) throw result.error;
+      if (result.status !== 0) throw new Error(result.stderr.trim() || `falha ao executar git ${command.join(" ")}`);
+      for (const path of result.stdout.split("\0")) if (path) found.add(prefix + path);
+    }
+  }
+  return [...found];
+}
+
+const changed = provided ?? gitPaths();
+const baseline = changed === null;
+const source = provided !== null ? "paths" : baseline ? "baseline" : "git";
+const diagnostic = baseline ? "Git indisponível ou sem repositório no projeto ou nos filhos diretos. Nenhum diff foi verificado." : null;
+const recovery = baseline ? "Execute novamente com --paths e os caminhos efetivamente alterados. Use --paths '[]' quando souber que a lista está vazia, ou execute em uma cópia com Git." : null;
+const paths = [...new Set((changed ?? [])
+  .filter((path) => path && !(provided?.length === 1 && path === "[]"))
+  .map((path) => path.replaceAll("\\", "/").replace(/^\.\//, "")))].sort();
+const inspected = paths.filter((path) => !context.has(path)); const name = (path) => path.split("/").at(-1).toLowerCase(); const parts = (path) => new Set(path.toLowerCase().split("/"));
+const stack = inspected.filter((path) => new Set(["composer.json", "composer.lock", "package.json", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb", "pyproject.toml", "uv.lock", "requirements.txt", "go.mod", "go.sum", "cargo.toml", "cargo.lock", "dockerfile", "compose.yaml", "compose.yml", "docker-compose.yml"]).has(name(path)) || /^(next|astro|vite)\.config\./.test(name(path))); const packages = inspected.filter((path) => new Set(["composer.json", "composer.lock", "package.json", "package-lock.json"]).has(name(path))); const database = inspected.filter((path) => { const set = parts(path); return ["db", "database", "databases", "migration", "migrations", "prisma"].some((item) => set.has(item)) || name(path) === "schema.prisma" || name(path).startsWith("drizzle.config.") || path.toLowerCase().endsWith(".sql") || ((set.has("models") || set.has("entities")) && ["app", "src", "server"].includes(path.split("/")[0].toLowerCase())); }); const app = inspected.filter((path) => { const set = parts(path), suffix = `.${name(path).split(".").slice(1).join(".")}`; return !["test", "tests", "spec", "specs", "fixtures"].some((item) => set.has(item)) && ["api", "app", "components", "lib", "pages", "resources", "routes", "server", "src"].some((item) => set.has(item)) && new Set([".php", ".py", ".js", ".jsx", ".ts", ".tsx", ".vue", ".astro", ".rb", ".go", ".rs"]).has(suffix); }); const rules = inspected.filter((path) => ["agents.md", "claude.md", ".editorconfig"].includes(name(path)) || /^(eslint\.config\.|biome\.json|phpstan\.|pint\.json)/.test(name(path))); const docs = paths.filter((path) => path.startsWith("docs/")); const pending = []; const add = (document, skill, reason, evidence, mode) => pending.push({ document, skill, ...(mode ? { mode } : {}), reason, evidence }); if (stack.length && !paths.includes(STACK)) add(STACK, "specsfy-setup", "stack estrutural alterado", stack, "stack"); if (packages.length && !paths.includes(PACKAGES)) add(PACKAGES, "specsfy-documentator", "dependências alteradas exigem reconstrução do inventário", packages); if (database.length && !paths.includes(DATABASE)) add(DATABASE, "specsfy-setup", "persistência alterada", database, "database"); if (app.length && !paths.includes(PROJECT) && !ackProject) add(PROJECT, "specsfy-setup", "mudança de aplicação exige revisão narrativa", app); if (rules.length && !paths.includes(RULES) && !ackRules) add(RULES, "specsfy-setup", "instrução ou convenção alterada exige revisão", rules, "rules"); if ((app.length || database.length || packages.length) && !docs.length) add("docs/", "specsfy-documentator", "aplicação, persistência ou dependências alteradas exigem reconstrução documental", [...new Set([...app, ...database, ...packages])].sort());
+const report = {
+  source, diagnostic, recovery, changed_paths: paths, stack_changes: stack,
+  package_changes: packages, database_changes: database, application_changes: app,
+  rules_changes: rules, documentation_changes: docs, project_review_required: Boolean(app.length),
+  project_review_acknowledged: ackProject, rules_review_required: Boolean(rules.length),
+  rules_review_acknowledged: ackRules, documentation_review_required: Boolean(app.length || database.length || packages.length),
+  pending, status: baseline ? "baseline" : pending.length ? "pending" : "current",
+};
+
+if (json) console.log(JSON.stringify(report, null, 2));
+else {
+  console.log(`Context monitor: ${report.status.toUpperCase()}`);
+  if (baseline) {
+    console.log(diagnostic);
+    console.log(recovery);
+  } else if (!pending.length) {
+    console.log("Documentação compatível com os caminhos alterados.");
+  }
+  pending.forEach((item) => console.log(`- ${item.document} via ${item.skill}${item.mode ? ` (modo ${item.mode})` : ""}: ${item.reason} (${item.evidence.join(", ")})`));
+  if (report.project_review_required) console.log("- PROJECT.md foi revisado ou a ausência de impacto deve ser registrada na evidência da tarefa.");
+  if (report.rules_review_required) console.log("- RULES.md foi revisado ou a ausência de nova regra deve ser registrada na evidência da tarefa.");
+  if (report.documentation_review_required) console.log("- docs/ e .specsfy/PACKAGES.md foram reconstruídos por $specsfy-documentator após a mudança.");
+}
 process.exitCode = check && pending.length ? 1 : 0;

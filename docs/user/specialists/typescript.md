@@ -38,9 +38,12 @@ Este especialista cuida do contrato de tipos que eles expõem.
   ser ativadas. Desde o 6.0, `strict` é o default, `module` é `esnext`,
   `types` começa vazio e `rootDir` começa em `./`. Os erros revelados pelas
   flags são corrigidos sem casts cosméticos.
-- `moduleResolution` acompanha a geração: `node`, `node10` e `classic` foram
-  removidos no TypeScript 7.0, que recomenda `bundler` ou `nodenext`.
-  `baseUrl` também saiu, e `paths` é relativo à raiz do projeto.
+- O TypeScript 6.0 depreciou `node`, `node10` e `classic` em
+  `moduleResolution`, além de `baseUrl`. A opção `ignoreDeprecations: "6.0"`
+  permite manter essas configurações temporariamente. No 7.0, elas geram
+  erro. Use `bundler` ou `nodenext` para `moduleResolution` e ajuste os
+  mapeamentos de `paths` para usar caminhos relativos ao `tsconfig.json`
+  ao remover `baseUrl`. [Notas de migração do TypeScript](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html#deprecated---baseurl)
 - Uma union como `{ status: "ok"; data: T } | { status: "error"; error: E }`
   substitui combinações de booleanos que permitem estados inválidos.
 - Entradas ainda não validadas usam `unknown` no lugar de `any`.

@@ -22,7 +22,8 @@ decompor tarefas (use `$specsfy-05-tasks`) ou mudar o comportamento acordado
 - Suíte completa, lint, tipos e build disponíveis passaram depois de `SAFE`.
 - A rastreabilidade não tem lacunas e cada `AC`, `FR`, `NFR` e item da
   Definition of Done aponta para comprovação atual.
-- `specsfy context monitor --check` e `specsfy docs build --check` passam.
+- `specsfy context monitor --check` retorna `CURRENT` e
+  `specsfy docs build --check` passa.
 - `Delivery Gate: Passed`, `Status: Reviewing` e a spec está em `review/`.
 
 ## Proteção obrigatória do banco
@@ -155,9 +156,10 @@ são sequenciais.
   antes de escrever JSX ou TSX. Se ele não estiver instalado, siga o
   [protocolo de carregamento](specialists-implement.md) e
   não implemente a tela até concluir esse preparo.
-- Em um CRUD, confirme um único `PageHeader` reutilizável em todas as telas,
-  `DataGrid` em largura total, coluna `ID` sempre visível, link da linha para o
-  detalhe e botões de editar e apagar independentes na linha.
+- Em um CRUD, confirme um único `PageHeader` reutilizável e, para `listar`,
+  `DataGrid` em largura total com coluna `ID` visível. Conforme `Operações:`
+  no Contrato CRUD, confira link de linha para `consultar` e ações
+  independentes para `editar` e `apagar`.
 
 ## Executar uma tarefa
 
@@ -201,12 +203,16 @@ Atualize cada item no momento em que ele acontece, não em lote no final.
      --project <raiz> --check
    ```
 
+   Se retornar `BASELINE` em uma cópia sem Git, reexecute com os caminhos
+   alterados em `--paths` (vírgulas no CLI, espaços no script). Use
+   `--paths '[]'` para uma lista sabidamente vazia.
+
    Faça handoff de stack pendente para `$specsfy-setup` no modo `stack`, de
    persistência para o modo `database` e de regra confirmada para o modo
    `rules`. Revise `PROJECT.md` em toda mudança de aplicação; sem
    impacto material em história, finalidade, capacidades ou limites, registre
    a avaliação na tarefa e repita com `--acknowledge-project-no-change`. A
-   tarefa só avança quando o monitor deixar de retornar `PENDING`.
+   tarefa só avança quando o monitor retornar `CURRENT`.
 6. **Documentação.** Depois de cada tarefa `[CODE]`, anuncie
    `Transição automática: $specsfy-06-implement → $specsfy-documentator —
    motivo: implementação alterou o sistema — resultado esperado: docs/
@@ -295,7 +301,8 @@ Quando todas as tarefas da seção 14 estiverem marcadas, execute em sequência:
 4. busca por tarefas abertas, placeholders, testes pulados e falhas conhecidas;
 5. `specsfy gate evidence <spec>` para toda tarefa `[MIGRATION]`, confirmando
    arquivo, aplicação e consulta de estado;
-6. `specsfy context monitor --project <raiz> --check` sem pendências;
+6. `specsfy context monitor --project <raiz> --check` em `CURRENT`, com
+   `--paths` quando a cópia não tiver Git;
 7. `$specsfy-documentator` com `specsfy docs build --project <raiz> --check`
    aprovado.
 

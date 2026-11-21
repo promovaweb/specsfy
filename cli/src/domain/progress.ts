@@ -309,10 +309,12 @@ const TASK_CAPTURE = /^(?:\*\*|`)?T(\d+)\b/i;
  * section is absent), outside fenced blocks, with the checklist items
  * indented below each one.
  */
-export function parseTasks(content: string): TaskEntry[] {
+export function parseTasks(content: string, sectionOnly = false): TaskEntry[] {
   const tasks: TaskEntry[] = [];
-  const hasTaskSection = /^#{1,6}\s+14\.\s+Tarefas\s*$/mu.test(content);
+  const section = sectionOnly ? /^(#{1,6})[ \t]+(?:14\.[ \t]+)?Tarefas[ \t]*$/u : /^(#{1,6})\s+14\.\s+Tarefas\s*$/u;
+  const hasTaskSection = sectionOnly || content.split(/\r?\n/u).some((line) => section.test(line));
   let inTasks = !hasTaskSection;
+  let sectionLevel = 0;
   let fence: { marker: string; length: number } | null = null;
   let active: { entry: TaskEntry; indent: number } | null = null;
   for (const [index, line] of content.split("\n").entries()) {
@@ -323,9 +325,16 @@ export function parseTasks(content: string): TaskEntry[] {
       continue;
     }
     if (fence) continue;
-    if (/^#{1,6}\s/u.test(line)) {
+    const heading = /^(#{1,6})[ \t]/u.exec(line);
+    if (heading) {
       active = null;
-      if (hasTaskSection && /^#{1,6}\s+\d+\./u.test(line)) inTasks = /^#{1,6}\s+14\.\s+Tarefas\s*$/u.test(line.trimEnd());
+      const opening = section.exec(line.trimEnd());
+      if (opening) {
+        inTasks = true;
+        sectionLevel = opening[1]!.length;
+      } else if (hasTaskSection && (sectionOnly ? heading[1]!.length <= sectionLevel : /^#{1,6}\s+\d+\./u.test(line))) {
+        inTasks = false;
+      }
       continue;
     }
     if (!inTasks) continue;

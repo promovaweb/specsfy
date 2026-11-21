@@ -86,10 +86,15 @@ sequenciais.
    informação e navegação, menus e navegação principal, formulários e ações,
    composição e disposição, estados e acessibilidade. Confirme que a tecnologia
    proposta segue as fontes da stack ou que a lacuna foi registrada para a
-   pessoa. Em `Contrato CRUD`, confira uma entrada por operação declarada,
-   com o controle de interface e a referência à tarefa `[CODE]` que o
-   implementa na seção 14 do plano. Se faltar uma decisão sobre a interface, registre `BLOCKER` e volte
-   para `$specsfy-02-backlog`.
+   pessoa. Em `Menus e navegação principal`, confira o menu, o rótulo
+   visível e o destino na própria seção, ou a justificativa de acesso direto.
+   Em `Contrato CRUD`, o Definition Gate confere uma entrada por operação
+   declarada, com seu controle de interface e a **reserva** do ID da tarefa.
+   No planejamento, `$specsfy-05-tasks` materializa cada ID reservado como
+   tarefa `[CODE]` na seção 14 e confere se ela implementa o controle e a
+   operação. Com tarefas presentes, o validador também resolve os vínculos.
+   Se faltar uma decisão sobre a interface, registre `BLOCKER` e volte para
+   `$specsfy-02-backlog`.
 7. Compare research, requisitos, BDD, plano técnico, modelo de dados,
    contratos, TDD, matriz e tarefas. Confirme no mínimo três `AC` distintos
    para a feature inteira e para cada `US`, `FR` e `NFR`.

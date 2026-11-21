@@ -3,9 +3,10 @@
 Reúne as regras que valem para documento, consulta e operação, o índice das
 referências por modo e as fontes oficiais.
 
-Revisado em 2026-11-20 contra: MongoDB Manual (linha 8.x, com notas de 8.1 em
-transação) e Atlas, que mantém a linha 9.x em prévia pública; Database Tools;
-e documentação de replica set e backup do próprio manual.
+Em 20/11/2026, MongoDB Server 9.0 está em disponibilidade geral desde
+29/09/2026 e disponível no Atlas Core. As notas registram 9.0.8 em 10/11/2026.
+A prévia pública é da edição Atlas Infinite, que roda a linha 9.x.
+Confira a versão do servidor, do driver e do Database Tools separadamente.
 
 ## Versão e topologia antes de regra
 
@@ -15,9 +16,10 @@ db.hello();
 db.adminCommand({ getCmdLineOpts: 1 });
 ```
 
-- `db.hello().setName` revela o nome do replica set; ausência indica instância
-  isolada.
-- `db.hello().msg === "isdbgrid"` indica `mongos`, ou seja, cluster sharded.
+- `db.hello().msg === "isdbgrid"` identifica o roteador `mongos` de um
+  cluster sharded, mesmo sem `setName`.
+- `setName` identifica o replica set de um membro `mongod`. Um `mongod`
+  standalone não anuncia `setName`.
 - Transação multi-documento exige replica set ou shard; standalone não aceita.
 - Atualização de versão envolve binário, `setFeatureCompatibilityVersion` e
   driver compatível. Confirme a matriz na nota de release da versão instalada.
@@ -72,12 +74,19 @@ referenciar o que cresce, é compartilhado ou tem ciclo de vida próprio.
 | --- | --- | --- | --- |
 | `w: 0` | nenhum membro | alta | telemetria descartável |
 | `w: 1` | primário | failover antes da replicação | dado recriável |
-| `w: "majority"` | maioria dos membros com dado | nenhuma após confirmação | financeiro, auditoria, cadastro |
+| `w: "majority"` | maioria calculada de membros votantes com dados | depende da topologia e da persistência | operações que precisam resistir a failover |
 
-- `readConcern: "local"` lê o que o primário tem; `"majority"` lê o que a maioria
-  confirmou; `"snapshot"` é usado em transação.
-- `readPreference: "primary"` para leitura que precisa do dado mais recente;
-  `"secondaryPreferred"` aceita atraso de replicação.
+- `w: "majority"` usa a maioria calculada do replica set (veja
+  `writeMajorityCount` em `rs.status()`). Confira
+  `writeConcernMajorityJournalDefault` e a engine de armazenamento.
+- Timeout de write concern não cancela a escrita. Consulte a chave da
+  operação para reconciliar o resultado antes de repetir.
+- `readConcern: "local"` lê o que o membro selecionado tem. `"majority"`
+  lê dados no ponto confirmado pela maioria e `"snapshot"` pode fornecer
+  uma visão consistente para a transação.
+- Escolha `readPreference` por operação. `"primary"` direciona a leitura
+  ao primário; `"secondaryPreferred"` pode ler dado atrasado. Combine a
+  preferência com o read concern exigido pela operação.
 - Transação usa `readConcern`, `writeConcern` e `readPreference` no nível da
   transação, com `session` passada em cada operação.
 
@@ -90,8 +99,10 @@ referenciar o que cresce, é compartilhado ou tem ciclo de vida próprio.
 - `partial` reduz tamanho quando a consulta sempre filtra por um estado.
 - `TTL` remove documento expirado; o processo roda em segundo plano e não
   substitui política de retenção declarada.
-- `unique` garante unicidade, mas com documento ausente do campo o índice não
-  entra na checagem; combine com validador.
+- Unique simples comum indexa ausência e `null` como a mesma chave nula,
+  permitida uma vez. Unique sparse ainda indexa `null` explícito. Use
+  validador para campo obrigatório ou unique parcial para o tipo escolhido.
+  Em composto, a chave única é a combinação dos campos.
 - Índice de texto é um por coleção e atende busca textual simples, não substitui
   motor de busca dedicado.
 
@@ -99,8 +110,9 @@ referenciar o que cresce, é compartilhado ou tem ciclo de vida próprio.
 
 - Replica set de produção tem três membros com dado, em zonas ou hosts
   distintos. Arbiter serve para quorum, não para disponibilidade de dado.
-- Eleição escolhe primário novo em segundos; a aplicação precisa de retry e de
-  `retryWrites` habilitado.
+- Liste seeds alcançáveis e confira os endereços anunciados pelo conjunto.
+  `retryWrites` cobre operações elegíveis dentro dos limites do driver.
+  Teste reconexão, falhas visíveis e resultados ambíguos durante eleição.
 - Backup lógico (`mongodump`) serve base pequena e migração; snapshot de volume
   ou backup gerenciado serve base grande e restore rápido.
 - Ponto no tempo usa oplog com janela de retenção maior que a janela declarada
@@ -109,6 +121,11 @@ referenciar o que cresce, é compartilhado ou tem ciclo de vida próprio.
   direção de ida e volta definida pela versão.
 
 ## Fontes oficiais
+
+- Disponibilidade do 9.0: https://www.mongodb.com/products/updates/mongodb-9-0-is-now-available/
+- Notas do 9.0: https://www.mongodb.com/docs/manual/release-notes/9.0/
+- Versões no Atlas: https://www.mongodb.com/docs/atlas/atlas-versions/
+- Topologia no retorno de `hello`: https://www.mongodb.com/docs/manual/reference/command/hello/
 
 - Manual: https://www.mongodb.com/docs/manual/
 - Modelagem de dados: https://www.mongodb.com/docs/manual/data-modeling/

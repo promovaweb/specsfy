@@ -151,12 +151,12 @@ registrada abaixo.
 
 | Superfície | Composição obrigatória | Regras de uso |
 | --- | --- | --- |
-| Lista | `PageHeader` + resumo útil + `DataGrid` | Usar para comparação densa, busca, filtros, ordenação, paginação, seleção e ações por registro. Ações em lote devem deixar escopo e resultado claros. |
+| Lista | `PageHeader` + resumo útil + `DataGrid` | Usar para comparação densa, busca, filtros, ordenação e paginação. Seleção e ações por registro seguem as operações declaradas. |
 | Detalhe | `PageHeader` + `DetailLists` | Organizar atributos por assunto, destacar status e próxima ação. Adicionar atividade, relações ou histórico quando o domínio exigir. |
 | Criar | `PageHeader` + seções de formulário em duas colunas responsivas | Cada seção tem coluna de contexto, painel de campos, labels visíveis, ajuda junto do campo e submit com estado de envio. |
 | Editar | `PageHeader` + seções de formulário em duas colunas responsivas | Reaproveitar a estrutura de criar, exibir valores atuais, preservar alterações após falha e informar o resultado da gravação. |
 
-### Reuso e ações obrigatórias do CRUD
+### Reuso e ações por operação do CRUD
 
 - Todas as telas de um CRUD usam o mesmo componente `PageHeader` reutilizável.
   Lista, detalhe, criação e edição variam título, descrição, breadcrumbs e
@@ -166,16 +166,18 @@ registrada abaixo.
   por todas as telas compatíveis.
 - O `DataGrid` da listagem ocupa toda a largura disponível. A coluna `ID` fica
   visível sempre, inclusive com outras colunas de negócio.
-- A linha inteira é o link para o detalhe por mouse e teclado. Botões
-  independentes de editar e apagar ficam na própria linha e não propagam o
-  clique para o detalhe.
+- Siga `Operações:` no Contrato CRUD. Se incluir `consultar`, a linha inteira
+  é um link para o detalhe por mouse e teclado. Exiba ação de edição se incluir
+  `editar` e ação de exclusão se incluir `apagar`, ambas independentes do
+  link da linha. Em `listar, criar`, mantenha linhas informativas e a ação
+  de criação no cabeçalho.
 - Apagar respeita permissão, mostra o registro alvo e confirma a consequência
   antes da execução.
 
 ### Navegação da lista
 
-- Quando a linha representa um registro com detalhe, a linha inteira é uma ação
-  de navegação para esse detalhe. O clique em qualquer célula e a ativação por
+- Quando `Operações:` inclui `consultar`, a linha inteira é uma ação de
+  navegação para o detalhe. O clique em qualquer célula e a ativação por
   teclado têm o mesmo resultado.
 - Use um link acessível sobre a área da linha, como `data-row-link`, sem colocar
   um link dentro de outro ou transformar o `tr` em um elemento inválido.
@@ -257,7 +259,7 @@ E consegue identificar status, atualização e ação disponível por linha
 Dado que não há registros para o escopo atual
 Quando a pessoa abre a lista
 Então vê uma mensagem que explica o motivo do vazio
-E vê a ação para criar o primeiro registro quando tiver permissão
+E vê a ação para criar o primeiro registro quando a operação criar está no escopo e a pessoa tem permissão
 ```
 
 ### Visualização de detalhe

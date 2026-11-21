@@ -79,10 +79,10 @@ specsfy skills remove specsfy-specialist-laravel --project .
 specsfy skills update --project .
 ```
 
-`specialists suggest` aceita número, slug ou caminho e mostra sinal, modo
-quando houver, declaração e instalação, também com `--json`. `skills install`,
-`skills remove` e `skills update` alteram o projeto. Skills externas ou com
-alterações locais exigem `--force` para remoção.
+`specialists suggest` agrupa os sinais por nome e modo e mostra a linha e o
+trecho da spec. Confira a declaração de cada modo no plano técnico ou nas
+tarefas. O comando aceita número, slug ou caminho e oferece `--json`.
+Skills externas ou com alterações locais exigem `--force` para remoção.
 
 ## Ciclo da spec
 
@@ -145,10 +145,10 @@ specsfy gate database --project .
 specsfy verify --boundary local
 ```
 
-`specsfy verify` executa a política completa no terminal e no CI. A atestação
-opcional registra o commit, os comandos aprovados e os arquivos cobertos.
-Especialistas desconhecidos, ausentes ou sugeridos sem declaração aparecem
-como avisos informativos. Em JSON, consulte `data.warnings`.
+`specsfy verify` executa a política do projeto inteiro. Use
+`specsfy verify --spec 0001` para checar só a spec 0001 no estado atual.
+Em JSON, consulte `data.warnings` para ver os avisos de especialistas
+e a evidência dos sinais que ainda precisam de declaração.
 
 ## Inbox e backlog
 
@@ -171,9 +171,9 @@ specsfy inbox process 2026-07-28-143205-recuperar-senha.md \
   --spec 0001 --project .
 ```
 
-O processamento move a captura para `specs/inbox/processed/`, marca
-`Status: Processada` e preserva o texto original. O backlog é refinado e
-registrado com:
+O processamento move a captura para `specs/inbox/processed/` e preserva o
+texto original. Também corrige os vínculos nas specs, no backlog e no contexto,
+incluindo `.specsfy/DATABASE.md`. Para registrar o backlog:
 
 ```bash
 specsfy backlog list
@@ -202,9 +202,9 @@ specsfy progress --spec 0001 --json
 specsfy status
 ```
 
-`tasks delivery` escreve somente em `stdout`, enquanto a publicação do texto depende
-de uma solicitação explícita. `progress --watch` atualiza a cada mudança das specs e `--json`
-entrega `summary` e `specs` para automação.
+Em Defined, com o Plan Gate pendente, use `specsfy tasks next 0001 --phase red`
+para selecionar a primeira tarefa `[TEST] [TDD]` com dependências concluídas.
+`tasks delivery` escreve em `stdout`. Use `progress --watch` para acompanhar mudanças.
 
 ## Contexto do projeto
 

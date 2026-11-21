@@ -296,3 +296,63 @@ test('#43: dados conversados migram linha antiga com pipe escapado para o format
   const database = readFileSync(join(root, '.specsfy/DATABASE.md'), 'utf8');
   assert.ok(database.includes('| Credencial | Acessar o banco | nome `PG \\| Main` | A confirmar | Nenhuma | Equipe | Ao trocar a senha | conversa |'), database);
 });
+
+test('spec e findings reconhecem as mesmas declarações de IDs', t => {
+  const root = temporary(t);
+  put(root, 'app/service.php', '<?php');
+  const spec = put(root, 'spec.md', [
+    '#### US-001 — História',
+    '#### AC-001 — Aceite',
+    '- **FR-001**: Listar.',
+    '- **FR-002** — Criar.',
+    '- **NFR-001:** Desempenho.',
+    '- NFR-002 – Acessibilidade.',
+    '### 14. Tarefas',
+    '- [ ] T001 [CODE] Implementar listagem — Refs: FR-001 — Depends: none',
+    '```markdown',
+    '- [ ] T999 [CODE] Exemplo — Refs: FR-001 — Depends: none',
+    '- **FR-999**: Exemplo.',
+    '```',
+    '### 13. Validações',
+    '- **FIND-PROD-001** [P2] [Resolved] Revisão — Refs: US-001 FR-001 FR-002 NFR-001 NFR-002 AC-001 T001 — Evidence: app/service.php:1 — Effect: Define escopo — Suggestion: Manter',
+  ].join('\n'));
+  const definition = JSON.parse(run(script('specsfy-04-validate', 'validate_spec'), [spec, '--json'], root).stdout);
+  assert.equal(definition.counts.FR, 2);
+  assert.equal(definition.counts.NFR, 2);
+  const findings = run(script('specsfy-04-validate', 'review_findings'), [spec, '--root', root, '--json'], root);
+  assert.equal(findings.status, 0, findings.stdout + findings.stderr);
+
+  put(root, 'spec.md', readFileSync(spec, 'utf8').replace('AC-001 T001 —', 'AC-001 T001 T999 —'));
+  const missing = run(script('specsfy-04-validate', 'review_findings'), [spec, '--root', root, '--json'], root);
+  assert.deepEqual(JSON.parse(missing.stdout).errors, ['FIND-PROD-001: refs inexistentes: T999']);
+});
+
+test('monitor distingue baseline sem Git de lista explicitamente vazia', t => {
+  const root = temporary(t);
+  put(root, 'composer.json', '{}');
+  const monitor = script('specsfy-setup', 'monitor_context');
+  const args = ['--check', '--project', root, '--json'];
+  const baseline = run(monitor, args, root);
+  assert.equal(baseline.status, 0, baseline.stderr);
+  assert.equal(baseline.stderr, '');
+  const report = JSON.parse(baseline.stdout);
+  assert.equal(report.status, 'baseline');
+  assert.equal(report.source, 'baseline');
+  assert.deepEqual(report.changed_paths, []);
+  assert.deepEqual(report.pending, []);
+  assert.match(report.diagnostic, /Git/);
+  assert.match(report.recovery, /--paths/);
+  for (const flags of [['--paths'], ['--paths', '[]'], ['--paths', '']]) {
+    const explicit = run(monitor, [...flags, ...args], root);
+    assert.equal(explicit.status, 0, explicit.stderr);
+    const current = JSON.parse(explicit.stdout);
+    assert.equal(current.status, 'current');
+    assert.equal(current.source, 'paths');
+    assert.deepEqual(current.changed_paths, []);
+  }
+  const changes = run(monitor, ['--paths', './composer.json', 'composer.json', ...args], root);
+  assert.equal(changes.status, 1, changes.stderr);
+  const pending = JSON.parse(changes.stdout);
+  assert.deepEqual(pending.changed_paths, ['composer.json']);
+  assert.equal(pending.status, 'pending');
+});

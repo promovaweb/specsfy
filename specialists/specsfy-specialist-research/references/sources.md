@@ -26,8 +26,11 @@ changelog mais recente contradiz).
 
 - **RFC**: confira o cabeçalho da própria RFC. Um RFC pode ser obsoletado ou
   atualizado por outro (`Obsoletes`/`Updates`), e o link correto passa a ser o
-  do substituto. RFC 9110 substituiu RFC 7230 a 7235, e RFC 9457 substituiu
-  RFC 7807.
+  do substituto. A [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110.html)
+  substituiu as RFCs 7231, 7232, 7233 e 7235 e parte da RFC 7230. A
+  [RFC 9112](https://www.rfc-editor.org/rfc/rfc9112.html) substituiu o restante
+  da RFC 7230. A [RFC 9111](https://www.rfc-editor.org/rfc/rfc9111.html)
+  substituiu a RFC 7234. A RFC 9457 substituiu a RFC 7807.
 - **Internet-Draft**: não é padrão publicado e expira em seis meses. Use como
   fonte de trabalho, diga que é draft, informe o número (`-08`, `-12`) e a data,
   e revalide antes de apoiar uma escolha durável. Verifique se virou RFC.

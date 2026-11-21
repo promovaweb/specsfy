@@ -2,7 +2,7 @@
  * MCP tools of the spec lifecycle (spec 0003).
  *
  * Script-backed tools (`inbox_capture`, `backlog_start`, `spec_create`,
- * `spec_research`, `spec_change_analyze`, `task_next`, `delivery_render`)
+ * `spec_research`, `spec_change_analyze`, `delivery_render`) and `task_next`
  * come from the same definitions as the CLI commands. Native tools
  * (`inbox_process`, `spec_transition`, `spec_effort`, `specs_migrate`,
  * `task_check`) call `lifecycleActions`, the implementation behind
@@ -15,7 +15,7 @@ import { AppError } from "../../app/errors.ts";
 import { SPEC_FOLDERS } from "../../domain/lifecycle.ts";
 import { resolveProject } from "../../core/project.ts";
 import { registerScriptTools } from "../../engine/script-command.ts";
-import { lifecycleActions, lifecycleScriptDefs } from "../../cli/commands/lifecycle.ts";
+import { lifecycleActions, lifecycleCommandDefs } from "../../cli/commands/lifecycle.ts";
 import type { Registrar } from "../server.ts";
 
 const project = z.string().optional().describe("Project root. Defaults to the nearest directory with specs/, .specsfy/ or skills-lock.json.");
@@ -35,7 +35,7 @@ export function respond<T>(fn: () => Promise<T>) {
 /** Registers the lifecycle tools. */
 export function registerLifecycleTools(registrar: Registrar): void {
   const { server, catalog } = registrar;
-  registerScriptTools(registrar, lifecycleScriptDefs);
+  registerScriptTools(registrar, lifecycleCommandDefs);
   const write = { readOnlyHint: false, destructiveHint: false, idempotentHint: false };
 
   catalog.tools.push({ name: "inbox_process", description: "Move a capture to specs/inbox/processed/ once specs with the Definition Gate passed cover it." });

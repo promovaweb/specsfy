@@ -24,8 +24,9 @@ import { manifest } from "../../app/manifest.ts";
 import { ExitCode } from "../../app/exit-codes.ts";
 import { error } from "../../app/errors.ts";
 import { getPath, readSettings } from "../../config/settings.ts";
-import { resolveProject } from "../../core/project.ts";
-import { analyzeSpecSpecialists, projectStackSpecialists, installedSpecSpecialists } from "../../domain/spec-specialists.ts";
+import { resolveProject, resolveSpecPath } from "../../core/project.ts";
+import { formatSpecialistSignals, type SpecialistSignal, analyzeSpecSpecialists, projectStackSpecialists, installedSpecSpecialists } from "../../domain/spec-specialists.ts";
+import { verifyOneSpec } from "../../engine/verify-spec.ts";
 import { runScript, skillsRuntimeDir, type ScriptRun } from "../../engine/runner.ts";
 import { projectOption, toCommand, type ScriptCommandDef, type ScriptParam, projectFile } from "../../engine/script-command.ts";
 import type { Command } from "../registry.ts";
@@ -171,6 +172,7 @@ export const VERIFY_BOUNDARIES = ["local", "git", "ci"] as const;
 
 /** Options of `runVerify`, already parsed. */
 export interface VerifyOptions {
+  spec?: string;
   project?: string | boolean;
   boundary?: string;
   attestation?: string;
@@ -203,6 +205,7 @@ interface VerifyWarning {
   name?: string;
   mode?: string;
   signal?: string;
+  signals?: SpecialistSignal[];
 }
 
 /** `gate.timeoutSeconds` from settings, falling back to 300. */
@@ -234,19 +237,24 @@ export async function runVerify(options: VerifyOptions): Promise<{ data: VerifyD
   const maxOutputBytes = numberOption("max-output-bytes", options.maxOutputBytes, 0);
   const argv = [project, "--boundary", boundary, "--timeout-seconds", String(timeoutSeconds), "--json"];
   if (maxOutputBytes !== undefined) argv.push("--max-output-bytes", String(maxOutputBytes));
-  if (options.attestation) argv.push("--attestation", projectFile(project, options.attestation, "attestation"));
+  const attestation = options.attestation ? projectFile(project, options.attestation, "attestation") : undefined;
+  if (attestation) argv.push("--attestation", attestation);
+  if (options.spec && options.selfTest) throw error.usage("--spec cannot be combined with --self-test.");
   if (options.selfTest) argv.push("--self-test");
   const projectSkills = existsSync(join(project, ".agents", "skills"));
-  const run = await runScript(VERIFY_SCRIPT, argv, {
-    cwd: project,
-    env: { SPECSFY_SKILLS_DIR: skillsRuntimeDir() },
-    nodeShim: projectSkills ? "auto" : "always",
-  });
+  const spec = options.spec ? await resolveSpecPath(project, options.spec) : undefined;
+  const run = spec
+    ? await verifyOneSpec({ project, spec, boundary, timeoutSeconds, maxOutputBytes: maxOutputBytes ?? 65536, attestation })
+    : await runScript(VERIFY_SCRIPT, argv, {
+      cwd: project,
+      env: { SPECSFY_SKILLS_DIR: skillsRuntimeDir() },
+      nodeShim: projectSkills ? "auto" : "always",
+    });
   const code = run.code === 0 ? ExitCode.SUCCESS : run.code === 2 ? ExitCode.USAGE : ExitCode.GATE_FAILED;
   const payload = run.json as VerifyPayload | undefined;
   const data: VerifyData = {
     project,
-    script: VERIFY_SCRIPT,
+    script: run.script,
     boundary,
     timeoutSeconds,
     skillsSource: projectSkills ? "project" : "embedded",
@@ -260,7 +268,7 @@ export async function runVerify(options: VerifyOptions): Promise<{ data: VerifyD
 }
 
 interface VerifyCheck { name: string; status: string; code: number; detail?: string; command?: string[] }
-interface VerifyPayload { result: string; boundary: string; checks?: VerifyCheck[]; canaries?: Array<{ name: string; passed: boolean }> }
+interface VerifyPayload { result: string; boundary: string; spec?: string; checks?: VerifyCheck[]; canaries?: Array<{ name: string; passed: boolean }> }
 
 async function verifySpecialists(project: string, checks: VerifyCheck[]): Promise<VerifyWarning[]> {
   const paths = new Set(
@@ -288,11 +296,11 @@ async function verifySpecialists(project: string, checks: VerifyCheck[]): Promis
       if (!known.has(name)) warnings.push({ severity: "warning", kind: "unknown-specialist", spec, name, message: `${name} is not in the specialist catalog.` });
       if (!installed.has(name)) warnings.push({ severity: "warning", kind: "specialist-not-installed", spec, name, message: `${name} is declared but not installed in .agents/skills.` });
     }
-    for (const { name, mode, signal, declared } of suggestions) {
+    for (const { name, mode, signal, signals, declared } of suggestions) {
       if (declared) continue;
       warnings.push({
-        severity: "warning", kind: "undeclared-specialist", spec, name, mode, signal,
-        message: `${name}${mode ? ` (${mode})` : ""} matches "${signal}" but is not declared.`,
+        severity: "warning", kind: "undeclared-specialist", spec, name, mode, signal, signals,
+        message: `${name}${mode ? ` (${mode})` : ""} matches ${formatSpecialistSignals(signals)} but is not declared.`,
       });
     }
   }
@@ -309,6 +317,7 @@ export function renderVerify(data: VerifyData): string {
   const payload = data.result as VerifyPayload | string;
   if (typeof payload !== "object" || payload === null) return [String(payload), data.stderr].filter(Boolean).join("\n");
   const lines = [`Specsfy verify: ${String(payload.result).toUpperCase()}`, `Boundary: ${payload.boundary}`];
+  if (payload.spec) lines.push(`Spec: ${payload.spec}`);
   if (data.skillsSource === "embedded") lines.push("Skills: .agents/skills/ not found; spec checks used the embedded scripts.");
   for (const check of payload.checks ?? []) {
     lines.push(`- ${check.status.toUpperCase()} ${check.name} (exit ${check.code})`);
@@ -321,12 +330,13 @@ export function renderVerify(data: VerifyData): string {
 
 const verifyCommand: Command = {
   name: "verify",
-  description: "Run the whole Specsfy policy on the project: the CI entry point.",
+  description: "Run the Specsfy policy on the project or diagnose one spec.",
   longDescription:
     "Runs verify_repo: validates every spec by status (spec, tasks, traceability, acceptance, evidence and research for complete specs with Evidence Contract 1) and the skills contract, and returns the attestation payload. " +
     "The checks use the scripts in .agents/skills/ of the project; when that folder is missing they fall back to the scripts embedded in the binary, and the skills check fails. Node.js is not required. " +
-    "Specialist warnings are informational. Exit code 10 means the policy failed.",
+    "Use --spec to run checks for one spec only. Specialist warnings are informational. Exit code 10 means the policy failed.",
   options: [
+    { name: "--spec", argument: { name: "id" }, description: "Diagnose one spec by ID, folder name, slug or path." },
     { name: "--boundary", argument: { name: "boundary", values: VERIFY_BOUNDARIES }, description: "Verification boundary recorded in the attestation. Default: local." },
     { name: "--attestation", argument: { name: "file" }, description: "Write the attestation JSON to this file, relative to the project root." },
     { name: "--timeout-seconds", argument: { name: "seconds" }, description: "Time limit of each check. Default: setting gate.timeoutSeconds (300)." },
@@ -335,10 +345,11 @@ const verifyCommand: Command = {
     projectOption,
   ],
   exitCodes: [ExitCode.GATE_FAILED, ExitCode.NOT_FOUND],
-  examples: [`${bin} verify`, `${bin} verify --boundary ci --attestation .specsfy/attestation.json --json`, `${bin} verify --self-test --json`],
+  examples: [`${bin} verify`, `${bin} verify --spec 0001 --json`, `${bin} verify --boundary ci --attestation .specsfy/attestation.json --json`, `${bin} verify --self-test --json`],
   run: async (ctx) => {
     const { data, code } = await runVerify({
       project: ctx.options.project,
+      spec: ctx.options.spec as string | undefined,
       boundary: ctx.options.boundary as string | undefined,
       attestation: ctx.options.attestation as string | undefined,
       timeoutSeconds: ctx.options["timeout-seconds"] as string | undefined,

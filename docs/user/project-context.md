@@ -173,8 +173,12 @@ node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
   --project . --check
 ```
 
-Em uma cópia sem Git, informe os caminhos alterados com
+Em uma cópia sem Git, `BASELINE` informa que o monitor não pôde comparar os
+arquivos. Compare a cópia com a origem e informe os caminhos alterados com
 `specsfy context monitor --project . --check --paths caminho1,caminho2`.
+Passe os caminhos como argumentos separados ao rodar o script com Node.
+Se a comparação confirmar que nada mudou, use `--paths '[]'`. A verificação
+termina em `CURRENT` quando os caminhos conhecidos não geram pendências.
 
 | Sinal observado | Obrigação |
 | --- | --- |

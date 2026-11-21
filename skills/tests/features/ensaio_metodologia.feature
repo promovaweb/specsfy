@@ -30,3 +30,19 @@ Feature: Validar specs e tarefas em cópias do projeto
   Scenario: Fechar setup com pré-condições de deploy
     Given a política de stack do setup para Laravel
     Then as ausências viram pendências registradas para o deploy
+
+  Scenario: Distinguir baseline de lista vazia conhecida
+    Given uma cópia sem Git com manifests preexistentes
+    When o monitor roda sem lista de alterações
+    Then ele retorna baseline com diagnóstico e recuperação
+    And uma lista explicitamente vazia retorna current
+
+  Scenario: Compartilhar declarações entre spec e findings
+    Given requisitos em negrito com dois pontos ou travessão e tarefas na seção 14
+    Then os gates de spec e findings reconhecem as mesmas declarações
+    And uma referência de finding a uma tarefa ausente é rejeitada
+
+  Scenario: Mapear o menu na seção de navegação
+    Given uma spec com menu e rótulo na seção de navegação
+    Then o destino declarado na mesma seção satisfaz o contrato
+    And um destino em outra seção não satisfaz o contrato

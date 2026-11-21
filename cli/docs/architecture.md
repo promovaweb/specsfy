@@ -17,7 +17,8 @@ src/
     overview.ts           leitura do projeto: specs, progresso, backlog e inbox
   domain/
     lifecycle.ts          pastas de estado, transições e scanners de spec
-    progress.ts           progresso, gates e resumo das specs
+    progress.ts           progresso, gates e leitura das tarefas
+    red-tasks.ts          seleção de teste TDD com Plan Gate pendente
     backlog.ts            itens de specs/backlog/
     inbox.ts              capturas de specs/inbox/
     installer.ts          instalação das skills, .specsfy/ e blocos gerenciados
@@ -33,6 +34,7 @@ src/
   engine/
     script-command.ts     ScriptCommandDef, toCommand e registerScriptTools
     runner.ts             materializa skills/ e executa os scripts .mjs
+    verify-spec.ts        checagens de política para a spec selecionada
     skills.gen.ts         árvore de ../skills/ embutida (gerada)
   cli/
     index.ts              runCli(argv): parse, options globais, envelope JSON
@@ -119,8 +121,13 @@ Comandos nativos como `specialists suggest` usam `NativeProjectCommandDef`.
 O mesmo adaptador gera argumentos, opções e schema MCP, e chama a função
 de execução nativa após resolver o projeto. O filtro de stack fica nessa
 função: o especialista de tecnologia só é sugerido quando o catálogo ou o
-`.specsfy/STACK.md` confirma a tecnologia, e o declarado na spec aparece
-sempre.
+`.specsfy/STACK.md` confirma a tecnologia, e uma declaração do mesmo modo permite sugerir o par. A análise preserva
+os números das linhas do Markdown e agrupa as ocorrências pelo par nome e modo.
+
+`verify` sem filtro usa a política de projeto de `verify_repo.mjs`. Com
+`--spec`, o CLI resolve a spec antes de executar os scripts de validação
+aplicáveis ao seu estado. A seleção por estado é coberta pelos testes de
+política, e cada script recebe a mesma raiz e os mesmos argumentos de gate.
 
 ## Fluxo de execução
 

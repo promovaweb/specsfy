@@ -186,3 +186,16 @@ test('Contrato CRUD vincula cada controle afirmativo à tarefa de interface da s
   const unnumbered = crudSpec('criar', positive, ui).replace('### 14. Tarefas', '### Tarefas');
   assert.deepEqual(validate(root, unnumbered).filter(error => error.includes('Contrato CRUD')), []);
 });
+
+test('mapeamento do menu exige rótulo e destino de navegação na própria seção', t => {
+  const root = temporary(t);
+  const menuError = 'Interface para pessoas: Menus e navegação principal precisa mapear menus, itens e destinos, ou declarar por que não há menu.';
+  const withMenu = menu => interfaceSpec(fixtures.complete.replace(/- O menu principal tem[^\n]+/, menu));
+  for (const mapping of [
+    '- **Menu**: AppSidebar — **Rótulo**: Cupons — **Destino**: `/equipes/{equipe}/cupons`.',
+    '- Adicionar item Cupons ao AppSidebar — `/equipes/{equipe}/cupons`.',
+  ]) {
+    assert.ok(!validate(root, withMenu(mapping)).includes(menuError), mapping);
+  }
+  assert.ok(validate(root, withMenu('- O menu principal tem o item Cupons.\n\n#### Outra seção\n\n- Destino: /cupons.')).includes(menuError));
+});

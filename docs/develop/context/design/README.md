@@ -52,7 +52,11 @@ macro.
 - A seção 10 da spec declara as operações incluídas em `Operações`.
   Quando listagem e detalhe estiverem no escopo, a linha de `DataGrid` abre o
   detalhe por clique e teclado. Controles internos ficam acima do link.
-  `Editar` e `Apagar` são ações independentes quando declaradas.
+  `Editar` e `Apagar` são ações independentes quando declaradas. Em
+  `listar, criar`, a grade tem linhas informativas e entrada de criação.
+- O inventário de `INTERFACE.md` comprova uma composição existente com
+  arquivo e uso observados. A política de composições gratuitas ReUI pode
+  orientar uma seleção futura enquanto o item está pendente em `STACK.md`.
 - Todas as telas exibem `Breadcrumb` com a equipe ativa, o módulo e a tela
   atual. Em Laravel, a implementação existente do layout é reaproveitada.
 - Detalhes usam `PageHeader` e `DetailLists`.

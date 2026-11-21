@@ -5,7 +5,7 @@ use App\Models\Team;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 
-// SPECSFY: FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-001
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-001
 test('authenticated people can inspect a user profile without receiving email', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
     $target = User::factory()->unverified()->create([
@@ -36,6 +36,7 @@ test('authenticated people can inspect a user profile without receiving email', 
         );
 });
 
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-002
 test('user profile presents an explicit empty team list', function () {
     $viewer = User::factory()->create(['name' => 'Viewer']);
     $target = User::factory()->create(['name' => 'User Without Teams']);
@@ -46,10 +47,40 @@ test('user profile presents an explicit empty team list', function () {
         ->get(route('directory.users.show', $target))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->has('user.teams', 0),
+            ->component('directory/users/show')
+            ->where('user.name', $target->name)
+            ->where('user.isVerified', true)
+            ->where('user.joinedAt', $target->created_at->toDateString())
+            ->has('user.teams', 0)
+            ->missing('user.email'),
         );
 });
 
+// SPECSFY: US-001 FR-001 FR-002 FR-003 NFR-001 NFR-002 AC-003
+test('the profile shows the personal team and its owner role', function () {
+    $viewer = User::factory()->create();
+    $target = User::factory()->create();
+    $team = $target->personalTeam();
+
+    $this
+        ->actingAs($viewer)
+        ->get(route('directory.users.show', $target))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('directory/users/show')
+            ->where('user.name', $target->name)
+            ->where('user.isVerified', true)
+            ->where('user.joinedAt', $target->created_at->toDateString())
+            ->has('user.teams', 1)
+            ->where('user.teams.0.name', $team->name)
+            ->where('user.teams.0.isPersonal', true)
+            ->where('user.teams.0.role', TeamRole::Owner->value)
+            ->where('user.teams.0.roleLabel', TeamRole::Owner->label())
+            ->missing('user.email'),
+        );
+});
+
+// SPECSFY: US-001 FR-001 AC-001
 test('user profile requires authentication', function () {
     $target = User::factory()->create();
 
@@ -58,6 +89,7 @@ test('user profile requires authentication', function () {
         ->assertRedirect(route('login'));
 });
 
+// SPECSFY: US-001 FR-001 AC-001
 test('missing user profiles return not found', function () {
     $viewer = User::factory()->create();
 

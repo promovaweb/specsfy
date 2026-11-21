@@ -59,15 +59,15 @@ Conteúdo extenso, padrões externos e matrizes de decisão ficam em
 `references/`, com indicação explícita de quando devem ser lidos.
 
 As skills base selecionam especialistas pelos sinais da demanda, da spec e
-do código. As referências de cada fase incluem a mesma tabela para uso em
-instalações independentes. O
+do código. Cada fase distribui a mesma tabela em sua referência. O
 [contrato de especialistas no fluxo](../../skills/tests/specialist-flow.test.mjs)
 confere a paridade das tabelas com o catálogo e os modos dos especialistas.
+Em `No Specsfy`, **Fonte de entrada por fase** precede a leitura da spec.
 
 O [template da spec](../../skills/templates/Spec.md) armazena os nomes curtos
-no cabeçalho e associa modo, sinal e fases na seção 8. A seção 14 registra
-cada `Especialista:` como item sem checkbox, entre a linha da tarefa e seu
-checklist, preservando a seleção da próxima tarefa e a contagem dos seis
+no cabeçalho e associa modo, sinal e fases na seção 8. A fase 05 escreve a
+seção 14 e registra cada `Especialista:` sem checkbox, entre a tarefa e seu
+checklist. Isso preserva a seleção da próxima tarefa e a contagem dos seis
 itens canônicos.
 
 Scripts automatizam transformações determinísticas. Eles retornam códigos úteis,
@@ -376,8 +376,17 @@ exigido. Testes de regressão pós-código ficam fora dessa contagem.
 Os scripts que leem evidências encontram a raiz pelo marcador `.specsfy/` ou
 pelo diretório `specs/` que contém a spec. Em um layout exportado, os scripts
 de tarefas e de findings aceitam raiz explícita com `--project` e `--root`,
-respectivamente. O monitor recebe `--paths` quando a lista de mudanças vem
-de uma cópia sem Git.
+respectivamente. O monitor informa `source` como `git`, `paths` ou
+`baseline`. Em uma cópia sem Git e sem lista, `status: baseline` inclui
+diagnóstico e recuperação e preserva a estrutura das listas `changed_paths`
+e `pending`. `--check` falha por pendências detectadas. A comparação pode ser
+retomada com `--paths`; a lista vazia conhecida passa com `--paths '[]'`.
+
+`validate_spec.mjs` e `review_findings.mjs` leem as mesmas declarações de IDs.
+Requisitos aceitam dois pontos e travessão após o ID, inclusive em negrito.
+O Definition Gate verifica a reserva do ID do Contrato CRUD. Quando existem
+tarefas ou o plano está aprovado, o ID precisa apontar para a tarefa `[CODE]`
+da seção 14 que implementa o controle.
 
 O validador verifica frontmatter, nome, metadata e estrutura. Testes focais
 devem verificar o comportamento específico. Validação estrutural não prova a

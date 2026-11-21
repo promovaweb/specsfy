@@ -13,10 +13,15 @@ Especialistas de tecnologia (`postgres`, `supabase`, `redis`, `laravel`, `react`
 | --- | --- | --- |
 | Login, autorização, dado sensível ou entrada externa | `application-security` | `padrão` |
 | Papel por equipe, dono do recurso ou isolamento entre tenants | `application-security` | `padrão` |
+| Permissão por papel e operação na equipe | `application-security` | `padrão` |
 | Nova tabela, migration, entidades persistidas ou cardinalidade | `modeling` | `data` |
 | Domínio, vocabulário, invariantes e transições de negócio | `modeling` | `domain` |
 | Janela de validade, vencimento ou vigência | `modeling` | `domain` |
-| Cota, contador, saldo ou resgate concorrente | `modeling` | `data` |
+| Validade por data civil com relógio controlado, fuso e inclusão do último dia | `modeling` | `domain` |
+| Limite de uso configurado ou cota persistida | `modeling` | `data` |
+| Consumo de limite ou resgate concorrente com regra de negócio | `modeling` | `domain` |
+| Consumo de limite ou resgate concorrente com atualização atômica | `modeling` | `data` |
+| Unicidade normalizada por equipe | `modeling` | `data` |
 | Valor monetário, percentual ou desconto | `modeling` | `domain` |
 | Schema, migration, índice ou concorrência com PostgreSQL confirmado no STACK.md | `postgres` | `padrão` |
 | Supabase confirmado no STACK.md: migration, Auth, RLS, Storage, Realtime ou Edge Functions | `supabase` | `padrão` |
@@ -69,7 +74,8 @@ Especialistas de tecnologia (`postgres`, `supabase`, `redis`, `laravel`, `react`
 | Instalar ou operar n8n em Docker, queue mode ou variáveis de ambiente | `n8n` | `self-hosting` |
 | Webhook ou API do n8n como contrato com o sistema | `n8n` | `integration` |
 | Teste Pest ou PHPUnit, factory, dataset ou banco de teste em Laravel | `testing` | `pest` |
-| Teste E2E, navegador, locator ou trace | `testing` | `playwright` |
+| Validade por data civil com relógio controlado em testes Laravel | `testing` | `pest` |
+| Teste automatizado de navegador com stack compatível ou decisão explícita de instalar Playwright | `testing` | `playwright` |
 | Teste unitário ou de componente em TypeScript ou React | `testing` | `vitest` |
 | Servidor MCP, tool, resource ou prompt MCP por HTTP | `mcp` | `protocol` |
 | Descoberta OAuth do servidor MCP (RFC 9728) | `mcp` | `protocol` |

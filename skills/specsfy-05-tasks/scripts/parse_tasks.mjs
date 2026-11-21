@@ -36,13 +36,47 @@ export function parseTasks(text) {
 
 /** Lê tarefas e checklists da seção 14 para os gates de spec e de tarefas. */
 function taskSection(text) {
-  const lines = text.split(/\r?\n/);
+  const lines = Array.from(specLines(text), ({ line }) => line);
   const start = lines.findIndex((line) => /^#{1,6}\s+(?:14\.\s+)?Tarefas\s*$/i.test(line));
   if (start < 0) return null;
   const level = lines[start].match(/^#+/)[0].length;
   const closingHeading = new RegExp(`^#{1,${level}}\\s`);
   const end = lines.findIndex((line, index) => index > start && closingHeading.test(line));
   return { lines: lines.slice(start + 1, end < 0 ? undefined : end), start };
+}
+
+function* specLines(text) {
+  let fence;
+  let index = 0;
+  for (const raw of text.split("\n")) {
+    const line = raw.replace(/\r$/u, "");
+    const delimiter = /^ {0,3}(`{3,}|~{3,})(.*)$/u.exec(line);
+    if (delimiter) {
+      const [, marker, remainder] = delimiter;
+      if (!fence) fence = marker;
+      else if (marker[0] === fence[0] && marker.length >= fence.length && !remainder.trim()) fence = undefined;
+    }
+    yield { line: fence || delimiter ? "" : line, index };
+    index += raw.length + 1;
+  }
+}
+
+/** Lê declarações Markdown, sem contar menções em referências ou exemplos cercados. */
+export function parseSpecIds(text, tasks = parseGateTasks(text)) {
+  const declarations = new Map();
+  const heading = /^ {0,3}####[ \t]+((?:US|AC)-\d{3,})\b/u;
+  const requirement = /^ {0,3}(?:[-*+][ \t]+)?(?:((?:N?FR|DEC)-\d{3,})[ \t]*[:—–-]|\*\*((?:N?FR|DEC)-\d{3,})(?:\*\*[ \t]*[:—–-]|[ \t]*[:—–-]\*\*))/u;
+  for (const { line, index } of specLines(text)) {
+    const row = requirement.exec(line);
+    const id = heading.exec(line)?.[1] ?? row?.[1] ?? row?.[2];
+    if (id && !declarations.has(id)) declarations.set(id, { index });
+  }
+  for (const task of tasks) declarations.set(task.id, { line: task.line });
+  return declarations;
+}
+
+export function specReferences(text) {
+  return new Set(text.match(/\b(?:(?:US|N?FR|AC)-\d{3,}|T\d{3,})\b/gu));
 }
 
 export function parseGateTasks(text, errors = []) {

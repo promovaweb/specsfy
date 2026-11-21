@@ -58,6 +58,16 @@ describe("gate tools", () => {
     expect((run.structuredContent as { result: { result: string } }).result.result).toBe("passed");
   });
 
+  test("verify accepts a spec scope over MCP", async () => {
+    const root = projectWithSpec(validSpec());
+    cleanup.push(root);
+    const run = await client.callTool({ name: "verify", arguments: { spec: "0001", project: root } });
+    expect(run.isError).toBe(false);
+    expect(run.structuredContent).toMatchObject({
+      result: { spec: "specs/specs/0001-lista/spec.md", checks: [{ name: "spec:0001-lista", status: "passed" }] },
+    });
+  });
+
   test("project_test without a runner returns NOT_FOUND", async () => {
     const root = temporary("specsfy-gates-mcp-empty-");
     cleanup.push(root);

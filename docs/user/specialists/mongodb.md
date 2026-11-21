@@ -26,10 +26,18 @@ restauração testada.
 - Você precisa atualizar versão com `setFeatureCompatibilityVersion` controlado.
 
 O agente confirma versão, topologia e volume por coleção antes de recomendar.
-Standalone não aceita transação multi-documento, e `mongos` muda o plano, então a
-topologia faz parte da resposta.
+Na resposta de `hello`, `msg: "isdbgrid"` identifica um roteador `mongos`
+e `setName` identifica o replica set de um membro. Instâncias standalone não
+aceitam transações multi-documento. MongoDB 9.0 está disponível no Atlas Core.
+A edição Atlas Infinite, que também roda a linha 9.x, está em prévia pública.
 
-## Como ele trabalha
+## No Specsfy
+
+O especialista lê a spec e a tarefa indicadas pela fase. A fase registra a
+conclusão, as dúvidas e as evidências na spec. A criação e a decomposição
+das tarefas da seção 14 cabem a `specsfy-05-tasks`.
+
+## Fluxo
 
 1. Descobre versão, topologia, volume, tamanho médio do documento e as consultas
    reais com a frequência de cada uma.
@@ -41,8 +49,8 @@ topologia faz parte da resposta.
    representativa.
 5. Define write concern e read concern por operação crítica, com a consequência
    de durabilidade e latência declarada.
-6. Entrega o texto para a spec com o índice, o validador e o procedimento de
-   restauração.
+6. Entrega à fase chamadora o índice, o validador e o procedimento de
+   restauração para registro na spec.
 
 ## Modelagem
 
@@ -60,8 +68,11 @@ O modo Modeling define o formato que o banco carrega.
 - `additionalProperties: false` impede campo novo sem revisão.
 - `schemaVersion` no documento permite conviver com duas versões durante a
   migração.
-- Validador rejeita documento novo; não corrige o antigo. Faça backfill antes de
-  endurecer a regra.
+- Faça backfill em lotes limitados e preserve valores já preenchidos.
+  Endureça o validador depois de medir a conformidade dos documentos legados.
+- Unique simples permite uma única chave nula, compartilhada entre campo
+  ausente e `null`. Use validador para campo obrigatório ou índice unique
+  parcial para restringir a unicidade a valores do tipo escolhido.
 
 As tabelas de decisão, o exemplo de bucket e o passo a passo de evolução estão
 em
@@ -71,21 +82,24 @@ em
 
 O modo Queries parte do plano real.
 
-- `explain("executionStats")` na consulta real. `totalDocsExamined` próximo de
-  `nReturned` indica índice seletivo.
+- Rode `explain("executionStats")` na consulta real. Leia a árvore do plano,
+  inclusive `winningPlan.queryPlan` quando o motor SBE o retornar. Compare
+  chaves e documentos examinados com a quantidade devolvida.
 - `COLLSCAN` em coleção grande com filtro seletivo é índice ausente ou
   inaplicável.
-- `SORT` no plano é ordenação em memória. Índice na ordem do `sort` elimina o
-  estágio.
+- `SORT` indica ordenação explícita. Um índice composto pode fornecer a
+  ordem do `sort` no mesmo sentido ou com todos os sentidos invertidos.
 - Composto segue equality, sort, range. O prefixo mais à esquerda atende a
   consulta.
-- Índice parcial só serve quando a consulta inclui o mesmo predicado.
+- O índice parcial pode atender consultas cujo predicado implica seu filtro,
+  inclusive consultas mais restritivas. O TTL remove documentos em segundo
+  plano, sem prazo máximo garantido.
 - Multikey em array grande custa memória e escrita, e um composto com dois arrays
   é recusado.
-- `$match` e `$project` cedo no pipeline usam índice e reduzem documento
-  carregado.
-- `$lookup` exige índice na coleção estrangeira. `allowDiskUse` evita erro, mas
-  esconde pipeline que deveria ser reescrito.
+- `$match` no início pode usar índice. Use `$project` para definir a saída,
+  pois o otimizador normalmente já elimina campos dispensáveis.
+- Índice no campo estrangeiro favorece a junção de igualdade com `$lookup`.
+  Teste o pipeline com dados representativos e confira o uso de memória.
 
 A matriz de tipos de índice, os exemplos de pipeline e o diagnóstico de índice
 ignorado estão em
@@ -97,26 +111,39 @@ O modo Operação define como o conjunto volta depois de uma falha.
 
 - Replica set de produção tem três membros com dado, em host ou zona distinta.
 - Arbiter sustenta quorum e não protege dado.
-- Driver com `retryWrites=true` e URI com todos os membros trata eleição sem
-  erro para o usuário.
-- `w: "majority"` em operação financeira ou de auditoria. `w: 1` pode desaparecer
-  em failover.
-- `mongodump --oplog` serve base pequena e restauração pontual. Snapshot de
-  volume serve base grande.
-- `fsyncLock` bloqueia escrita apenas durante o snapshot, não durante a cópia.
-- Ponto no tempo depende de oplog retido por mais tempo que a janela declarada
-  de recuperação.
+- Dê ao cliente seeds alcançáveis e confira se ele resolve os nomes anunciados
+  pelo replica set. `retryWrites=true` cobre escritas elegíveis e ainda pode
+  devolver erro durante a eleição.
+- Escolha a consistência por operação. A proteção de `w: "majority"`
+  depende da maioria calculada e da persistência do conjunto. Um timeout
+  pode ocorrer mesmo se a escrita tiver sido aplicada.
+- `mongodump --oplog --gzip` exige dump completo de replica set, sem banco
+  no caminho do URI. Restaure em destino isolado com `--oplogReplay --gzip`.
+  Para migrar uma coleção, faça dump filtrado sem `--oplog`. Clusters
+  sharded exigem backup coordenado.
+- Capture dados e journal juntos no snapshot. Se usar `fsyncLock`,
+  garanta a liberação do lock mesmo se o snapshot falhar.
+- Para recuperar um ponto no tempo, combine uma base consistente anterior ao
+  alvo com oplog contínuo até o corte. No Atlas, use Continuous Cloud Backup
+  com retenção suficiente e valide a recuperação em destino isolado.
 - Transação recebe `session` em cada operação e cabe no limite de tempo e de
   oplog.
 - Autenticação, TLS e role por aplicação em qualquer ambiente compartilhado.
-- Upgrade atualiza secundário, depois primário, e só então sobe a
-  `featureCompatibilityVersion`.
+- No upgrade rolling, atualize os secundários primeiro, provoque nova
+  eleição e atualize o antigo primário. Mantenha a FCV anterior durante
+  a observação e confira as condições de downgrade antes de mudar a FCV.
 
 Os comandos de réplica, backup, transação, segurança, upgrade e monitoramento
 estão em
 [operation.md](../../../specialists/specsfy-specialist-mongodb/references/operation.md).
 
-## Erros que ele evita
+## Padrões
+
+- Modele documentos pelo acesso e declare o limite de crescimento dos arrays.
+- Confirme cada índice com o plano da consulta que o motivou.
+- Teste restauração e eleição antes de assumir a janela de recuperação.
+
+## Antipadrões
 
 - Array sem limite dentro do documento principal.
 - `$lookup` no caminho quente para reconstruir relação que deveria ser embutida.
@@ -129,13 +156,15 @@ estão em
 - Snapshot sem oplog tratado como recuperação pontual.
 - `mongorestore --drop` em ambiente compartilhado sem confirmação.
 
-## Como conferir o resultado
+## Validação
 
 - `explain("executionStats")` antes e depois, com contagens e tempo anexados.
-- `getIndexes()` e `$indexStats` confirmando índice usado.
+- `getIndexes()` para conferir os índices existentes e `accesses.ops`
+  de `$indexStats` para medir o uso.
 - Documento fora do contrato rejeitado pelo validador, com o erro esperado.
 - `$bsonSize` medindo tamanho médio e máximo do documento.
-- Teste de eleição com reconexão da aplicação e nenhuma perda em `majority`.
+- Teste de eleição com tempo de reconexão, conferência dos dados confirmados
+  e tratamento de timeouts com resultado ambíguo.
 - Restauração cronometrada com contagem por coleção.
 - Transação abortada desfazendo todas as operações do mesmo `session`.
 
@@ -146,7 +175,7 @@ npx skills add https://github.com/promovaweb/specsfy \
   --skill specsfy-specialist-mongodb --agent universal --copy --full-depth
 ```
 
-## Especialistas relacionados
+## Skills relacionadas
 
 - [Modelagem](modeling.md) decide agregado e invariante antes do formato.
 - [Arquitetura](architecture.md) define o contrato HTTP que o documento

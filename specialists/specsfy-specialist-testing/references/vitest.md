@@ -2,13 +2,27 @@
 
 ## Configuração
 
+Para reproduzir os exemplos em React, confirme no lockfile `react`, `react-dom`
+e as dependências de desenvolvimento `vite`, `@vitejs/plugin-react`, `vitest`,
+`jsdom`, `@testing-library/react`, `@testing-library/dom`,
+`@testing-library/jest-dom`, `@testing-library/user-event` e `msw` (receita de
+rede). Use uma versão de `jsdom` compatível com o Node do projeto. Instale
+`@vitest/coverage-v8` na mesma versão do Vitest para a receita de cobertura.
+
+Se o projeto já tem Vite, adicione o bloco `test` à configuração existente.
+Este arquivo mostra uma configuração única com a transformação JSX do plugin
+React:
+
 ```ts
-// vitest.config.ts
+// vite.config.ts
+import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  plugins: [react()],
   test: {
-    environment: 'jsdom',
+    globals: false,
+    environment: 'node',
     setupFiles: ['./tests/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     coverage: { provider: 'v8', reporter: ['text', 'html'] },
@@ -17,24 +31,50 @@ export default defineConfig({
 });
 ```
 
-- Vitest lê `vite.config.*` por padrão. Configuração separada serve quando o teste
-  precisa de ambiente diferente do build.
-- `environment: 'jsdom'` ou `'happy-dom'` para componente. Função pura não precisa
-  de DOM e roda mais rápido em `node`.
-- `restoreMocks: true` evita mock vazando entre testes.
-- `setupFiles` registra matcher de DOM e limpeza global.
-- `projects` (ou workspace) separa unidade, componente e integração com
-  configuração própria.
+```ts
+// tests/setup.ts
+import '@testing-library/jest-dom/vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach } from 'vitest';
+
+afterEach(cleanup);
+```
+
+Se precisar de um arquivo separado, `vitest.config.ts` tem precedência.
+Use `mergeConfig` para manter plugins e aliases. Para um `vite.config.ts`
+que exporta um objeto, a combinação fica assim:
+
+```ts
+// vitest.config.ts
+import { defineConfig, mergeConfig } from 'vitest/config';
+import viteConfig from './vite.config.ts';
+
+export default mergeConfig(viteConfig, defineConfig({
+  test: { testTimeout: 10_000 },
+}));
+```
+
+Os arquivos do exemplo usam ESM. Se o TypeScript verificar a configuração,
+habilite `allowImportingTsExtensions` em um tsconfig com `noEmit`. Para um
+Vite config que exporta função, avalie essa função com o ambiente recebido
+pelo callback de `defineConfig` antes de chamar `mergeConfig`.
+Use `node` para função pura, `jsdom` para os exemplos de componente e
+`projects` em Vitest 5.x quando a suíte precisar de configurações por grupo.
+Com `globals: false`, importe os hooks e APIs de teste em cada arquivo.
+
+Depois de obter `SAFE` para cada execução no modo `tests`:
 
 ```bash
-npx vitest
 npx vitest run
-npx vitest run src/order.test.ts
-npx vitest run -t "rejeita pedido sem cliente"
+npx vitest run src/total.test.ts
+npx vitest run -t 'aplica desconto percentual sobre o total'
 npx vitest run --coverage
 ```
 
 ## Unidade
+
+O exemplo em `src/total.test.ts` usa a função `withDiscount` do projeto,
+que aplica desconto percentual em centavos e rejeita taxa fora de 0 a 100.
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -55,21 +95,26 @@ describe('withDiscount', () => {
 - `toBe` compara valor primitivo; `toEqual` compara estrutura; `toStrictEqual`
   compara tipo e campo indefinido.
 - `toThrow` verifica exceção. Teste que só espera "não lançar" não prova regra.
-- `test.each` cobre matriz de entrada sem repetir corpo:
+- `it.each` cobre matriz de entrada sem repetir corpo. No mesmo arquivo:
 
 ```ts
 it.each([
   [0, 0],
-  [100, 10],
-  [-1, null],
-])('calcula desconto de %i', (total, expected) => {
+  [100, 90],
+  [10000, 9000],
+])('calcula o total com desconto para %i centavos', (total, expected) => {
   expect(withDiscount(total, 10)).toBe(expected);
 });
 ```
 
 ## Componente
 
+O exemplo em `src/OrderForm.test.tsx` usa um formulário com o campo `Total`
+e o botão `Salvar`. O formulário chama `onSubmit` com o total em centavos.
+Declare `jsdom` no início do arquivo.
+
 ```tsx
+// @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -99,8 +144,7 @@ describe('OrderForm', () => {
 - `screen.debug()` imprime a árvore quando o seletor não encontra.
 - Matcher de DOM (`toBeInTheDocument`, `toHaveValue`) vem de
   `@testing-library/jest-dom`, registrado no `setupFiles`.
-- `cleanup` é automático no Testing Library moderno; chamada manual só quando o
-  setup desliga a limpeza.
+- Com globals desativados, registre `afterEach(cleanup)` como no setup acima.
 
 ## Mock
 
@@ -112,59 +156,107 @@ vi.mock('./mailer', () => ({
 }));
 ```
 
-- `vi.mock` é içado e substitui módulo inteiro. Prefira dependência injetada
+- Use o bloco no teste do módulo que importa `./mailer`. A chamada
+  `vi.mock` é içada e substitui o módulo inteiro. Prefira dependência injetada
   quando o desenho permite.
 - `vi.fn()` cria dublê; `mockResolvedValue` e `mockRejectedValue` cobrem
   caminho assíncrono.
 - `vi.spyOn(objeto, 'método')` observa sem substituir o módulo.
 - Mock do próprio módulo sob teste invalida o teste: ele prova que o mock foi
   chamado.
-- `vi.clearAllMocks`, `clearMocks` e `restoreMocks` definem o que acontece antes
-  de cada teste. Escolha um e registre na configuração.
+- `vi.clearAllMocks()` e `clearMocks` limpam histórico e preservam a
+  implementação.
+- `vi.resetAllMocks()` e `mockReset` limpam histórico e reiniciam a
+  implementação conforme o tipo de mock. Reconfigure respostas de dublês que
+  o teste ainda usa.
+- `vi.restoreAllMocks()` e `restoreMocks` restauram implementações originais
+  de spies criados com `vi.spyOn`. Para automocks e `vi.fn()` de módulos
+  mockados, limpe ou reinicie explicitamente o dublê conforme o caso.
 
 ## Tempo
 
-```ts
-import { afterEach, beforeEach, vi } from 'vitest';
+Exemplo completo de timer falso combinado com interação assíncrona no Testing
+Library:
+
+```tsx
+// @vitest-environment jsdom
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { useState } from 'react';
+
+function ExpirationButton() {
+  const [expired, setExpired] = useState(false);
+
+  return (
+    <>
+      <button onClick={() => setTimeout(() => setExpired(true), 30_000)}>
+        Iniciar sessão
+      </button>
+      {expired && <p role="status">Sessão expirada</p>}
+    </>
+  );
+}
 
 beforeEach(() => vi.useFakeTimers());
-afterEach(() => vi.useRealTimers());
+afterEach(() => {
+  vi.runOnlyPendingTimers();
+  vi.useRealTimers();
+});
 
-it('expira sessão depois de 30 minutos', () => {
-  const session = createSession();
-  vi.advanceTimersByTime(30 * 60 * 1000);
-  expect(session.isExpired()).toBe(true);
+it('expira sessão depois de 30 segundos', async () => {
+  const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  render(<ExpirationButton />);
+
+  const click = user.click(screen.getByRole('button', { name: 'Iniciar sessão' }));
+  // Execute o timer de finalização da Testing Library antes de aguardar o clique.
+  await vi.advanceTimersByTimeAsync(1);
+  await click;
+  expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+  await act(async () => { await vi.advanceTimersByTimeAsync(30_000); });
+  expect(screen.getByRole('status')).toHaveTextContent('Sessão expirada');
 });
 ```
 
-- `useFakeTimers` controla `setTimeout`, `Date` e `performance` conforme a versão.
-- `advanceTimersByTime` avança de forma síncrona; `runAllTimersAsync` quando a
-  continuação é Promise.
-- Timer falso e `userEvent` exigem configuração de avanço. Interação de usuário
-  com timer falso sem ajuste trava o teste.
-- Teste que depende de relógio real falha em fuso e em horário de verão.
+- `useFakeTimers` controla o tempo simulado dentro do teste. Passe
+  `advanceTimers` ao `userEvent.setup` para que a interação possa avançar.
+- Para timers que agendam Promises, use a variante assíncrona de avanço. Para
+  atualizações de React disparadas pelo timer, envolva o avanço em `act`.
 
 ## Rede
+Esta receita usa MSW 3.x. Em projetos com MSW 2.x, a opção equivalente em
+`server.listen()` se chama `onUnhandledRequest`.
 
 ```ts
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
+import { afterAll, afterEach, beforeAll, expect, it } from 'vitest';
 
 const server = setupServer(
-  http.get('/api/orders', () => HttpResponse.json([{ id: 42 }]))
+  http.get('https://shop.example.test/api/orders', () =>
+    HttpResponse.json([{ id: 42 }])
+  ),
 );
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+beforeAll(() => server.listen({ onUnhandledFrame: 'error' }));
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
+
+it('recebe a lista de pedidos da resposta simulada', async () => {
+  const response = await fetch('https://shop.example.test/api/orders');
+  expect(await response.json()).toEqual([{ id: 42 }]);
+});
 ```
 
 - MSW intercepta no nível de rede, sem substituir o cliente HTTP do código.
-- `onUnhandledRequest: 'error'` revela requisição não prevista, que passaria
+- `onUnhandledFrame: 'error'` revela requisição não prevista, que passaria
   silenciosamente.
 - `server.use()` sobrescreve handler no caso específico e volta ao padrão no
   `resetHandlers`.
-- Teste de contrato confere método, caminho, cabeçalho e corpo enviados.
+- Para provar o comportamento do seu cliente, chame o cliente no teste e
+  confira método, caminho, cabeçalhos e corpo no handler. Integração com o
+  provedor exige a fronteira real no ambiente de teste previsto.
 - `vi.mock` de módulo é mais simples para função pura de transformação; MSW é mais
   fiel para cliente HTTP.
 
@@ -172,7 +264,7 @@ afterAll(() => server.close());
 
 ```bash
 npx vitest run --coverage
-npx vitest run --coverage.include 'src/order/**'
+npx vitest run --coverage --coverage.include 'src/total.ts'
 npx vitest run --shard=1/3
 ```
 
@@ -189,8 +281,18 @@ npx vitest run --shard=1/3
 | --- | --- | --- |
 | `not wrapped in act` | Atualização de estado fora de ato | Use `findBy*` ou `waitFor` |
 | Elemento não encontrado | Consulta por classe ou texto quebrado | Consulte por papel e rótulo |
-| Teste passa sozinho e falha na suíte | Mock ou estado global vazando | `restoreMocks` e limpeza |
+| Teste passa sozinho e falha na suíte | Mock ou estado global vazando | Limpe histórico, reinicie dublês ou restaure spies conforme a causa |
 | `Cannot find module` em CSS ou asset | Transformação não configurada | Ajuste `test.alias` ou `deps` |
 | timer falso trava interação | `userEvent` sem avanço de timer | Configure `advanceTimers` |
 | Cobertura baixa em componente | Caminho de erro não testado | Cubra erro e vazio |
 | Falso positivo de acessibilidade | `jsdom` não calcula layout | Rode browser mode ou teste E2E |
+
+
+Fontes: [configuração](https://vitest.dev/config/),
+[projects](https://vitest.dev/guide/projects),
+[clearMocks](https://vitest.dev/config/clearmocks),
+[mockReset](https://vitest.dev/config/mockreset),
+[restoreMocks](https://vitest.dev/config/restoremocks),
+[cleanup](https://testing-library.com/docs/react-testing-library/setup/#auto-cleanup-in-vitest)
+[advanceTimers](https://testing-library.com/docs/user-event/options/#advancetimers)
+e [migração do MSW 3](https://mswjs.io/docs/migrations/2.x-to-3.x).

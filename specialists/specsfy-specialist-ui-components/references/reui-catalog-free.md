@@ -27,9 +27,11 @@ Se a necessidade não aparecer nesse mapa, pesquise o catálogo antes de criar
 um componente manual. O resultado final preserva o fluxo e as convenções do
 sistema atual.
 
-Para o Data Grid, escolha a variante que permita link de detalhe na linha inteira
-com equivalente de teclado. Registre como ações internas, seleção e menus ficam
-acima dessa área sem propagar a navegação.
+Quando `consultar` constar no Contrato CRUD, escolha uma variante de Data Grid
+que use a linha inteira como link para o detalhe, com equivalente de teclado.
+Registre como ações internas, seleção e menus operam sem propagar a navegação.
+Sem `consultar`, escolha uma grade com linhas informativas e foco nos
+controles disponíveis.
 
 O `Breadcrumb` pertence ao shell de toda tela. Em Laravel, procure o componente
 shadcn/ui ou a composição existente no layout antes de instalar ou criar outro;

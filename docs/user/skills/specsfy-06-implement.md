@@ -73,6 +73,16 @@ RED válido: o teste falhou porque a recuperação ainda não foi implementada.
 Caso: TDD-AC-001
 ```
 
+Em Laravel, o teste de aplicação combina `testing/pest + laravel/app`.
+Uma rota nova pode produzir um RED com `404` se o teste alcançou a aplicação
+e a rota ainda não existe. Mantenha a asserção do resultado esperado, como
+`403` para uma pessoa sem permissão. A asserção sobre os registros de uma
+tabela nova roda depois que a migration for aplicada no banco de teste.
+
+Use Playwright para um plano automatizado de navegador com stack compatível,
+ou após decidir explicitamente instalar o runner para o plano. Registre
+a verificação manual de teclado com `interface/accessibility`.
+
 Depois da implementação, a skill repete o teste focal e executa a regressão
 para confirmar que o comportamento ficou GREEN sem quebrar o restante.
 

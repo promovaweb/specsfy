@@ -34,9 +34,10 @@ política do servidor exigir requisição condicional.
   `RateLimit-Remaining` e `RateLimit-Reset` vêm de drafts antigos e não devem
   ser usados em contrato novo.
 
-Modele erros com RFC 9457 usando `type` estável, `title`, `status`, `detail`
-seguro e `instance` quando útil. Extensões carregam código de domínio, campos
-inválidos e correlação; não coloque stack trace, SQL ou segredo.
+Quando o contrato adotar Problem Details (RFC 9457), use `type` estável,
+`title`, `status`, `detail` seguro e `instance` quando útil. Extensões podem
+carregar código de domínio, campos inválidos e correlação. Preserve stack
+trace, SQL e segredos no servidor em qualquer formato de erro.
 
 ## Idempotência e retry
 
@@ -117,14 +118,16 @@ Field com a data em `@<segundos desde a época>`) e, quando houver data de
 desligamento, `Sunset` (RFC 8594, no formato HTTP-date). A data de `Sunset` não
 pode ser anterior à de `Deprecation`, e os dois campos usam formatos de data
 diferentes. `Link: <url>; rel="deprecation"` aponta a documentação da migração,
-inclusive antes de a depreciação começar. Compare OpenAPI estruturalmente e
-rode contract tests de consumidores antes de remover.
+inclusive antes de a depreciação começar. Compare a descrição versionada no
+formato adotado, como OpenAPI, e rode contract tests de consumidores antes
+de remover.
 
 ## Evidência mínima
 
-- OpenAPI 3.2 (ou 3.1 quando o ferramental do projeto ainda não suporta 3.2) e
-  JSON Schemas Draft 2020-12 validam exemplos positivos e negativos;
-- testes cobrem status, headers, Problem Details e limites;
+- quando adotados, OpenAPI 3.2 (ou 3.1 conforme o ferramental) e JSON Schemas
+  Draft 2020-12 validam exemplos positivos e negativos;
+- testes cobrem status, headers, formato de erro e limites do contrato.
+  Inclua Problem Details quando o contrato usar RFC 9457;
 - replay e concorrência provam idempotência;
 - testes cruzados provam isolamento por tenant/recurso;
 - paginação permanece coerente sob mutação;

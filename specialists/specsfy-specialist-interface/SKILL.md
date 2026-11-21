@@ -31,30 +31,34 @@ Não use para:
 
 ## No Specsfy
 
-1. Antes de agir, leia a spec aberta, cujo caminho vem da skill que chamou ou
-   de `specsfy status`. Leia a linha `| Especialistas |` da tabela de
-   metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
-   seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
+1. **Fonte de entrada por fase**
+   - Em `specsfy-02-backlog`, leia o item em `specs/backlog/` e registre ali
+     as decisões e sinais do especialista, além das dúvidas abertas.
+   - Em `specsfy-03-specify` e `specsfy-04-validate`, use a
+     spec aberta e devolva a conclusão à seção trabalhada pela fase.
+   - Em `specsfy-05-tasks`, ajude a sugerir e sincronizar especialistas e modos
+     entre o cabeçalho, a seção 8 e as tarefas. Só essa fase escreve a seção 14.
+   - Em `specsfy-06-implement`, limite-se à tarefa indicada e ao passo carregado.
+
+   Nas fases com spec, leia a spec aberta indicada pela skill chamadora ou
+   localizada por `specsfy status`. Consulte a linha `| Especialistas |`,
+   a subseção `#### Especialistas` em `### 8. Plano técnico` e a seção
+   pertinente à fase.
+   Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, para tela nova ou alterada, `INTERFACE.md`.
-   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
-     registre no item de `specs/backlog/`; em specify e validate, leia a spec
-     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
-     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
-     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
-     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-interface (<modo>)`, com `discovery`,
    `system`, `ux`, `ui` ou `accessibility`. Sem indicação, escolha o modo pelo
    "Quando usar" acima.
-3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
-   escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
-   dúvida aberta da spec.
+3. Devolva a conclusão e as dúvidas abertas no destino indicado no item 1,
+   no próprio backlog, na spec ou na tarefa da fase.
 4. Não mude o estado da spec nem marque gate: isso pertence a
    `$specsfy-03-specify`, `$specsfy-04-validate`, `$specsfy-05-tasks` e
    `$specsfy-06-implement`.
 5. Confirme telas, estados, permissões e testes em `INTERFACE.md` e
-   `DESIGNSYSTEM.MD`, e escreva o resultado na subseção `Views e experiência`
-   da seção 8 antes de qualquer código de componente.
+   `DESIGNSYSTEM.MD`, e, quando a fase trabalhar o plano técnico da spec,
+   registre o resultado na subseção `Views e experiência` antes de escrever
+   código de componente.
 
 ## Fluxo
 
@@ -96,7 +100,7 @@ Não use para:
 4. Na seção 10 da spec, ou no item de `specs/backlog/` quando a spec ainda não
    existe, registre stack observada, cada tela, fluxo, formulário, composição,
    ações, estados, mensagens, retornos, teclado, foco e responsividade. Mapeie
-   lista, detalhe, criação e edição no CRUD.
+   as telas das operações incluídas no Contrato CRUD.
 5. Indique à fase `specsfy-05-tasks` a `Fase de interface`, com uma tarefa por
    tela e testes de navegação, formulários, validação, feedback e teclado, sem
    criar tarefa fora dela. Encaminhe aos modos ux e ui. Em React, carregue
@@ -178,7 +182,9 @@ contraste e uso do shell. A composição deve informar e orientar a tarefa.
   Todas as telas CRUD reutilizam o mesmo `PageHeader`. Use `Breadcrumb` com
   equipe ativa, módulo e tela atual e reaproveite o componente do layout
   Laravel. (regra da casa)
-- Faça a linha abrir o detalhe por clique e teclado com ações independentes.
+- Quando `consultar` constar no Contrato CRUD, faça a linha abrir o detalhe
+  por clique e teclado, com ações independentes. Sem `consultar`, mantenha a
+  linha informativa e deixe o foco nos controles disponíveis.
   Em criar e editar, use seções com contexto e campos em duas colunas largas
   e uma no mobile. Use labels visíveis, erro associado abaixo do campo e
   preservação da entrada.

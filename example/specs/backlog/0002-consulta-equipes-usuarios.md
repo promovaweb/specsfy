@@ -10,7 +10,7 @@
 | Tipo | Funcionalidade |
 | Prioridade | Não priorizado |
 | Criado em | 2026-07-25 |
-| Spec promovida | `specs/specs/0004-diretorio-global-equipes/spec.md` |
+| Spec promovida | `specs/completed/0004-diretorio-global-equipes/spec.md` |
 
 ## Ideia original
 
@@ -106,6 +106,6 @@ composição das equipes e os papéis de seus membros.
 
 ## Próximo passo
 
-Promovido para `specs/specs/0004-diretorio-global-equipes/spec.md` e dividido
+Promovido para `specs/completed/0004-diretorio-global-equipes/spec.md` e dividido
 na fatia complementar
-`specs/specs/0005-detalhe-publico-equipe/spec.md`.
+`specs/completed/0005-detalhe-publico-equipe/spec.md`.

@@ -24,10 +24,9 @@ achado de estilo, mesmo que o estilo seja mais fácil de apontar.
 
 ## Padrão de aprovação
 
-- A revisão aprova quando a mudança melhora a saúde do código do sistema, ainda
-  que não esteja perfeita. Exigir perfeição no diff trava entrega sem reduzir
-  defeito, e o Google Engineering Practices adota explicitamente o critério de
-  saúde do código, não o de preferência do revisor.
+- O Google Engineering Practices recomenda aprovar mudanças que melhoram a
+  saúde do código como um todo, mesmo quando ainda há espaço para melhorias
+  pontuais.
 - Bloqueia o que piora comportamento, segurança, estrutura ou operação. O que
   apenas poderia ser melhor vira comentário com dono e prazo, não bloqueio.
 

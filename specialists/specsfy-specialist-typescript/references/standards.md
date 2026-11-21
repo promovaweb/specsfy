@@ -8,11 +8,14 @@ Revisado em 2026-11-20 contra: TypeScript 7.0 e 7.1 beta (blogs oficiais) e Type
   mudou defaults: `strict: true`, `module: esnext`, `target` na versão estável
   do ECMAScript imediatamente anterior a `esnext`,
   `noUncheckedSideEffectImports: true`, `libReplacement: false`,
-  `stableTypeOrdering: true`, `rootDir: "./"` e `types: []`.
-- TypeScript 7.0 (julho de 2026) é o compilador nativo em Go, de 8 a 12 vezes
-  mais rápido, compatível com a checagem do 6.0 quando o projeto usa
-  `stableTypeOrdering` e não depende de `ignoreDeprecations`. Ele não expõe API
-  pública; typescript-eslint, Volar e loaders que precisam da API continuam no
+  `rootDir: "./"` e `types: []`. Ative `stableTypeOrdering` explicitamente
+  no 6.0 para antecipar a ordenação do 7.0, versão em que a opção fica
+  sempre ligada.
+- TypeScript 7.0 (julho de 2026) é o compilador nativo em Go. A Microsoft
+  relata ganhos típicos de 8 a 12 vezes em builds completos. A checagem
+  é compatível com a do 6.0 quando o projeto usa `stableTypeOrdering` e
+  dispensa `ignoreDeprecations`. O compilador 7.0 ainda não expõe API pública.
+  Typescript-eslint, Volar e loaders que precisam da API continuam no
   6.0, possível em paralelo com `@typescript/typescript6` (`tsc6`) e um alias
   próprio para o binário 7, como `@typescript/native`.
 - TypeScript 7.1 está em beta (outubro de 2026) e deve trazer a nova API.
@@ -84,10 +87,14 @@ validar, não substituir, a inferência.
 - Confirme `"type": "module"` ou `"commonjs"` no `package.json` e a extensão
   de import (`.js` explícito em ESM Node) antes de assumir que uma
   biblioteca resolve igual em todos os targets.
-- A partir do 6.0, `moduleResolution: node`/`node10`/`classic`, `module:
-  amd`/`umd`/`systemjs`/`none`, `baseUrl` e `target: es5` não existem mais;
-  use `bundler` ou `nodenext`, `esnext` ou `preserve`, e `paths` relativo à
-  raiz do projeto.
+- O TypeScript 6.0 depreciou `moduleResolution: node`/`node10`/`classic`,
+  `module: amd`/`umd`/`systemjs`/`none`, `baseUrl` e `target: es5`.
+  `ignoreDeprecations: "6.0"` permite manter essas opções temporariamente.
+  As notas do 6.0 orientam a trocar `baseUrl` como raiz de busca por um
+  mapeamento explícito em `paths`. O compilador 6.0.3 ainda usa `baseUrl`
+  para resolver imports sem caminho relativo com essa compatibilidade ativa.
+  No 7.0, essas opções geram erro. Migre para `bundler` ou `nodenext`, use
+  `esnext` ou `preserve` e configure `paths` em relação ao `tsconfig.json`.
 - Bibliotecas que suportam ESM e CJS devem declarar `exports` com
   condições (`import`/`require`/`types`) coerentes; um `types` apontando para
   o arquivo errado quebra apenas para quem consome via um dos dois formatos.
@@ -132,7 +139,8 @@ validar, não substituir, a inferência.
 - TSConfig reference: https://www.typescriptlang.org/tsconfig/
 - Declaration files: https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html
 - Do's and Don'ts: https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html
-- TypeScript 6.0: https://devblogs.microsoft.com/typescript/announcing-typescript-6-0/
+- TypeScript 6.0 (ordenação de tipos e depreciações): https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html
+- Resolução de módulos no TypeScript 6.0.3: https://github.com/microsoft/TypeScript/blob/v6.0.3/src/compiler/moduleNameResolver.ts
 - TypeScript 7.0: https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
 - TypeScript 7.1 beta: https://devblogs.microsoft.com/typescript/announcing-typescript-7-1-beta/
 - Semantic Versioning: https://semver.org/

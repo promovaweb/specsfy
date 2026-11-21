@@ -728,6 +728,23 @@
                 "description": "List every ready task instead of the first."
               },
               {
+                "name": "--phase",
+                "description": "Select one ready TDD test in Defined with Plan Gate Pending. In this phase --all still returns at most one.",
+                "arguments": [
+                  {
+                    "name": "phase",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    },
+                    "acceptedValues": [
+                      "red"
+                    ]
+                  }
+                ]
+              },
+              {
                 "name": "--project",
                 "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
                 "arguments": [
@@ -744,7 +761,8 @@
             ],
             "examples": [
               "specsfy tasks next 0001",
-              "specsfy tasks next 0001 --all --json"
+              "specsfy tasks next 0001 --all --json",
+              "specsfy tasks next 0001 --phase red --json"
             ],
             "exitCodes": [
               {
@@ -2096,8 +2114,22 @@
       },
       {
         "name": "verify",
-        "description": "Run the whole Specsfy policy on the project: the CI entry point.",
+        "description": "Run the Specsfy policy on the project or diagnose one spec.",
         "options": [
+          {
+            "name": "--spec",
+            "description": "Diagnose one spec by ID, folder name, slug or path.",
+            "arguments": [
+              {
+                "name": "id",
+                "required": true,
+                "arity": {
+                  "minimum": 1,
+                  "maximum": 1
+                }
+              }
+            ]
+          },
           {
             "name": "--boundary",
             "description": "Verification boundary recorded in the attestation. Default: local.",
@@ -2180,6 +2212,7 @@
         ],
         "examples": [
           "specsfy verify",
+          "specsfy verify --spec 0001 --json",
           "specsfy verify --boundary ci --attestation .specsfy/attestation.json --json",
           "specsfy verify --self-test --json"
         ],

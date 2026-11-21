@@ -24,11 +24,18 @@ por restauração cronometrada.
   copiar receita de blog.
 
 O agente confirma a versão com `SELECT VERSION()`, o engine das tabelas, o
-`sql_mode` e o charset antes de recomendar. O manual cobre a linha 8.4 como LTS
-e mantém 8.0 em manutenção; a linha de inovação mudou de numeração mais de uma
-vez, então versão instalada vale mais que número decorado.
+`sql_mode` e o charset antes de recomendar. MySQL 8.4 e 9.7 são linhas LTS.
+O ciclo público de 8.0 terminou em abril de 2026 com a versão 8.0.46.
+Desde 26.7.0, Innovation e LTS usam ano, mês e patch no formato `YY.M.P`.
+Consulte a trilha de upgrade para as versões instaladas e planejadas.
 
-## Como ele trabalha
+## No Specsfy
+
+O especialista lê a spec e a tarefa indicadas pela fase. A fase registra a
+conclusão, as dúvidas e as evidências na spec. A criação e a decomposição
+das tarefas da seção 14 cabem a `specsfy-05-tasks`.
+
+## Fluxo
 
 1. Confirma banco, versão, volume por tabela, workload e o contrato de
    recuperação que o produto assume.
@@ -39,8 +46,8 @@ vez, então versão instalada vale mais que número decorado.
 4. Mede a consulta com dados representativos e compara plano antes e depois.
 5. Confere o custo de escrita e o bloqueio do DDL antes de agendar qualquer
    mudança em tabela grande.
-6. Entrega o texto para a spec com o arquivo versionado, o comando de aplicação
-   e o trade-off residual.
+6. Entrega à fase chamadora o arquivo versionado, o comando de aplicação e a
+   consequência da decisão que ainda precisa ser acompanhada.
 
 ## Schema
 
@@ -55,8 +62,10 @@ O modo Schema define a estrutura que o banco consegue garantir sozinho.
 - Índice composto segue a ordem de uso: igualdade, ordenação, faixa. O índice
   atende o prefixo mais à esquerda e ignora o resto.
 - `CHECK` é aplicado desde 8.0.16, e FK exige índice e tipo compatível.
-- DDL declara `ALGORITHM` e `LOCK`, e tabela grande com reescrita é janela
-  agendada, não execução oportunista.
+- Valide se o DDL reconstrói a tabela, permite escrita concorrente e
+  espera por metadata lock. Com `ALGORITHM=INSTANT`, use o comportamento
+  padrão de `LOCK`. Declare `LOCK=NONE` quando a operação aceitar e a escrita
+  concorrente for requisito.
 - Mudança incompatível segue expandir, preencher, migrar leitura, remover.
 
 O detalhe de tipo, conversão de charset, coluna gerada sobre `JSON`, matriz de
@@ -67,7 +76,8 @@ DDL e o passo a passo de expansão está em
 
 O modo Queries parte do plano real, não da intuição.
 
-- `EXPLAIN` mostra estimativa; `EXPLAIN ANALYZE` mostra tempo e linhas reais.
+- `EXPLAIN` estima linhas e mostra `filtered` em percentual. `1.00` é 1%.
+  `EXPLAIN ANALYZE` executa a consulta e mostra tempo e linhas reais.
 - `type: ALL` em tabela grande com filtro seletivo é o sinal mais direto de
   índice ausente ou inaplicável.
 - `Using index` significa consulta coberta pelo índice. `Using filesort` e
@@ -92,21 +102,32 @@ Os comandos de diagnóstico, a tabela de isolation e a leitura de
 O modo Operação define como o banco volta depois de uma falha.
 
 - RPO e RTO são escritos antes da escolha da ferramenta.
-- `mysqldump --single-transaction` serve base pequena e janela longa.
-- XtraBackup serve base grande com restore rápido, com `--prepare` obrigatório.
-- Point-in-time recovery combina backup com binlog até o instante anterior ao
-  erro.
-- Replicação usa GTID, `binlog_format=ROW` e `server_id` único.
+- Para exportar só um banco InnoDB, use dump consistente com
+  `--single-transaction` e `--set-gtid-purged=OFF`. Teste a restauração.
+- Para recuperar um ponto no tempo, use backup compatível com o escopo
+  dos binlogs. Capture as coordenadas do snapshot (por exemplo, com
+  `--source-data=2`) e reaplique a cadeia completa até a posição anterior
+  à transação indesejada, em destino isolado.
+- XtraBackup exige preparação da base e incorporação dos incrementais em ordem.
+- Uma réplica GTID começa com cópia consistente e os GTIDs correspondentes.
+  Use `server_id` único, TLS com verificação do servidor e isole o primário
+  antigo antes de promover a réplica.
 - `Seconds_Behind_Source` pode mentir; heartbeat mede atraso de verdade.
-- Upgrade segue trilha suportada, roda `util.checkForServerUpgrade` e trata
-  `mysql_native_password` desabilitado na linha 8.4.
+- Rode `util.checkForServerUpgrade` com o alvo exato. Sem downgrade in-place
+  suportado, teste a restauração do backup anterior em instância compatível.
 - Parâmetro é ajustado por cálculo e medição, com o valor anterior registrado.
 
 Os comandos de backup, o procedimento de promoção de réplica, a trilha de
 upgrade e a tabela de parâmetros estão em
 [operation.md](../../../specialists/specsfy-specialist-mysql/references/operation.md).
 
-## Erros que ele evita
+## Padrões
+
+- Valide invariantes no banco com constraints e tipos adequados.
+- Derive índices das consultas reais e confirme o plano com dados representativos.
+- Conte o backup na política de recuperação depois de testar a restauração.
+
+## Antipadrões
 
 - `utf8` ou `utf8mb3` em schema novo, que não armazena emoji.
 - `FLOAT` para dinheiro.
@@ -119,7 +140,10 @@ upgrade e a tabela de parâmetros estão em
 - Réplica promovida sem conferir GTID executado e atraso.
 - Backup nunca restaurado.
 
-## Como conferir o resultado
+## Validação
+
+Em Laravel, confirme que `.env.testing` aponta para um banco separado.
+Reserve `RefreshDatabase` e `migrate:fresh` para bancos descartáveis.
 
 - `EXPLAIN` e `EXPLAIN ANALYZE` antes e depois, com a mesma massa de dados.
 - `SHOW CREATE TABLE` e `information_schema.COLUMNS` confirmando `utf8mb4`.
@@ -139,13 +163,16 @@ npx skills add https://github.com/promovaweb/specsfy \
   --skill specsfy-specialist-mysql --agent universal --copy --full-depth
 ```
 
-## Especialistas relacionados
+## Skills relacionadas
 
 - [Modelagem](modeling.md) decide entidade, relação e ciclo de vida antes do
   schema.
 - [PostgreSQL](postgres.md) cobre o outro banco relacional, com semântica
   própria de índice, lock e DDL.
-- [Laravel](laravel.md) cuida de migration, Eloquent e transação na aplicação.
+- [Laravel](laravel.md) cuida de domínio, migrations, Eloquent e transações
+  na aplicação. O especialista de schema e plano segue a engine observada.
+- [Testing](testing.md) implementa o teste indicado pelo método com o runner
+  instalado.
 - [Redis](redis.md) cuida do cache na frente da consulta.
 - [Docker](docker.md) empacota e opera o servidor MySQL em container.
 - [Observabilidade](observability.md) define métrica, alerta e SLO de banco.

@@ -143,7 +143,9 @@ substituído ou removido.
 
 Durante planejamento, implementação e projeção de progresso,
 `specsfy context monitor` classifica mudanças staged, unstaged
-e untracked. Alterações estruturais exigem `STACK.md`. Alterações de
+e untracked. Fora do Git, `BASELINE` informa que não houve comparação.
+Use `--paths` com os caminhos alterados ou `--paths '[]'` quando souber que
+a lista está vazia. Alterações estruturais exigem `STACK.md`. Alterações de
 persistência exigem `DATABASE.md`. Código de aplicação exige revisão de
 `PROJECT.md`. A ausência de impacto material é registrada na evidência da
 tarefa, nunca presumida silenciosamente.
