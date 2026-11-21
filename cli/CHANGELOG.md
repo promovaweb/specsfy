@@ -4,6 +4,35 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.41.0] - 2026-11-21
+
+### Adicionado
+
+- O especialista `delivery` ganhou o modo `pipeline`: deploy de A a Z, que
+  liga teste, build da imagem Docker e deploy pelo Ansible num único workflow
+  do GitHub Actions.
+  - Gatilhos: pull request roda os testes; push na `main` gera a imagem,
+    com tag SEMVER mais sha, e faz deploy em staging; uma tag `vX.Y.Z`
+    promove a mesma imagem para produção, com aprovação no environment.
+  - Jobs encadeados: teste, imagem no GHCR, promoção, deploy com
+    `ansible-playbook` (senha do vault e chave SSH vindas dos secrets) e
+    `docker stack deploy`, verificação de saúde e convergência da stack,
+    smoke HTTP e rollback automático para a imagem anterior.
+  - Boas práticas: actions fixadas por SHA, permissões mínimas por job,
+    concorrência por ambiente, cache de dependências e build, e migrations
+    em expand/contract.
+  - Arquivos novos: `assets/pipeline.yml`, `assets/stack-deploy.yml`,
+    `assets/stack-verify.yml` e `references/pipeline.md`. O
+    `scripts/scaffold.mjs` também gera o workflow
+    (`.github/workflows/deploy.yml`) e os playbooks no projeto.
+  - Validado com `actionlint` e `ansible-playbook --syntax-check`; o
+    rollback foi exercitado com Ansible local e Docker simulado.
+  - Cada etapa chama o especialista certo: `testing`, `docker`,
+    `server`, `versioning` e `deploy`.
+- O catálogo ganhou sinais para "pipeline de deploy", "deploy automático" e
+  "CI/CD com Ansible", que levam a `delivery` no modo `pipeline`. O guia
+  do especialista ganhou a seção "Pipeline de deploy".
+
 ## [0.40.5] - 2026-11-21
 
 ### Corrigido
