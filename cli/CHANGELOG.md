@@ -4,6 +4,16 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.40.3] - 2026-11-20
+
+### Corrigido
+
+- O workflow de CI compila o CLI da própria revisão e o coloca no PATH do
+  Composer. Na 0.40.2, o `composer ci:check` do `example/` passou a chamar
+  `specsfy gate database`. Sem o binário, o job saía com código 127 e os
+  executáveis não eram compilados, então a 0.40.2 não teve GitHub Release com
+  binários nem npm. Esta versão publica tudo o que está na seção da 0.40.2.
+
 ## [0.40.2] - 2026-11-20
 
 ### Corrigido
