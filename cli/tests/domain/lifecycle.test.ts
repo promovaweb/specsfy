@@ -74,6 +74,27 @@ describe("ciclo de vida das specs", () => {
     ).resolves.toBe("# Provider\n");
   });
 
+  test("retargets only promoted backlog cells that point to the moved spec", async () => {
+    const project = await temporaryDirectory();
+    const identifier = "0042-login-social";
+    const previous = `specs/planned/${identifier}/spec.md`;
+    const target = `specs/in-progress/${identifier}/spec.md`;
+    await createSpec(project, `specs/planned/${identifier}`, "Planned");
+    const backlog = join(project, "specs/backlog");
+    await mkdir(backlog, { recursive: true });
+    const fixtures = [
+      ["quoted.md", `# Backlog\r\n| Spec promovida |  \`${previous}\`  |\r\n| Referência | ${previous} |\r\n`,
+        `# Backlog\r\n| Spec promovida |  \`${target}\`  |\r\n| Referência | ${previous} |\r\n`],
+      ["plain.md", `| Spec promovida | ${previous} |\n`, `| Spec promovida | ${target} |\n`],
+      ["other.md", "| Spec promovida | specs/planned/0043-other/spec.md |\n", "| Spec promovida | specs/planned/0043-other/spec.md |\n"],
+    ] as const;
+    for (const [file, before] of fixtures) await writeFile(join(backlog, file), before);
+
+    await transitionSpec(project, identifier, "in-progress");
+
+    for (const [file, , after] of fixtures) expect(await readFile(join(backlog, file), "utf8")).toBe(after);
+  });
+
   test("destino ocupado preserva o conteúdo da spec de origem", async () => {
     const project = await temporaryDirectory();
     const source = await createSpec(project, "specs/planned/0042-login-social", "Planned");
@@ -96,6 +117,28 @@ describe("ciclo de vida das specs", () => {
     });
     const target = join(project, "specs/draft/0042-login-social/spec.md");
     expect(await readFile(target, "utf8")).toContain("| Status | Draft |");
+  });
+
+  test("restores the spec and earlier backlinks when a backlog write fails", async () => {
+    const project = await temporaryDirectory();
+    const identifier = "0042-login-social";
+    const source = await createSpec(project, `specs/planned/${identifier}`, "Planned");
+    const original = await readFile(source, "utf8");
+    const backlog = join(project, "specs/backlog");
+    await mkdir(backlog, { recursive: true });
+    const content = `| Spec promovida | specs/planned/${identifier}/spec.md |\n`;
+    const first = join(backlog, "first.md");
+    const second = join(backlog, "second.md");
+    await writeFile(first, content);
+    await writeFile(second, content);
+    await mkdir(join(backlog, `.second.md.${process.pid}.tmp`));
+
+    await expect(transitionSpec(project, identifier, "in-progress")).rejects.toThrow();
+
+    expect(await readFile(source, "utf8")).toBe(original);
+    expect(await readFile(first, "utf8")).toBe(content);
+    expect(await readFile(second, "utf8")).toBe(content);
+    await expect(resolveSpec(project, identifier)).resolves.toMatchObject({ folder: "planned" });
   });
 
   test("reabre spec concluída somente desde o Ato II", async () => {

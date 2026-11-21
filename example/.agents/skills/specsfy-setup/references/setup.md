@@ -44,6 +44,10 @@ Use quando outra skill carrega o setup ou quando há handoff automático.
      --project <raiz> --check
    ```
 
+   Em uma cópia sem metadados Git, forneça os caminhos alterados conhecidos com
+   `specsfy context monitor --project <raiz> --check --paths <caminho1>,<caminho2>`.
+   No script, passe `--paths <caminho1> <caminho2>` após as outras opções.
+
 3. Em Laravel, execute também `specsfy gate database --project <raiz>`
    (seção `Proteção do banco durante o setup`).
 4. Se tudo estiver atual, devolva o controle à skill chamadora. Se houver
@@ -101,8 +105,9 @@ em paralelo; as etapas dependem do resultado da anterior.
    A saída orienta a leitura; não substitui as fontes.
 8. **Conversar sobre lacunas.** Siga as seções `Perfil de conhecimento e
    memória de respostas` e `Roteiro adaptativo do setup`.
-9. **Instalar especialistas.** Siga a seção `Stack e especialistas instalados
-   pelo setup`.
+9. **Instalar especialistas e diagnosticar stack.** Siga a seção `Stack e
+   especialistas instalados pelo setup` e, em Laravel, registre as ausências
+   conforme `Diagnóstico de stack para Laravel`.
 10. **Completar stack, regras e dados.** Anuncie o handoff e carregue
     o modo `stack`, `rules` ou `database` desta skill, conforme a lacuna,
     lendo a referência do modo antes de continuar.
@@ -120,7 +125,8 @@ em paralelo; as etapas dependem do resultado da anterior.
 
 - A raiz está confirmada e todos os comandos usaram essa raiz.
 - `specsfy context monitor --check` não retorna `PENDING`.
-- Em Laravel, `specsfy gate database` retornou `SAFE`.
+- Em Laravel, `specsfy gate database` retornou `SAFE`. As ausências de
+  runtime ou de composição da UI foram registradas no diagnóstico de stack.
 - Os arquivos de contexto existem, nenhum arquivo existente foi substituído e
   os blocos reservados estão atualizados sem duplicação.
 - O núcleo e os especialistas detectados foram instalados ou a falha foi
@@ -371,15 +377,23 @@ Depois de ler a stack:
 | `specsfy-specialist-architecture` | módulos, dependências e estrutura técnica |
 | `specsfy-specialist-ui-components` | base ReUI, primitives, tema e registry para React/Tailwind |
 
-Em todo projeto Laravel com React, shadcn/ui e ReUI são instalados juntos:
-shadcn/ui prepara a base e ReUI cria CRUDs e interfaces sobre ela. Depois da
-instalação, registre em `INTERFACE.md` que telas React são compostas por
-componentes. Cada nova tela consulta esse mapa, reutiliza o que existe e
-registra componentes próprios, primitives shadcn/ui e composições ReUI com
-arquivos e consumidores reais.
+### Diagnóstico de stack para Laravel
 
 Para toda aplicação Laravel, Laravel Octane com Open Swoole é obrigatório.
 Confira `laravel/octane` em `composer.json` e `composer.lock`, a extensão
-`openswoole` na imagem e `--server=swoole` no runtime. Registre a combinação em
-`.specsfy/STACK.md` e encaminhe a instalação ou correção ausente para uma spec
-antes de aprovar o setup.
+`openswoole` na imagem e `--server=swoole` no runtime.
+
+Em Laravel com React, shadcn/ui e ReUI são obrigatórios. Confira a base
+shadcn/ui e as composições ReUI usadas no projeto. Depois da instalação,
+registre em `INTERFACE.md` os componentes próprios, primitives shadcn/ui e
+composições ReUI com arquivos e consumidores reais.
+
+Registre itens ausentes ou sem comprovação em `### Pendências de stack` em
+`.specsfy/STACK.md`, fora do bloco gerenciado. Inclua o item, a fonte
+inspecionada e o que falta instalar, configurar ou verificar. O setup pode ser
+aprovado com essas pendências quando satisfizer os demais critérios.
+
+Encaminhe cada correção ao planejamento. Registre a tarefa de instalação ou
+configuração na seção 14 da spec aplicável e faça o deploy depender dela.
+Para liberar a pré-condição do deploy, confirme a evidência de runtime e,
+quando aplicável, a composição shadcn/ui com ReUI.

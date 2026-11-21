@@ -34,6 +34,7 @@ interface DemoSpec {
   folder: "draft" | "defined" | "planned" | "in-progress" | "review" | "completed";
   status: string;
   gates: [Gate, Gate, Gate];
+  specialists?: string;
   /** How many of the base spec's tasks are checked, from the first. */
   done: number;
 }
@@ -46,7 +47,7 @@ const SPECS: DemoSpec[] = [
   { slug: "0005-avaliacoes-de-produtos", title: "Avaliações de produtos", folder: "in-progress", status: "Implementing", gates: ["Passed", "Passed", "Pending"], done: 1 },
   { slug: "0006-rastreio-de-pedidos", title: "Rastreio de pedidos", folder: "planned", status: "Planned", gates: ["Passed", "Passed", "Pending"], done: 0 },
   { slug: "0007-lista-de-desejos", title: "Lista de desejos", folder: "defined", status: "Defined", gates: ["Passed", "Pending", "Pending"], done: 0 },
-  { slug: "0008-programa-de-fidelidade", title: "Programa de fidelidade", folder: "draft", status: "Draft", gates: ["Pending", "Pending", "Pending"], done: 0 },
+  { slug: "0008-programa-de-fidelidade", title: "Programa de fidelidade", folder: "draft", status: "Draft", gates: ["Pending", "Pending", "Pending"], done: 0, specialists: "interface, laravel" },
 ];
 
 const BACKLOG = [
@@ -72,6 +73,9 @@ function demoSpec(base: string, spec: DemoSpec, index: number): string {
     .replace(/^\| Plan Gate \| .* \|$/m, `| Plan Gate | ${spec.gates[1]} |`)
     .replace(/^\| Delivery Gate \| .* \|$/m, `| Delivery Gate | ${spec.gates[2]} |`)
     .replace(/^\| Atualizada em \| .* \|$/m, `| Atualizada em | ${DATE} |\n| Milestones | ${index < 5 ? "M01" : "M02"} |`);
+  if (spec.specialists) {
+    text = text.replace(/^\| Status \| .* \|$/m, `$&\n| Especialistas | ${spec.specialists} |`);
+  }
   // Inside section 14, a top-level task and its sub-items follow its index.
   const lines = text.split("\n");
   let inTasks = false;

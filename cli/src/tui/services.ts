@@ -19,11 +19,12 @@ import { projectOverview, type ProjectOverview } from "../core/overview.ts";
 import { gateDefinitions } from "../cli/commands/gates.ts";
 import { executeScriptCommand, type ScriptCommandDef } from "../engine/script-command.ts";
 import { backlogStartDef, inboxCaptureDef, lifecycleActions, specCreateDef, taskNextDef } from "../cli/commands/lifecycle.ts";
-import { runVerify } from "../cli/commands/gates.ts";
+import { renderVerifyWarnings, runVerify } from "../cli/commands/gates.ts";
 import { runProjectTests, type TestRun } from "../domain/project-testing.ts";
 import { Catalog } from "../domain/catalog.ts";
 import { FRAMEWORK_SKILLS, releaseRef, SkillInstaller } from "../domain/installer.ts";
 import { readSkillsLock, skillsLockFingerprint } from "../domain/skill-lock.ts";
+import { installedSpecSpecialists } from "../domain/spec-specialists.ts";
 import { specsFingerprint } from "../domain/progress.ts";
 import { backlogsFingerprint } from "../domain/backlog.ts";
 import { scanInboxCaptures } from "../domain/inbox.ts";
@@ -44,6 +45,8 @@ export interface TuiServices {
   readText(path: string): Promise<string>;
   /** Names registered in `skills-lock.json`, without creating it. */
   installedSkills(project: string): Promise<Set<string>>;
+  /** Specialist skills with a readable installation path under .agents/skills. */
+  installedSpecialists(project: string): Promise<Set<string>>;
   /** Cheap combined fingerprint of specs, backlog, inbox and the lock. */
   fingerprint(project: string): Promise<string>;
   /** Gate definitions, in the order the Gates tab shows them. */
@@ -145,6 +148,7 @@ export function defaultServices(): TuiServices {
     overview: projectOverview,
     readText: (path) => readFile(path, "utf8"),
     installedSkills: async (project) => new Set(Object.keys((await readSkillsLock(project)).skills)),
+    installedSpecialists: installedSpecSpecialists,
     fingerprint: async (project) => {
       const [specs, backlog, lock, inbox] = await Promise.all([
         specsFingerprint(project),
@@ -173,7 +177,7 @@ export function defaultServices(): TuiServices {
     startBacklog: (project, title, idea) => runWrite(backlogStartDef, { title, idea, problem: "A esclarecer", person: "A esclarecer", result: "A esclarecer", context: "Criado pela TUI" }, project),
     verify: async (project) => {
       const { data } = await runVerify({ project });
-      return { ok: data.ok, exitCode: data.exitCode, output: formatScriptOutput(data.result, data.stderr) };
+      return { ok: data.ok, exitCode: data.exitCode, output: formatScriptOutput(data.result, [data.stderr, renderVerifyWarnings(data)].filter(Boolean).join("\n")) };
     },
   };
 }

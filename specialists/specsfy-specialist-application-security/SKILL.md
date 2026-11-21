@@ -26,6 +26,12 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, quando a superfície for tela ou formulário,
    `INTERFACE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-application-security`. Sem indicação,
    confirme pelo "Quando usar" acima se a mudança cria trust boundary nova.
@@ -73,8 +79,12 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
 - Não implementar criptografia própria; usar primitivas e bibliotecas
   estabelecidas. Nunca logar segredo, token, senha ou dado sensível, mesmo
   em ambiente de debug.
-- Rotacionar credenciais periodicamente e preferir identidade temporária
-  (tokens de curta duração, STS/OIDC) a segredo estático de longa duração.
+- Rotacionar credencial estática por compromisso, troca de tecnologia ou
+  política do provedor, e preferir identidade temporária (tokens de curta
+  duração, STS/OIDC) a segredo estático de longa duração. Troca periódica
+  obrigatória de senha memorizada não é recomendada por NIST SP 800-63B nem por
+  OWASP: empurra o usuário para padrões previsíveis e não cobre o vazamento que
+  já aconteceu.
 - Mitigar abuso com limites por ator e por recurso (rate limit por usuário/
   API key/tenant), não apenas por IP: um IP compartilhado (NAT, proxy)
   penaliza usuários legítimos e um atacante distribuído contorna limite
@@ -112,11 +122,11 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
   não apenas manualmente antes de um release grande.
 - Configuração segura de produção: headers de segurança (ex.:
   `Content-Security-Policy`, `Strict-Transport-Security`), atributos de
-  cookie (`HttpOnly`, `Secure`, `SameSite`) e política de CORS restrita à
-  origem realmente necessária.
+  cookie (`HttpOnly`, `Secure`, `SameSite`, lembrando que `SameSite=None` exige
+  `Secure`) e política de CORS restrita à origem realmente necessária.
 - Comprovação concreta de cada controle reivindicado e da exposição que
   permanece, nunca declarar algo "seguro" em linguagem absoluta sem o teste
-  que comprova.
+  que comprova. (regra da casa)
 
 ## Skills relacionadas
 
@@ -136,6 +146,14 @@ description: "Modelar ameaças e revisar segurança de aplicações, APIs, auten
   de pipeline, assinatura de artefato e supply chain.
 - `$specsfy-specialist-architecture` quando a exposição vem do desenho do
   contrato de API (verbos, versionamento, exposição de campo sensível).
+- `$specsfy-specialist-mysql` e `$specsfy-specialist-mongodb` materializam
+  usuário, privilégio e TLS do banco; ameaça e autorização continuam aqui.
+- `$specsfy-specialist-n8n` quando webhook, credencial e variável de ambiente
+  do fluxo entram na superfície de ataque.
+- `$specsfy-specialist-mcp` para autorização por operação e por objeto em
+  servidores MCP; a ameaça e o controle continuam decididos aqui.
+- `$specsfy-specialist-cloudflare` para WAF, rate limiting, Access e Tunnel: a
+  política de borda materializa o controle de acesso decidido aqui.
 
 Leia [references/standards.md](references/standards.md) para checklist de
 threat modeling por boundary, ASVS, segurança de API e supply chain, com

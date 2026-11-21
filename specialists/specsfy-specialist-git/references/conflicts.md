@@ -4,8 +4,9 @@
 
 - `git status`: identifica a operação em andamento (merge/rebase/cherry-pick)
   e a lista exata de caminhos unmerged.
-- `git ls-files -u`: lista as três stages de cada conflito — stage 1 (ancestral
-  comum/base), stage 2 (ours), stage 3 (theirs) — com os respectivos blobs.
+- `git ls-files -u`: lista os estágios disponíveis em cada conflito — stage 1 (ancestral
+  comum/base), stage 2 (ours), stage 3 (theirs) — com os respectivos blobs. Um estágio pode faltar, como o ancestral
+  comum em um conflito de adição dos dois lados.
 - `git show :1:path`, `git show :2:path`, `git show :3:path`: mostra o
   conteúdo completo de cada versão do arquivo em conflito (base, ours,
   theirs respectivamente), útil quando os marcadores inline não bastam para
@@ -15,7 +16,10 @@
 - `git diff --cc` (ou `git diff` durante o conflito): mostra o resultado
   combinado atual comparado às duas origens, no formato "diff combinado".
 - `git log --oneline <base>..HEAD` e `git log --oneline <base>..<other>`:
-  reconstrói o que cada lado adicionou desde o ancestral comum.
+  reconstrói o que cada lado adicionou desde o ancestral comum em um merge.
+  Para rebase, confira o patch atual com `git rebase --show-current-patch`.
+  Com `ort`, `git diff AUTO_MERGE` mostra as edições feitas desde o resultado
+  automático enquanto essa referência estiver presente.
 
 ## Conflitos sem marcador textual (os mais perigosos)
 
@@ -43,20 +47,25 @@ completa.
 
 - **Merge manual hunk a hunk**: padrão seguro para a maioria dos casos;
   exige entender a intenção de cada lado antes de combinar.
-- **`-X ours`/`-X theirs`** (estratégia de recursive merge, não checkout):
-  resolve automaticamente hunks conflitantes a favor de um lado sem
-  remover a mudança do outro lado em arquivos não conflitantes — ainda
-  assim, restrinja a arquivos onde um lado é comprovadamente autoritativo
-  (ex.: lockfile regenerável), nunca em código de lógica de negócio.
+- **`-X ours`/`-X theirs`**: são opções da estratégia `ort` para a operação
+  inteira. Favorecem um lado nos trechos conflitantes (ou no arquivo inteiro,
+  quando binário) e integram mudanças sem conflito. Se a escolha só vale para
+  um caminho, resolva esse caminho individualmente. O Specsfy veta esse
+  atalho para código de lógica de negócio. A estratégia `-s ours`
+  tem outro efeito: descarta a árvore do outro lado.
 - **`git checkout --ours`/`--theirs <path>`**: descarta inteiramente um
   lado para aquele arquivo — só use quando um lado inteiro do arquivo é
-  definitivamente obsoleto, com confirmação explícita.
+  definitivamente obsoleto, com confirmação explícita. Durante rebase,
+  `ours` é a série já reaplicada sobre a nova base e `theirs` é o commit
+  da branch original sendo reaplicado.
 - **`git rerere`**: grava resoluções para reaplicar automaticamente em
   conflitos idênticos futuros (útil em rebase longo com múltiplos commits
   gerando o mesmo conflito) — reconfirme que o contexto ao redor não mudou
-  antes de confiar na resolução gravada.
+  antes de confiar na resolução gravada. Use `--no-rerere-autoupdate`
+  quando quiser revisar antes de adicionar ao índice.
 - **Rebase vs merge**: merge preserva o histórico de ambos os lados exatamente
-  como ocorreu, criando um commit de merge; rebase reescreve os commits de
+  como ocorreu, criando um commit de merge quando a integração não é
+  fast-forward; rebase reaplica os commits de
   um lado sobre o outro, produzindo histórico linear mas alterando hashes de
   commit — nunca reescrever (rebase/force push) commits já publicados e
   usados por outras pessoas sem coordenação.

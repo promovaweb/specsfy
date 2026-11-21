@@ -1,9 +1,10 @@
 # Componentes gratuitos ReUI
 
-O catálogo público ReUI declara mais de mil componentes copiáveis. Esta
-referência cobre todas as famílias públicas usadas pela skill. Antes de instalar
-um item, consulte o registry e a documentação do componente para obter seu
-nome `c-*`, API, dependências e exemplos atuais.
+O catálogo público ReUI declara mais de mil exemplos gratuitos em 87
+categorias, além de 27 primitives próprias. Esta referência cobre todas as
+famílias públicas usadas pela skill. Antes de instalar um item, consulte o
+registry e a documentação do componente para obter seu nome `c-*`, API,
+dependências e exemplos atuais.
 
 O registry é a relação completa e mutável dos blocos gratuitos. Portanto, não
 congele os mais de mil nomes nesta skill: antes de cada tela, pesquise o
@@ -14,9 +15,10 @@ famílias técnicas de todos esses blocos.
 
 | Família | Componentes e usos |
 | --- | --- |
-| Feedback | Alert, Badge, Rating, Timeline, indicadores de sucesso, aviso, erro e atividade |
+| Feedback | Alert, Badge, Rating, Timeline, Sonner, indicadores de sucesso, aviso, erro e atividade |
 | Entrada e seleção | Autocomplete, Cascader, Date Selector, Number Field, Phone Input, Rating e Select |
 | Dados | Data Grid, Filters, Tree, Sortable, listas, colunas, edição, agrupamento e virtualização |
+| Código e terminal | Code Block para código, log, diff e saída de comando |
 | Arquivos | File Upload, dropzone, prévia de imagem, múltiplos arquivos e validação |
 | Planejamento | Event Calendar, Gantt, Kanban, Stepper, Timeline e Schedule |
 | Estrutura | Frame, App Shell, Navbar, Button, Sheet, Dialog, Scrollspy, Icon Stack e Icon Tile |

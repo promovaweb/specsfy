@@ -37,6 +37,11 @@ Não use para:
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` para confirmar runtime, backend de telemetria e limites.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção 8, seção em escrita); só
+     `specsfy-05-tasks` escreve a seção 14, então apenas indique o que a tarefa
+     deve prever; em `specsfy-06-implement`, siga a tarefa indicada.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-observability (signals|performance)`.
    Sem indicação, escolha o modo pelo "Quando usar" acima.
@@ -102,11 +107,11 @@ Não use para:
   normalizado, código de status, tenant se o volume de tenants for baixo);
   nunca user id, URL crua com query string ou mensagem de erro bruta como
   label: cada valor único de label multiplica as séries armazenadas.
-- Traces preservam o mesmo contexto de correlação atravessando HTTP, fila e job
-  assíncrono: um trace que "quebra" na borda de uma fila não serve para depurar
-  o problema mais comum (latência distribuída entre serviços).
-- Sampling de traces preserva 100% dos erros e das transações de negócio
-  crítico, mesmo reduzindo a amostragem do caminho feliz de alto volume.
+- Propagar o contexto em HTTP e filas. Em consumo em lote ou com outro
+  contexto pai, usar span links para preservar a correlação entre traces.
+- Preservar 100% dos traces com erro e transações críticas é a política
+  local. Se o erro só puder ser detectado ao concluir os spans, usar tail
+  sampling e verificar a retenção real, inclusive sob carga. (regra da casa)
 - Alertas refletem impacto real ao usuário ou ameaça iminente de violar o SLO.
   Todo alerta tem owner e runbook alcançável: alerta sem ação associada é ruído
   que treina a equipe a ignorar alertas.
@@ -120,7 +125,7 @@ Não use para:
 - Separar explicitamente latência de cliente, rede, aplicação, banco e
   dependências externas antes de decidir onde otimizar.
 - Medir tanto cache frio quanto cache quente, sempre sob condição concorrente
-  real, não apenas uma requisição isolada.
+  real, não apenas uma requisição isolada. (regra da casa)
 - Não adicionar camada de cache antes de provar o custo do caminho sem cache e
   definir a estratégia de invalidação: cache é a fonte mais comum de bug de
   dado obsoleto quando adicionado sem essa prova.
@@ -165,7 +170,7 @@ Não use para:
 ## Validação
 
 - Gerar telemetria ponta a ponta em um cenário controlado e confirmar que a
-  correlação (trace id) atravessa todos os boundaries mapeados.
+  correlação atravessa os pontos mapeados por trace id ou span links.
 - Verificar cardinalidade projetada, custo estimado, retenção configurada e que
   campos sensíveis passam por redaction antes de sair do serviço.
 - Confirmar que os alertas configurados realmente disparam no cenário que
@@ -207,6 +212,10 @@ Não use para:
   entram ou ficam fora da telemetria.
 - `$specsfy-specialist-delivery` usa o sinal de saúde definido aqui para
   continuar, pausar ou reverter um rollout.
+- `$specsfy-specialist-mysql`, `$specsfy-specialist-mongodb`,
+  `$specsfy-specialist-n8n` e `$specsfy-specialist-cloudflare` entregam os
+  sinais de dados, execução e borda que este especialista transforma em SLO,
+  alerta e dashboard.
 
 Leia [references/standards.md](references/standards.md) para os pilares de
 observabilidade, frameworks de dashboard (RED/USE), SLIs/SLOs, sinais por tipo

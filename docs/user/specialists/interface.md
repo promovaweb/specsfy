@@ -114,7 +114,9 @@ tarefa registra como a revisão foi feita e o que precisou de ajuste.
 ## Acessibilidade
 
 O agente confirma o nível da WCAG, o escopo da auditoria, os navegadores e
-as tecnologias assistivas. Ele corrige primeiro o HTML nativo e verifica
+as tecnologias assistivas. A versão vigente é a WCAG 2.2, atualizada em
+dezembro de 2024 e equivalente à ISO/IEC 40500:2025; a WCAG 3 ainda é
+rascunho. Ele corrige primeiro o HTML nativo e verifica
 o nome, o papel, o valor e o estado de cada controle. Modais precisam
 funcionar por teclado, manter o foco no conteúdo aberto e devolvê-lo ao
 gatilho ao fechar.

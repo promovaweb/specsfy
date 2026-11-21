@@ -23,7 +23,7 @@ de abas rola até a aba selecionada.
 | Screen | Função | Teclas da screen |
 | --- | --- | --- |
 | `overview` | Painel das specs: barra de progresso geral, medidores de specs, gates, tarefas e checklist, gráfico de specs por estado, gates aprovados por tipo e por spec, lista das specs com gates e barra própria, backlog, inbox e próximos passos. | `↑/↓` spec, `Enter` open, `r` recarrega |
-| `specs` | Specs agrupadas por estado, com detalhe de gates e tarefas e o Markdown da selecionada. | `↑/↓` muda a spec, `t` muda o estado, `Espaço` marca o próximo item de checklist, `u` desfaz a última marcação, `e` registra o esforço, `n` cria uma spec, `g` abre os gates, `r` recarrega |
+| `specs` | Specs agrupadas por estado, com gates, tarefas, especialistas declarados e o Markdown da selecionada. `(!)` identifica um especialista sem instalação em `.agents/skills/`. | `↑/↓` muda a spec, `t` muda o estado, `Espaço` marca o próximo item de checklist, `u` desfaz a última marcação, `e` registra o esforço, `n` cria uma spec, `g` abre os gates, `r` recarrega |
 | `backlog` | Itens de `specs/backlog/` e capturas de `specs/inbox/`, com preview do Markdown. | `↑/↓` muda o item, `PgUp/PgDn` rola, `c` captura uma ideia, `p` processa a captura, `b` cria um item de backlog, `r` recarrega |
 | `milestones` | Milestones de `specs/milestones/`, com o título, a porcentagem do progresso derivado e a prévia do Markdown. | `↑/↓` muda o milestone, `PgUp/PgDn` rola, `s` sincroniza, `/` filtra |
 | `context` | Documentos de contexto do projeto, com `✓` quando existem e `○` quando faltam, e a prévia do selecionado. | `↑/↓` muda o documento, `PgUp/PgDn` rola, `/` filtra |
@@ -51,7 +51,7 @@ em vermelho quando falha. A cada resultado a TUI recarrega o projeto.
 | `c` | Backlog | Pede uma linha na barra de teclas e registra uma captura em `specs/inbox/`, igual a `specsfy inbox capture`; `Enter` registra e `Esc` cancela. |
 | `p` | Backlog | Processa a captura selecionada de `specs/inbox/`, pedindo as specs que a cobrem (por exemplo, `0004,0005`), igual a `specsfy inbox process --spec`. |
 | `b` | Backlog | Cria um item de backlog pedindo o título e a ideia; os outros campos ficam `A esclarecer` para refinar com `$specsfy-02-backlog`, igual a `specsfy backlog start`. |
-| `v` | Gates | Roda o `specsfy verify` do projeto inteiro e mostra o relatório no painel Output; `Enter` continua rodando todos os gates da spec selecionada. |
+| `v` | Gates | Roda o `specsfy verify` do projeto inteiro e mostra o relatório e os avisos de especialistas no painel Output. Use `Enter` para rodar os gates da spec selecionada. |
 
 `PgUp/PgDn` continuam rolando o Markdown; na aba Specs, `Espaço` deixou de
 rolar.

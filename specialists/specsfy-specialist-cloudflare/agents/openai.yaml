@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Cloudflare"
+  short_description: "DNS, Workers e segurança de borda"
+  default_prompt: "Use $specsfy-specialist-cloudflare para orientar esta tarefa com padrões e validação especializados."

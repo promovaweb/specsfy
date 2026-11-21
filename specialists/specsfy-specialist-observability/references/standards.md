@@ -1,5 +1,7 @@
 # Padrões e referências de observabilidade
 
+Revisado em 2026-11-20 contra: OpenTelemetry Specification 1.62.0, Semantic Conventions 1.45.0, W3C Trace Context Level 1, Prometheus, Google SRE Workbook, Core Web Vitals e Grafana k6.
+
 ## Índice das referências
 
 | Modo | Arquivo | Conteúdo |
@@ -21,8 +23,8 @@ trace localiza o serviço/etapa responsável, o log explica o evento exato.
 ## Frameworks de dashboard
 
 - **RED** (por requisição/serviço): **R**ate (taxa de requisições), **E**rrors
-  (taxa de erro), **D**uration (latência, em percentis). Ideal para serviços
-  request-driven (APIs, web).
+  (taxa de erro), **D**uration (duração, analisada pela distribuição ou por
+  percentis). Ideal para serviços request-driven (APIs, web).
 - **USE** (por recurso): **U**tilization, **S**aturation, **E**rrors. Ideal
   para recursos finitos (CPU, memória, conexões de pool, disco).
 - Combine os dois: RED no nível do serviço para detectar impacto ao usuário,
@@ -58,9 +60,9 @@ trace localiza o serviço/etapa responsável, o log explica o evento exato.
 
 ## Cardinalidade e custo
 
-- Cardinalidade de uma métrica é o produto do número de valores possíveis de
-  cada label; um label com 10 valores e outro com 1000 gera até 10.000
-  séries só para essa métrica.
+- A cardinalidade máxima por métrica é limitada pelo produto da quantidade de
+  valores possíveis de cada label. Um label com 10 valores e outro com 1000
+  permitem até 10.000 combinações, antes de considerar buckets de histogramas.
 - Nunca use como label: identificador de usuário, e-mail, URL não
   normalizada (com IDs ou query string), mensagem de erro livre. Normalize a
   rota (`/users/{id}`, não `/users/123`) antes de usá-la como label.
@@ -70,13 +72,21 @@ trace localiza o serviço/etapa responsável, o log explica o evento exato.
 
 ## Correlação e contexto distribuído
 
-- Propague o contexto de trace (W3C Trace Context: `traceparent`/
-  `tracestate`) por todos os boundaries síncronos (HTTP) e assíncronos
-  (mensagem de fila, job agendado) para que um trace único cubra a jornada
-  completa.
-- Sampling: preserve 100% dos traces com erro e das transações marcadas como
-  criticamente importantes para o negócio; aplique amostragem estatística
-  apenas no volume "feliz" de alto tráfego.
+- Em HTTP, propague `traceparent` e, quando presente, `tracestate` conforme
+  W3C Trace Context. Na mensageria, propague o contexto de criação na
+  mensagem. Use links no span de consumo como padrão, inclusive quando o
+  consumo ocorre em lote ou já tem outro contexto pai. Um job agendado
+  sem contexto de origem inicia seu próprio trace.
+- Para métricas HTTP do OpenTelemetry, use `http.server.request.duration`
+  (histograma em segundos). Use `http.route` com o template de baixa
+  cardinalidade do framework quando disponível. Deixe o atributo ausente
+  se o framework não expuser a rota.
+- A política local de sampling é preservar 100% dos traces com erro e
+  transações marcadas como críticas, amostrando o restante. Quando o erro
+  só é conhecido nos spans finais, a decisão antecipada (head sampling)
+  não garante essa retenção. Use tail sampling com spans do mesmo trace
+  encaminhados à mesma instância. Monitore perdas, spans atrasados e
+  limites de memória e confirme a taxa de retenção observada. (regra da casa)
 
 ## Fontes primárias
 
@@ -85,6 +95,15 @@ trace localiza o serviço/etapa responsável, o log explica o evento exato.
 - W3C Trace Context: https://www.w3.org/TR/trace-context/
 - Prometheus practices (nomeação e cardinalidade de métricas): https://prometheus.io/docs/practices/
 - Google SRE Book — SLOs: https://sre.google/workbook/implementing-slos/
-- Google SRE Book — Monitoring Distributed Systems (RED/USE na prática): https://sre.google/sre-book/monitoring-distributed-systems/
+- Google SRE Book — Monitoring Distributed Systems (quatro sinais de ouro): https://sre.google/sre-book/monitoring-distributed-systems/
 - OpenMetrics (formato de exposição): https://openmetrics.io/
 - Brendan Gregg, USE Method: https://www.brendangregg.com/usemethod.html
+- OpenTelemetry Specification: https://opentelemetry.io/docs/specs/otel/
+- OpenTelemetry — métricas HTTP: https://opentelemetry.io/docs/specs/semconv/http/http-metrics/
+- OpenTelemetry — spans de mensageria: https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/
+- OpenTelemetry — head e tail sampling: https://opentelemetry.io/docs/concepts/sampling/
+- OpenTelemetry Collector — tail sampling: https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/main/processor/tailsamplingprocessor/README.md
+- Google SRE Workbook — alertas por burn rate: https://sre.google/workbook/alerting-on-slos/
+- Core Web Vitals e thresholds: https://web.dev/articles/vitals
+- Grafana k6 — opções de execução: https://grafana.com/docs/k6/latest/using-k6/k6-options/reference/
+- John D. C. Little — condições e aplicações da lei de Little: https://pubsonline.informs.org/doi/abs/10.1287/opre.1110.0940?journalCode=opre

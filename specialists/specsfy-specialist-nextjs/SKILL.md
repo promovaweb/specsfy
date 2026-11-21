@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-nextjs
-description: Implementar e revisar aplicações Next.js com App Router, Server e Client Components, data fetching, cache, mutations, routing, metadata, segurança e deploy. Use quando houver dependência next ou next.config e a tarefa tocar rota, layout, Server Action, cache ou runtime; use também para decidir a fronteira server/client; não use para lógica de estado/efeito React independente de framework — aí use a skill React; confirme sempre o router (App ou Pages) e a versão antes de recomendar, pois cache e defaults mudam entre gerações.
+description: Implementar e revisar aplicações Next.js com App Router, Server e Client Components, data fetching, Cache Components, mutations, routing, metadata, segurança e deploy. Use quando houver dependência next ou next.config e a tarefa tocar rota, layout, Server Action, cache, proxy ou runtime; use também para decidir a fronteira server/client; não use para lógica de estado/efeito React independente de framework — aí use a skill React; confirme sempre o router (App ou Pages) e a versão antes de recomendar, pois cache, símbolos de build e nomes de arquivo mudam entre gerações.
 ---
 
 # Next.js
@@ -8,8 +8,8 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 ## Quando usar
 
 - Acionar quando o projeto depende de `next`/`next.config` e a tarefa envolve
-  rota, layout, Server/Client Component, Server Action, route handler, cache,
-  middleware, metadata ou deploy.
+  rota, layout, Server/Client Component, Server Action, route handler, Cache
+  Components, proxy, metadata ou deploy.
 - Acionar também para diagnosticar waterfalls de dados, hydration mismatch,
   ou cache servindo dado obsoleto/entre usuários.
 - Não acionar para hooks, estado ou composição de componentes que não dependem
@@ -27,6 +27,12 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, quando a rota renderizar tela, `INTERFACE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-nextjs`. Sem indicação, confirme pelo
    "Quando usar" acima se o projeto depende de `next` antes de propor rota.
@@ -44,21 +50,29 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 
 1. Confirmar versão do Next.js, router (App ou Pages), runtime (Node vs
    Edge), deployment target e flags experimentais ativas: a semântica de
-   cache e de Server Components muda entre versões.
+   cache e de Server Components muda entre versões. No Next.js 16, Turbopack é
+   o bundler padrão, `cacheComponents` e `partialPrefetching` são o modelo
+   recomendado (padrão em projetos novos desde 16.4 e default na versão 17) e
+   `middleware.ts` deu lugar a `proxy.ts`.
 2. Mapear a rota alterada: layout, `loading`, `error`, `not-found` e onde
-   está o boundary entre dado (server) e interação (client).
+   está o boundary entre dado (server) e interação (client). `params`,
+   `searchParams`, `cookies()`, `headers()` e `draftMode()` são assíncronos no
+   App Router do Next.js 16 e precisam de `await`.
 3. Manter componentes Server por padrão; marcar `"use client"` apenas no
    componente folha que realmente precisa de hook, evento ou API do
    navegador, nunca no layout ou página inteira por conveniência.
-4. Definir explicitamente cache, revalidação e tags de cada fonte de dado;
-   tratar o comportamento padrão como contrato da versão instalada, não como
-   suposição.
+4. Definir explicitamente cache, revalidação e tags de cada fonte de dado.
+   No modelo Cache Components o cache é opt-in: `"use cache"` na função ou
+   componente, com `cacheLife` e `cacheTag`; sem a diretiva, o código roda em
+   request time. Tratar o comportamento padrão como contrato da versão
+   instalada, não como suposição.
 5. Validar entrada e checar autorização dentro de cada Server Action e route
    handler, como se fosse um endpoint HTTP público, porque é.
 6. Projetar metadata, streaming (`loading.js`/`Suspense`), imagens/fontes e o
    caminho de recuperação de erro (`error.js`, `not-found.js`).
-7. Executar lint, typecheck, testes, build de produção e checar o resultado
-   no runtime real do adapter/host alvo, não só no `next dev`.
+7. Executar typecheck, lint (ESLint ou Biome), testes e build de produção, e
+   checar o resultado no runtime real do adapter/host alvo, não só no
+   `next dev`. Desde o Next.js 16 o `next build` não executa mais lint.
 
 ## Padrões
 
@@ -70,16 +84,21 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
   eliminar waterfalls sequenciais evitáveis (requisições que dependem umas das
   outras sem necessidade real).
 - Tratar cache como contrato explícito por rota: declarar se cada fonte de
-  dado é estática, revalidada por tempo, revalidada por tag ou dinâmica,
-  nunca herdar o default sem checar a versão instalada.
-- Revalidar (`revalidatePath`/`revalidateTag`) imediatamente após qualquer
-  mutation que afete dado já cacheado; sem isso a UI mostra estado obsoleto.
+  dado é estática, cacheada com `"use cache"` e `cacheLife`, revalidada por
+  tag ou dinâmica em request time, nunca herdar o default sem checar a versão
+  instalada.
+- Revalidar imediatamente após qualquer mutation que afete dado já cacheado:
+  `revalidateTag(tag, "max")` invalida com stale-while-revalidate,
+  `updateTag(tag)` em Server Action entrega read-your-writes e `refresh()`
+  atualiza só dado não cacheado. Sem isso a UI mostra estado obsoleto.
 - Proteger toda Server Action com a mesma disciplina de um endpoint público:
   autenticar, autorizar por objeto e validar payload, o cliente pode chamá-la
   diretamente, fora do fluxo de UI esperado.
-- Usar middleware apenas para lógica curta e compatível com o runtime da
-  rota (Edge tem API restrita); lógica pesada pertence ao route handler ou à
-  camada de aplicação.
+- Usar `proxy.ts` (Node.js runtime) apenas para lógica curta de rede:
+  redirect, header, cookie e feature flag. Ele não é solução de sessão ou
+  autorização completa e não aplica `use cache`/`use server` nem cache de
+  `fetch`. Lógica pesada pertence ao route handler ou à camada de aplicação.
+  `middleware.ts` segue disponível para Edge, mas está depreciado.
 - Documentar qualquer acoplamento a comportamento específico do host/adapter
   (headers, streaming, limites de tempo) em vez de deixá-lo implícito.
 
@@ -93,7 +112,13 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
   waterfall de rede.
 - Mutar dado via Server Action e não revalidar o path/tag correspondente: a
   UI parece "quebrada" porque mostra o cache antigo até o próximo refresh
-  completo.
+  completo. `revalidateTag("posts")` com um argumento está depreciado no
+  Next.js 16: use `revalidateTag("posts", "max")` ou `updateTag("posts")`.
+- Criar `middleware.ts` em projeto Next.js 16: o arquivo correto é
+  `proxy.ts`, com função `proxy`; o nome antigo sobrevive só para Edge e será
+  removido.
+- Assumir cache implícito de `fetch` ou de página como default: no modelo
+  Cache Components nada é cacheado sem `"use cache"`.
 - Confiar em variável de ambiente sem prefixo público (`NEXT_PUBLIC_`) dentro
   de um Client Component: ela não existirá no bundle do navegador.
 - Tratar uma Server Action como "só acessível pela UI" e pular autorização:
@@ -101,9 +126,13 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
 
 ## Validação
 
-- `next build` completo (mais lint/typecheck do projeto) e leitura do
-  relatório de rotas que ele imprime (estático `○`, dinâmico `λ`, ISR); conferir
-  se isso bate com a intenção declarada no passo 4 do Fluxo.
+- `next build` completo e leitura do relatório de rotas que ele imprime:
+  `○` estático, `●` SSG, `ƒ` dinâmico e `◐` Partial Prerender, com colunas
+  `Revalidate`/`Expire` quando houver cache. O símbolo `λ` não existe mais.
+  Conferir se isso bate com a intenção declarada no passo 4 do Fluxo.
+- Rodar o lint separadamente (ESLint ou Biome), porque `next lint` foi
+  removido e `next build` não lint mais; usar `next typegen` quando a rota
+  depender de tipos gerados.
 - Exercitar `loading`, `error`, `not-found`, redirects e autorização em cada
   rota alterada, incluindo acesso direto por URL sem navegação client-side.
 - Provar cache hit/miss e invalidation: mutar o dado, checar que a rota
@@ -130,9 +159,16 @@ description: Implementar e revisar aplicações Next.js com App Router, Server e
   TTFB ou regressão de performance com metodologia própria.
 - `$specsfy-specialist-typescript` para tipar params de rota, payload de
   Server Action e retorno de data fetching de forma segura.
+- `$specsfy-specialist-mcp` quando a rota servir um servidor MCP: contrato
+  Streamable HTTP, OAuth e primitivas ficam lá; rota e runtime do framework
+  continuam aqui.
 - `$specsfy-specialist-tailwind-css` e `$specsfy-specialist-ui-components` para a
   camada de estilo e os componentes visuais renderizados dentro de cada
   Server/Client Component.
+- `$specsfy-specialist-cloudflare` para Pages, Worker, domínio e binding de
+  publicação; a rota e o runtime do framework continuam aqui.
+- `$specsfy-specialist-testing` executa a jornada no navegador e a unidade do
+  módulo que comprovam o comportamento da rota.
 
 Leia [references/standards.md](references/standards.md) para fronteiras
 server/client, cache, Server Actions, streaming, segurança e checklist de

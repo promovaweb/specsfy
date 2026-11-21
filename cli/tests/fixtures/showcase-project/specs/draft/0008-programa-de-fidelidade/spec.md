@@ -6,6 +6,7 @@
 | ID | SPEC-0008 |
 | Slug | 0008-programa-de-fidelidade |
 | Status | Draft |
+| Especialistas | interface, laravel |
 | Definition Gate | Pending |
 | Plan Gate | Pending |
 | Delivery Gate | Pending |

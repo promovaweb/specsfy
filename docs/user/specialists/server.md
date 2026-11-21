@@ -64,7 +64,8 @@ Padrões do modo Debian:
   Debian.
 - Serviços rodam em unidades systemd ou pacotes oficiais, com restart, limites
   e logs definidos.
-- O firewall usa nftables com a configuração carregada no boot, testada em uma
+- O firewall usa nftables no host e mantém o backend iptables do Docker em
+  Swarm no Engine 29. A configuração do host carrega no boot e é testada em uma
   nova sessão administrativa.
 - Cada parâmetro de kernel fica em um arquivo pequeno e nomeado, com a
   finalidade registrada.
@@ -164,7 +165,8 @@ Padrões do modo Relatório:
 - Os logs usam `--tail 200` para serviços, `--tail 100` para containers e
   `--since 24h`, salvo quando você solicita outra janela.
 - Containers parados com erro recebem o código de saída e o final do log. O
-  código `137` indica falta de memória ou kill externo e é cruzado com `dmesg`.
+  código `137` é compatível com `SIGKILL`. Para investigar falta de memória,
+  a coleta confere `OOMKilled` e os eventos do kernel.
 - As imagens aparecem com repositório, tag, digest, tamanho e data. As
   candidatas a `prune` são marcadas sem limpeza.
 - O disco gera alerta acima de 80% e fica crítico acima de 90% ou com inodes

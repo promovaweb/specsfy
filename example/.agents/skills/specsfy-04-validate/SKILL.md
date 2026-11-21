@@ -86,7 +86,9 @@ sequenciais.
    informação e navegação, menus e navegação principal, formulários e ações,
    composição e disposição, estados e acessibilidade. Confirme que a tecnologia
    proposta segue as fontes da stack ou que a lacuna foi registrada para a
-   pessoa. Um CRUD sem telas e formulário é `BLOCKER` e volta automaticamente
+   pessoa. Em `Contrato CRUD`, confira as telas e os controles das operações
+   declaradas em `Operações`. Exija formulário quando a operação incluída o
+   usar. Se faltar uma decisão sobre a interface, registre `BLOCKER` e volte
    para `$specsfy-02-backlog`.
 7. Compare research, requisitos, BDD, plano técnico, modelo de dados,
    contratos, TDD, matriz e tarefas. Confirme no mínimo três `AC` distintos

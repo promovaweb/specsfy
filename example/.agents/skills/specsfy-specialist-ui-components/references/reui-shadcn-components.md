@@ -18,19 +18,24 @@ itens pelas rotas e pela tipagem local.
 | Feedback | Alert, Badge, Empty, Progress, Skeleton, Spinner, Toast | Alert, Badge, Rating, Timeline |
 | Estrutura | Card, Separator, Scroll Area, Resizable, Carousel | App Shell, Dashboard, Stats, List |
 | Fluxos | Accordion, Collapsible, Stepper por composição | Stepper, Wizard, Onboarding |
+| Conversa e agente | Message, Message Scroller, Bubble, Trace, Code Block, Questionnaire | Timeline, Code Block, File Upload |
 | Arquivos e agenda | Attachment | File Upload, Event Calendar, Gantt, Kanban |
 
 ## Lista de primitives shadcn/ui
 
 Accordion, Alert, Alert Dialog, Aspect Ratio, Attachment, Avatar, Badge,
 Breadcrumb, Bubble, Button, Button Group, Calendar, Card, Carousel, Chart,
-Checkbox, Collapsible, Combobox, Command, Context Menu, Data Table, Date
-Picker, Dialog, Direction, Drawer, Dropdown Menu, Empty, Field, Hover Card,
+Checkbox, Code Block, Collapsible, Combobox, Command, Context Menu, Data Table,
+Date Picker, Dialog, Direction, Drawer, Dropdown Menu, Empty, Field, Hover Card,
 Input, Input Group, Input OTP, Item, Kbd, Label, Marker, Menubar, Message,
 Message Scroller, Native Select, Navigation Menu, Pagination, Popover,
 Progress, Questionnaire, Radio Group, Resizable, Scroll Area, Select,
 Separator, Sheet, Sidebar, Skeleton, Slider, Spinner, Switch, Table, Tabs,
-Textarea, Toast, Toggle, Toggle Group, Tooltip e Typography.
+Textarea, Toast, Toggle, Toggle Group, Tooltip, Trace e Typography.
+
+Projeto novo desde julho de 2026 nasce em Base UI; a lista vale para Base UI,
+Radix e React Aria, com API e atributos de estado próprios de cada base. Em
+Base UI, `asChild` dá lugar a `render`.
 
 Para cada tela, use primeiro a linha da tabela. Em seguida, consulte
 [reui-components-free.md](reui-components-free.md) para a família ReUI e a documentação oficial para a API

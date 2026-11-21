@@ -93,6 +93,8 @@ discussão é um conceito de negócio ainda não modelado, o especialista
   determinística e ID como desempate.
 - Criação e retry usam uma chave de idempotência quando necessário.
 - Webhooks têm assinatura, timestamp, proteção contra replay e reentrega.
+- A depreciação aparece nos cabeçalhos `Deprecation` e `Sunset`, com link para a
+  documentação da migração.
 - Mudanças incompatíveis são declaradas. Campos ambíguos ficam fora do contrato.
 - O modelo de persistência não vira contrato por conveniência.
 

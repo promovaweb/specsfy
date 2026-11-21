@@ -261,6 +261,12 @@ escolher essa opção:
 - permita o handoff solicitado, mantendo `Status: Draft` e
   `Definition Gate: Pending` quando restarem lacunas aplicáveis.
 
+Se a pessoa delegar expressamente a decisão ao agente, aplique a opção
+recomendada dentro do alcance autorizado. Registre no backlog como
+`Escolha delegada`, com a opção, a fonte da autorização e o alcance da
+decisão. Mantenha respostas confirmadas pela pessoa e evidências observadas
+em seus registros próprios. Questões fora do alcance seguem em aberto.
+
 Durante a conversa:
 
 - ofereça pelo menos três opções numeradas quando reduzirem o esforço e

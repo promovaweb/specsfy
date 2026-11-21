@@ -31,7 +31,9 @@ Componentes React e UI Design.
 5. Desenha a árvore de componentes com responsabilidades e props pequenas,
    preferindo composição a componentes cheios de flags.
 6. Deriva valores durante o render e usa efeitos apenas para sincronizar com
-   sistemas externos, como DOM, rede ou storage.
+   sistemas externos, como DOM, rede ou storage. Para ler o valor mais recente
+   dentro de um efeito sem reiniciar a conexão, usa `useEffectEvent` no React
+   19.2 ou superior.
 7. Implementa semântica HTML e teclado antes do acabamento visual e cobre o
    comportamento com testes.
 8. Mede performance apenas diante de um sintoma, com profiler ou métrica de
@@ -51,7 +53,12 @@ Componentes React e UI Design.
   booleano `loading`.
 - Listas usam `key` estável vinda do registro, como o id.
 - Cada `Context.Provider` é separado pela frequência de mudança.
-- `memo`, `useMemo` e `useCallback` entram depois de uma medição.
+- `memo`, `useMemo` e `useCallback` entram depois de uma medição. Com o React
+  Compiler ligado no build, o compilador cuida dessa otimização e a
+  memoização manual deixa de ser necessária na maioria dos casos.
+- Abas, painéis e formulários que serão reabertos usam `<Activity>` para
+  preservar estado e DOM em vez de serem desmontados, com cleanup nos efeitos
+  de mídia.
 - Os testes verificam texto, papel e estado visíveis, em vez de detalhes
   internos dos hooks.
 
@@ -60,6 +67,8 @@ Componentes React e UI Design.
 - `useEffect(() => setX(prop), [prop])`, que duplica o estado.
 - Cadeias de efeitos que disparam outros efeitos.
 - Dependências incompletas silenciadas com `eslint-disable`.
+- `useEffectEvent` usado para esconder uma dependência que deveria reexecutar
+  o efeito.
 - Um único `Context.Provider` com todo o estado global da aplicação.
 - `"use client"` em cascata para contornar um erro de hook no Next.js.
 
@@ -71,6 +80,8 @@ Componentes React e UI Design.
 - O console não mostra warnings de chaves, ordem de hooks ou hydration.
 - Profiling e análise de bundle aparecem com medição de antes e depois quando
   existe uma suposição de performance.
+- O build confirma a versão do React usada: `useEffectEvent` e `<Activity>`
+  exigem 19.2, e `<ViewTransition>` exige 19.3.
 
 ## Como instalar
 

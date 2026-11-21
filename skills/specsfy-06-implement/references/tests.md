@@ -81,7 +81,12 @@ a configuração do projeto e [test-levels.md](test-levels.md). Depois:
 1. Exija `Formato: Specsfy/2.0` e `Definition Gate: Passed`. No passo
    `prepare`, use `Status: Defined` e `Plan Gate: Pending`; nos passos `cycle`
    e `verify`, use `Status: Planned` ou `Implementing`.
-2. Selecione uma fatia vertical pequena: um `AC` Gherkin e seus `FR/NFR`.
+2. Em `prepare`, use o ID enviado por `$specsfy-05-tasks`. Se ele faltar,
+   percorra os `Depends` da seção 14 e selecione a primeira tarefa
+   `[TEST] [TDD]` aberta exigida pelo Plan Gate com dependências concluídas.
+   Use a ordem da seção 14 entre tarefas prontas. Derive o teste do `AC`
+   Gherkin e dos `FR/NFR` referenciados. Em `cycle`, selecione a fatia ativa
+   pelo `AC` e seus `FR/NFR`.
 3. Resolva o runner de testes pela stack antes de escrever testes:
    - projeto PHP (`composer.json` ou `artisan`), inclusive PHP + Node: use
      Pest;
@@ -138,10 +143,11 @@ a configuração do projeto e [test-levels.md](test-levels.md). Depois:
 
 Registre o RED observado na tabela `Evidência RED-GREEN-REFACTOR`.
 
-No passo `prepare`, pare após o RED válido, registre a evidência e conclua o
-checklist da tarefa `[TEST]` correspondente. Deixe `Plan Gate` como está:
-anuncie e retorne automaticamente para `$specsfy-05-tasks`, que valida todos
-os predecessores antes de promover a spec para `Planned`.
+No passo `prepare`, registre um RED válido e conclua o checklist da tarefa
+`[TEST] [TDD]` correspondente. Informe o ID e a evidência no retorno automático
+a `$specsfy-05-tasks`. O Plan Gate permanece `Pending` enquanto faltar
+qualquer RED exigido. A skill de tarefas valida cada retorno e faz um novo
+handoff de `tests` → `prepare` para o próximo RED até completar o plano.
 
 ### GREEN
 

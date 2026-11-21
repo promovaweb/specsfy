@@ -97,10 +97,11 @@ Padrões do modo Deploy:
 - O `SEMVER` na raiz governa imagem, manifesto, tag Git e release.
 - O `compose.yaml` serve ao desenvolvimento e o `stack.yaml` à produção, que
   roda pelo Docker Swarm.
-- Em Laravel, a imagem usa `laravel/octane` com Open Swoole
-  (`--server=swoole`).
+- No template do Specsfy para Laravel, a imagem usa `laravel/octane` com
+  Open Swoole (`--server=swoole`).
 - O `cloudflared` roda como serviço da stack na mesma rede overlay da
-  aplicação, com o serviço Laravel sem porta pública.
+  aplicação, com o serviço Laravel sem porta pública. A opção `--token-file`
+  exige `cloudflared` 2025.4.0 ou posterior e um túnel gerenciado remotamente.
 - O Ansible configura o servidor e o Swarm. Sequências manuais de SSH ficam
   fora do procedimento principal.
 - Somente o usuário `deploy` entra no grupo `docker`, porque esse grupo dá
@@ -182,8 +183,8 @@ Padrões do modo CI/CD:
 
 - Credenciais temporárias, como OIDC, substituem segredos estáticos de longa
   duração.
-- Actions e dependências do pipeline ficam fixadas por hash ou versão exata,
-  sem tags móveis como `@latest`.
+- Actions externas do GitHub ficam fixadas pelo SHA completo. Use lockfile ou
+  digest para as demais dependências quando o ecossistema oferecer suporte.
 - O artefato é construído uma vez, identificado por digest ou assinatura e
   promovido sem recompilação.
 - Dois deploys do mesmo serviço não rodam ao mesmo tempo.
@@ -194,6 +195,25 @@ Padrões do modo CI/CD:
 - O rollback de código e o rollback de banco têm planos separados, porque nem
   toda migration é reversível.
 - A trilha de auditoria registra as promoções e aprovações sem expor segredos.
+
+## GitHub Actions
+
+No modo `ci-cd`, use a [referência de GitHub Actions](../../../specialists/specsfy-specialist-delivery/references/github-actions.md)
+para configurar os workflows em `.github/workflows/`. Cada workflow declara
+os eventos que o disparam e os jobs que executa. Uma matriz permite rodar
+o mesmo job em várias versões ou plataformas.
+
+- Use cache para acelerar dependências e artefatos para guardar resultados
+  ou entregá-los a outro job. Promova a imagem identificada pelo digest
+  gerado no build.
+- Restrinja `permissions:` ao necessário, fixe actions externas pelo SHA
+  completo e prefira OIDC para obter credenciais temporárias.
+- Proteja o ambiente de produção com regras de branch e aprovação quando o
+  plano oferecer esse recurso. Controle a concorrência por serviço e ambiente
+  para evitar que dois deploys alterem o mesmo destino ao mesmo tempo.
+- Use workflows reutilizáveis quando vários pipelines tiverem a mesma
+  sequência. Confira o comportamento em PR de fork, com aprovação pendente
+  e com duas promoções simultâneas.
 
 ## Erros que ele evita
 

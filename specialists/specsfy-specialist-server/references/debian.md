@@ -22,8 +22,12 @@ estado do daemon, função no cluster, labels, disponibilidade, uso de
 
 ## APT e atualizações
 
+A série estável revisada é Debian 13 (trixie). Debian 12 (bookworm) está
+em LTS. Em hosts existentes, use a documentação da série encontrada em
+`/etc/os-release` e confira a cobertura da arquitetura e dos pacotes.
+
 - Manter entradas de repositório compatíveis com a release indicada em
-  `/etc/os-release` e chaves em keyrings próprios.
+  `/etc/os-release` e limitar a chave do repositório com `Signed-By`.
 - Simular upgrades, ler pacotes retidos e identificar serviços ou reboot
   necessários antes da janela de manutenção.
 - Confirmar os timers `apt-daily.timer` e `apt-daily-upgrade.timer` quando o
@@ -54,11 +58,16 @@ do cluster. Controle, descoberta e VXLAN não devem ficar abertos para a
 internet. Serviços internos podem usar overlay criptografada sem publicar
 portas no host.
 
+A política nftables do host é independente do backend de firewall do Docker.
+No Engine 29, mantenha o backend iptables em Swarm: o backend nativo nftables é
+experimental e ainda não implementa as regras de overlay. Valide o acesso às
+portas publicadas e as regras efetivas depois de recarregar o firewall.
+
 ## Fontes oficiais
 
 - [Manual de administração Debian](https://www.debian.org/doc/manuals/debian-handbook/)
 - [Manual de proteção Debian](https://www.debian.org/doc/manuals/securing-debian-manual/)
-- [Referência `sysctl.d`](https://manpages.debian.org/bookworm/systemd/sysctl.d.5.en.html)
+- [Referência `sysctl.d`](https://manpages.debian.org/trixie/systemd/sysctl.d.5.en.html)
 - [Atualizações periódicas](https://wiki.debian.org/PeriodicUpdates)
 - [nftables no Debian](https://wiki.debian.org/nftables)
 - [Docker Engine no Debian](https://docs.docker.com/engine/install/debian/)

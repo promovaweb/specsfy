@@ -45,7 +45,8 @@ escolha de produto sobre qual mudança deve prevalecer pertence a você.
    integrações:
    - `feature/*` parte de `develop` e volta para `develop`
    - `release/*` parte de `develop` e vai para `main` e `develop`
-   - `hotfix/*` parte de `main` e vai para `main` e `develop`
+   - `hotfix/*` parte de `main` e vai para `main` e `develop`. Se houver
+     uma `release/*` aberta, ela pode levar a correção a `develop`
 6. Coordena a tag de versão no merge de `release/*` ou `hotfix/*` em `main`,
    de acordo com o versionamento do projeto.
 7. Confere que `develop` recebeu todas as correções feitas em `release/*` ou
@@ -53,17 +54,18 @@ escolha de produto sobre qual mudança deve prevalecer pertence a você.
 
 Padrões do modo Gitflow:
 
-- Toda integração usa `git merge --no-ff`, que preserva o registro da branch no
-  histórico.
+- Na convenção do Specsfy, toda integração de feature, release e hotfix usa
+  `git merge --no-ff` para criar um commit de merge identificável.
 - Os prefixos seguem o mesmo separador em todo o projeto, como
   `feature/<slug>` e `release/<versao>`.
 - `release/*` e `hotfix/*` partem do commit correspondente, sem cherry-pick
   seletivo.
 - Uma `release/*` aberta recebe somente correções, textos, documentação,
   changelog e versão.
-- Cada `hotfix/*` chega a `main` com tag e a `develop` na mesma operação.
-- As branches de vida curta são apagadas depois do merge confirmado nos dois
-  destinos.
+- Cada `hotfix/*` recebe uma tag em `main` e chega a `develop` diretamente
+  ou pela release em curso.
+- As branches de vida curta são apagadas depois do merge confirmado nos
+  destinos previstos.
 - Uma branch `support/*` mantém versão anterior quando o projeto precisa
   sustentar mais de uma linha de release.
 
@@ -83,8 +85,9 @@ Padrões do modo Gitflow:
    descrito na spec ou na issue e registra a alternativa descartada.
 6. Remove os marcadores, valida a sintaxe e roda lint e typecheck nos arquivos
    alterados.
-7. Retoma o comando com `git merge --continue` ou `git rebase --continue` e
-   executa a suíte de regressão relevante.
+7. Adiciona os caminhos resolvidos ao índice e retoma a operação com
+   `git merge --continue`, `git rebase --continue` ou
+   `git cherry-pick --continue`. Depois executa a regressão relevante.
 
 Padrões do modo Conflitos:
 
@@ -119,13 +122,13 @@ Padrões do modo Conflitos:
 
 - `git log --graph --oneline --all` mostra os merges `--no-ff` como commits de
   merge identificáveis.
-- `git branch -a --merged develop` e `git branch -a --merged main` são
-  conferidos antes de apagar uma branch.
+- `git branch -a --merged <destino>` confirma que a branch foi integrada
+  em cada destino previsto antes de apagá-la.
 - Cada release ou hotfix fechado tem tag em `main` e a mesma correção em
   `develop`.
 - O `.specsfy/RULES.md` registra a convenção de nomes e a política de merge.
-- `git status` não mostra arquivos unmerged e nenhum `<<<<<<<` permanece no
-  diretório de trabalho.
+- `git status` confirma que não há arquivos por resolver. `git diff --check`
+  e `git diff --cached --check` apontam marcadores de conflito nas mudanças.
 - O resultado combinado foi revisado trecho a trecho contra a intenção dos dois
   lados.
 - Typecheck, build, testes focais e a suíte de regressão rodaram.

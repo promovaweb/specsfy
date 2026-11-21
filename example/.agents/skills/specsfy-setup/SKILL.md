@@ -74,12 +74,17 @@ GitHub Spec Kit (`sync_speckit_context.mjs`) roda dentro do
   cada command. Contexto, specs, testes e código ficam dentro dessa raiz.
 - Nunca substitua um arquivo de contexto existente. Conteúdo humano fora dos
   blocos `specsfy:*:start` e `specsfy:*:end` continua intacto.
-- Só entra no contexto o que uma fonte executável sustenta ou o que a pessoa
-  confirmou. Hipótese e sugestão ficam na conversa.
+- Registre no contexto o que a fonte executável sustenta, o que a pessoa
+  confirmou e escolhas expressamente delegadas, com fonte e alcance. Hipótese
+  e sugestão ficam na conversa.
 - Não registre segredo, token, string de conexão, valor de `.env`, dado de
   produção nem dado pessoal sensível.
 - Em Laravel, nenhum teste roda antes de `specsfy gate database` retornar
   `SAFE`, e comandos que apagam banco ou schema são sempre ignorados.
 - Feche cada modo com `specsfy context monitor --project <raiz> --check` e
   resolva todo `PENDING` antes de devolver o controle.
+- No modo `setup`, registre Laravel Octane com Open Swoole ausente e, em
+  Laravel com React, ausência de shadcn/ui ou ReUI em `Pendências de stack`.
+  Aprove o setup quando os demais critérios passarem e encaminhe a instalação
+  ao planejamento como pré-condição do deploy.
 - Os limites completos de cada modo estão na referência correspondente.

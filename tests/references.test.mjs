@@ -7,7 +7,7 @@ import {execFileSync} from 'node:child_process';
 import {ROOT,read} from './helpers.mjs';
 const ignored=new Set(['.git','.mypy_cache','.pytest_cache','.ruff_cache','.venv','__pycache__','build','dist','node_modules','vendor']);
 // Skills do Termfy em cli/.agents/skills/termfy-* são cópias do framework externo, instaladas por npx skills, e não prosa autoral.
-const vendored=path=>relative(ROOT,path).replaceAll("\\","/").startsWith("cli/.agents/skills/termfy");
+const vendored=path=>{const rel=relative(ROOT,path).replaceAll("\\","/");return rel.startsWith("cli/.agents/skills/termfy")||rel.startsWith("cli/tests/fixtures/specialists");};
 function files(suffixes,directory=ROOT){return readdirSync(directory,{withFileTypes:true}).flatMap(entry=>ignored.has(entry.name)||vendored(join(directory,entry.name))?[]:entry.isDirectory()?files(suffixes,join(directory,entry.name)):suffixes.includes(extname(entry.name))?[join(directory,entry.name)]:[]).sort();}
 const htmlTargets=text=>[...text.matchAll(/\b(?:href|src|srcset|poster)=(["'])(.*?)\1/gi)].map(match=>match[2]);
 function targets(text){return [...[...text.matchAll(/!?\[[^\]]*\]\(([^)\s]+)(?:\s+[^)]*)?\)/g)].map(m=>m[1]),...[...text.matchAll(/^\s*\[[^\]]+\]:\s*(\S+)/gm)].map(m=>m[1]),...htmlTargets(text)];}

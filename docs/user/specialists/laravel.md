@@ -16,6 +16,7 @@ para cada dependência em `docs/packages/`.
 - Você recebeu a URL GitHub de um pacote para uma aplicação Laravel, um pacote
   instalado ainda não tem ficha de uso ou o `composer.json`, o `composer.lock`
   e o `docs/packages/` estão fora de sincronia.
+- Você precisa expor operações da aplicação a um cliente MCP por HTTP.
 
 A escolha de schema, índice e plano de query fica com o especialista
 [PostgreSQL](postgres.md). O resultado dessa análise volta para o Eloquent na
@@ -27,9 +28,8 @@ Packagist ficam fora deste especialista.
 1. Lê as instruções locais, o `composer.json` e o `composer.lock` para confirmar
    as versões do framework, do PHP e de pacotes como Sanctum, Horizon, Octane e
    Scout.
-2. Identifica se o pedido é de aplicação em execução ou de dependência nova. Em
-   dúvida, resolve a instalação e a documentação do pacote antes de alterar
-   código de aplicação.
+2. Identifica se a tarefa envolve a aplicação, um pacote Composer ou um
+   servidor MCP por HTTP.
 3. Lê `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas existentes
    antes de propor pacote, comando ou abstração.
 4. Registra a consequência operacional quando a ação exigir autorização
@@ -37,8 +37,9 @@ Packagist ficam fora deste especialista.
 
 ## Aplicação Laravel
 
-1. Trata Laravel Octane com Open Swoole como runtime obrigatório. Quando ele
-   está ausente, a instalação e a configuração entram no trabalho.
+1. Trata Laravel Octane com Open Swoole como runtime obrigatório. O setup
+   registra a ausência como pendência de stack. Instalar e configurar o
+   runtime é pré-condição do deploy.
 2. Acompanha a requisição da entrada até o domínio, a persistência, a resposta e
    os efeitos assíncronos. Também localiza onde as regras de negócio já vivem no
    projeto.
@@ -80,6 +81,23 @@ Packagist ficam fora deste especialista.
    escritas à mão fora da seção gerenciada.
 8. Mantém o `docs/packages/README.md` como índice dos pacotes diretos, com
    versão, finalidade e link para cada ficha.
+
+## Servidor MCP
+
+No modo `mcp`, o agente usa o pacote oficial `laravel/mcp` para expor
+operações da aplicação a clientes de IA. Ele registra a URL por
+`Mcp::web` em `routes/ai.php`, declara os dados que cada ferramenta recebe
+e devolve e aplica as políticas do Laravel antes de acessar os dados.
+
+Para clientes que já recebem um token, ele pode usar Sanctum. Para clientes
+que precisam descobrir o servidor de autorização e obter um token via
+OAuth, usa o fluxo documentado com Passport. O agente confirma a execução
+dos handlers com Pest ou PHPUnit e verifica a rota real com
+`php artisan mcp:inspector mcp/catalog`, usando o caminho configurado
+no seu projeto.
+
+Veja o [exemplo técnico](../../../specialists/specsfy-specialist-laravel/references/mcp.md)
+e o guia [MCP](mcp.md) para o contrato do protocolo.
 
 ## O que fica em `docs/packages/`
 

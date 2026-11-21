@@ -1,5 +1,7 @@
 # Padrões e referências Laravel
 
+Revisado em 2026-11-20 contra: docs oficiais do Laravel 13.x (releases, Octane, Eloquent, autorização, filas, migrations, database testing), Laravel 12.x (releases) e o código de `laravel/octane` 2.x (`config/octane.php`, `StartCommand`, `InstallCommand`) e `laravel/framework` 13.x.
+
 ## Índice das referências
 
 | Modo | Arquivo | Conteúdo |
@@ -13,6 +15,10 @@
   coleção. Detecte contando queries (Debugbar, Telescope, `DB::listen`,
   `Model::preventLazyLoading()` em ambiente de teste/dev) e corrija com
   `with()`/`load()`/`withCount()`, nunca escondendo a query em um accessor.
+- `expectsDatabaseQueryCount()` é a asserção nativa de teste para fixar o
+  total de queries de um caso; para medir só um trecho, conte em `DB::listen`
+  depois de semear os dados. `assertQueryCountLessThan()` não faz parte do
+  framework, vem de pacote de terceiros.
 - `chunkById`/`lazyById` para processar tabelas grandes sem carregar tudo em
   memória; `cursor()` quando o driver e o volume permitirem streaming sem
   hidratar toda a coleção.
@@ -76,14 +82,25 @@
 - Laravel Octane com Open Swoole e `laravel/octane` é o runtime HTTP
   obrigatório. Instale `openswoole` por PECL na imagem, execute
   `octane:start --server=swoole`, configure o healthcheck no processo Octane e
-  recarregue os workers durante o deploy.
+  recarregue os workers durante o deploy. (regra da casa)
+- A documentação do Octane lista FrankenPHP, RoadRunner, Swoole e Open
+  Swoole, mas `config/octane.php` e `octane:install` aceitam `frankenphp`,
+  `roadrunner` e `swoole` (o driver swoole também reconhece a extensão
+  `openswoole`), e o instalador usa `frankenphp` como padrão. A exigência de
+  Open Swoole é regra deste catálogo, não uma obrigação do framework: confirme
+  com `composer show laravel/octane` e com `config/octane.php` antes de trocar o
+  servidor de um projeto existente.
+- `octane:reload` recarrega os workers depois do deploy, `octane:status`
+  confirma que o processo está de pé e `octane:stop` encerra o servidor. Em
+  produção use Supervisor ou equivalente para reiniciar após crash.
 - Revise singletons, estado estático e callbacks capturados: workers Octane
   persistem entre requisições e não podem carregar dados de um usuário para o
   próximo.
-- `config:cache`, `route:cache`, `event:cache` reduzem I/O de boot; qualquer
-  um deles fica obsoleto silenciosamente se o deploy não os regenerar após
-  mudar config/rotas/listeners — automatizar no pipeline, não como passo
-  manual esquecível.
+- `config:cache`, `route:cache`, `event:cache` (ou `php artisan optimize`, que
+  agrupa config, eventos, rotas e views) reduzem I/O de boot; qualquer um deles
+  fica obsoleto silenciosamente se o deploy não os regenerar após mudar
+  config/rotas/listeners — automatizar no pipeline, não como passo manual
+  esquecível.
 - Workers (`queue:work`) precisam de supervisor/systemd que reinicie após
   deploy (`queue:restart` sinaliza, não mata) e após crash.
 - `schedule:run` via cron único chamando o Scheduler do Laravel, nunca um
@@ -133,9 +150,11 @@
 ## Fontes oficiais
 
 - [Documentação Laravel](https://laravel.com/docs)
-- [Laravel Octane e Open Swoole](https://laravel.com/docs/octane#swoole)
+- [Notas de versão e política de suporte](https://laravel.com/docs/releases)
+- [Laravel Octane](https://laravel.com/docs/octane) e [seção Swoole/Open Swoole](https://laravel.com/docs/octane#swoole)
 - [Ciclo de vida da requisição](https://laravel.com/docs/lifecycle)
 - [Relacionamentos Eloquent e eager loading](https://laravel.com/docs/eloquent-relationships)
+- [Testes de banco e `expectsDatabaseQueryCount`](https://laravel.com/docs/database-testing)
 - [Autorização com Policies e Gates](https://laravel.com/docs/authorization)
 - [Filas](https://laravel.com/docs/queues)
 - [Banco e migrations](https://laravel.com/docs/migrations)
@@ -145,3 +164,9 @@
 
 Confirme a versão instalada em `composer.lock` antes de usar uma API — o
 comportamento de casts, filas e autorização mudou entre versões majors.
+
+Versões em 20/11/2026: Laravel 13 é a versão atual (PHP 8.3 a 8.5, lançada no
+Q1 de 2026, correções de bug até o Q3 de 2027); Laravel 12 (PHP 8.2 a 8.5)
+segue com correções de segurança até 24/02/2027; Laravel 11 encerrou o suporte
+de segurança em 12/03/2026. Não trate uma versão sem suporte como base de
+recomendação.

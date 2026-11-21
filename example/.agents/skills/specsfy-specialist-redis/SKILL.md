@@ -27,6 +27,12 @@ description: Projetar e operar Redis para cache, filas, sessões, rate limiting,
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
    `.specsfy/RULES.md` e, quando a chave ou a fila derivar de tabela
    existente, `.specsfy/DATABASE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-redis`. Sem indicação, confirme pelo
    "Quando usar" acima qual dado fica no Redis e qual é a fonte de verdade.
@@ -87,6 +93,11 @@ description: Projetar e operar Redis para cache, filas, sessões, rate limiting,
   é fire-and-forget (assinante ausente perde a mensagem); Streams com
   consumer group oferece at-least-once com ACK explícito e precisa de
   reprocessamento idempotente do lado consumidor.
+- Confirmar servidor e versão (`INFO server`) antes de usar recurso recente:
+  política de eviction LRM, vector sets e os módulos JSON/Search/TimeSeries/
+  Bloom chegaram no Redis Open Source 8.x e não existem no Redis 7. Em Valkey,
+  que segue linha própria, confirme se o comando ou módulo equivalente existe na
+  versão instalada antes de depender dele.
 
 ## Antipadrões
 
@@ -102,10 +113,10 @@ description: Projetar e operar Redis para cache, filas, sessões, rate limiting,
 - Lock distribuído implementado com `SETNX` + `DEL` simples, sem TTL: um
   processo que trava ou morre antes do `DEL` deixa o lock preso
   indefinidamente.
-- Tratar `maxmemory-policy` padrão (`noeviction`) como cache automático, com
-  `noeviction`, ao atingir o limite de memória o Redis passa a **rejeitar
-  escritas** em vez de evictar, o que derruba a aplicação se ela não trata
-  esse erro.
+- Tratar `maxmemory-policy` padrão (`noeviction`) como cache automático: com
+  `maxmemory` definido e `noeviction`, o Redis passa a **rejeitar escritas** em
+  vez de evictar, o que derruba a aplicação se ela não trata esse erro. Sem
+  `maxmemory`, não existe limite nem eviction.
 
 ## Validação
 
@@ -137,6 +148,10 @@ description: Projetar e operar Redis para cache, filas, sessões, rate limiting,
   fila/sessão do framework.
 - `$specsfy-specialist-docker` para empacotar e operar Redis/Sentinel/Cluster,
   inclusive no cluster de produção.
+- `$specsfy-specialist-mysql` e `$specsfy-specialist-mongodb` guardam a fonte
+  de verdade que o cache e a fila nunca substituem.
+- `$specsfy-specialist-n8n` quando o Redis for o broker do queue mode: aqui se
+  define chave, TTL e eviction; lá se decide a topologia da fila.
 
 Leia [references/standards.md](references/standards.md) para estruturas de
 dado, persistência, cluster, segurança e padrões de cache.

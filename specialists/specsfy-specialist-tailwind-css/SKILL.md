@@ -10,7 +10,9 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 - Acionar quando o projeto depende de `tailwindcss` e a tarefa envolve
   classe utilitária, tema, variante, responsividade ou dark mode.
 - Acionar também para decidir se um padrão visual repetido deve virar token,
-  `@apply` local ou componente extraído.
+  `@apply` local ou componente extraído, ou se um utilitário novo da versão
+  instalada (scrollbar, container de tamanho, zoom, tab-size) resolve sem CSS
+  próprio.
 - Não acionar para a escolha da biblioteca de componentes em si (Radix,
   shadcn/ui); usar `$specsfy-specialist-ui-components` para isso e voltar aqui
   para o sistema de tokens e classes que a sustenta.
@@ -24,6 +26,12 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
    `.specsfy/RULES.md` e, para tokens e telas em uso, `INTERFACE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-tailwind-css`. Sem indicação, confirme
    pelo "Quando usar" acima a versão instalada antes de propor sintaxe.
@@ -39,9 +47,11 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 
 ## Fluxo
 
-1. Confirmar a versão do Tailwind, a integração (Vite, PostCSS, framework) e
-   onde os tokens são declarados (`tailwind.config.js` ou `@theme` em CSS na
-   v4): a sintaxe de configuração muda entre gerações.
+1. Confirmar a versão do Tailwind, a integração (Vite, PostCSS, webpack ou
+   framework) e onde os tokens são declarados (`tailwind.config.js` ou `@theme`
+   em CSS na v4): a sintaxe de configuração muda entre gerações. Na v4.3, a
+   integração usa `@tailwindcss/vite`, `@tailwindcss/postcss` ou
+   `@tailwindcss/webpack`, e o CLI é `@tailwindcss/cli`.
 2. Traduzir o layout e os estados da interface em constraints responsivas
    (breakpoints ou `@container`) antes de escrever a primeira classe.
 3. Reutilizar tokens semânticos já existentes (cor, espaçamento, radius,
@@ -71,6 +81,7 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 - Não usar `@apply` como substituto geral de componente: ele recria uma
   folha de estilo tradicional dentro do utility-first e perde a
   colocação (a classe deixa de estar ao lado do elemento que ela estiliza).
+  (regra da casa)
 - Garantir que toda classe construída dinamicamente (template string,
   concatenação condicional) seja detectável estaticamente pelo scanner de
   conteúdo: usar mapas completos de classes literais em vez de montar a
@@ -82,7 +93,16 @@ description: Implementar e revisar Tailwind CSS com tokens, variantes, responsiv
 - Preferir layout fluido (`flex`, `grid`, unidades relativas) e
   `@container` quando o componente precisa responder ao próprio contêiner
   (ex.: um card que muda de layout dentro de uma sidebar estreita), não ao
-  viewport inteiro.
+  viewport inteiro. Na v4.3, `@container-size` cobre o caso em que a consulta
+  depende também da altura (`cqb`/`cqh`).
+- Usar propriedades lógicas (`ms-`, `me-`, `pbs-`, `pbe-`, `inline-*`,
+  `block-*`, `inset-s-*`, `inset-e-*`) quando o layout precisa sobreviver a
+  RTL ou modo de escrita vertical; `start-*` e `end-*` estão depreciados na
+  v4.2 em favor de `inset-s-*` e `inset-e-*`.
+- Preferir o utilitário de primeira parte da versão instalada antes de CSS
+  customizado: `scrollbar-*` e `scrollbar-gutter-*` (v4.3), `zoom-*` (v4.3),
+  `tab-*` (v4.3), `font-features-*` (v4.2) e as paletas `mauve`, `olive`,
+  `mist` e `taupe` (v4.2).
 - Não multiplicar valores arbitrários (`p-[13px]`, `text-[15px]`) sem antes
   perguntar se um novo token de escala deveria existir: um valor arbitrário
   isolado é aceitável; vários próximos e repetidos indicam token ausente.

@@ -25,6 +25,12 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, quando a mudança publicar ou alterar pacote,
    `.specsfy/PACKAGES.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-typescript`. Sem indicação, confirme
    pelo "Quando usar" acima qual contrato de tipos está em jogo.
@@ -40,9 +46,13 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 
 ## Fluxo
 
-1. Ler `tsconfig` (strict flags ativas), `package.json#type`, bundler e
+1. Ler `tsconfig` (strict flags efetivas), `package.json#type`, bundler e
    runtime alvo, além da versão do TypeScript instalada antes de recomendar uma
-   sintaxe ou opção específica.
+   sintaxe ou opção específica. Registre a geração: TypeScript 6.0 e 7.0
+   mudaram defaults e removeram flags (detalhe em
+   [references/standards.md](references/standards.md)); o 7.0 é o compilador
+   nativo, sem API pública, e ferramentas que embutem o compilador podem exigir
+   o 6.0 em paralelo.
 2. Identificar as fronteiras não confiáveis do código alterado (entrada de
    rede, arquivo, variável de ambiente, resposta de terceiro) e os tipos que
    formam a API pública do módulo.
@@ -62,9 +72,16 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
 
 ## Padrões
 
-- Ativar as opções strict compatíveis com o projeto (`strict`,
-  `strictNullChecks`, `noUncheckedIndexedAccess` quando viável) e corrigir os
-  erros revelados por elas, nunca silenciá-los com cast cosmético.
+- Confirmar as opções strict efetivas: em TypeScript 5.x elas precisam ser
+  ativadas (`strict`, `strictNullChecks`, `noUncheckedIndexedAccess` quando
+  viável); a partir do 6.0, `strict` já é `true` por default. Corrigir os
+  erros revelados pelas flags, nunca silenciá-los com cast cosmético.
+- Respeitar o `moduleResolution` da geração instalada: `node`/`node10` e
+  `classic` foram removidos no 7.0; use `bundler` ou `nodenext`. `baseUrl`
+  também saiu, e `paths` passa a ser relativo à raiz do projeto.
+- Lembrar que, a partir do 6.0, `module` default é `esnext`, `types` default é
+  `[]`, `rootDir` default é `./` e `noUncheckedSideEffectImports` é `true`:
+  projeto que depende de `@types` global precisa listar os pacotes.
 - Preferir uma union discriminada (`{ status: "ok"; data: T } | { status: "error"; error: E }`)
   a combinações de booleanos/campos opcionais que permitem estado inválido
   (`{ loading: true; data: T; error: E }` simultâneos).
@@ -131,6 +148,13 @@ description: Modelar e revisar TypeScript seguro com strictness, narrowing, gene
   API consumido por outro serviço: a fonte de verdade do contrato vive lá.
 - `$specsfy-specialist-code-review` para revisão ampla além de tipos, quando
   a mudança também afeta lógica de negócio ou arquitetura.
+- `$specsfy-specialist-mcp` usa estes tipos em `inputSchema` e
+  `structuredContent`; o contrato do protocolo fica lá, o tipo do domínio
+  continua aqui.
+- `$specsfy-specialist-cloudflare` quando o código tipado rodar em Worker ou
+  Pages: tipo e configuração ficam aqui, runtime e binding lá.
+- `$specsfy-specialist-testing` usa o mesmo contrato de tipo ao escrever o
+  teste que comprova o comportamento.
 
 Leia [references/standards.md](references/standards.md) para modelagem de
 estado com tipos, configuração strict, módulos, bibliotecas e validação

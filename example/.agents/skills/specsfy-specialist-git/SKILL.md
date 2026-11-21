@@ -41,6 +41,11 @@ escreve e a conclusão volta para a spec.
    está escrevendo, mais `.specsfy/STACK.md` e `.specsfy/RULES.md`. Abrir
    `.specsfy/DATABASE.md` ou `.specsfy/PACKAGES.md` quando o conflito tocar
    schema ou dependência.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, ler e
+     registrar no item de `specs/backlog/`; em specify e validate, ler a spec
+     aberta (linha `| Especialistas |`, subseção 8, seção em escrita); só
+     `specsfy-05-tasks` escreve a seção 14, então apenas indicar o que a tarefa
+     deve prever; em `specsfy-06-implement`, seguir a tarefa indicada.
 2. Seguir o modo indicado na spec ou na tarefa
    (`Especialista: $specsfy-specialist-git (gitflow)` ou `(conflicts)`); sem
    indicação, escolher pelo "Quando usar".
@@ -81,8 +86,9 @@ escreve e a conclusão volta para a spec.
    `.specsfy/RULES.md`, não apenas na conversa.
 5. Orientar abertura, integração e fechamento: `feature/*` parte de e volta para
    `develop`; `release/*` parte de `develop` e vai para `main` e `develop`;
-   `hotfix/*` parte de `main` e vai para `main` e `develop`, sempre com
-   `merge --no-ff`.
+   `hotfix/*` parte de `main` e vai para `main` e `develop` ou para a
+   `release/*` aberta, que levará a correção a `develop`. Use `merge --no-ff`
+   conforme a convenção do Specsfy.
 6. Coordenar a tag de versão no merge de `release/*` ou `hotfix/*` em `main`,
    alinhada ao versionamento já adotado pelo projeto.
 7. Conferir que `develop` recebeu de volta toda correção aplicada em `release/*`
@@ -103,15 +109,17 @@ escreve e a conclusão volta para a spec.
    da integração descrito na spec ou issue e registrar o trade-off descartado.
 6. Remover todos os marcadores, validar sintaxe e rodar lint e typecheck nos
    arquivos tocados.
-7. Continuar a operação com `git merge --continue` ou `git rebase --continue` e
-   executar a suíte de regressão relevante antes de publicar.
+7. Adicionar os caminhos resolvidos ao índice e continuar com `git merge
+   --continue`, `git rebase --continue` ou `git cherry-pick --continue`.
+   Executar a suíte de regressão relevante antes de publicar.
 
 ## Padrões
 
 No modo gitflow:
 
 - Usar `git merge --no-ff` em toda integração de `feature/*`, `release/*` e
-  `hotfix/*`: merge fast-forward apaga o registro de que a branch existiu.
+  `hotfix/*`: fast-forward move a referência sem criar um commit de merge.
+  (regra da casa)
 - Nomear com prefixo consistente e o mesmo separador em todo o projeto
   (`feature/<slug>`, `release/<versao>`, `hotfix/<versao-ou-slug>`).
 - Fazer `release/*` e `hotfix/*` partirem exatamente do commit de `develop` ou
@@ -120,12 +128,13 @@ No modo gitflow:
   preparação de release; funcionalidade nova volta para a próxima `feature/*`.
 - Fechar todo `hotfix/*` em `main` com tag e em `develop` (ou na `release/*`
   aberta) na mesma operação.
-- Apagar a branch de vida curta depois do merge confirmado nos dois destinos.
+- Apagar a branch de vida curta depois do merge confirmado nos destinos previstos.
 
 No modo conflicts:
 
 - Nunca usar `git checkout --ours`/`--theirs` ou `-X ours`/`-X theirs` em lote
   por conveniência; cada hunk pode ter resolução correta diferente.
+  (regra da casa)
 - Não editar arquivo gerado sem atualizar a fonte que o gera e regenerar.
 - Preservar mudanças de schema, migrations, testes e contratos de API dos dois
   lados quando não colidem de fato.
@@ -135,9 +144,9 @@ No modo conflicts:
 - Não introduzir comportamento novo além do necessário para resolver o
   conflito; a resolução não é oportunidade de refactor.
 - Não usar `--abort`, force push ou reset destrutivo sem pedido explícito de
-  quem conduz a integração.
-- Conferir que nenhum arquivo permanece unmerged e que o índice está limpo antes
-  de continuar.
+  quem conduz a integração. (regra da casa)
+- Conferir que nenhum arquivo permanece unmerged e que o índice contém apenas
+  as mudanças previstas antes de continuar.
 
 ## Antipadrões
 
@@ -162,15 +171,15 @@ No modo conflicts:
 
 - `git log --graph --oneline --all` (ou `git log --first-parent main`) mostrando
   os merges `--no-ff` de cada branch como commits de merge identificáveis.
-- `git branch -a --merged develop` e `git branch -a --merged main` conferidos
-  antes de apagar uma branch de vida curta.
+- Conferir a integração em cada destino previsto com `git branch -a --merged
+  <destino>` antes de apagar uma branch de vida curta.
 - Tag de versão presente em `main` para cada `release/*` ou `hotfix/*` fechado
-  (`git tag --contains <commit-do-merge>`), com a mesma correção presente em
+  (`git tag --points-at <commit-do-merge>`), com a mesma correção presente em
   `develop`.
 - `.specsfy/RULES.md` registrando convenção de nomes e política de merge,
   revisitada pelo modo `rules` de `$specsfy-setup` quando alguém a violar.
-- `git status` sem arquivo unmerged e `grep` sem `<<<<<<<` residual no diretório
-  de trabalho.
+- `git status` sem arquivo unmerged e `git diff --check` e
+  `git diff --cached --check` sem marcador introduzido antes de continuar.
 - Diff combinado revisado hunk a hunk contra a intenção reconstruída de ambos os
   lados, com typecheck, build, testes focais e suíte de regressão executados.
 - Histórico resultante e destino do push (branch, force ou não) confirmados
@@ -187,6 +196,8 @@ No modo conflicts:
   diff novo, inclusive o que a resolução introduziu.
 - `$specsfy-specialist-modeling` entra quando o conflito semântico revela dois
   modelos do mesmo conceito de domínio incompatíveis.
+- `$specsfy-specialist-n8n` versiona o workflow exportado na branch e na
+  revisão definidas aqui.
 
 Leia [references/standards.md](references/standards.md) para os padrões comuns,
 o índice dos modos e as fontes oficiais, [references/gitflow.md](references/gitflow.md)

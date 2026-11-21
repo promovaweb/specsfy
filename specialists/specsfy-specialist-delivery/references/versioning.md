@@ -5,13 +5,16 @@
 O arquivo `SEMVER` vive na raiz do projeto e contém somente uma versão estável
 no formato `MAJOR.MINOR.PATCH`. O valor termina com quebra de linha. O modo
 versioning recusa prefixo `v`, espaços, metadados, versão preliminar e conteúdo
-adicional.
+adicional. (regra da casa)
 
-A especificação oficial do [Semantic Versioning](https://semver.org/) define:
+A restrição a versões estáveis é do Specsfy. A especificação oficial do [Semantic Versioning](https://semver.org/) define:
 
 - `patch` para correção compatível;
 - `minor` para capacidade nova e compatível;
 - `major` para mudança incompatível na interface pública.
+
+O SemVer 2.0.0 também prevê pré-releases e metadados de build. A série
+`0.y.z` é de desenvolvimento inicial e não promete estabilidade da API.
 
 ## Correspondência entre artefatos
 
@@ -38,7 +41,7 @@ o conteúdo promovido entre ambientes, sem recompilação.
 7. Promover o mesmo digest e observar a convergência.
 
 Essa sequência impede uma tag Git pública de apontar para uma imagem ausente.
-Qualquer ação remota exige autorização explícita.
+Qualquer ação remota exige autorização explícita. (regra da casa)
 
 ## Fontes
 

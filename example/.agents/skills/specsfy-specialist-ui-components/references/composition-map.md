@@ -86,8 +86,9 @@ Sequência comum:
 2. `PageHeader`: um componente compartilhado de contexto, título, descrição e
    ação principal da tela, configurado por props ou configuração.
 3. Lista: `ui-data-display` com `DataGrid` em largura total, coluna `ID`,
-   resumo, busca, filtros, ordenação, paginação e ações de editar e apagar por
-   registro.
+   resumo, busca, filtros, ordenação, paginação e as ações das operações
+   incluídas no Contrato CRUD; uma tela só de listagem e cadastro não ganha
+   editar e apagar.
 4. Detalhe: `ui-data-display` com `DetailLists`, status, atributos agrupados,
    atividade e relações quando o domínio pedir.
 5. Criar ou editar: seções com coluna de contexto e painel em duas colunas nos
@@ -102,9 +103,9 @@ Regras do fluxo:
 - `DESIGNSYSTEM.MD` define a composição macro antes da seleção de assets.
 - O erro de campo aparece em vermelho abaixo do campo e leva foco ao primeiro
   erro sem apagar os valores já preenchidos.
-- A linha inteira do DataGrid abre o detalhe por clique e teclado; controles de
-  editar e apagar usam uma camada acima do link da linha e não propagam o
-  clique.
+- A linha inteira do DataGrid abre o detalhe por clique e teclado; os controles
+  das operações incluídas (editar e apagar quando declaradas) usam uma camada
+  acima do link da linha e não propagam o clique.
 - A personalidade vem do domínio, dos dados, da linguagem e dos estados, não
   de uma sequência genérica de cards.
 

@@ -1,5 +1,7 @@
 # Padrões comuns e referências Git
 
+Revisado em 2026-11-20 contra: Git 2.56.0, documentação oficial do Git, modelo de Gitflow de Vincent Driessen e extensão Git Flow AVH arquivada.
+
 Reúne as regras que valem para os dois modos (gitflow e conflicts) e serve de
 índice para a referência de cada um.
 
@@ -29,11 +31,13 @@ Reúne as regras que valem para os dois modos (gitflow e conflicts) e serve de
 - Histórico publicado e compartilhado não é reescrito sem alinhamento com quem
   mais trabalha sobre ele.
 - `--abort`, force push e reset destrutivo dependem de pedido explícito.
+  (regra da casa)
 
 ## Comprovação
 
-- O ciclo de Gitflow só está fechado com merge `--no-ff` rastreável, tag em
-  `main` e a mesma correção em `develop`.
+- Na política do Specsfy, o merge `--no-ff` precisa ser rastreável.
+  Release e hotfix também exigem tag em `main` e a mesma correção em
+  `develop` ao fechar o ciclo. (regra da casa)
 - A resolução só está concluída com build, typecheck e testes revalidados e sem
   arquivo unmerged ou marcador residual.
 
@@ -46,3 +50,10 @@ Reúne as regras que valem para os dois modos (gitflow e conflicts) e serve de
 - [git-tag](https://git-scm.com/docs/git-tag)
 - [git-rerere](https://git-scm.com/docs/git-rerere)
 - [Pro Git: branching workflows](https://git-scm.com/book/en/v2/Git-Branching-Branching-Workflows)
+- [Notas de release do Git 2.56.0](https://github.com/git/git/blob/master/Documentation/RelNotes/2.56.0.adoc)
+- [git-cherry-pick, continuação](https://git-scm.com/docs/git-cherry-pick)
+- [git-diff, AUTO_MERGE e --check](https://git-scm.com/docs/git-diff)
+- [git-log, --merge](https://git-scm.com/docs/git-log)
+- [git-ls-files, estágios do índice](https://git-scm.com/docs/git-ls-files)
+- [git-restore, lados em operações de rebase](https://git-scm.com/docs/git-restore)
+- [Git Flow AVH, implementação de feature finish](https://github.com/petervanderdoes/gitflow-avh/blob/develop/git-flow-feature)

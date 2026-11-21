@@ -74,6 +74,14 @@ domínio.
   precisa de uma linha aqui, nos dois sentidos (a skill B também cita a skill
   A). Não duplique o conteúdo da skill vizinha — aponte a fronteira.
 
+## Regras da casa
+
+Uma convenção da Promovaweb que a fonte oficial do domínio não exige continua
+valendo, mas leva o marcador `(regra da casa)` ao fim do item. O marcador
+avisa que a exigência é política local, não norma externa, e a fonte oficial
+não precisa respaldá-la. O agente cumpre a regra; se a spec precisar
+contrariá-la, registra a exceção na própria spec com o alcance da exceção.
+
 ## Estrutura de `references/`
 
 - `references/standards.md` é obrigatório. Reúna nele as regras comuns, o

@@ -59,8 +59,7 @@ ser reaberta; o `specsfy mcp` segue na versão antiga até o agente reiniciar o 
 
 ## Skills e especialistas
 
-O comando `install` publica as bases, os templates e os especialistas
-detectados:
+O comando `install` publica as bases, os templates e os especialistas detectados:
 
 ```bash
 specsfy install --project . --detected
@@ -74,19 +73,21 @@ vale. Depois da instalação inicial, os subcomandos de `skills` gerenciam o cat
 ```bash
 specsfy skills list
 specsfy skills detect --project .
+specsfy specialists suggest 0001
 specsfy skills install specsfy-specialist-laravel --project .
 specsfy skills remove specsfy-specialist-laravel --project .
 specsfy skills update --project .
 ```
 
-`skills list` e `skills detect` apenas leem. `skills install`, `skills remove` e
-`skills update` alteram o projeto, limitados aos nomes informados. Uma
-skill externa ou com alteração local não é removida sem `--force`.
+`specialists suggest` aceita número, slug ou caminho e mostra sinal, modo
+quando houver, declaração e instalação, também com `--json`. `skills install`,
+`skills remove` e `skills update` alteram o projeto. Skills externas ou com
+alterações locais exigem `--force` para remoção.
 
 ## Ciclo da spec
 
 O ciclo canônico é `draft`, `defined`, `planned`, `in-progress`, `review` e
-`completed`. O comando atualiza o campo `Status` junto com a pasta:
+`completed`. A transição atualiza o `Status` e os vínculos do backlog:
 
 ```bash
 specsfy specs list
@@ -144,9 +145,10 @@ specsfy gate database --project .
 specsfy verify --boundary local
 ```
 
-`specsfy verify` executa a política completa e é a entrada do CI. Os modos
-`local`, `git` e `ci` de `--boundary` aplicam a mesma política. A atestação opcional registra o
-commit, os comandos aprovados e os arquivos cobertos.
+`specsfy verify` executa a política completa no terminal e no CI. A atestação
+opcional registra o commit, os comandos aprovados e os arquivos cobertos.
+Especialistas desconhecidos, ausentes ou sugeridos sem declaração aparecem
+como avisos informativos. Em JSON, consulte `data.warnings`.
 
 ## Inbox e backlog
 
@@ -299,8 +301,8 @@ direita, com as capturas do inbox na mesma lista.
 
 ![Specs](assets/cli/cli-specs.png)
 
-A aba Specs agrupa as specs por estado. A selecionada mostra gates, tarefas e
-progresso, com o Markdown abaixo. `g` abre Gates e `r` recarrega.
+A spec selecionada mostra gates, tarefas e especialistas declarados. A marca
+`(!)` indica instalação ausente. `g` abre Gates e `r` recarrega.
 
 #### Skills: instalar com confirmação
 
@@ -377,9 +379,7 @@ checagem reprovada produz código de saída `3`.
 
 ## Justificativa de tamanho
 
-Comandos, TUI e MCP operam os mesmos arquivos do projeto. Reuni-los nesta página
-permite comparar a ação no terminal com o resultado mostrado na TUI, sem
-duplicar explicações sobre progresso e proteção de alterações locais.
+Comandos, TUI e MCP operam os mesmos arquivos e são apresentados juntos.
 
 ## Segurança e reversibilidade
 

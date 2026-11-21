@@ -204,6 +204,44 @@ function nextSitespecId(worktree) {
  * other removed route gets a 410 in src/config/gone.mjs. Routes that already
  * have a 301 or a 410 are left alone. Returns the routes of each kind.
  */
+/** Heading id the website gives a title (GitHub style: accents kept, punctuation dropped). */
+function headingId(title) {
+  return title.toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, "").trim().replace(/\s/gu, "-");
+}
+
+/**
+ * Page of the specialist that absorbed a merged one, pointing to the section
+ * of the mode (catalog `modes[].absorbs` and `modes[].title`).
+ */
+function absorbedTargets() {
+  const catalog = JSON.parse(readFileSync(join(ROOT, "specialists", "catalog.json"), "utf8"));
+  const targets = {};
+  for (const entry of catalog.skills) {
+    for (const mode of entry.modes ?? []) {
+      if (!mode.absorbs) continue;
+      targets[mode.absorbs] = `/docs/specsfy/especialistas/${entry.name.replace(/^specsfy-specialist-/u, "")}/#${headingId(mode.title)}`;
+    }
+  }
+  return targets;
+}
+
+/** Points the existing 301s of merged specialists to the section of their mode. */
+function refreshSpecialistAnchors(worktree) {
+  const redirectsFile = join(worktree, "src", "config", "redirects.mjs");
+  let redirects = readFileSync(redirectsFile, "utf8");
+  let changed = 0;
+  for (const [name, target] of Object.entries(absorbedTargets())) {
+    const from = `/docs/specsfy/especialistas/${name.replace(/^specsfy-specialist-/u, "")}`;
+    const line = new RegExp(`^(\\t'${from}': )'([^']*)'`, "mu");
+    const match = line.exec(redirects);
+    if (!match || match[2] === target) continue;
+    redirects = redirects.replace(line, `$1'${target}'`);
+    changed++;
+  }
+  if (changed) writeFileSync(redirectsFile, redirects);
+  return changed;
+}
+
 function registerRemovedRoutes(worktree, routes) {
   const result = { moved: [], gone: [] };
   if (!routes.length) return result;
@@ -213,11 +251,13 @@ function registerRemovedRoutes(worktree, routes) {
   let gone = readFileSync(goneFile, "utf8");
   const pending = routes.filter((route) => !redirects.includes(`'${route}'`) && !gone.includes(`'${route}'`));
   const renamed = JSON.parse(readFileSync(join(ROOT, "skills", "inventory.json"), "utf8")).renamed ?? {};
+  const anchored = absorbedTargets();
   const moves = [];
   for (const route of pending) {
     const specialist = /^\/docs\/specsfy\/especialistas\/(.+)$/u.exec(route)?.[1];
-    const target = specialist && renamed[`specsfy-specialist-${specialist}`];
-    if (target) moves.push([route, `/docs/specsfy/especialistas/${target.replace(/^specsfy-specialist-/u, "")}/`]);
+    const name = specialist && `specsfy-specialist-${specialist}`;
+    const target = name && (anchored[name] ?? (renamed[name] && `/docs/specsfy/especialistas/${renamed[name].replace(/^specsfy-specialist-/u, "")}/`));
+    if (target) moves.push([route, target]);
   }
   if (moves.length) {
     const anchor = "\t'/docs/specsfy/ideias':";
@@ -272,6 +312,7 @@ function releaseSite() {
       cpSync(join(WEBSITE, path), join(worktree, path));
     }
     const { moved, gone } = registerRemovedRoutes(worktree, removed);
+    const anchors = refreshSpecialistAnchors(worktree);
     // Give the website checkout back: tracked files return to HEAD and new
     // files the sync created there are removed (media stays, it is ignored).
     for (const path of written) {
@@ -341,7 +382,7 @@ function releaseSite() {
     let count = 0;
     const lock = readFileSync(join(worktree, "package-lock.json"), "utf8").replace(new RegExp(`"version": "${previous.replaceAll(".", "\\.")}"`, "g"), (match) => (count++ < 2 ? `"version": "${next}"` : match));
     writeFileSync(join(worktree, "package-lock.json"), lock);
-    const goneNote = (gone.length ? ` Páginas retiradas, com 410: ${gone.map((route) => `\`${route}/\``).join(", ")}.` : "") + (moved.length ? ` Páginas fundidas, com 301 para a nova: ${moved.map((route) => `\`${route}/\``).join(", ")}.` : "");
+    const goneNote = (gone.length ? ` Páginas retiradas, com 410: ${gone.map((route) => `\`${route}/\``).join(", ")}.` : "") + (moved.length ? ` Páginas fundidas, com 301 para a nova: ${moved.map((route) => `\`${route}/\``).join(", ")}.` : "") + (anchors ? ` ${anchors} redirecionamento(s) de especialistas agrupados passam a apontar para a seção do modo.` : "");
     const entry = `Documentação do Specsfy em \`/docs/specsfy/\` na versão ${version}, com o ebook e as imagens do guia publicados no R2.${goneNote} Sitespec ${id}.`;
     const changelog = readFileSync(join(worktree, "CHANGELOG.md"), "utf8");
     writeFileSync(join(worktree, "CHANGELOG.md"), changelog.replace("# Changelog do website\n\n", `# Changelog do website\n\n## [${next}] - ${now.slice(0, 10)}\n\n### Alterado\n\n- ${entry}\n\n`));

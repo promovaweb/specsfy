@@ -26,10 +26,10 @@ sem alterações e conserva o valor depois do reboot.
 - Inventory por ambiente (`inventories/staging`, `inventories/production`)
   reaproveita as mesmas roles; a diferença entre ambientes vive em
   `group_vars`/`host_vars`, nunca em lógica duplicada dentro da role.
-- Fixe collections e `ansible-core` em `requirements.yml` e
-  `ansible.cfg`/`collections/requirements.yml` com versão mínima e máxima
-  conhecida; uma collection nova pode mudar o comportamento default de um
-  módulo entre versões.
+- Fixe as collections no manifesto do Ansible Galaxy (`requirements.yml`
+  ou `collections/requirements.yml`). Fixe `ansible-core` no manifesto de
+  dependências Python ou na imagem da controladora. Confira as versões de
+  Python suportadas na controladora e nos alvos.
 - Use `tags` com semântica operacional real (`tags: [migration, restart]`)
   para permitir execução seletiva (`--tags`/`--skip-tags`); não use tags como
   substituto de dividir um playbook monolítico em roles menores.
@@ -42,10 +42,12 @@ tem ~22 níveis):
 1. `role defaults` (`defaults/main.yml`).
 2. `inventory group_vars` (do grupo mais genérico ao mais específico).
 3. `inventory host_vars`.
-4. `play vars` e `vars_files` declarados no playbook.
-5. `role vars` (`vars/main.yml` da role, não os defaults).
-6. `set_fact` / `register` em tempo de execução.
-7. Variáveis de linha de comando (`-e`/`--extra-vars`), sempre a mais forte.
+4. Facts do host e `set_fact` recuperado do cache.
+5. `play vars` e `vars_files` declarados no playbook.
+6. `role vars` (`vars/main.yml` da role), vars de bloco e de task e `include_vars`.
+7. `set_fact` / `register` na execução atual, seguidos de parâmetros de
+   role, `include_role` ou include.
+8. Variáveis de linha de comando (`-e`/`--extra-vars`), sempre a mais forte.
 
 Antes de depurar "por que essa variável não tem o valor esperado", confirme
 em qual desses níveis ela está definida; um `-e` na CI, por exemplo,
@@ -73,9 +75,9 @@ sobrescreve silenciosamente qualquer `group_vars`.
   qualquer execução com `--limit` amplo; um padrão de host mal escrito pode
   atingir mais máquinas do que o pretendido.
 - Use `serial` (quantos hosts por lote), `max_fail_percentage` (tolerância de
-  falha antes de abortar o lote) e `any_errors_fatal` (aborta tudo no
-  primeiro erro) conscientemente conforme o alcance da mudança; nunca deixe
-  no default silencioso para uma mudança que afeta produção.
+  falha por lote antes de abortar o play) e `any_errors_fatal` (conclui a
+  tarefa fatal no lote atual e interrompe o play para todos os hosts).
+  Declare a política de parada efetiva para mudanças de produção.
 - Nunca imprima conteúdo de Vault, tokens, senhas ou templates sensíveis em
   `debug:`; use `no_log: true` na task inteira quando o argumento ou o
   resultado contiver segredo, não apenas em partes do output.

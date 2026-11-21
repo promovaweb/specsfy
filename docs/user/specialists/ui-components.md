@@ -52,13 +52,14 @@ com sua autorização.
 
 ## ReUI
 
-O agente confirma React 19, Tailwind CSS v4, shadcn/ui e a variante Base UI
-ou Radix já em uso. Quando `INTERFACE.md` está ausente, usa
-`$specsfy-setup`. Em Laravel, usa o frontend React existente e mantém
-Form Requests, policies e validação no servidor. Blade, Livewire ou Vue
-precisam de migração aprovada e registrada na spec antes de receber ReUI.
-Em Next.js, Astro e React com Vite, o framework continua definindo
-roteamento e hidratação.
+O agente confirma React 19+, Tailwind CSS v4, shadcn/ui com a CLI atual e a
+variante Base UI ou Radix já em uso. Projeto novo criado pelo shadcn/ui nasce
+em Base UI; para manter Radix, o comando é `npx shadcn@latest init -b radix`.
+Quando `INTERFACE.md` está ausente, usa `$specsfy-setup`. Em Laravel, usa o
+frontend React existente e mantém Form Requests, policies e validação no
+servidor. Blade, Livewire ou Vue precisam de migração aprovada e registrada na
+spec antes de receber ReUI. Em Next.js, Astro e React com Vite, o framework
+continua definindo roteamento e hidratação.
 
 Para um CRUD React e Tailwind, o agente consulta Data Grid ou List para
 consulta, Filters para filtros, Form e campos para criar e editar, Dialog
@@ -75,7 +76,8 @@ npx shadcn@latest add @reui/c-alert
 ```
 
 A seleção inclui somente itens gratuitos e suas dependências públicas.
-Os tokens adicionais entram conforme o uso da tela.
+Os tokens adicionais entram conforme o uso da tela. Cada item do catálogo
+existe em variante Base UI e Radix.
 
 ## shadcn/ui
 
@@ -83,12 +85,18 @@ O agente procura os imports nos arquivos da tela e os confere no manifest.
 `@base-ui/react` indica Base UI. `radix-ui` e `@radix-ui/react-*` indicam
 Radix. `react-aria-components` e `@react-aria/*` indicam React Aria. Se
 houver mais de uma base ou os sinais forem insuficientes, registra a
-situação por arquivo e esclarece a base antes de alterar primitives.
+situação por arquivo e esclarece a base antes de alterar primitives. Desde
+julho de 2026, projeto novo nasce em Base UI, e a prop de composição dessa
+base é `render`, no lugar de `asChild`.
 
 O código adicionado pelo registry passa a fazer parte do projeto. O agente
 revisa o código gerado e compara a nova versão com as customizações locais
 antes de atualizar um arquivo. Os tokens de tema ficam centralizados em
-CSS variables.
+CSS variables. Desde setembro de 2026, os componentes importam `cn` do pacote
+`cn`, e `lib/utils.ts` apenas reexporta; projeto antigo migra com
+`npx shadcn@latest migrate cn`. O `init` também adiciona
+`@import "shadcn/tailwind.css"` ao CSS global, com variantes e animações
+compartilhadas, e a CLI oferece `eject` para inlinear esse CSS.
 
 O comportamento orienta a escolha entre Dialog, Popover e Sheet. Título,
 descrição, teclado e retorno de foco são preservados. Cada tabela recebe
@@ -100,7 +108,7 @@ após falha, associa o erro ao campo e valida a entrada no servidor.
 
 - O agente rodou testes, lint, typecheck e build conforme os comandos do
   projeto. Os imports e as dependências existem, e os itens ReUI são do
-  registry gratuito.
+  registry gratuito. Quando o projeto usa a CLI v4, `cn` vem do pacote `cn`.
 - A tela foi verificada com teclado, foco, zoom, contraste e movimento
   reduzido, em celular e desktop, nos temas usados pelo projeto.
 - O fluxo funciona com dados reais e nos estados aplicáveis de

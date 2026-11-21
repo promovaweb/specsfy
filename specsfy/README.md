@@ -376,7 +376,13 @@ descarta a customização protegida.
 ## Uso por stack
 
 O framework base é independente de linguagem. Especialistas acrescentam
-orientação técnica sem alterar os três atos:
+orientação técnica sem alterar os três atos. O catálogo reúne 27 especialistas:
+Laravel, MCP, Supabase, PostgreSQL, MySQL, MongoDB, Redis, Modelagem,
+Arquitetura, Interface, Componentes de UI, React, Tailwind CSS, Next.js,
+TypeScript, Docker, Servidor, Cloudflare, Entrega, n8n, Git, Observabilidade,
+Testes, Segurança de Aplicações, Code Review, Debugging e Pesquisa. O guia de
+cada um está em
+[`docs/user/specialists.md`](../docs/user/specialists.md).
 
 - [Laravel](../docs/user/laravel.md).
 - [Next.js](../docs/user/nextjs.md).

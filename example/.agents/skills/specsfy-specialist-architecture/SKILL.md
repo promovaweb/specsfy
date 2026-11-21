@@ -37,6 +37,12 @@ Não use para:
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` antes de propor boundary, serviço ou contrato.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-architecture (system|web-api)`. Sem
    indicação, escolha o modo pelo "Quando usar" acima.
@@ -125,6 +131,9 @@ Não use para:
   determinística e ID como desempate.
 - Tornar criação/retry seguros com chave de idempotência quando necessário.
 - Proteger webhooks com assinatura, timestamp, replay defense e reentrega.
+- Sinalizar depreciação na própria resposta (`Deprecation`, `Sunset` e
+  `Link rel="deprecation"`) com alternativa, prazo e caminho de migração, em vez
+  de deixar o consumidor descobrir a mudança pelo erro.
 - Evitar breaking changes silenciosas e campos com semântica ambígua.
 - Não expor modelo de persistência como contrato por conveniência.
 
@@ -173,6 +182,7 @@ Não use para:
   changes contra a última versão publicada.
 - Não declarar uma arquitetura "escalável" ou "resiliente" sem o cenário
   mensurável que o comprova: linguagem absoluta sem prova é proibida.
+  (regra da casa)
 - Não declarar compatibilidade ou idempotência sem comprovação de replay e
   teste automatizado do contrato observado pelo consumidor.
 
@@ -192,6 +202,11 @@ Não use para:
   automaticamente a fonte pública do contrato.
 - `$specsfy-specialist-interface` trata a superfície para pessoas quando o
   mesmo sistema também é acessado por tela.
+- `$specsfy-specialist-mcp` quando o contrato exposto for MCP em vez de REST:
+  o boundary de serviço continua decidido aqui, o protocolo Streamable HTTP
+  fica lá.
+- `$specsfy-specialist-mongodb` quando o contrato público for servido por
+  documento: a forma de armazenar não muda o contrato decidido aqui.
 
 Leia [references/standards.md](references/standards.md) para o padrão comum, o
 índice dos modos e as fontes primárias. Leia

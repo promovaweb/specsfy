@@ -46,6 +46,12 @@ docs/user/specialists/debugging.md
 docs/user/specialists/modeling.md
 docs/user/specialists/research.md
 docs/user/specialists/git.md
+docs/user/specialists/mysql.md
+docs/user/specialists/mongodb.md
+docs/user/specialists/cloudflare.md
+docs/user/specialists/n8n.md
+docs/user/specialists/testing.md
+docs/user/specialists/mcp.md
 docs/user/deploy.md
 docs/user/deploy-operations.md
 docs/user/deploy-vault.md

@@ -9,7 +9,8 @@
 2. Para CRUD, fixe um `PageHeader` reutilizável, `DataGrid`, `DetailLists` e
    seções de formulário em duas colunas responsivas conforme a superfície antes
    de consultar `catalog.md`. A lista ocupa a largura disponível, exibe `ID` e
-   oferece editar e apagar na linha.
+   oferece as ações das operações incluídas no campo `Operações:` do Contrato
+   CRUD; listagem e cadastro sem edição e exclusão não ganham essas ações.
 3. Para dashboard, fixe `PageHeader`, filtros, `KPI`, visualização principal e
    lista ou `DataGrid` de investigação antes de consultar `catalog.md`.
 4. Liste apenas a família correspondente.
@@ -66,8 +67,8 @@ foi deliberadamente excluído.
 
 Para formulários, mantenha a coluna de contexto separada do painel de campos,
 refluindo para uma coluna no mobile. Para listas, dê à linha um link de detalhe
-inteiro e mantenha controles internos de editar e apagar acima dessa camada.
-Toda tela mantém um
+inteiro e mantenha os controles das operações incluídas (editar e apagar
+quando declaradas) acima dessa camada. Toda tela mantém um
 `Breadcrumb` com equipe, módulo e título atual; em Laravel, reaproveite o
 componente existente e seus tipos.
 
@@ -88,8 +89,8 @@ componente existente e seus tipos.
   cortado;
 - `PageHeader` é a mesma implementação nas telas CRUD, com variações por props
   ou configuração;
-- a listagem mostra `DataGrid` em largura total, `ID` e ações independentes de
-  editar e apagar na linha;
+- a listagem mostra `DataGrid` em largura total, `ID` e, quando declaradas no
+  campo `Operações:`, ações independentes de editar e apagar na linha;
 - a revisão visual durante o desenvolvimento confere bordas, espaçamentos,
   margens, padding e tipografia, mesmo sem pedido específico;
 - teclado, foco, zoom e reduced motion foram inspecionados;

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Valida findings de produto, arquitetura e segurança registrados na spec. */
 
-import { lstat, readFile, realpath } from "node:fs/promises";
+import { lstat, readFile, realpath, stat } from "node:fs/promises";
 import { basename, dirname, relative, resolve } from "node:path";
 
 const finding = /^-\s+\*\*(FIND-(PROD|ARCH|SEC)-\d{3,})\*\*\s+\[(P[123])\]\s+\[(Open|Resolved|Accepted)\]\s+(.+?)\s+—\s+Refs:\s+(.+?)\s+—\s+Evidence:\s+(.+?)\s+—\s+Effect:\s+(.+?)\s+—\s+Suggestion:\s+(.+?)\s*$/gmu;
@@ -19,11 +19,16 @@ function argumentsMap(argv) {
 }
 
 /** Reconhece o diretório specs nos layouts atual e legado sem depender da profundidade. */
-function projectRoot(spec) {
-  for (let directory = dirname(spec); dirname(directory) !== directory; directory = dirname(directory)) {
+async function projectRoot(spec) {
+  for (let directory = dirname(spec); ; directory = dirname(directory)) {
+    const context = await stat(resolve(directory, ".specsfy")).catch(error => {
+      if (error.code !== "ENOENT") throw error;
+      return null;
+    });
+    if (context?.isDirectory()) return directory;
     if (basename(directory) === "specs" && basename(dirname(directory)) !== "specs") return dirname(directory);
+    if (dirname(directory) === directory) return process.cwd();
   }
-  return resolve(dirname(spec), "../..");
 }
 
 async function safeEvidence(root, locator) {
@@ -65,7 +70,7 @@ try {
   const args = argumentsMap(process.argv.slice(2));
   const spec = resolve(args.spec);
   const text = await readFile(spec, "utf8");
-  const root = args.root ? resolve(args.root) : projectRoot(spec);
+  const root = args.root ? resolve(args.root) : await projectRoot(spec);
   const payload = await analyze(text, root);
   if (args.json) console.log(JSON.stringify(payload, null, 2));
   else {

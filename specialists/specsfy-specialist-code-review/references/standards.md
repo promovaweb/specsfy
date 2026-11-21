@@ -1,5 +1,9 @@
 # Padrões e referências de revisão de código
 
+Revisado em 2026-11-20 contra: Google Engineering Practices (review e
+developer guide, incluindo `reviewer/standard`), OWASP Code Review Guide,
+OWASP WSTG, Conventional Comments e SEI CERT Secure Coding Standards.
+
 ## Lentes de revisão, em ordem de prioridade
 
 1. **Contrato**: a mudança faz o que a spec/issue pede? Cobre os critérios de
@@ -18,14 +22,25 @@
 Revise nessa ordem: um achado crítico de correção importa mais que qualquer
 achado de estilo, mesmo que o estilo seja mais fácil de apontar.
 
+## Padrão de aprovação
+
+- A revisão aprova quando a mudança melhora a saúde do código do sistema, ainda
+  que não esteja perfeita. Exigir perfeição no diff trava entrega sem reduzir
+  defeito, e o Google Engineering Practices adota explicitamente o critério de
+  saúde do código, não o de preferência do revisor.
+- Bloqueia o que piora comportamento, segurança, estrutura ou operação. O que
+  apenas poderia ser melhor vira comentário com dono e prazo, não bloqueio.
+
 ## Tamanho de PR e profundidade de revisão
 
-- PRs grandes (regra prática: acima de ~400 linhas de diff efetivo,
-  ignorando arquivos gerados/lockfile) reduzem a taxa de detecção de defeito
-  por revisor — a atenção não escala linearmente com o tamanho do diff.
-  Quando o PR for grande demais para revisar com confiança, isso é, em si,
-  um achado a reportar, não algo a absorver silenciosamente revisando
-  superficialmente.
+- PRs grandes reduzem a taxa de detecção de defeito por revisor: a atenção não
+  escala linearmente com o tamanho do diff. O Google Engineering Practices
+  recomenda mudança pequena, na ordem de 100 linhas como razoável, e trata 1000
+  linhas como grande demais para revisão confiável. Neste catálogo, ~400 linhas
+  de diff efetivo (ignorando gerados e lockfile) é o limite prático para aplicar
+  as seis lentes com profundidade. Acima disso, o tamanho é, em si, um achado a
+  reportar, não algo a absorver silenciosamente revisando superficialmente.
+  (regra da casa)
 - Separe lockfiles, arquivos gerados e formatação automática do diff
   "efetivo" antes de estimar profundidade necessária.
 - Revisão de PR pequeno e focado permite lente completa (as 6 acima); PR
@@ -35,13 +50,13 @@ achado de estilo, mesmo que o estilo seja mais fácil de apontar.
 ## Severidade
 
 - **Crítica**: exploração de segurança, perda ou corrupção de dado,
-  indisponibilidade ampla provável. Bloqueia merge sempre.
+  indisponibilidade ampla provável. Bloqueia merge sempre. (regra da casa)
 - **Alta**: comportamento incorreto relevante para o usuário ou o negócio,
   sem mitigação existente. Bloqueia merge por padrão.
 - **Média**: falha de escopo limitado ou dívida técnica com impacto
   concreto e localizável. Pode virar follow-up explícito com owner e prazo.
 - **Baixa**: robustez, legibilidade ou manutenção com benefício demonstrável,
-  não apenas preferência. Comentário, nunca bloqueio.
+  não apenas preferência. Comentário, nunca bloqueio. (regra da casa)
 
 ## Formato de achado
 
@@ -72,8 +87,15 @@ Feedback de estilo/preferência usa o mesmo formato, mas rotulado como `nit`
 
 ## Fontes oficiais
 
-- Google Engineering Practices (revisão de código): https://google.github.io/eng-practices/review/
-- Google Engineering Practices (como enviar um CL para revisão): https://google.github.io/eng-practices/review/developer/
+- Google Engineering Practices, revisão de código:
+  https://google.github.io/eng-practices/review/
+- Google Engineering Practices, o padrão de revisão:
+  https://google.github.io/eng-practices/review/reviewer/standard.html
+- Google Engineering Practices, como enviar um CL para revisão:
+  https://google.github.io/eng-practices/review/developer/
 - OWASP Code Review Guide: https://owasp.org/www-project-code-review-guide/
+- OWASP Web Security Testing Guide (teste de segurança complementar):
+  https://owasp.org/www-project-web-security-testing-guide/
 - Conventional Comments (rótulos de comentário): https://conventionalcomments.org/
-- SEI CERT Coding Standards (critérios objetivos de correção por linguagem): https://cmu-sei.github.io/secure-coding-standards/
+- SEI CERT Coding Standards (critérios objetivos de correção por linguagem):
+  https://cmu-sei.github.io/secure-coding-standards/

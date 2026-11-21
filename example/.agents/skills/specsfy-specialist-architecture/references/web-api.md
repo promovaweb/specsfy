@@ -26,7 +26,13 @@ política do servidor exigir requisição condicional.
 - `404 Not Found`: recurso ausente ou ocultado por política consistente.
 - `409 Conflict`: conflito com estado atual que o cliente pode tratar.
 - `422 Unprocessable Content`: conteúdo entendido, mas semanticamente inválido.
-- `429 Too Many Requests`: limite excedido; informe retry quando possível.
+- `429 Too Many Requests`: limite excedido; envie `Retry-After` quando o cliente
+  puder esperar. Para publicar cota de forma estruturada, use `RateLimit-Policy`
+  (política com `q`, `qu` e `w`) e `RateLimit` (disponível `a`, janela efetiva
+  `w`, custo `c`), com `RateLimit-Partition` declarando as dimensões da
+  partição. Esses são os nomes do draft vigente; `RateLimit-Limit`,
+  `RateLimit-Remaining` e `RateLimit-Reset` vêm de drafts antigos e não devem
+  ser usados em contrato novo.
 
 Modele erros com RFC 9457 usando `type` estável, `title`, `status`, `detail`
 seguro e `instance` quando útil. Extensões carregam código de domínio, campos
@@ -34,14 +40,22 @@ inválidos e correlação; não coloque stack trace, SQL ou segredo.
 
 ## Idempotência e retry
 
-Para uma operação POST com efeito externo:
+`Idempotency-Key` é um Item Structured Field (RFC 9651) cujo valor é uma string
+opaca gerada pelo cliente; UUID v4 (RFC 9562) é a escolha recomendada. Para uma
+operação POST com efeito externo:
 
 1. cliente gera chave de idempotência de alta entropia por intenção;
 2. servidor vincula chave a identidade, operação e hash/fingerprint do payload;
 3. repetição equivalente recebe o resultado previamente materializado;
-4. repetição com payload diferente falha explicitamente;
-5. concorrência sobre a mesma chave é serializada ou rejeitada;
-6. retenção e expiração da chave são documentadas.
+4. repetição com payload diferente falha explicitamente, com `422 Unprocessable
+   Content` (ou `400` quando a chave documentada como obrigatória não vier);
+5. repetição concorrente sobre a mesma chave, ainda em processamento, é
+   serializada ou rejeitada com `409 Conflict`;
+6. retenção e expiração da chave são documentadas e publicadas.
+
+A chave precisa de validação de formato e de um índice composto com atributos do
+cliente: chave de baixa entropia aceita sem validação permite adivinhar a chave
+de outro cliente e recuperar a resposta em cache.
 
 Teste o caso em que o commit ocorreu e a resposta se perdeu. Retry de transporte
 não pode significar duplicação de efeito.
@@ -97,13 +111,19 @@ Potencialmente breaking:
 - adicionar enum quando clientes usam switch exaustivo;
 - alterar regra de autorização, retry ou consistência.
 
-Publique depreciação, telemetria de uso, alternativa, prazo e canal de migração.
-Compare OpenAPI estruturalmente e rode contract tests de consumidores antes de
-remover.
+Publique depreciação, telemetria de uso, alternativa, prazo e canal de
+migração. Sinalize em resposta com `Deprecation` (RFC 9745, Item Structured
+Field com a data em `@<segundos desde a época>`) e, quando houver data de
+desligamento, `Sunset` (RFC 8594, no formato HTTP-date). A data de `Sunset` não
+pode ser anterior à de `Deprecation`, e os dois campos usam formatos de data
+diferentes. `Link: <url>; rel="deprecation"` aponta a documentação da migração,
+inclusive antes de a depreciação começar. Compare OpenAPI estruturalmente e
+rode contract tests de consumidores antes de remover.
 
 ## Evidência mínima
 
-- OpenAPI 3.1 e JSON Schemas validam exemplos positivos e negativos;
+- OpenAPI 3.2 (ou 3.1 quando o ferramental do projeto ainda não suporta 3.2) e
+  JSON Schemas Draft 2020-12 validam exemplos positivos e negativos;
 - testes cobrem status, headers, Problem Details e limites;
 - replay e concorrência provam idempotência;
 - testes cruzados provam isolamento por tenant/recurso;
@@ -113,12 +133,22 @@ remover.
 
 ## Fontes primárias
 
-- HTTP Semantics, RFC 9110: https://www.rfc-editor.org/rfc/rfc9110
+- HTTP Semantics, RFC 9110 (STD 97): https://www.rfc-editor.org/rfc/rfc9110
 - HTTP Caching, RFC 9111: https://www.rfc-editor.org/rfc/rfc9111
 - Problem Details, RFC 9457: https://www.rfc-editor.org/rfc/rfc9457
 - Conditional Requests, RFC 9110: https://www.rfc-editor.org/rfc/rfc9110#section-13
-- OpenAPI 3.1: https://spec.openapis.org/oas/v3.1.0
-- JSON Schema: https://json-schema.org/specification
+- Deprecation, RFC 9745: https://www.rfc-editor.org/rfc/rfc9745
+- Sunset, RFC 8594: https://www.rfc-editor.org/rfc/rfc8594
+- OpenAPI 3.2.1: https://spec.openapis.org/oas/v3.2.1.html
+- OpenAPI 3.1.2: https://spec.openapis.org/oas/v3.1.2.html
+- JSON Schema, Draft 2020-12: https://json-schema.org/specification
 - OAuth 2.0 Security BCP, RFC 9700: https://www.rfc-editor.org/rfc/rfc9700
-- Idempotency-Key draft: https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
+- Structured Field Values for HTTP, RFC 9651: https://www.rfc-editor.org/rfc/rfc9651
+- UUIDs, RFC 9562: https://www.rfc-editor.org/rfc/rfc9562
+- Idempotency-Key, draft-ietf-httpapi-idempotency-key-header-08:
+  https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
+- RateLimit header fields, draft-ietf-httpapi-ratelimit-headers-12:
+  https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/
 - CloudEvents: https://cloudevents.io/
+- Standard Webhooks (assinatura de webhook):
+  https://www.standardwebhooks.com/

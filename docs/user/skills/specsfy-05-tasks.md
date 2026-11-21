@@ -75,8 +75,14 @@ especialista estiver ausente, o fluxo retorna ao setup para instalar a skill
 detectada antes de liberar o código da tela.
 
 Depois de registrar as tarefas, a skill chama `specsfy-06-implement` no modo
-`tests` para materializar os testes. O Plan Gate só pode ser aprovado quando todos os
-predecessores exigidos possuem RED válido.
+`tests`, passo `prepare`. A fase prepara um RED válido por chamada. Em cada
+retorno, a skill de tarefas consulta as dependências da seção 14 e encaminha
+o próximo teste pronto. A spec fica `Defined` com o Plan Gate pendente até o
+último RED exigido.
+
+O validador usa `[TEST] [TDD]` para contar os predecessores de código. As
+tarefas de aceite e regressão pós-código usam `[TEST]` e aparecem em um
+subtotal próprio.
 
 ## O que esperar
 

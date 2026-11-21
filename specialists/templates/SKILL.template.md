@@ -79,6 +79,7 @@ genérico como "planeje com cuidado".
 - {{Proibição explícita com o motivo técnico, quando não for óbvio}}.
 - {{Regra sobre quando NÃO aplicar uma prática comum do domínio}}.
 - {{Regra sobre limite, threshold ou condição de decisão}}.
+- {{Convenção local obrigatória que a fonte oficial não exige}}. (regra da casa)
 
 Cada item deve ser verificável olhando o código, a configuração ou o
 resultado — nunca uma aspiração ("cuidar da performance") sem critério de

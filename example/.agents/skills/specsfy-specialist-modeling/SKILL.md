@@ -37,6 +37,12 @@ Não use para:
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
    `.specsfy/RULES.md` e, por tratar dado persistido,
    `.specsfy/DATABASE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-modeling (domain|data)`. Sem indicação,
    escolha o modo pelo "Quando usar" acima.
@@ -187,6 +193,9 @@ precisa guardar quando o sistema atual não responder.
   invariantes e boundaries decididos aqui.
 - `$specsfy-specialist-git` preserva nomes e invariantes quando um conflito de
   merge atinge o modelo.
+- `$specsfy-specialist-mysql` e `$specsfy-specialist-mongodb` materializam o
+  mesmo modelo em tabela relacional ou em documento, sem mudar entidades,
+  relações e invariantes decididos aqui.
 
 Leia [references/standards.md](references/standards.md) para o padrão comum, o
 índice dos modos e as fontes primárias. Leia

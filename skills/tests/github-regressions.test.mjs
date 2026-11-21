@@ -33,6 +33,18 @@ test('#47: review encontra comprovação na raiz nos dois layouts de specs', (t)
   }
 });
 
+test('review usa a raiz do projeto exportado ou a raiz explícita', t => {
+  const root = temporary(t);
+  put(root, '.specsfy/STACK.md', '# Stack');
+  put(root, 'src/evidence.ts', 'export const evidence = true;');
+  const content = '- **FR-001**: Validar conexão.\n- **FIND-SEC-001** [P2] [Resolved] Conexão isolada — Refs: FR-001 — Evidence: src/evidence.ts:1 — Effect: Confere o destino — Suggestion: Preservar teste\n';
+  const spec = put(root, 'exported/nested/feature/spec.md', content);
+  for (const flags of [[], ['--root', root]]) {
+    const result = run(script('specsfy-04-validate', 'review_findings'), [spec, ...flags, '--json'], dirname(root));
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+  }
+});
+
 test('#43: atualizar stack preserva pipes escapados e texto humano', (t) => {
   const root = temporary(t);
   const row = '| Banco | PostgreSQL, credencial `PG \\| Main` | `workflow.json` |';

@@ -13,7 +13,9 @@
     "test:specialists": "node --test specialists/tests/*.test.mjs",
     "test:example": "node --test example/tests/*.test.mjs",
     "validate:skills": "node scripts/validate-skills.mjs",
-    "release": "node scripts/release.mjs"
+    "release": "node scripts/release.mjs",
+    "signals": "node scripts/specialist-signals.mjs",
+    "signals:check": "node scripts/specialist-signals.mjs --check"
   },
   "devDependencies": {
     "yaml": "2.9.0"

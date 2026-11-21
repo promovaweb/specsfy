@@ -33,9 +33,12 @@
   influência), **Anticorruption Layer** (traduz na fronteira para proteger o
   modelo próprio de um modelo externo ruim ou legado), **Shared Kernel**
   (parte do modelo é literalmente compartilhada — usar com cautela, cria
-  acoplamento de mudança).
-- Use Anticorruption Layer sempre que integrar com um sistema legado ou
-  externo cujo modelo violaria as invariantes do contexto atual.
+  acoplamento de mudança), **Open Host Service** (um contexto publica API
+  estável para muitos consumidores) e **Published Language** (o contrato
+  publicado que esses consumidores leem). **Separate Ways** vale quando
+  integrar custa mais do que manter os modelos independentes.
+- Use Anticorruption Layer quando o sistema externo tem um modelo diferente do
+  seu domínio.
 
 ## Artefatos de modelagem
 
@@ -65,7 +68,8 @@
 ## Fontes oficiais e primárias
 
 - Domain-Driven Design Reference (Eric Evans): https://www.domainlanguage.com/ddd/reference/
-- Implementing Domain-Driven Design (Vaughn Vernon) — resumo e padrões:
+- Implementing Domain-Driven Design (Vaughn Vernon), obra de referência para
+  aggregates e context mapping:
   https://www.informit.com/store/implementing-domain-driven-design-9780321834577
 - DDD Crew — Context Mapping (padrões e cartas): https://github.com/ddd-crew/context-mapping
 - DDD Crew — Bounded Context Canvas: https://github.com/ddd-crew/bounded-context-canvas

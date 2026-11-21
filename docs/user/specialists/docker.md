@@ -2,9 +2,9 @@
 
 O especialista Docker orienta o agente na criação e na revisão de imagens,
 arquivos Compose e políticas de tag, além da orquestração de serviços em vários
-nós com Docker Swarm. Ele trabalha em dois modos: **Compose**, para imagens e
-ambiente local ou de CI, e **Swarm**, para stacks, redes, secrets, rollout e
-recuperação do cluster.
+nós com Docker Swarm. Ele trabalha em três modos. **Compose** cobre imagens,
+ambiente local e CI. **Swarm** cobre stacks, redes, secrets, rollout e
+recuperação do cluster. **Proxy** cobre a entrada HTTP e HTTPS com Traefik.
 
 ## Quando usar
 
@@ -17,6 +17,7 @@ recuperação do cluster.
   ou arquivos de stack com a chave `deploy:`.
 - Você precisa definir managers e workers, planejar rollout e rollback ou
   recuperar o quorum do cluster.
+- Você precisa configurar Traefik, certificados TLS ou um dashboard protegido.
 
 Desenvolvimento local e build de imagem ficam no modo Compose. Orquestração com
 vários nós, réplicas, secrets de cluster e redes overlay ficam no modo Swarm.
@@ -73,7 +74,7 @@ os nodes e o rollout preserva a capacidade durante a troca.
   especialista Delivery, na mesma rede overlay da aplicação, com o serviço
   Laravel sem porta pública.
 - O token do túnel chega por Docker Secret montado como arquivo, com
-  `cloudflared --token-file`.
+  `cloudflared tunnel run --token-file` (2025.4.0 ou posterior).
 - Dependências, aplicação e ingress ficam em stacks separadas, publicadas em
   ordem de dependência.
 - As migrations rodam em uma única réplica, enquanto os outros serviços sobem
@@ -82,12 +83,33 @@ os nodes e o rollout preserva a capacidade durante a troca.
   healthchecks próprios.
 - As redes overlay são externas e criptografadas, com os serviços de banco
   restritos à rede interna.
-- O cluster tem 1, 3 ou 5 managers, em número ímpar, para que o quorum não
-  dependa de um único manager em produção.
+- Em produção, o Specsfy prevê 3 ou 5 managers para tolerar perda de nós.
+  Um Swarm com apenas um manager serve para cenários sem alta disponibilidade.
 - As imagens são referenciadas por digest e ficam acessíveis a todos os nodes.
 - Secrets e configs são versionados por nome, como `app_secret_v2`.
 - Limites e reservas de recursos são declarados de forma explícita.
 - O placement usa labels administradas (`node.labels.*`) em vez de hostnames.
+
+## Traefik
+
+Use o modo `proxy` para publicar serviços HTTP e HTTPS com Traefik v3 no
+Compose ou no Swarm. Um entrypoint é a porta de entrada. Um router escolhe
+a rota pelo domínio ou caminho e o service do Traefik aponta para o backend.
+Middlewares aplicam regras como autenticação ou compressão.
+
+1. No Compose, configure o provider Docker e coloque os labels no serviço
+   Compose. No Swarm, configure o provider Swarm, use `deploy.labels` e
+   declare a porta interna do backend com um label.
+2. Conecte proxy e backend à mesma rede e deixe a porta da aplicação sem
+   publicação direta no host.
+3. Para certificados do Let's Encrypt, selecione a validação ACME adequada
+   ao DNS e às portas disponíveis. Confira a emissão no ambiente de staging
+   da autoridade certificadora e persista o armazenamento de certificados.
+4. Se habilitar o dashboard, proteja a rota e sua API com HTTPS e autenticação.
+   Confira a resposta da aplicação, o certificado e o bloqueio do painel
+   para quem não tem credenciais.
+
+Veja a [referência técnica do Traefik](../../../specialists/specsfy-specialist-docker/references/traefik.md).
 
 ## Erros que ele evita
 

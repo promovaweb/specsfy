@@ -1,11 +1,17 @@
 # Padrões e referências de diagnóstico
 
+Revisado em 2026-11-20 contra: git-bisect, Node.js v26 (flag `--cpu-prof` e
+`--heapsnapshot-signal`), Python 3 `pdb`/`profile`/`tracemalloc`,
+PostgreSQL (documentação corrente, `pg_stat_statements`), OpenTelemetry traces
+e W3C Trace Context.
+
 ## Técnicas de isolamento, da mais barata à mais cara
 
 - **Bisseção** (`git bisect`, ou busca binária manual no espaço de
   configuração/dados): localiza a mudança mínima que introduziu a falha em
   `O(log n)` passos sobre `n` commits/estados candidatos, em vez de revisar
-  linearmente.
+  linearmente. `git bisect run <comando>` automatiza a decisão de bom/ruim
+  quando existe um teste ou script que reproduz a falha.
 - **Differential debugging**: comparar sistematicamente ambiente que falha
   contra ambiente que funciona, fixando todas as variáveis exceto uma por
   rodada (versão, config, dados, ordem, carga).
@@ -20,6 +26,7 @@
 - **Fault injection**: introduzir falha controlada (latência, erro,
   partição) para confirmar hipótese de dependência — só em ambiente onde o
   blast radius é conhecido e autorizado, nunca em produção sem esse aval.
+  (regra da casa)
 
 ## Causas comuns de flakiness, por categoria
 
@@ -54,14 +61,19 @@ concorrência que também existem em produção.
 
 ## Ferramentas por ambiente
 
-- Node.js/browser: `--inspect` + Chrome DevTools, `node --prof` para CPU
-  profiling, `console.trace()` para stack em ponto de interesse.
+- Node.js/browser: `--inspect` + Chrome DevTools para passo a passo,
+  `node --cpu-prof` para perfil de CPU no formato `.cpuprofile` (o `--prof`
+  antigo continua existindo, mas exige `--prof-process` e não abre no DevTools),
+  `--heapsnapshot-signal=SIGUSR2` ou `v8.writeHeapSnapshot()` para vazamento de
+  memória, e `console.trace()` para stack em ponto de interesse.
 - Python: `pdb`/`breakpoint()`, `cProfile` para CPU, `tracemalloc` para
   memória, `faulthandler` para travas.
 - Bancos: `EXPLAIN (ANALYZE, BUFFERS)` no Postgres para causa de query lenta;
-  `pg_stat_activity` para lock e query em execução.
+  `pg_stat_activity` para lock e query em execução; `pg_stat_statements` para
+  a query que mais consome no agregado, e não só a que está rodando agora.
 - Distribuído: trace com OpenTelemetry, correlação por `trace id` em todos
-  os logs estruturados dos serviços envolvidos.
+  os logs estruturados dos serviços envolvidos, com propagação pelo
+  `traceparent` do W3C Trace Context entre boundaries.
 
 ## Registro do diagnóstico
 
@@ -74,9 +86,12 @@ próximo diagnóstico parecido.
 ## Fontes oficiais
 
 - git-bisect: https://git-scm.com/docs/git-bisect
+- Node.js, flags de CLI (`--cpu-prof`, `--heapsnapshot-signal`):
+  https://nodejs.org/api/cli.html
 - Chrome DevTools (debugging JS): https://developer.chrome.com/docs/devtools/
 - Python `pdb`: https://docs.python.org/3/library/pdb.html
 - Python `cProfile`/`profile`: https://docs.python.org/3/library/profile.html
 - PostgreSQL monitoring e `pg_stat_activity`: https://www.postgresql.org/docs/current/monitoring.html
 - PostgreSQL `EXPLAIN`: https://www.postgresql.org/docs/current/using-explain.html
 - OpenTelemetry traces: https://opentelemetry.io/docs/concepts/signals/traces/
+- W3C Trace Context: https://www.w3.org/TR/trace-context/

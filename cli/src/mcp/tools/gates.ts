@@ -22,7 +22,7 @@ export function registerGatesTools(registrar: Registrar): void {
       title: "Run the whole Specsfy policy on the project (CI entry point).",
       description:
         "Runs verify_repo: validates every spec by status and the skills contract, and returns the attestation payload under result " +
-        "(result.result is passed or failed, result.checks lists each check). Uses .agents/skills/ of the project or, when missing, the embedded scripts. A failed policy returns isError.",
+        "(result.result is passed or failed, result.checks lists each check). Specialist warnings are returned in warnings without affecting the policy. Uses .agents/skills/ of the project or, when missing, the embedded scripts. A failed policy returns isError.",
       inputSchema: {
         boundary: z.enum(VERIFY_BOUNDARIES).optional().describe("Verification boundary. Default: local."),
         attestation: z.string().min(1).optional().describe("Write the attestation JSON to this file, relative to the project root."),

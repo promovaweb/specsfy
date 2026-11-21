@@ -59,30 +59,45 @@ export type ProjectMode =
   /** Only as the working directory. */
   | "cwd";
 
-/** Definition of a command backed by an embedded script. */
-export interface ScriptCommandDef {
+/** Description shared by both adapters of a project command. */
+interface ProjectCommandDef {
   /** Subcommand name, e.g. `spec` in `gate spec`. */
   name: string;
   /** MCP tool name, in snake_case. */
   tool: string;
   description: string;
   longDescription?: string;
-  /** Path inside the skills tree. */
-  script: string;
-  project: ProjectMode;
   params: readonly ScriptParam[];
-  /** The script accepts `--json`; the binary passes it to get structured data. */
-  json?: boolean;
   /**
    * `read` never changes files; `write` changes files in the project;
    * `execute` runs code of the project (its own scripts, `php artisan`), so
    * MCP clients must not auto-approve it as a read.
    */
   effect: "read" | "write" | "execute";
-  /** A gate maps any failure to GATE_FAILED. */
-  gate?: boolean;
   examples?: readonly string[];
 }
+
+/** Definition of a command backed by an embedded script. */
+export interface ScriptCommandDef extends ProjectCommandDef {
+  /** Path inside the skills tree. */
+  script: string;
+  project: ProjectMode;
+  /** The script accepts `--json`; the binary passes it to get structured data. */
+  json?: boolean;
+  /** A gate maps any failure to GATE_FAILED. */
+  gate?: boolean;
+}
+
+/** Definition of a native project command shared by CLI and MCP. */
+export interface NativeProjectCommandDef extends ProjectCommandDef {
+  exitCodes: readonly ExitCode[];
+  execute(project: string, values: Record<string, unknown>): Promise<Result & {
+    data: Record<string, unknown>;
+    warning?: string;
+  }>;
+}
+
+type CommandDef = ScriptCommandDef | NativeProjectCommandDef;
 
 const PROJECT_OPTION: OptionDefinition = {
   name: "--project",
@@ -197,7 +212,7 @@ export function renderScriptText(def: ScriptCommandDef, run: ScriptRun): string 
 }
 
 /** CLI `Command` for a definition. */
-export function toCommand(def: ScriptCommandDef): Command {
+export function toCommand(def: CommandDef): Command {
   const args: ArgumentDefinition[] = [];
   const options: OptionDefinition[] = [];
   for (const param of def.params) {
@@ -221,7 +236,9 @@ export function toCommand(def: ScriptCommandDef): Command {
     arguments: args,
     options,
     examples: def.examples,
-    exitCodes: def.gate ? [ExitCode.GATE_FAILED, ExitCode.NOT_FOUND] : [ExitCode.NOT_FOUND],
+    exitCodes: "script" in def
+      ? (def.gate ? [ExitCode.GATE_FAILED, ExitCode.NOT_FOUND] : [ExitCode.NOT_FOUND])
+      : def.exitCodes,
     run: async (ctx: Context): Promise<Result> => {
       const values: Record<string, unknown> = {};
       let index = 0;
@@ -231,8 +248,12 @@ export function toCommand(def: ScriptCommandDef): Command {
       }
       const missing = def.params.find((param) => param.required && (values[param.name] === undefined || values[param.name] === ""));
       if (missing) {
-        const { error } = await import("../app/errors.ts");
         throw error.usage(`Missing required ${missing.kind === "spec" || missing.kind === "positional" ? "argument" : "option"}: ${missing.name}`);
+      }
+      if (!("script" in def)) {
+        const result = await def.execute(resolveProject(ctx.options.project), values);
+        if (!ctx.json && result.warning) ctx.stderr(result.warning);
+        return result;
       }
       const { data, run, code } = await executeScriptCommand(def, values, ctx.options.project);
       const text = () => renderScriptText(def, run);
@@ -242,7 +263,7 @@ export function toCommand(def: ScriptCommandDef): Command {
 }
 
 /** Zod schema of the MCP input for a definition. */
-function inputSchema(def: ScriptCommandDef): Record<string, z.ZodTypeAny> {
+function inputSchema(def: ProjectCommandDef): Record<string, z.ZodTypeAny> {
   const shape: Record<string, z.ZodTypeAny> = {};
   for (const param of def.params) {
     let schema: z.ZodTypeAny;
@@ -257,26 +278,33 @@ function inputSchema(def: ScriptCommandDef): Record<string, z.ZodTypeAny> {
   return shape;
 }
 
-/** Registers one MCP tool per definition. */
-export function registerScriptTools({ server, catalog }: Registrar, defs: readonly ScriptCommandDef[]): void {
+/** Registers one MCP tool per project command definition. */
+export function registerCommandTools({ server, catalog }: Registrar, defs: readonly CommandDef[]): void {
   for (const def of defs) {
     catalog.tools.push({ name: def.tool, description: def.description });
     server.registerTool(
       def.tool,
       {
         title: def.description,
-        description: `${def.description} Runs ${def.script} from the embedded framework.${def.gate ? " A failed gate returns isError with the findings." : ""}`,
+        description: "script" in def
+          ? `${def.description} Runs ${def.script} from the embedded framework.${def.gate ? " A failed gate returns isError with the findings." : ""}`
+          : [def.description, def.longDescription].filter(Boolean).join(" "),
         inputSchema: inputSchema(def),
         annotations: { readOnlyHint: def.effect === "read", destructiveHint: false, idempotentHint: def.effect === "read" },
       },
       async (input: Record<string, unknown>) => {
-        const { data } = await executeScriptCommand(def, input, input.project as string | undefined);
+        const option = input.project as string | undefined;
+        const { data, code } = "script" in def
+          ? await executeScriptCommand(def, input, option)
+          : await def.execute(resolveProject(option), input);
         return {
           content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
           structuredContent: data as unknown as Record<string, unknown>,
-          isError: !data.ok,
+          isError: (code ?? ExitCode.SUCCESS) !== ExitCode.SUCCESS,
         };
       },
     );
   }
 }
+
+export { registerCommandTools as registerScriptTools };

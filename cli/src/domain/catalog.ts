@@ -14,6 +14,7 @@ import { mkdtemp, readdir, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
+import embeddedCatalog from "../../../specialists/catalog.json";
 import { AppError, error as appError } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
 import { apiHeaders } from "./github.ts";
@@ -29,6 +30,20 @@ export const CATALOG_PATH = "specialists/catalog.json";
 
 export const DEFAULT_CATALOG_URL = catalogApiUrl(DEFAULT_REPOSITORY)!;
 
+/** Optional specialization within a catalog entry. */
+export interface CatalogMode {
+  name: string;
+  title: string;
+  absorbs?: string;
+}
+
+/** Signal that can be detected from keywords in a spec. */
+export interface CatalogTrigger {
+  signal: string;
+  mode?: string;
+  keywords: string[];
+}
+
 /** Normalized entry of the specialist catalog. */
 export interface CatalogEntryValue {
   name: string;
@@ -38,6 +53,8 @@ export interface CatalogEntryValue {
   files: string[];
   dependencies: string[];
   requires: string[];
+  modes: CatalogMode[];
+  triggers: CatalogTrigger[];
 }
 
 interface CatalogPayload {
@@ -48,6 +65,8 @@ interface CatalogPayload {
     category: string;
     tags?: string[];
     requires?: string[];
+    modes?: CatalogMode[];
+    triggers?: CatalogTrigger[];
     detect?: { files?: string[]; dependencies?: string[] };
   }>;
 }
@@ -85,8 +104,19 @@ export class Catalog {
       throw new AppError(ExitCode.NETWORK_OR_API, "unsupported catalog version");
     }
     const source = payload as CatalogPayload;
-    return new Catalog(
-      source.skills.map((value) => ({
+    return new Catalog(source.skills.map((value) => {
+      const modes = value.modes ?? [];
+      const triggers = value.triggers ?? [];
+      if (!Array.isArray(modes) || !modes.every((mode) =>
+        mode && typeof mode.name === "string" && typeof mode.title === "string" &&
+        (mode.absorbs === undefined || typeof mode.absorbs === "string")
+      )) throw new AppError(ExitCode.NETWORK_OR_API, `invalid modes in specialist catalog: ${value.name}`);
+      if (!Array.isArray(triggers) || !triggers.every((trigger) =>
+        trigger && typeof trigger.signal === "string" &&
+        (trigger.mode === undefined || typeof trigger.mode === "string") &&
+        Array.isArray(trigger.keywords) && trigger.keywords.every((keyword: unknown) => typeof keyword === "string")
+      )) throw new AppError(ExitCode.NETWORK_OR_API, `invalid triggers in specialist catalog: ${value.name}`);
+      return {
         name: value.name,
         description: value.description,
         category: value.category,
@@ -94,8 +124,23 @@ export class Catalog {
         files: value.detect?.files ?? [],
         dependencies: value.detect?.dependencies ?? [],
         requires: value.requires ?? [],
-      })),
-    );
+        modes,
+        triggers,
+      };
+    }));
+  }
+
+  /** Loads the spec-analysis catalog, using the bundled default offline. */
+  static async forSpecAnalysis(repository = DEFAULT_REPOSITORY): Promise<Catalog> {
+    if (process.env.SPECSFY_SPECIALISTS_CATALOG || repository !== DEFAULT_REPOSITORY) {
+      return Catalog.fetch(repository);
+    }
+    return Catalog.embedded();
+  }
+
+  /** Loads the catalog shipped with this version of the binary. */
+  static embedded(): Catalog {
+    return Catalog.fromPayload(embeddedCatalog);
   }
 
   /** Reads the catalog from a local file. */

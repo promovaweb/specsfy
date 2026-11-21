@@ -52,7 +52,10 @@
 
 #### Artefatos de pesquisa armazenados
 
-- `specs/draft/{{SPEC_NUMBER}}-{{SPEC_SLUG}}/research/[fonte]/`: [origem, versão/data, licença quando aplicável e propósito], ou “Nenhum artefato externo”.
+- [Indexe cada arquivo ou pasta em `research/` com caminho entre crases,
+  origem, versão ou data, licença quando aplicável e propósito. Quando a
+  pesquisa usar somente fontes locais do projeto, escreva “Nenhum artefato
+  externo”.]
 - Toda fonte externa efetivamente consultada deve ter uma evidência local em `research/`; registre aqui o caminho e mantenha conclusões normativas no `spec.md`.
 
 #### Dúvidas respondidas
@@ -253,7 +256,8 @@ tests/
   responsividade e componentes existentes.]
 - [Em aplicação Laravel, Laravel Octane com Open Swoole e `laravel/octane` são
   obrigatórios. Registre `--server=swoole`, o healthcheck e o reload dos
-  workers persistentes.]
+  workers persistentes. Se houver pendência de stack no setup, planeje
+  instalação e configuração como pré-condição do deploy.]
 
 #### Blocos React e componentes selecionados
 
@@ -263,7 +267,9 @@ tests/
 
 - [Para Laravel com React, shadcn/ui e ReUI são obrigatórios: escolha as
   primitives shadcn/ui e as composições ReUI gratuitas `@reui/c-*` desta
-  entrega. Registre também cada bloco próprio que compõe a tela.]
+  entrega. Registre cada bloco próprio que compõe a tela. Se o setup registrou
+  pendência de stack para a dupla, planeje a instalação como pré-condição do
+  deploy.]
 - [A lista deve corresponder a `INTERFACE.md`; não usar somente nomes de
   bibliotecas sem informar os componentes selecionados.]
 
@@ -275,11 +281,16 @@ tests/
 
 #### Contrato CRUD
 
-- [Quando houver CRUD, todas as telas usam o mesmo `PageHeader` componentizado
-  e reutilizável para lista, detalhe, criação e edição.]
-- [A listagem usa `DataGrid` em largura total, mantém a coluna `ID` visível,
-  transforma a linha inteira em link para o detalhe e oferece botões
-  independentes de editar e apagar.]
+- **Operações**: [Escolha entre listar, consultar, criar, editar, apagar.
+  Escreva os itens incluídos em uma única linha, por exemplo: `listar, criar`.]
+- [As telas incluídas compartilham o mesmo `PageHeader` reutilizável.]
+- [Se listar, use `DataGrid` em largura total com a coluna `ID` visível.
+  Se consultar, descreva o acesso ao detalhe. Quando houver também listagem,
+  a linha abre o detalhe por mouse e teclado.]
+- [Se criar ou editar, descreva o formulário ou a ação que o abre. Se apagar,
+  descreva a ação independente, a permissão e a confirmação.]
+- [Na seção 14, nomeie as operações incluídas nas tarefas de interface. Uma
+  tarefa pode cobrir mais de uma operação.]
 - [Registre em `INTERFACE.md` os componentes reaproveitados e os novos, com
   seus consumidores, estados e regra de extensão.]
 

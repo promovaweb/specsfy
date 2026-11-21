@@ -12,6 +12,17 @@
 - `components.json` define aliases de import, estilo base e onde os
   arquivos são gerados; confirme-o antes de adicionar um componente para não
   duplicar estrutura de pasta.
+- Desde setembro de 2026, componentes novos importam `cn` do pacote `cn`, e
+  `init` gera `lib/utils.ts` como `export { cn } from "cn"`. Projeto antigo
+  migra com `npx shadcn@latest migrate cn`; a CLI v4 (março de 2026) é a base
+  dessa geração de comandos.
+- `init` acrescenta `@import "shadcn/tailwind.css"` ao CSS global, com
+  variantes (`data-open:`, `data-closed:`) e animações compartilhadas. O
+  comando `eject` inlina esse CSS e remove a dependência do pacote `shadcn`
+  quando o projeto precisa controlar tudo.
+- Desde julho de 2026, `init` cria projeto novo em Base UI. Radix continua
+  suportado; use `npx shadcn@latest init -b radix` para manter Radix. A CLI
+  aceita `-b base`, `-b radix` e `-b aria`.
 
 ## Padrões de composição por caso
 
@@ -23,6 +34,7 @@
 | Form | Label associado, texto de ajuda, erro por campo, estado pendente no submit, confirmação de sucesso, valores preservados após falha de validação |
 | Overlay (Dialog/Sheet/Popover) | Trigger semântico (`button`), título e descrição associados via aria, foco movido para dentro ao abrir, foco devolvido ao trigger ao fechar |
 | Chart | Título, unidade dos eixos, período coberto, legenda, e uma tabela ou descrição textual equivalente para quem não enxerga o gráfico |
+| Interface agêntica | `Message Scroller`, `Message`, `Bubble`, `Trace`, `Code Block` e `Questionnaire` compõem chat e fluxo de agente; os padrões de `AI Elements` são composições copiadas, não pacote |
 
 ## Data Table
 
@@ -86,4 +98,9 @@
 - Data Table: https://ui.shadcn.com/docs/components/data-table
 - Chart: https://ui.shadcn.com/docs/components/chart
 - Sidebar: https://ui.shadcn.com/docs/components/sidebar
+- AI Elements: https://ui.shadcn.com/docs/ai-elements
+- Changelog: https://ui.shadcn.com/docs/changelog
+- Base UI como padrão: https://ui.shadcn.com/docs/changelog/2026-07-base-ui-default
+- Pacote `cn`: https://ui.shadcn.com/docs/changelog/2026-09-cn
 - Radix Primitives — Accessibility: https://www.radix-ui.com/primitives/docs/overview/accessibility
+- Base UI: https://base-ui.com/react/overview/getting-started

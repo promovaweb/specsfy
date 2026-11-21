@@ -163,6 +163,13 @@ specsfy install --project . --detected
 specsfy skills install specsfy-specialist-laravel --project .
 ```
 
+O catálogo tem 27 especialistas: Laravel, MCP, Supabase, PostgreSQL, MySQL,
+MongoDB, Redis, Modelagem, Arquitetura, Interface, Componentes de UI, React,
+Tailwind CSS, Next.js, TypeScript, Docker, Servidor, Cloudflare, Entrega, n8n,
+Git, Observabilidade, Testes, Segurança de Aplicações, Code Review, Debugging e
+Pesquisa. O guia de cada um está em
+[docs/user/specialists.md](docs/user/specialists.md).
+
 Uma recomendação do agente não instala o especialista. A pessoa confirma a
 instalação.
 

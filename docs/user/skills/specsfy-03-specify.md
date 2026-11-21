@@ -42,7 +42,7 @@ com base nas definições desta conversa.
 ```text
 specs/<estado>/0004-recuperar-senha/
 ├── spec.md
-└── research/        # somente quando houver pesquisa externa
+└── research/        # quando houver artefatos de pesquisa
 ```
 
 Em seguida, ela preenche o Ato I com requisitos e cenários, mantém as escolhas
@@ -55,7 +55,13 @@ o refinamento não é reaberto imediatamente nessa retomada.
 
 Os arquivos em `research/` apoiam as escolhas registradas, mas não substituem
 o texto normativo de `spec.md`. Quando houver divergência, a entrega e seus
-validadores devem seguir a spec.
+validadores devem seguir a spec. Se você consultou somente fontes locais
+do projeto e nenhum claim depende de um artefato, escreva
+`Nenhum artefato externo` no índice de pesquisa.
+
+Para uma interface de recursos, liste as operações incluídas no
+`Contrato CRUD`. Por exemplo, `Operações: listar, criar` pede uma listagem e
+uma ação de criação. Uma spec antiga sem a linha segue o contrato completo.
 
 ## O que esperar
 

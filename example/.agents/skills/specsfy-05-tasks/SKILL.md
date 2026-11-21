@@ -108,9 +108,12 @@ configurações do repositório. Depois siga a ordem:
 ## Gerar
 
 Use `.specsfy/templates/custom/Tasks.md` como contrato quando existir e
-`.specsfy/templates/Tasks.md` caso contrário. Substitua somente o conteúdo das
-seções `14. Tarefas` e `15. Ordem de execução` em
-`<raiz>/specs/<estado>/<NNNN>-<slug>/spec.md` e preserve todas as outras.
+`.specsfy/templates/Tasks.md` caso contrário. Edite o plano nas seções
+`14. Tarefas` e `15. Ordem de execução` em
+`<raiz>/specs/<estado>/<NNNN>-<slug>/spec.md`. Se uma tarefa revelar um
+especialista ou modo novo, atualize pontualmente a linha `Especialistas` do
+cabeçalho e a subseção `#### Especialistas` da seção 8. Preserve o restante do
+plano técnico e aplique as atualizações de status e gates descritas abaixo.
 
 ### Reabrir o plano antes de editar
 
@@ -142,6 +145,8 @@ seções `14. Tarefas` e `15. Ordem de execução` em
   referência o Gherkin mantido na spec. O conjunto dessas tarefas materializa
   pelo menos três casos TDD distintos para a feature inteira e para cada `US`,
   `FR` e `NFR`.
+- Use `[TEST] [TDD]` para predecessores e `[TEST]` para aceite e regressão
+  pós-código. A regressão tem subtotal próprio no validador.
 - O Gherkin da spec é contrato de referência: não crie tarefa para arquivo
   `.feature` ou step definition e não o execute.
 - Em PHP, a tarefa TDD aponta para teste Pest e exige marcador `SPECSFY`; em
@@ -157,9 +162,10 @@ Quando `Interface para pessoas` for `Sim`:
 
 - crie tarefas explícitas para as telas, menus e navegação principal,
   formulário e ações descritos na seção 10, além da camada de dados ou API;
-- inclua testes de comportamento da interface para navegação, envio,
-  validação, recuperação de erro e o padrão de abertura escolhido, como painel
-  lateral ou modal;
+- quando houver `Contrato CRUD`, nomeie nas tarefas `[CODE]` as operações
+  incluídas em `Operações`. Planeje controles e testes para esse recorte;
+- inclua testes de comportamento para navegação, estados, envio, validação,
+  recuperação de erro e padrão de abertura que a interface declarar;
 - use somente os componentes, convenções e runners da stack de interface
   registrada; cada tarefa aponta os blocos React, componentes shadcn/ui e ReUI
   ou rotas reais;
@@ -255,6 +261,16 @@ Pelo MCP, use a tool `gate_interface`. Sem o binário, rode o script equivalente
 node .agents/skills/specsfy-05-tasks/scripts/validate_interface_tasks.mjs specs/<estado>/<NNNN>-<slug>/spec.md
 ```
 
+Quando a spec declarar `Operações` em `Contrato CRUD`, valide também a
+cobertura das operações pelas tarefas escritas:
+
+```bash
+specsfy gate spec <spec>
+```
+
+Pelo MCP, use `gate_spec`. Sem o binário, rode
+`validate_spec.mjs` da skill `specsfy-04-validate` com o caminho da spec.
+
 Corrija o que o validador apontar, em no máximo três ciclos: IDs duplicados,
 dependências inválidas ou cíclicas, referências inexistentes, itens sem três
 cenários BDD, AC sem tarefa TDD distinta, plano sem três predecessores ou
@@ -266,22 +282,29 @@ tarefa concluída sem evidence.
 
 ### Fechar o Plan Gate
 
-Quando a estrutura passar ainda com `Plan Gate: Pending`, chame
-automaticamente `$specsfy-06-implement` no modo `tests`, passo `prepare`. Ele
-usa o BDD da spec para materializar o predecessor TDD, observa RED e conclui
-somente essa tarefa de teste. Ao retomar esta skill, siga em ordem:
+Quando a estrutura passar com `Status: Defined` e `Plan Gate: Pending`,
+siga a ordem de dependências da seção 14. Selecione a primeira tarefa
+`[TEST] [TDD]` aberta exigida pelo Plan Gate cujas dependências já estejam
+concluídas. Use a ordem da seção 14 para desempatar entre tarefas prontas.
 
-1. execute novamente o validador com `--allow-draft`;
-2. altere `Plan Gate` para `Passed` e defina `Status: Planned`;
+Com o ID da tarefa, chame automaticamente `$specsfy-06-implement` no modo
+`tests`, passo `prepare`. A skill registra um RED e devolve o controle após
+concluir essa tarefa.
+A cada retorno, execute o validador com `--allow-draft`, confira a evidência e
+envie a próxima tarefa pronta. Mantenha `Plan Gate: Pending` até registrar o
+último RED exigido. Se ainda houver REDs pendentes e nenhum predecessor
+pronto, revise as dependências antes de retomar.
+
+Com todos os REDs exigidos registrados, siga em ordem:
+
+1. altere `Plan Gate` para `Passed`;
+2. execute `specsfy gate tasks <spec>` sem `--allow-draft`;
 3. registre o resultado em `Gate do Ato II — Plano`;
-4. execute `specsfy gate tasks <spec>` sem `--allow-draft`;
-5. execute `specsfy specs transition <id> planned`, equivalente a
-   `specsfy specs transition <id> planned`.
+4. execute `specsfy specs transition <id> planned` para definir
+   `Status: Planned` e mover a pasta da spec.
 
-O modo estrito rejeita `Plan Gate: Passed` enquanto algum predecessor TDD de
-uma tarefa `[CODE]` continuar aberto. Se a validação falhar, mantenha
-`Status: Defined`, `Plan Gate: Failed`, `Delivery Gate: Pending` e relate as
-pendências.
+Se a validação final falhar, mantenha `Status: Defined`, registre
+`Plan Gate: Failed` e `Delivery Gate: Pending` e relate as pendências.
 
 Quando a conversa alterar abrangência, dependência ou capacidade necessária,
 chame `$specsfy-interviewer` antes de replanejar e atualize o Effort com

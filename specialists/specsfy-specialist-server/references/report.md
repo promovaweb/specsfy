@@ -7,10 +7,10 @@ Ordem fixa para permitir diff entre datas.
 
 | Seção | Comando base | O que registrar |
 | --- | --- | --- |
-| Procedência | `ansible --version`, `docker version`, `docker info --format` | inventory, `--limit`, data, fuso, `SEMVER`, papel Swarm |
+| Procedência | `ansible --version`, `docker version`, `docker info --format '{{json .Swarm}}'` | inventory, `--limit`, data, fuso, `SEMVER`, papel Swarm |
 | Containers em execução | `docker ps --format` com nome, imagem, status, portas | uptime, restarts, health |
-| Containers parados com erro | `docker ps -a --filter status=exited --filter status=dead` + `docker inspect --format {{.State.ExitCode}}` | exit code, horário de saída, trecho de log |
-| Logs com erro | `docker logs --tail 200 --timestamps --since 24h <container>` | últimas linhas com erro, sem despejo integral |
+| Containers parados com erro | `docker ps -a --filter status=exited --filter status=dead` + `docker inspect --format '{{.State.ExitCode}}' <container>` | exit code, horário de saída, trecho de log |
+| Logs com erro | `docker logs --tail 100 --timestamps --since 24h <container>` | últimas linhas com erro, sem despejo integral |
 | Serviços Swarm | `docker service ls`, `docker service ps <serviço> --no-trunc` | réplicas `Running/Desired`, `converged` ou divergência |
 | Stats | `docker stats --no-stream --format` | CPU, memória, rede por container no instante da coleta |
 | Imagens | `docker images --format` + `docker system df -v` | repositório, tag, digest, tamanho, `dangling` |
@@ -25,8 +25,9 @@ Ordem fixa para permitir diff entre datas.
   `docker volume ls`.
 - Node Swarm manager: além do standalone, `docker node ls`,
   `docker service ls`, `docker service ps`, `docker stack services <stack>`.
-- Node Swarm worker: coleta standalone mais `docker node inspect self`.
-  Não consultar estado global do Swarm a partir do worker como fonte única.
+- Node Swarm worker: coleta standalone mais
+  `docker info --format '{{json .Swarm}}'` para o estado local. Consulte `docker node inspect`
+  e o estado global a partir de um manager.
 - Nunca usar `docker system prune`, `docker rmi`, `docker volume prune` ou
   `docker stack deploy` dentro do play de relatório.
 
@@ -35,25 +36,30 @@ Ordem fixa para permitir diff entre datas.
 - Default: `--tail 200` para serviço Swarm, `--tail 100` para container,
   `--since 24h`. Ampliar somente com pedido explícito e registro da janela.
 - Usar `--timestamps` para correlacionar com deploy e restart.
-- Usar `check_mode: false` em tasks de inspeção quando o play declarar
-  `check_mode: true` no nível do play; tasks de coleta não alteram estado
-  e precisam continuar úteis em simulação.
-- Usar FQCN (`ansible.builtin.shell`, `community.docker.docker_host_info`)
-  e `changed_when: false` + `failed_when: false` somente quando a semântica
-  for leitura real; nunca para mascarar falha de conexão ou permissão.
+- Em `--check`, use `check_mode: false` somente em tasks comprovadamente
+  de leitura que precisem executar de verdade, como consultas do Docker
+  por `command`. Mantenha as consultas úteis sem permitir alterações remotas.
+- Usar FQCN (`ansible.builtin.command`, `community.docker.docker_host_info`)
+  e `changed_when: false` em comandos somente leitura. Quando um retorno
+  não zero for previsto, declare os códigos esperados em `failed_when` e
+  mantenha falhas reais de conexão ou permissão visíveis.
 
 ## Thresholds operacionais
 
 - Disco: atenção em 80%, crítico em 90%. Inodes: atenção em 80%, crítico
   em 85%. Acima do crítico, priorizar limpeza autorizada de `dangling` e
   rotação de log antes de qualquer outra ação.
-- Exit codes: `0` normal; `1` erro genérico da aplicação; `125`-`127`
-  erro do runtime Docker; `137` OOM/kill (`SIGKILL`); `143` `SIGTERM`
-  sem shutdown gracioso. Correlacionar `137` com `dmesg | grep -i oom` e
-  limites de memória do serviço.
-- Serviço Swarm: `Running < Desired` por mais de 5 minutos após deploy
-  indica falha de convergência; `Shutdown Failed` repetido indica loop de
-  restart que pede `docker service ps --no-trunc` completo.
+- Diferencie o status do CLI `docker run` do código do processo em
+  `.State.ExitCode`. No CLI, `125` indica falha do Docker, `126` um
+  comando que não pôde ser invocado e `127` um comando ausente. Para o
+  processo, `137` é compatível com `SIGKILL` e `143` com `SIGTERM`.
+  Um `143` isolado não comprova falha de shutdown. Para investigar OOM,
+  confira `.State.OOMKilled`, os eventos do kernel e o limite de memória.
+- Serviço Swarm: o relatório sinaliza `Running < Desired` por mais de
+  5 minutos após deploy. Compare com o prazo de convergência do rollout.
+  Em `docker service ps --no-trunc`, diferencie estado desejado `Shutdown`
+  e estado atual `Failed`. Tarefas substituídas em sequência pedem inspeção
+  do erro e da política de restart. (regra da casa)
 
 ## Segurança operacional
 
@@ -64,8 +70,9 @@ Ordem fixa para permitir diff entre datas.
   `password`, `secret`, `vault_` antes de salvar em `server-reports/`.
 - Preferir `community.docker` (`docker_host_info`, `docker_container_info`)
   a `shell` quando o módulo entrega o mesmo dado com parsing estável.
-- Fixar `ansible-core` e collections em `requirements.yml`; divergência de
-  versão entre controladora e documentação invalida a comparação histórica.
+- Registrar as versões da controladora e das collections no relatório.
+  Fixar cada dependência no manifesto correspondente, conforme
+  [ansible.md](ansible.md#estrutura-recomendada).
 
 ## Comandos de verificação
 

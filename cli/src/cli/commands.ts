@@ -31,6 +31,7 @@ import { testingTopLevelCommands } from "./commands/testing.ts";
 import { milestonesCommands } from "./commands/milestones.ts";
 import { projectDocsCommands } from "./commands/project-docs.ts";
 import { frameworkTopLevelCommands, skillsCommands } from "./commands/framework.ts";
+import { specialistSuggestCommand } from "./commands/specialists.ts";
 import type { Command } from "./registry.ts";
 
 /**
@@ -68,7 +69,8 @@ export const root: Command = {
     ...group("milestones", "Milestones of the project.", milestonesCommands),
     ...group("docs", "Project documentation generated from the specs.", projectDocsCommands),
     ...frameworkTopLevelCommands,
-    ...group("skills", "Specsfy skills of the project: list, detect, install, remove, update.", skillsCommands),
+    ...group("skills", "Specsfy skills of the project: list, detect, install, remove, update, suggest.", [...skillsCommands, specialistSuggestCommand]),
+    ...group("specialists", "Specialists for a spec.", [specialistSuggestCommand]),
     scriptsCommand,
     aboutCommand,
     configCommand,

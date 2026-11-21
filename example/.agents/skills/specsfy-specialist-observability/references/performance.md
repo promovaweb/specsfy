@@ -17,12 +17,12 @@
 
 | Métrica | Bom | Precisa melhorar | Ruim | O que mede |
 |---|---|---|---|---|
-| LCP (Largest Contentful Paint) | ≤ 2.5s | 2.5s–4s | > 4s | Tempo até o maior elemento visível renderizar |
-| INP (Interaction to Next Paint) | ≤ 200ms | 200ms–500ms | > 500ms | Responsividade a interações ao longo da sessão |
-| CLS (Cumulative Layout Shift) | ≤ 0.1 | 0.1–0.25 | > 0.25 | Estabilidade visual (deslocamento de layout) |
+| LCP (Largest Contentful Paint) | ≤ 2.5s | > 2.5s e ≤ 4s | > 4s | Tempo até renderizar o maior elemento de conteúdo elegível na área visível |
+| INP (Interaction to Next Paint) | ≤ 200ms | > 200ms e ≤ 500ms | > 500ms | Responsividade a interações ao longo da sessão |
+| CLS (Cumulative Layout Shift) | ≤ 0.1 | > 0.1 e ≤ 0.25 | > 0.25 | Estabilidade visual (deslocamento de layout) |
 
-Meça no percentil 75 de sessões reais (field data), não apenas em lab —
-condições de rede/dispositivo reais divergem do ambiente de desenvolvimento.
+Classifique cada métrica pelo percentil 75 das visitas reais, segmentando
+dispositivos móveis e desktops. Use medições de laboratório para diagnóstico.
 INP substituiu o antigo FID (First Input Delay) como métrica oficial de
 responsividade do Core Web Vitals.
 
@@ -61,10 +61,9 @@ ab -n 10000 -c 100 https://staging.exemplo.com/api/rota
 ## Teoria das filas (qualitativo)
 
 - **Lei de Little**: em regime estável, `L = λ × W` (itens em média no
-  sistema = taxa de chegada × tempo médio no sistema). Use-a para checar
-  consistência entre métricas medidas — se a fila/concorrência observada for
-  muito maior que `λ × W` previsto, há acúmulo (backpressure) não explicado
-  pelas métricas coletadas.
+  sistema = taxa de chegada × tempo médio no sistema). Use a mesma fronteira
+  para as três medidas. Se os valores não fecharem, verifique a janela, as
+  unidades, o volume descartado e se o sistema estava em regime estável.
 - Perto da saturação de um recurso (CPU, pool de conexões, thread pool), a
   fila de espera cresce de forma não linear: um pequeno aumento de carga
   produz um aumento desproporcional de latência. Por isso headroom de

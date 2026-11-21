@@ -15,7 +15,7 @@ histórico. Use o template `skills/templates/DESIGNSYSTEM.MD` no monorepo e
 
 | Superfície | Composição mínima |
 | --- | --- |
-| lista de CRUD | `PageHeader` compartilhado + resumo útil + `DataGrid` em largura total, com `ID` e ações por linha |
+| lista de CRUD | `PageHeader` compartilhado + resumo útil + `DataGrid` em largura total, com `ID` e as ações das operações incluídas no Contrato CRUD |
 | detalhe | `PageHeader` + `DetailLists` + status e próxima ação |
 | criar e editar | `PageHeader` + seções com contexto e campos em duas colunas |
 | dashboard | período ou escopo + filtros + `KPI` + tendência ou distribuição + detalhe |
@@ -33,9 +33,11 @@ mobile. Em Laravel, preserve a tipagem dos itens e reaproveite o componente
 existente, adaptando a composição só para exibir a equipe ativa.
 
 Todas as telas CRUD reutilizam o mesmo `PageHeader`, variando props ou
-configuração. Deixe editar e apagar como ações independentes na linha da lista.
-Registre cabeçalho, tabela, linha, ações, formulários, estados e feedback
-recorrentes em `INTERFACE.md` e consulte o registro antes de recriá-los.
+configuração. Deixe as ações das operações incluídas no campo `Operações:` do
+Contrato CRUD da spec como controles independentes na linha da lista; uma tela
+só de listagem e cadastro não ganha editar e apagar. Registre cabeçalho,
+tabela, linha, ações, formulários, estados e feedback recorrentes em
+`INTERFACE.md` e consulte o registro antes de recriá-los.
 
 ## Dashboards
 

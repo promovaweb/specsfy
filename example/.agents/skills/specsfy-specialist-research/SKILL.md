@@ -38,6 +38,12 @@ Não use para:
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico`, a
    seção que a fase está escrevendo e `### 2. Research e esclarecimentos`.
    Leia também `.specsfy/STACK.md` e `.specsfy/RULES.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-research (sources|prototype)`. Sem
    indicação, escolha o modo pelo "Quando usar" acima.
@@ -75,7 +81,7 @@ Não use para:
    comprovação para a versão em uso.
 3. Triangular toda afirmação crítica para a escolha com uma segunda fonte
    independente. Executar experimento controlado quando a documentação não
-   resolver a dúvida.
+   resolver a dúvida. (regra da casa)
 4. Separar explicitamente fatos confirmados, inferências (prováveis mas não
    confirmadas), consequências possíveis e lacunas que permanecem sem
    comprovação.
@@ -110,6 +116,9 @@ Não use para:
   extensa que apenas desloca o trabalho de leitura para depois.
 - Registrar versão e data de qualquer fonte cujo comportamento pode mudar entre
   releases; sem isso, a conclusão expira silenciosamente.
+- Verificar a vigência do documento citado antes de usá-lo: RFC obsoletado ou
+  atualizado, Internet-Draft expirado ou versão substituída invalidam a
+  conclusão mesmo quando o link ainda abre.
 - Quando duas fontes conflitam, declarar o conflito explicitamente em vez de
   escolher uma silenciosamente sem justificar por que ela prevalece.
 - Não criar um `research.md` paralelo à fonte normativa do projeto; a pesquisa é

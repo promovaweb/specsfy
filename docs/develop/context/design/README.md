@@ -49,9 +49,10 @@ macro.
   por props ou configuração. A marcação do cabeçalho não é duplicada.
 - Listas usam `DataGrid` em toda a largura disponível e exibem sempre uma
   coluna `ID`.
-- A linha do `DataGrid` abre o detalhe inteiro por clique e teclado; controles
-  internos ficam acima do link da linha. Cada linha também oferece `Editar` e
-  `Apagar` como ações independentes.
+- A seção 10 da spec declara as operações incluídas em `Operações`.
+  Quando listagem e detalhe estiverem no escopo, a linha de `DataGrid` abre o
+  detalhe por clique e teclado. Controles internos ficam acima do link.
+  `Editar` e `Apagar` são ações independentes quando declaradas.
 - Todas as telas exibem `Breadcrumb` com a equipe ativa, o módulo e a tela
   atual. Em Laravel, a implementação existente do layout é reaproveitada.
 - Detalhes usam `PageHeader` e `DetailLists`.

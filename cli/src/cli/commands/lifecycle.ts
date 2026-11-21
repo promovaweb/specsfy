@@ -249,7 +249,7 @@ function transitionText(data: { identifier: string; from: string; to: string; st
 
 const specsTransition: Command = {
   name: "transition",
-  description: "Move a spec to another state folder and mirror its Status; only adjacent states of the method are accepted.",
+  description: "Move a spec to another state folder and update its Status and backlog links.",
   longDescription:
     `Order: ${SPEC_FOLDERS.join(" → ")}. From each state the spec may stay, go one step forward or one step back; completed may reopen to draft or defined. ` +
     "An invalid transition exits with code 2 and lists the accepted destinations. Milestones are synced afterwards.",

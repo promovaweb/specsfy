@@ -1,5 +1,7 @@
 # Padrões comuns e referências de entrega
 
+Revisado em 2026-11-20 contra: SemVer 2.0.0, SLSA 1.2, GitHub Actions no GitHub.com, Ansible 14 (ansible-core 2.21), community.docker 5.4.0, Docker Engine 29.10.0, Laravel Octane e Cloudflare Tunnel (cloudflared 2025.4.0+ para --token-file).
+
 Reúne as regras que valem para os três modos (deploy, versioning e ci-cd) e
 serve de índice para a referência de cada um.
 
@@ -9,7 +11,7 @@ serve de índice para a referência de cada um.
 | --- | --- | --- |
 | deploy | [deploy.md](deploy.md) e [vault.md](vault.md) | estado do servidor pela automação, hosts, imagem, secrets e ordem operacional |
 | versioning | [versioning.md](versioning.md) | `SEMVER`, incremento, correspondência entre artefatos e ordem de publicação |
-| ci-cd | [ci-cd.md](ci-cd.md) | etapas de pipeline, estratégias de release, migrations e supply chain |
+| ci-cd | [ci-cd.md](ci-cd.md) e [github-actions.md](github-actions.md) | etapas de pipeline, estratégias de release, migrations, supply chain e GitHub Actions |
 
 ## Autorização e alcance
 
@@ -54,5 +56,18 @@ serve de índice para a referência de cada um.
 - [Módulos community.docker](https://docs.ansible.com/ansible/latest/collections/community/docker/)
 - [Senhas do Ansible Vault](https://docs.ansible.com/projects/ansible/latest/vault_guide/vault_managing_passwords.html)
 - [GitHub Actions](https://docs.github.com/actions)
-- [SLSA](https://slsa.dev/spec/)
 - [Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/)
+- [Workflow syntax, incluindo permissões e concorrência](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax)
+- [Uso seguro de GitHub Actions](https://docs.github.com/en/actions/reference/security/secure-use)
+- [Ambientes, proteções e aprovação](https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments)
+- [OIDC e credenciais temporárias](https://docs.github.com/en/actions/concepts/security/openid-connect)
+- [Workflows reutilizáveis](https://docs.github.com/en/actions/how-tos/reuse-automations/reuse-workflows)
+- [Cache de dependências](https://docs.github.com/en/actions/concepts/workflows-and-actions/dependency-caching)
+- [Artefatos e retenção](https://docs.github.com/en/actions/concepts/workflows-and-actions/workflow-artifacts)
+- [Concorrência](https://docs.github.com/en/actions/concepts/workflows-and-actions/concurrency)
+- [SLSA 1.2](https://slsa.dev/spec/v1.2/)
+- [Laravel Octane e servidores suportados](https://laravel.com/docs/octane)
+- [Cloudflare Tunnel — token-file](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/#token-file)
+- [Docker Engine 29](https://docs.docker.com/engine/release-notes/29/)
+- [Ansible — releases e manutenção](https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html)
+- [Changelog do GitHub Actions sobre queue: max](https://github.blog/changelog/2026-05-07-github-actions-concurrency-groups-now-allow-larger-queues/)

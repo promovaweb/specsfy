@@ -14,18 +14,22 @@
  * Node.js is missing. The MCP tool `verify` calls the same function.
  *
  * Paths given to `--attestation` are resolved against the project root,
- * which is the working directory of every script.
+ * which is the working directory of every script. Specialist warnings are
+ * added to the CLI response after the policy runs.
  */
 import { existsSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { join, relative, resolve, sep } from "node:path";
 import { manifest } from "../../app/manifest.ts";
 import { ExitCode } from "../../app/exit-codes.ts";
 import { error } from "../../app/errors.ts";
 import { getPath, readSettings } from "../../config/settings.ts";
 import { resolveProject } from "../../core/project.ts";
+import { analyzeSpecSpecialists, projectStackSpecialists, installedSpecSpecialists } from "../../domain/spec-specialists.ts";
 import { runScript, skillsRuntimeDir, type ScriptRun } from "../../engine/runner.ts";
 import { projectOption, toCommand, type ScriptCommandDef, type ScriptParam, projectFile } from "../../engine/script-command.ts";
 import type { Command } from "../registry.ts";
+import { loadSpecCatalog } from "./specialists.ts";
 
 const bin = manifest.bin;
 
@@ -188,6 +192,17 @@ export interface VerifyData {
   /** Payload of verify_repo (`schema_version`, `result`, `checks`, `canaries`...). */
   result: unknown;
   stderr: string;
+  warnings: VerifyWarning[];
+}
+
+interface VerifyWarning {
+  severity: "warning";
+  kind: "unknown-specialist" | "specialist-not-installed" | "undeclared-specialist" | "catalog-unavailable";
+  message: string;
+  spec?: string;
+  name?: string;
+  mode?: string;
+  signal?: string;
 }
 
 /** `gate.timeoutSeconds` from settings, falling back to 300. */
@@ -228,6 +243,7 @@ export async function runVerify(options: VerifyOptions): Promise<{ data: VerifyD
     nodeShim: projectSkills ? "auto" : "always",
   });
   const code = run.code === 0 ? ExitCode.SUCCESS : run.code === 2 ? ExitCode.USAGE : ExitCode.GATE_FAILED;
+  const payload = run.json as VerifyPayload | undefined;
   const data: VerifyData = {
     project,
     script: VERIFY_SCRIPT,
@@ -238,12 +254,53 @@ export async function runVerify(options: VerifyOptions): Promise<{ data: VerifyD
     ok: run.code === 0,
     result: run.json ?? run.stdout.trim(),
     stderr: run.stderr.trim(),
+    warnings: options.selfTest ? [] : await verifySpecialists(project, payload?.checks ?? []),
   };
   return { data, run, code };
 }
 
-interface VerifyCheck { name: string; status: string; code: number; detail?: string }
+interface VerifyCheck { name: string; status: string; code: number; detail?: string; command?: string[] }
 interface VerifyPayload { result: string; boundary: string; checks?: VerifyCheck[]; canaries?: Array<{ name: string; passed: boolean }> }
+
+async function verifySpecialists(project: string, checks: VerifyCheck[]): Promise<VerifyWarning[]> {
+  const paths = new Set(
+    checks.filter(({ name }) => name.startsWith("spec:"))
+      .map(({ command }) => command?.[2])
+      .filter((path): path is string => Boolean(path)),
+  );
+  if (!paths.size) return [];
+  const [{ catalog, catalogWarning }, installed] = await Promise.all([
+    loadSpecCatalog(),
+    installedSpecSpecialists(project),
+  ]);
+  const known = new Set(catalog.entries.map(({ name }) => name));
+  const warnings: VerifyWarning[] = catalogWarning
+    ? [{ severity: "warning", kind: "catalog-unavailable", message: catalogWarning }]
+    : [];
+  for (const path of paths) {
+    const markdown = await readFile(path, "utf8").catch(() => undefined);
+    if (markdown === undefined) continue;
+    const spec = relative(project, path).split(sep).join("/");
+    const { names, suggestions } = analyzeSpecSpecialists(markdown, catalog, installed, await projectStackSpecialists(project, catalog));
+    for (const name of names) {
+      if (!known.has(name)) warnings.push({ severity: "warning", kind: "unknown-specialist", spec, name, message: `${name} is not in the specialist catalog.` });
+      if (!installed.has(name)) warnings.push({ severity: "warning", kind: "specialist-not-installed", spec, name, message: `${name} is declared but not installed in .agents/skills.` });
+    }
+    for (const { name, mode, signal, declared } of suggestions) {
+      if (declared) continue;
+      warnings.push({
+        severity: "warning", kind: "undeclared-specialist", spec, name, mode, signal,
+        message: `${name}${mode ? ` (${mode})` : ""} matches "${signal}" but is not declared.`,
+      });
+    }
+  }
+  return warnings;
+}
+
+/** Formats the non-blocking findings for CLI stderr and the TUI gate report. */
+export function renderVerifyWarnings(data: VerifyData): string {
+  return data.warnings.map(({ spec, message }) => `WARNING: ${spec ? `${spec}: ` : ""}${message}`).join("\n");
+}
 
 /** Text rendering of a verify payload, close to the script's own text mode. */
 export function renderVerify(data: VerifyData): string {
@@ -266,7 +323,7 @@ const verifyCommand: Command = {
   longDescription:
     "Runs verify_repo: validates every spec by status (spec, tasks, traceability, acceptance, evidence and research for complete specs with Evidence Contract 1) and the skills contract, and returns the attestation payload. " +
     "The checks use the scripts in .agents/skills/ of the project; when that folder is missing they fall back to the scripts embedded in the binary, and the skills check fails. Node.js is not required. " +
-    "Exit code 10 means the policy failed.",
+    "Specialist warnings are informational. Exit code 10 means the policy failed.",
   options: [
     { name: "--boundary", argument: { name: "boundary", values: VERIFY_BOUNDARIES }, description: "Verification boundary recorded in the attestation. Default: local." },
     { name: "--attestation", argument: { name: "file" }, description: "Write the attestation JSON to this file, relative to the project root." },
@@ -286,6 +343,7 @@ const verifyCommand: Command = {
       maxOutputBytes: ctx.options["max-output-bytes"] as string | undefined,
       selfTest: Boolean(ctx.options["self-test"]),
     });
+    if (!ctx.json && data.warnings.length) ctx.stderr(renderVerifyWarnings(data));
     return { data, text: () => renderVerify(data), code };
   },
 };

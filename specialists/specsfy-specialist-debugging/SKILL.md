@@ -25,6 +25,12 @@ description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` para reproduzir no ambiente real, não no suposto.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-debugging`. Sem indicação, confirme pelo
    "Quando usar" acima se existe sintoma observado antes de investigar.
@@ -118,6 +124,8 @@ description: Diagnosticar bugs, regressões, falhas intermitentes e problemas de
   pode entregar a esta skill a escolha de qual otimização vale o custo.
 - `$specsfy-specialist-code-review` para revisar a correção e o teste de
   regressão antes do merge.
+- `$specsfy-specialist-testing` transforma a causa confirmada em teste de
+  regressão executável, com comando e saída registrados.
 
 Leia [references/standards.md](references/standards.md) para técnicas de
 reprodução e isolamento, causas comuns de flakiness, ferramentas por

@@ -1,14 +1,15 @@
 ---
 name: specsfy-specialist-laravel
-description: "Implementar, revisar e operar aplicações Laravel (modo app: domínio, HTTP, filas, autorização, dados e testes) e integrar pacotes Composer recebidos por URL do GitHub (modo packages: leitura do repositório, instalação autorizada e fichas em docs/packages/). Use quando o projeto tem `artisan` ou `laravel/framework` e a tarefa toca rotas, controllers, models, policies, form requests, jobs, eventos, cache, migrations, Pest/PHPUnit ou uma dependência Composer. Não use para PHP sem Laravel, pacotes npm ou publicação no Packagist; para schema, índice e plano de query use `$specsfy-specialist-postgres`; para Postgres gerenciado por Supabase use `$specsfy-specialist-supabase`; para autenticação, upload e dado sensível use `$specsfy-specialist-application-security`; para comparar versões e fontes primárias use `$specsfy-specialist-research`."
+description: "Implementar, revisar e operar aplicações Laravel (modo app: domínio, HTTP, filas, autorização, dados e testes) e integrar pacotes Composer recebidos por URL do GitHub (modo packages: leitura do repositório, instalação autorizada e fichas em docs/packages/). O modo mcp publica servidores MCP por HTTP com laravel/mcp. Use quando o projeto tem `artisan` ou `laravel/framework` e a tarefa toca rotas, controllers, models, policies, form requests, jobs, migrations, Pest/PHPUnit, uma dependência Composer ou routes/ai.php. Não use para PHP sem Laravel, pacotes npm ou publicação no Packagist; para schema, índice e plano de query use `$specsfy-specialist-postgres`; para Postgres gerenciado por Supabase use `$specsfy-specialist-supabase`; para autenticação, upload e dado sensível use `$specsfy-specialist-application-security`; para comparar versões e fontes primárias use `$specsfy-specialist-research`."
 ---
 
 # Laravel
 
 Oriente a aplicação Laravel pelo contrato real do projeto: versões do
 `composer.lock`, convenções já adotadas, boundary onde a regra de negócio vive
-e pacotes Composer que a aplicação realmente usa. O modo app cobre o runtime;
-o modo packages cobre receber, instalar e documentar uma dependência.
+e pacotes Composer que a aplicação realmente usa. O modo app cobre o runtime.
+O modo packages cobre a integração de dependências e o modo mcp cobre
+servidores MCP publicados por HTTP.
 
 ## Quando usar
 
@@ -16,6 +17,7 @@ o modo packages cobre receber, instalar e documentar uma dependência.
 | --- | --- | --- |
 | Rotas, controllers, models, policies, form requests, jobs, eventos, cache, migrations, Pest/PHPUnit, N+1, fila travada ou autorização quebrada | app | [Padrões e checklist por superfície](references/standards.md) |
 | URL do GitHub de um pacote Composer, ficha de uso ausente ou `composer.json`, `composer.lock` e `docs/packages/` fora de sincronia | packages | [Fichas, fontes e comandos Composer](references/packages.md) |
+| Servidor MCP por HTTP com `laravel/mcp`, `routes/ai.php` ou `Mcp::web` | mcp | [Servidor MCP em Laravel](references/mcp.md) |
 
 Não use para:
 
@@ -39,8 +41,14 @@ Não use para:
    `.specsfy/RULES.md`. Ao tocar migrations, models ou dado persistido, leia
    também `.specsfy/DATABASE.md`; ao receber pacote Composer, leia
    `.specsfy/PACKAGES.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção em
+     escrita) e escreva nela; só `specsfy-05-tasks` escreve a seção 14, então
+     apenas indique o que a tarefa deve prever; em `specsfy-06-implement`, siga
+     a tarefa indicada.
 2. Siga o modo indicado na spec ou na tarefa, no formato
-   `Especialista: $specsfy-specialist-laravel (app|packages)`. Sem indicação,
+   `Especialista: $specsfy-specialist-laravel (app|packages|mcp)`. Sem indicação,
    escolha o modo pelo "Quando usar" acima.
 3. Devolva a conclusão para a seção da spec ou para a tarefa que a fase está
    escrevendo; não abra arquivo paralelo. Se faltar informação, registre como
@@ -51,15 +59,16 @@ Não use para:
 5. No modo packages, registre a ficha em `docs/packages/` e alinhe
    `.specsfy/PACKAGES.md` antes de fechar a tarefa; no modo app, leve
    migrations e models para as subseções `Migrations` e `Models` da seção 8.
+   No modo mcp, registre a rota HTTP, a revisão, o guard e as operações
+   expostas.
 
 ## Fluxo
 
 1. Ler as instruções locais, `composer.json` e `composer.lock` para confirmar
    versão do framework, do PHP e dos pacotes relevantes (Sanctum, Horizon,
    Octane, Scout) antes de supor comportamento por memória.
-2. Identificar o modo pelo pedido: aplicação em execução ou dependência nova.
-   Em dúvida, resolver a instalação e a documentação do pacote antes de
-   alterar código de aplicação.
+2. Identificar se o pedido trata da aplicação em execução, da integração de
+   uma dependência ou de um servidor MCP por HTTP.
 3. Ler `.specsfy/PACKAGES.md`, `docs/packages/README.md` e as fichas existentes
    antes de propor pacote, comando ou abstração. Considerar o que já está
    instalado.
@@ -69,9 +78,9 @@ Não use para:
 ### Modo app
 
 1. Tratar Laravel Octane com Open Swoole e o pacote `laravel/octane` como
-   runtime obrigatório. Quando estiver ausente, incluir instalação e
-   configuração no trabalho antes de considerar a aplicação pronta para
-   execução ou deploy.
+   runtime obrigatório. No setup, registrar ausência como pendência de stack.
+   Incluir instalação e configuração como pré-condição do deploy.
+   (regra da casa)
 2. Mapear a requisição do ponto de entrada até domínio, persistência, efeitos
    assíncronos e resposta, identificando o boundary onde a regra de negócio já
    vive no projeto (Action, Service, Model rico).
@@ -128,12 +137,23 @@ Não use para:
    cada ficha. Apontar para `.specsfy/PACKAGES.md` quando a pessoa precisar da
    relação completa, incluindo dependências transitivas.
 
+### Modo mcp
+
+1. Ler [references/mcp.md](references/mcp.md), confirmar `laravel/mcp` no
+   `composer.lock` e verificar as revisões usadas pelos clientes.
+2. Registrar `Mcp::web` em `routes/ai.php`. Implementar as classes
+   Server, Tool, Resource e Prompt que o contrato exige.
+3. Configurar Sanctum para bearer tokens fornecidos ao cliente ou Passport
+   para descoberta OAuth. Aplicar Policies ou Gates por operação e objeto.
+4. Exercitar as primitivas nos testes do pacote e confirmar transporte e
+   autenticação pela rota HTTP com o Inspector.
+
 ## Padrões
 
 - Executar HTTP com Laravel Octane, Open Swoole e `--server=swoole`. Instalar a
   extensão `openswoole` na imagem e limpar estado por requisição; singletons e
   propriedades estáticas não podem transportar dados entre usuários nos
-  workers persistentes.
+  workers persistentes. (regra da casa)
 - Manter controllers finos: validação em Form Requests, autorização em
   Policies/Gates, regra de negócio no boundary já adotado pelo projeto.
 - Tratar Eloquent como acesso a dados: eager load explícito (`with`,
@@ -160,6 +180,7 @@ Não use para:
   de executar Pest ou PHPUnit. Se essa separação não estiver comprovada, não
   executar nenhum teste. Usar `DatabaseTransactions` para desfazer os registros
   criados pelo próprio caso e factories para preparar somente o necessário.
+  (regra da casa)
 - Tomar `composer.lock` como fonte da versão instalada; nunca derivar versão da
   tag mais recente do GitHub ou de uma restrição do manifest.
 - Nomear a ficha pelo nome Composer normalizado, com `/` convertido em `-`, e
@@ -173,6 +194,9 @@ Não use para:
   executá-lo e o arquivo que deve mudar.
 - Manter segredos, valores de `.env`, código inteiro de pacote e documentação
   extensa de terceiros fora de `docs/packages/`.
+
+- No modo mcp, declarar schema de entrada e de saída de tools estruturadas.
+  Validar os argumentos e reaproveitar serviços e políticas do domínio.
 
 ## Antipadrões
 
@@ -199,6 +223,10 @@ Não use para:
 - Criar ficha genérica baseada somente no README: a documentação deixa de
   explicar como o pacote aparece no projeto consumidor.
 
+- Configurar `Mcp::local` para um pedido HTTP ou publicar `Mcp::web` sem
+  autenticação em produção. O primeiro só atende por stdio e o segundo
+  expõe operações a todo chamador que alcance a rota.
+
 ## Validação
 
 - Cobrir caminho feliz, autorização negada, validação, efeitos colaterais e
@@ -207,14 +235,15 @@ Não use para:
   `.env.testing` aponta para um banco separado. Confirmar RED antes de
   implementar.
 - Ignorar `migrate:fresh`, `migrate:refresh`, `migrate:reset`,
-  `migrate:rollback`, `db:wipe` e qualquer comando que apague ou recrie o
-  banco, mesmo quando a tarefa ou um script existente sugerir sua execução.
+  `migrate:rollback`, `db:wipe`, o trait que recria o banco a cada teste fora de banco descartável e
+  qualquer comando que apague ou recrie o banco, mesmo quando a tarefa ou um
+  script existente sugerir sua execução. (regra da casa)
 - Antes de concluir `[MIGRATION]`, confirmar o arquivo em
   `database/migrations/`, executar `php artisan migrate --env=testing` e
   registrar `php artisan migrate:status --env=testing` com saída zero.
 - Inspecionar queries geradas quando a tela lista uma coleção com relação:
-  contar queries antes/depois (`assertQueryCountLessThan`, Debugbar, log de
-  queries) para provar ausência de N+1.
+  contar queries antes/depois (`expectsDatabaseQueryCount`, contador em
+  `DB::listen`, Debugbar ou Telescope) para provar ausência de N+1.
 - Verificar queues, scheduler, cache de config/rotas e variáveis de ambiente
   no ambiente alvo antes de declarar a tarefa pronta para deploy. Confirmar
   imagem, healthcheck do processo Octane e política de tag quando a aplicação
@@ -231,12 +260,17 @@ Não use para:
 - Conferir que `docs/packages/README.md` lista cada dependência direta do
   `composer.json`, que cada link aponta para uma ficha existente e que a ficha
   informa quando a finalidade ainda não foi confirmada.
+- No modo mcp, rodar `php artisan route:list -v --path=mcp` e testar os
+  handlers com Pest ou PHPUnit. Usar `mcp:inspector` no endpoint HTTP para
+  conferir credenciais, saída estruturada e acesso negado.
 - Verificar links, comandos, nomes de configuração e exemplos contra a versão
   instalada. Não declarar compatibilidade, segurança ou funcionamento sem uma
   fonte ou teste correspondente.
 
 ## Skills relacionadas
 
+- `$specsfy-specialist-mcp` para contrato Streamable HTTP, revisão do
+  protocolo, descoberta OAuth e interoperabilidade entre stacks.
 - `$specsfy-specialist-interface` para telas e fluxos em projetos Laravel com
   Inertia, incluindo a decisão de composição antes do componente React.
 - `$specsfy-specialist-modeling` para entidades, relações e ciclo de vida antes
@@ -251,6 +285,10 @@ Não use para:
   driver.
 - `$specsfy-specialist-observability` para instrumentar filas, workers e
   sinais do modo app.
+- `$specsfy-specialist-mysql` quando migration, Eloquent ou transação rodar em
+  MySQL: o dialeto e o plano de query ficam lá, a aplicação continua aqui.
+- `$specsfy-specialist-testing` quando a tarefa for escrever ou executar o
+  teste Pest que comprova o comportamento implementado aqui.
 - `$specsfy-specialist-research` para comparar documentação, versões e fontes
   primárias quando o repositório não esclarecer uma dúvida.
 

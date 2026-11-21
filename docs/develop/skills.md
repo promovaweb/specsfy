@@ -361,11 +361,23 @@ manifests nem autoriza instalar, atualizar ou remover dependências.
 Em projetos Laravel, `specsfy-specialist-laravel` amplia esse
 fluxo para pacotes recebidos por URL GitHub. Ele consulta os pacotes atuais,
 instala somente após autorização e mantém `docs/packages/README.md` mais uma
-ficha por pacote. `specsfy-03-specify` consulta essas fontes antes de registrar
-uma dependência na spec; `specsfy-06-implement` faz a mesma leitura antes de
-alterar Composer e carrega o especialista quando a tarefa envolve pacote.
+ficha por pacote. `specsfy-03-specify` usa `.specsfy/PACKAGES.md` e consulta
+as fichas quando existirem ou no modo Laravel `packages`. Antes de alterar
+Composer, `specsfy-06-implement` consulta essas fontes e carrega o especialista
+quando a tarefa envolve pacote.
 
 ## Validação
+
+Em `Defined`, cada chamada de `tests` no passo `prepare` prova um RED e
+retorna à fase de tarefas. A seção 14 define a ordem de dependências das
+tarefas `[TEST] [TDD]`. O Plan Gate permanece `Pending` até o último RED
+exigido. Testes de regressão pós-código ficam fora dessa contagem.
+
+Os scripts que leem evidências encontram a raiz pelo marcador `.specsfy/` ou
+pelo diretório `specs/` que contém a spec. Em um layout exportado, os scripts
+de tarefas e de findings aceitam raiz explícita com `--project` e `--root`,
+respectivamente. O monitor recebe `--paths` quando a lista de mudanças vem
+de uma cópia sem Git.
 
 O validador verifica frontmatter, nome, metadata e estrutura. Testes focais
 devem verificar o comportamento específico. Validação estrutural não prova a

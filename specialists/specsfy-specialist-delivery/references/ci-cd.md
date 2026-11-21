@@ -1,5 +1,7 @@
 # Padrões do modo ci-cd
 
+Quando o pipeline roda no GitHub Actions, use também [github-actions.md](github-actions.md).
+
 ## Etapas mínimas de pipeline
 
 1. **Validação**: lint, type-check e verificação de formatação — falha rápida
@@ -57,9 +59,10 @@ por segmento de usuário.
 - Proveniência/attestation (ex.: SLSA) liga o artefato final ao commit, ao
   pipeline e às entradas que o produziram, permitindo verificar que o binário
   em produção veio do processo esperado.
-- Fixe actions/dependências de pipeline por hash de commit (não por tag
-  móvel) e monitore com uma ferramenta de score de higiene de supply chain
-  (ex.: OpenSSF Scorecard) quando o projeto adotar.
+- Fixe actions por SHA completo de commit e demais dependências conforme
+  o ecossistema, com lockfile ou digest quando disponíveis. Use OpenSSF
+  Scorecard para acompanhar a higiene de supply chain quando o projeto adotar
+  a ferramenta.
 
 ## Privilégio, promoção e auditoria
 
@@ -77,7 +80,7 @@ por segmento de usuário.
 ## Fontes primárias
 
 - GitHub Actions: https://docs.github.com/actions
-- OpenID Connect para credenciais temporárias: https://docs.github.com/actions/security-for-github-actions/security-hardening-your-deployments/about-security-hardening-with-openid-connect
+- OpenID Connect para credenciais temporárias: https://docs.github.com/en/actions/concepts/security/openid-connect
 - SLSA (proveniência de build): https://slsa.dev/spec/
 - OpenSSF Scorecard: https://securityscorecards.dev/
 - OCI Distribution Spec (formato de artefato de imagem): https://github.com/opencontainers/distribution-spec

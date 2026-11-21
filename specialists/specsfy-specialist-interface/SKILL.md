@@ -36,6 +36,12 @@ Não use para:
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, para tela nova ou alterada, `INTERFACE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-interface (<modo>)`, com `discovery`,
    `system`, `ux`, `ui` ou `accessibility`. Sem indicação, escolha o modo pelo
@@ -87,13 +93,15 @@ Não use para:
    formato da ação. Ofereça opções textuais compatíveis, `Escrever outra
    resposta`, `Gere outras opções` e `Avançar`. Pergunte sobre composição
    quando houver conflito com regra existente ou lacuna de tarefa.
-4. Na seção 10 da spec, registre stack observada, cada tela, fluxo,
-   formulário, composição, ações, estados, mensagens, retornos, teclado,
-   foco e responsividade. Mapeie lista, detalhe, criação e edição no CRUD.
-5. Na seção 14, crie a `Fase de interface` com uma tarefa por tela e testes
-   de navegação, formulários, validação, feedback e teclado. Encaminhe aos
-   modos ux e ui. Em React, carregue `$specsfy-specialist-ui-components`
-   antes de escrever JSX ou TSX e `$specsfy-specialist-react` para a stack.
+4. Na seção 10 da spec, ou no item de `specs/backlog/` quando a spec ainda não
+   existe, registre stack observada, cada tela, fluxo, formulário, composição,
+   ações, estados, mensagens, retornos, teclado, foco e responsividade. Mapeie
+   lista, detalhe, criação e edição no CRUD.
+5. Indique à fase `specsfy-05-tasks` a `Fase de interface`, com uma tarefa por
+   tela e testes de navegação, formulários, validação, feedback e teclado, sem
+   criar tarefa fora dela. Encaminhe aos modos ux e ui. Em React, carregue
+   `$specsfy-specialist-ui-components` antes de escrever JSX ou TSX e
+   `$specsfy-specialist-react` para a stack.
 
 ### Modo system
 
@@ -164,10 +172,12 @@ contraste e uso do shell. A composição deve informar e orientar a tarefa.
 ## Padrões
 
 - Aplique a matriz SaaS de [system.md](references/system.md). Lista com
-  `DataGrid` em largura total, coluna `ID` e ações de editar e apagar por
-  linha. Detalhe com `DetailLists`. Todas as telas CRUD reutilizam o mesmo
-  `PageHeader`. Use `Breadcrumb` com equipe ativa, módulo e tela atual e
-  reaproveite o componente do layout Laravel.
+  `DataGrid` em largura total, coluna `ID` e as ações das operações incluídas
+  declaradas no Contrato CRUD da spec (campo `Operações:`); uma tela só de
+  listagem e cadastro não ganha editar/apagar. Detalhe com `DetailLists`.
+  Todas as telas CRUD reutilizam o mesmo `PageHeader`. Use `Breadcrumb` com
+  equipe ativa, módulo e tela atual e reaproveite o componente do layout
+  Laravel. (regra da casa)
 - Faça a linha abrir o detalhe por clique e teclado com ações independentes.
   Em criar e editar, use seções com contexto e campos em duas colunas largas
   e uma no mobile. Use labels visíveis, erro associado abaixo do campo e
@@ -219,8 +229,9 @@ contraste e uso do shell. A composição deve informar e orientar a tarefa.
   Revalide tarefas críticas após mudanças estruturais e registre limites da
   amostra. Use as matrizes dos modos para completar cada verificação.
 - Execute testes e validadores do consumidor quando houver implementação.
-  Para manutenção da skill, use `quick_validate.py` e a suíte do monorepo.
-  Sustente afirmações de usabilidade, responsividade e WCAG com evidência,
+  Para manutenção da skill no monorepo, use
+  `node scripts/validate-skills.mjs specsfy-specialist-interface` a partir da
+  raiz. Sustente afirmações de usabilidade, responsividade e WCAG com evidência,
   escopo, limitações e exceções aplicáveis.
 
 ## Skills relacionadas
@@ -234,3 +245,5 @@ contraste e uso do shell. A composição deve informar e orientar a tarefa.
 - `$specsfy-specialist-laravel` implementa telas Inertia e preserva o layout,
   a tipagem do breadcrumb e as regras do backend.
 - `$specsfy-specialist-code-review` amplia a revisão além de acessibilidade.
+- `$specsfy-specialist-testing` executa o teste de navegação, formulário e
+  teclado que comprova os estados e a semântica definidos aqui.

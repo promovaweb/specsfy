@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - MCP"
+  short_description: "Servidores MCP por HTTP com Laravel e Next.js"
+  default_prompt: "Use $specsfy-specialist-mcp para orientar esta tarefa com padrões e validação especializados."

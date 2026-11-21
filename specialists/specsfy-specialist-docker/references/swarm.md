@@ -30,16 +30,17 @@ no cluster e ordem explícita das rotas antes do catch-all.
   `docker node update --label-add`) para placement por capacidade real
   (`ssd=true`, `zone=us-east-1a`), nunca `engine.labels` (definidas no daemon,
   não confiáveis para decisão de placement administrativa).
-- Faça backup do diretório `/var/lib/docker/swarm` de um manager com o Swarm
-  parado (`docker swarm leave --force` só depois do backup, nunca antes) e
-  preserve a unlock key se `autolock` estiver ativo — sem ela o backup não
-  restaura.
+- Faça backup do diretório `/var/lib/docker/swarm` de um manager
+  com o daemon Docker daquele manager parado e o quorum dos demais intacto.
+  Preserve a unlock key se `autolock` estiver ativo. A restauração usa o backup
+  do diretório e `docker swarm init --force-new-cluster` no manager restaurado.
 
 ## Redes
 
 - Toda rede `overlay` usada por múltiplos serviços deve ser criada com
   `--attachable` apenas quando containers avulsos (fora de stack) precisarem
-  entrar nela; caso contrário, mantenha a rede restrita ao stack.
+  entrar nela; caso contrário, mantenha a rede restrita a serviços Swarm. Uma
+  rede overlay externa pode ser compartilhada por stacks.
 - O `ingress` overlay padrão faz load balancing de camada 4 (`routing mesh`)
   entre todas as réplicas de um serviço publicado; para desabilitar o mesh e
   publicar porta só no node que roda a réplica, use `mode: host` no
@@ -62,7 +63,7 @@ no cluster e ordem explícita das rotas antes do catch-all.
 | Mecanismo | Efeito | Quando usar |
 |---|---|---|
 | `placement.constraints` (`node.labels.zone==a`) | Regra dura; a tarefa só agenda em node que satisfaça | Requisito obrigatório: compliance, hardware específico (GPU), isolamento de tenant |
-| `placement.preferences` (`spread=node.labels.zone`) | Distribui tarefas proporcionalmente entre os valores do label, sem travar o agendamento se um valor ficar sem capacidade | Espalhar réplicas entre zonas de disponibilidade mantendo tolerância a falta de capacidade em uma zona |
+| `placement.preferences` (`spread=node.labels.zone`) | Tenta espalhar tarefas entre os valores do label, sem garantir a distribuição | Espalhar réplicas entre zonas de disponibilidade mantendo tolerância a falta de capacidade em uma zona |
 | `node.role==manager` / `node.role==worker` | Restringe a managers ou workers | Evitar que workload de aplicação compita por CPU/memória com o processo Raft nos managers |
 
 Combine as duas quando o requisito tiver parte obrigatória e parte de
@@ -75,8 +76,7 @@ entre zonas dentro dos nodes com SSD".
   `delay` (intervalo entre lotes), `order` (`stop-first` economiza recursos,
   `start-first` preserva capacidade — prefira `start-first` quando o serviço
   não tolera queda de capacidade), `failure_action` (`pause` para investigar,
-  `rollback` para reverter automaticamente) e `monitor` (janela para
-  considerar a réplica estável antes de avançar).
+  `rollback` para reverter automaticamente) e `monitor` (janela de observação de falhas após a atualização de uma tarefa).
 - `rollback_config` usa os mesmos campos e é o que executa quando
   `docker service update --rollback` ou um `failure_action: rollback` é
   disparado; sem configurá-lo, o rollback usa os defaults do Swarm, que nem
@@ -86,9 +86,9 @@ entre zonas dentro dos nodes com SSD".
 
 | Estratégia | Configuração | Efeito | Custo |
 |---|---|---|---|
-| Rolling, `start-first` | `order: start-first`, `parallelism: 1` | Sobe a réplica nova, espera o healthcheck ficar saudável, só então derruba a antiga | Exige capacidade extra temporária (N+1 réplicas); mais seguro com poucas réplicas |
+| Rolling, `start-first` | `order: start-first`, `parallelism: 1` | Inicia a tarefa nova antes de parar a antiga, com sobreposição temporária | Exige capacidade extra temporária (N+1 réplicas); mais seguro com poucas réplicas |
 | Rolling, `stop-first` (padrão do Swarm) | `order: stop-first` | Derruba a réplica antiga antes de subir a nova | Não exige capacidade extra, mas reduz capacidade útil durante a janela |
-| Recreate total | `parallelism` igual ao total de réplicas, sem lotes | Derruba todas as réplicas e sobe a versão nova de uma vez | Janela de indisponibilidade total; só aceitável com manutenção agendada |
+| Recreate total | `order: stop-first`, `parallelism: 0` (todas as tarefas em paralelo) | Atualiza todas as tarefas em paralelo, sem preservar um lote de réplicas antigas | Pode causar indisponibilidade total; só aceitável com manutenção agendada |
 
 `max_failure_ratio` define a fração de tarefas que pode falhar no rollout
 antes de disparar `failure_action` — mantenha próximo de zero em serviços
@@ -117,10 +117,10 @@ parcial.
   `resources.reservations` para garantir capacidade mínima ao scheduler
   decidir onde agendar; sem reservations, o Swarm pode empilhar réplicas em
   um node já saturado.
-- `healthcheck` no nível do serviço (ou herdado da imagem) é o sinal que o
-  `update_config.monitor` usa para decidir se uma réplica nova está pronta;
-  sem healthcheck, o Swarm considera "saudável" assim que o processo inicia,
-  mesmo que a aplicação ainda não aceite tráfego.
+- `healthcheck` no serviço ou na imagem ajuda a detectar falhas da aplicação.
+  `update_config.monitor` conta falhas na janela de monitoramento. Comprove
+  prontidão para receber tráfego e disponibilidade com verificação funcional
+  durante o rollout, inclusive quando usar `start-first`.
 
 ## Comandos de diagnóstico
 

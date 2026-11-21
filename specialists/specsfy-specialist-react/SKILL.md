@@ -28,6 +28,12 @@ description: Projetar, implementar e revisar interfaces React com composição, 
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, quando a tarefa renderizar tela, `INTERFACE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-react`. Sem indicação, confirme pelo
    "Quando usar" acima se o React está instalado antes de assumir a stack.
@@ -48,7 +54,10 @@ description: Projetar, implementar e revisar interfaces React com composição, 
    `$specsfy-specialist-interface`; não trocar uma interface pedida por
    endpoint ou componente vazio.
 2. Confirmar versão do React, renderer, framework (se houver), convenções do
-   projeto e estratégia de testes já em uso. Quando a tela usar shadcn/ui,
+   projeto e estratégia de testes já em uso. Registre a geração: `<Activity>` e
+   `useEffectEvent` existem a partir do React 19.2; `<ViewTransition>`,
+   Fragment refs e `browser()` a partir do 19.3; não proponha esses recursos em
+   projeto 18 sem plano de upgrade. Quando a tela usar shadcn/ui,
    identificar antes a base de primitives instalada, seguindo
    `$specsfy-specialist-ui-components`; nunca deduzir Radix ou Base UI pela
    aparência do componente.
@@ -64,7 +73,10 @@ description: Projetar, implementar e revisar interfaces React com composição, 
    valores durante o render em vez de sincronizar com `useEffect`.
 6. Usar effects apenas para sincronizar com um sistema externo (DOM,
    subscription, rede, storage), nunca para computar algo a partir de props
-   e state já disponíveis.
+   e state já disponíveis. Quando a lógica do effect precisa ler o valor mais
+   recente de props/state sem reconectar a subscription, use `useEffectEvent`
+   (React 19.2+); ele não serve para omitir dependência que deveria reexecutar
+   o effect.
 7. Implementar semântica HTML e navegação por teclado antes do acabamento
    visual; então cobrir com teste de comportamento observável.
 8. Medir performance somente quando houver sintoma real (profiler, métrica de
@@ -94,7 +106,14 @@ description: Projetar, implementar e revisar interfaces React com composição, 
   um context que muda a cada tecla não deve envolver a árvore inteira.
 - Não memoizar (`memo`/`useMemo`/`useCallback`) sem medição prévia; memoização
   tem custo de comparação e só compensa com renders caros ou comprovadamente
-  frequentes.
+  frequentes. Com React Compiler habilitado (1.0, integrado ao Next.js 16), a
+  documentação oficial trata a memoização manual como desnecessária na maioria
+  dos casos; mantenha `memo`/`useMemo`/`useCallback` só onde houver medição,
+  restrição do compilador ou componente fora do escopo otimizado.
+- Preferir `<Activity mode="hidden">` (React 19.2+) a desmontar painéis, abas e
+  formulários que a pessoa vai reabrir: ocultar preserva estado e DOM e destrói
+  os effects, então todo efeito com efeito colateral no DOM (mídia, iframe)
+  precisa de cleanup.
 - Testar pelo comportamento observável pelo usuário (texto, papel, estado),
   nunca por detalhes de implementação de hooks internos.
 
@@ -108,6 +127,9 @@ description: Projetar, implementar e revisar interfaces React com composição, 
   cálculo direto durante o render.
 - `useEffect` sem array de dependências completo, "silenciado" com
   `// eslint-disable`: esconde bug de closure obsoleta em vez de resolvê-lo.
+- `useEffectEvent` usado para esconder uma dependência real do effect
+  (`useEffect(() => log(pageUrl), [])`): a documentação do React trata isso
+  como bug escondido, não como otimização.
 - Context único guardando todo o estado global da aplicação ("god context"):
   qualquer mudança rerenderiza toda a árvore; prefira contexts menores ou
   uma biblioteca de estado dedicada quando o grafo de dependências crescer.
@@ -142,6 +164,8 @@ description: Projetar, implementar e revisar interfaces React com composição, 
   roteamento: este especialista trata React independente de framework.
 - `$specsfy-specialist-typescript` para tipar props, estado e union
   discriminada de forma exaustiva.
+- `$specsfy-specialist-testing` testa o comportamento visível com Testing
+  Library, sem substituir a definição de estado e composição daqui.
 
 Leia [references/standards.md](references/standards.md) para modelagem de
 estado, effects, composição, listas, context, testes e performance, com

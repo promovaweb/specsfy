@@ -28,6 +28,12 @@ description: Projetar, implementar e revisar soluções Supabase — Postgres, A
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
    `.specsfy/RULES.md` e, por tratar schema, policy e dado persistido,
    `.specsfy/DATABASE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-supabase`. Sem indicação, confirme pelo
    "Quando usar" acima se existe `supabase/config.toml` no projeto.
@@ -67,19 +73,26 @@ description: Projetar, implementar e revisar soluções Supabase — Postgres, A
 - Habilitar RLS em toda tabela de schema exposto à API e negar por padrão:
   tabela com RLS desabilitada em schema público é acessível por qualquer
   `anon` que descubra o nome.
-- Nunca expor `service_role` no cliente (browser, app mobile, bundle
-  público); ela ignora RLS e só pertence a ambiente de servidor confiável.
+- Nunca expor a chave secreta no cliente (browser, app mobile, bundle
+  público); ela resolve para o papel `service_role`, ignora RLS e só pertence
+  a ambiente de servidor confiável. Onde a RLS deve decidir, use a chave
+  publicável (`sb_publishable_…`); `anon` e `service_role` em JWT são as chaves
+  legadas, com descontinuação anunciada para o fim de 2026.
 - Testar cada policy separadamente para `anon`, `authenticated` e qualquer
   papel de aplicação: uma policy que "parece" restringir mas usa `USING
   (true)` equivale a não ter policy.
+- Tratar Realtime como superfície autorizada: Postgres Changes só entrega a
+  linha que a RLS da tabela permite ler, e canal privado de Broadcast/Presence
+  exige policy em `realtime.messages` mais `config: { private: true }` no
+  cliente.
 - Tratar como superfície crítica: funções `SECURITY DEFINER` (rodam com
   privilégio do dono, não do chamador, precisam de `search_path` fixo e
   validação interna própria), claims customizadas no JWT (podem ser
   manipuladas se a fonte não for confiável) e buckets de Storage marcados
   como públicos.
 - Versionar toda mudança de schema em migration (`supabase migration new`);
-  edição manual no dashboard de produção diverge do histórico e quebra
-  `supabase db diff`/CI.
+  edição manual no dashboard de produção diverge do histórico e quebra o
+  `supabase db push` e o CI.
 - Separar autorização de produto (o que este usuário pode fazer com este
   registro) da mera autenticação (quem é o usuário): RLS resolve a
   primeira, Auth resolve a segunda.
@@ -99,8 +112,8 @@ description: Projetar, implementar e revisar soluções Supabase — Postgres, A
   permite sequestro de função por objeto de mesmo nome em outro schema no
   `search_path` do chamador.
 - Migration aplicada manualmente em produção via dashboard, divergindo do
-  histórico versionado: o próximo `db push`/`db diff` não sabe reconciliar
-  o estado real.
+  histórico versionado: o próximo `db push` falha por divergência de histórico
+  e exige `migration repair` para reconciliar o estado real.
 - Confiar em claim customizada do JWT sem validar sua origem (ex.: campo
   gravável pelo próprio usuário sendo usado como papel de autorização).
 
@@ -108,11 +121,12 @@ description: Projetar, implementar e revisar soluções Supabase — Postgres, A
 
 - Provar acesso permitido e negado com identidades reais de teste para cada
   papel, incluindo sessão ausente (`anon`) e o "vizinho" de outro tenant.
-- Executar `supabase db reset`/lint/migrations no ambiente local antes de
-  promover: o projeto local reproduz o schema e as policies de produção.
-- Conferir tipos gerados (`supabase gen types`) atualizados, replicação/
-  Realtime restrita ao mesmo modelo de tenancy, policies de Storage por
-  bucket e segredos de Edge Functions fora do código-fonte.
+- Executar `supabase db reset`, `supabase db lint`, `supabase test db` e
+  `supabase db advisors` no ambiente local antes de promover: o projeto local
+  reproduz o schema e as policies de produção.
+- Conferir tipos gerados (`supabase gen types --remote`) atualizados,
+  replicação/Realtime restrita ao mesmo modelo de tenancy, policies de Storage
+  por bucket e segredos de Edge Functions fora do código-fonte.
 - Avaliar recuperação e exportação dos dados além do backup gerenciado:
   testar um restore ou export completo, não assumir que o backup automático
   garante RTO aceitável.

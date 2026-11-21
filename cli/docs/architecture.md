@@ -22,6 +22,7 @@ src/
     inbox.ts              capturas de specs/inbox/
     installer.ts          instalação das skills, .specsfy/ e blocos gerenciados
     catalog.ts            catálogo de especialistas
+    spec-specialists.ts   declarações, sinais e instalação de especialistas
     skill-lock.ts         skills-lock.json
     prerequisites.ts      checagens de ambiente
     github.ts             API do GitHub e resolução do token
@@ -106,6 +107,13 @@ projeto chega e qual é o efeito (`read` ou `write`). A partir dela:
   `USAGE`).
 
 Assim o command e a tool nunca divergem: os dois nascem da mesma definição.
+
+Comandos nativos como `specialists suggest` usam `NativeProjectCommandDef`.
+O mesmo adaptador gera argumentos, opções e schema MCP, e chama a função
+de execução nativa após resolver o projeto. O filtro de stack fica nessa
+função: o especialista de tecnologia só é sugerido quando o catálogo ou o
+`.specsfy/STACK.md` confirma a tecnologia, e o declarado na spec aparece
+sempre.
 
 ## Fluxo de execução
 

@@ -11,6 +11,7 @@ import { mkdir, readFile, readdir, rename } from "node:fs/promises";
 import { basename, dirname, join, relative, sep } from "node:path";
 import { AppError, error } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
+import { scanBacklogs } from "./backlog.ts";
 import { isFile, pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
 
 export const SPEC_FOLDERS = [
@@ -109,7 +110,7 @@ export async function resolveSpec(project: string, identifier: string): Promise<
 }
 
 /**
- * Moves a spec between adjacent states and updates its mirrored Status.
+ * Moves a spec between adjacent states and updates its Status and backlinks.
  * An invalid transition throws USAGE with the accepted destinations in
  * `details.accepted`.
  */
@@ -119,7 +120,8 @@ export async function transitionSpec(
   to: SpecFolder,
 ): Promise<SpecTransition> {
   assertFolder(to);
-  const spec = await resolveSpec(project, identifier);
+  const root = resolvePath(project);
+  const spec = await resolveSpec(root, identifier);
   if (!NEXT_FOLDERS[spec.folder].includes(to)) {
     throw error.usage(
       `Invalid transition: ${spec.folder} to ${to}. Accepted from ${spec.folder}: ${NEXT_FOLDERS[spec.folder].join(", ")}.`,
@@ -134,14 +136,47 @@ export async function transitionSpec(
     to,
     identifier,
   );
-  const targetDirectory = join(resolvePath(project), "specs", to, identifier);
+  const targetDirectory = join(root, "specs", to, identifier);
+  const targetPath = join(targetDirectory, "spec.md");
   if (spec.directory !== targetDirectory) {
     if (await pathExists(targetDirectory)) {
       throw new AppError(ExitCode.GENERIC_ERROR, `The destination already holds a spec: ${targetDirectory}`);
     }
     await mkdir(dirname(targetDirectory), { recursive: true });
-    await writeTextAtomic(spec.path, updated);
+    const sourceLink = relative(root, spec.path).split(sep).join("/");
+    const targetLink = relative(root, targetPath).split(sep).join("/");
+    const backlinks = (await scanBacklogs(root)).map(({ path, content }) => ({
+      path, content, updated: updatePromotedPath(content, sourceLink, targetLink),
+    })).filter((item) => item.updated !== item.content);
     await rename(spec.directory, targetDirectory);
+    const written: typeof backlinks = [];
+    let statusWritten = false;
+    try {
+      await writeTextAtomic(targetPath, updated);
+      statusWritten = true;
+      for (const item of backlinks) {
+        if (await readFile(item.path, "utf8") !== item.content) {
+          throw new Error(`Backlog item changed during the transition: ${item.path}`);
+        }
+        await writeTextAtomic(item.path, item.updated);
+        written.push(item);
+      }
+    } catch (cause) {
+      const rollback = await Promise.allSettled([
+        ...written.map(async (item) => {
+          const current = await readFile(item.path, "utf8");
+          const restored = current === item.updated ? item.content : updatePromotedPath(current, targetLink, sourceLink);
+          if (current !== restored) await writeTextAtomic(item.path, restored);
+        }),
+        (async () => {
+          if (statusWritten) await writeTextAtomic(targetPath, content);
+          await rename(targetDirectory, spec.directory);
+        })(),
+      ]);
+      const failures = rollback.flatMap((result) => result.status === "rejected" ? [result.reason] : []);
+      if (failures.length) throw new AggregateError([cause, ...failures], `Transition rollback failed: ${[cause, ...failures].join("; ")}`);
+      throw cause;
+    }
   } else {
     await writeTextAtomic(spec.path, updated);
   }
@@ -150,10 +185,23 @@ export async function transitionSpec(
     from: spec.folder,
     to,
     folder: to,
-    path: join(targetDirectory, "spec.md"),
+    path: targetPath,
     directory: targetDirectory,
     status,
   };
+}
+
+function updatePromotedPath(content: string, source: string, target: string): string {
+  return content.replace(
+    /^( {0,3}\|[ \t]*Spec promovida[ \t]*\|[ \t]*)([^|\r\n]*?)([ \t]*\|[ \t]*)(?=\r?$)/gim,
+    (row, before: string, cell: string, after: string) => {
+      const quoted = /^(`+)(.*?)\1$/.exec(cell);
+      const path = (quoted?.[2] ?? cell).replaceAll("\\", "/").replace(/^\.\//, "");
+      if (path !== source) return row;
+      const ticks = quoted?.[1] ?? "";
+      return before + ticks + target + ticks + after;
+    },
+  );
 }
 
 /** Migrates specs from both legacy layouts to the current state folders. */

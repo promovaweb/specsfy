@@ -86,11 +86,12 @@ exigindo autorização específica.
    brief do refinamento, o pedido atual, a spec nesse caminho, seu `research/`,
    `.specsfy/DATABASE.md` quando existir e os arquivos do repositório que
    revelem restrições reais.
-5. Em spec Laravel, leia também `.specsfy/PACKAGES.md`,
-   `docs/packages/README.md` e as fichas de `docs/packages/`. Se a solicitação
+5. Em spec Laravel, consulte o inventário em `.specsfy/PACKAGES.md`. Leia
+   `docs/packages/README.md` e as fichas pertinentes de `docs/packages/` quando
+   existirem ou quando o pedido envolver o modo Laravel `packages`. Se o pedido
    trouxer uma URL GitHub de pacote ou depender de uma biblioteca Composer,
-   carregue `$specsfy-specialist-laravel` para conferir se o
-   pacote já existe e registrar a necessidade sem duplicar dependências.
+   carregue `$specsfy-specialist-laravel` no modo `packages` para verificar o
+   inventário e registrar a necessidade sem duplicar dependências.
 6. Se faltar informação para identificar problema, ator e resultado, anuncie a
    pendência e carregue `$specsfy-02-backlog` para executar o ciclo. Retome
    esta skill ao final e use o brief completo ou parcial produzido.
@@ -206,7 +207,8 @@ Aplique a seção Especialistas ao preparar e escrever cada parte da spec.
   reestruture uma tela existente.
 - Carregue `$specsfy-specialist-interface` e o especialista da stack de
   interface. Não aceite uma descrição de CRUD que
-  tenha somente API, banco ou serviço.
+  tenha somente API, banco ou serviço. Em `Contrato CRUD`, declare as
+  operações incluídas e descreva os controles correspondentes.
 - Em Laravel com React, registre explicitamente shadcn/ui e ReUI, todos os
   blocos React previstos, suas responsabilidades, arquivos, componentes de
   origem e regra de reuso. A página apenas compõe esses blocos.
@@ -244,6 +246,11 @@ specsfy specs research <spec>
 node .agents/skills/specsfy-03-specify/scripts/load_research.mjs \
   specs/<estado>/<NNNN>-<slug>/spec.md
 ```
+
+Se a spec usar somente fontes locais, declare `Nenhum artefato externo` na
+subseção `Artefatos de pesquisa armazenados`. Com essa declaração, o índice
+pode ficar sem entradas quando nenhum claim depender de evidência em
+`research/`. Se houver entradas, cada caminho deve resolver para um artefato.
 
 Para pesquisa material, registre `R-ID`, criticalidade, claim, veredito,
 confiança, evidência local e orçamento na seção 2. Claim `critical` ainda não

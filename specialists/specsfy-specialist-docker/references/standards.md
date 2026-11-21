@@ -1,5 +1,7 @@
 # Padrões comuns e referências Docker
 
+Revisado em 2026-11-20 contra: Docker Engine 29.10.0, Compose v2/v5 (release v5.8.0), Node.js 24 LTS no exemplo, Traefik Proxy v3.7.19 e documentação do Let’s Encrypt.
+
 Reúne os padrões que valem para imagem, Compose e serviços em cluster e serve
 de índice para a referência de cada modo.
 
@@ -9,8 +11,9 @@ de índice para a referência de cada modo.
 | --- | --- | --- |
 | compose | este arquivo | imagem, multi-stage, segredos de build, checklist de produção, Compose, base images, scan e sinais |
 | swarm | [swarm.md](swarm.md) | Raft, redes overlay, placement, rollout, secrets e recuperação |
+| proxy | [traefik.md](traefik.md) | entrypoints, roteamento, Compose, Swarm, ACME e dashboard |
 
-## Padrões comuns aos dois modos
+## Padrões comuns
 
 - Toda referência entregue ao runtime é imutável e rastreável: tag SemVer, tag
   de commit e digest registrado, com a tag Git publicada só depois da imagem
@@ -49,18 +52,23 @@ de env são reconstruídos no startup.
 
 ```dockerfile
 # syntax=docker/dockerfile:1
-FROM node:20-slim AS build
+FROM node:24-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
 COPY . .
 RUN npm run build
 
-FROM node:20-slim AS runtime
+FROM node:24-slim AS production-deps
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev
+
+FROM node:24-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
+COPY --from=production-deps /app/node_modules ./node_modules
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s CMD node ./dist/healthcheck.js
@@ -68,8 +76,9 @@ ENTRYPOINT ["node", "dist/server.js"]
 ```
 
 - Estágio `build` carrega compilador/devDependencies; estágio `runtime`
-  copia só o artefato — a imagem final não tem toolchain de build.
-- `COPY package*.json` antes de `COPY . .` cacheia `npm ci` enquanto só o
+  copia o artefato e as dependências de produção — a imagem final não leva
+  as devDependencies do estágio de build.
+- `COPY package.json package-lock.json ./` antes de `COPY . .` cacheia `npm ci` enquanto só o
   código-fonte muda; qualquer mudança no lockfile invalida o cache
   corretamente porque ele é copiado e hasheado antes.
 - `--mount=type=cache` (BuildKit) persiste o cache do package manager entre
@@ -102,6 +111,11 @@ ENTRYPOINT ["node", "dist/server.js"]
   que toca banco/fila), não apenas "processo escutando".
 
 ## Compose (ambiente local/CI)
+
+Use `docker compose` nos CLIs Compose v2 e v5, que leem a Compose
+Specification. O campo de topo `version` é obsoleto para esses CLIs.
+`docker stack deploy` usa o formato Compose v3 legado. Confira o arquivo
+de stack separadamente.
 
 - Use para composição de serviços e contrato de desenvolvimento local, não
   como arquivo de segredos (não commitar senha em `environment:`; usar
@@ -145,25 +159,25 @@ ENTRYPOINT ["node", "dist/server.js"]
   Desktop/CLI; `grype <imagem>` é uma alternativa equivalente — o importante
   é rodar ao menos uma ferramenta de scan antes de publicar, não qual delas
   especificamente.
-- Gerar SBOM (`docker sbom <imagem>`, `syft <imagem>` ou o gerador do
-  próprio pipeline) para rastrear proveniência de dependência — necessário
+- Gerar SBOM (`docker scout sbom <imagem>`, `syft <imagem>` ou o gerador do
+  próprio pipeline) para inventariar componentes e dependências — necessário
   quando o processo de release exige auditoria de supply chain, não apenas
   "sabemos que buildamos".
 - Vulnerabilidade encontrada não significa bloquear automaticamente: avalie
   se o pacote vulnerável é de fato exercitado pelo runtime da imagem
   (superfície alcançável) antes de tratar toda CVE `CRITICAL` como bloqueio
   cego — mas nunca publique sem ter rodado o scan e revisado o resultado.
+  (regra da casa)
 
 ## Sinais e shutdown gracioso
 
-- PID 1 dentro do container não reaper processos zumbis nem repassa sinal
-  por padrão em muitos runtimes simples — usar `--init` (Docker) ou um init
-  mínimo (`tini`) quando o processo principal não foi desenhado para ser
-  PID 1.
-- `docker stop` envia `SIGTERM`, aguarda o timeout configurado (`-t`,
-  padrão 10s) e então envia `SIGKILL` — o processo precisa tratar
-  `SIGTERM` fechando conexões em andamento dentro desse prazo, ou o
-  shutdown vira kill forçado com requisição em voo perdida.
+- O processo que roda como PID 1 deve tratar o sinal de parada e recolher
+  processos filhos órfãos. Use `--init` ou um init mínimo como `tini` quando
+  a aplicação não assumir essas responsabilidades.
+- `docker stop` envia o sinal configurado no container (por padrão, `SIGTERM`),
+  espera o timeout (`--timeout` ou `-t`) e então envia `SIGKILL` se ele ainda
+  estiver em execução. Sem uma configuração de timeout, o daemon usa 10 s em
+  Linux e 30 s em Windows. Valide que o serviço encerra dentro desse prazo.
 
 ## Fontes oficiais
 
@@ -177,3 +191,28 @@ ENTRYPOINT ["node", "dist/server.js"]
 - Segurança: https://docs.docker.com/engine/security/
 - SBOM: https://docs.docker.com/scout/how-tos/view-create-sboms/
 - OCI Image Spec: https://github.com/opencontainers/image-spec
+- Docker Engine 29: https://docs.docker.com/engine/release-notes/29/
+- Docker Compose — gerações suportadas: https://docs.docker.com/compose/intro/history/
+- Docker Compose v5.8.0: https://github.com/docker/compose/releases/tag/v5.8.0
+- Stack deploy e formato legado: https://docs.docker.com/engine/swarm/stack-deploy/
+- Deploy specification: https://docs.docker.com/reference/compose-file/deploy/
+- Rollout Swarm: https://docs.docker.com/engine/swarm/swarm-tutorial/rolling-update/
+- Placement e volumes no Swarm: https://docs.docker.com/engine/swarm/services/
+- Backup e recuperação do Swarm: https://docs.docker.com/engine/swarm/admin_guide/
+- Sinais e timeout de parada: https://docs.docker.com/reference/cli/docker/container/stop/
+- Docker Scout CLI — SBOM: https://docs.docker.com/reference/cli/docker/scout/sbom/
+- Node.js — séries suportadas: https://nodejs.org/en/about/previous-releases
+- npm ci e omit: https://docs.npmjs.com/cli/v11/commands/npm-ci/
+- Traefik Proxy v3.7.19: https://github.com/traefik/traefik/releases/tag/v3.7.19
+- Traefik — entrypoints: https://doc.traefik.io/traefik/v3.7/reference/install-configuration/entrypoints/
+- Traefik — provider Docker: https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/docker/
+- Traefik — provider Swarm: https://doc.traefik.io/traefik/v3.7/reference/install-configuration/providers/swarm/
+- Traefik — labels e roteamento Docker: https://doc.traefik.io/traefik/v3.7/reference/routing-configuration/other-providers/docker/
+- Traefik — labels e roteamento Swarm: https://doc.traefik.io/traefik/v3.7/reference/routing-configuration/other-providers/swarm/
+- Traefik — configuração Swarm: https://doc.traefik.io/traefik/v3.7/setup/swarm/
+- Traefik — API e dashboard: https://doc.traefik.io/traefik/v3.7/reference/install-configuration/api-dashboard/
+- Traefik — ACME: https://doc.traefik.io/traefik/v3.7/reference/install-configuration/tls/certificate-resolvers/acme/
+- Traefik — permissões do arquivo ACME: https://github.com/traefik/traefik/blob/v3.7.19/pkg/provider/acme/local_store_unix.go
+- Let’s Encrypt — staging: https://letsencrypt.org/docs/staging-environment/
+- Cloudflare Tunnel — parâmetros de execução: https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/#token-file
+- Traefik — migração do provider Swarm: https://doc.traefik.io/traefik/master/migrate/v2-to-v3-details/

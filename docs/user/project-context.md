@@ -89,8 +89,8 @@ execução não começou por uma alteração recente no código.
 
 Use `$specsfy-setup` no modo `data-discovery` quando uma jornada depender de
 informações que o sistema precisa guardar, exibir, alterar ou apagar. A
-conversa usa palavras do seu produto e grava em `.specsfy/DATABASE.md` apenas
-o que você confirmar.
+conversa usa palavras do seu produto e grava suas confirmações e escolhas
+delegadas em `.specsfy/DATABASE.md`.
 
 ### Quando usar
 
@@ -116,7 +116,8 @@ de `.specsfy/DATABASE.md`. Ela informa para que a informação serve, o que deve
 ser guardado, o formato sugerido, o que fica ligado, os papéis que a usam e
 quando ela muda ou sai do sistema. A sugestão de formato, como texto curto,
 data, valor em dinheiro ou escolha entre opções, só é gravada depois que você
-confirmar que ela atende ao uso real.
+confirmar que ela atende ao uso real. Se você autorizar a skill a decidir,
+a opção vai em `Escolhas delegadas`, com a fonte da autorização e seu alcance.
 
 ### Erros comuns
 
@@ -153,6 +154,14 @@ persistente, campo, relação, índice ou migration. Use `$specsfy-setup` no mod
 `rules` para formular e acrescentar uma diretriz confirmada em
 `.specsfy/RULES.md` sem duplicar ou apagar as anteriores.
 
+## Pendências de stack em Laravel
+
+O setup registra em `Pendências de stack` de `.specsfy/STACK.md` o que
+falta comprovar ou instalar para Laravel Octane com Open Swoole ou, quando
+houver React, para shadcn/ui com ReUI. Com a pendência registrada e as demais
+verificações aprovadas, o setup pode terminar. O plano inclui a instalação ou
+configuração como pré-condição do deploy.
+
 ## Monitoramento durante mudanças
 
 O monitor é executado pelas skills no início e no fim de uma mudança. Ele lê os
@@ -163,6 +172,9 @@ precisa ser revisto, mas não permanece como daemon em segundo plano:
 node .agents/skills/specsfy-setup/scripts/monitor_context.mjs \
   --project . --check
 ```
+
+Em uma cópia sem Git, informe os caminhos alterados com
+`specsfy context monitor --project . --check --paths caminho1,caminho2`.
 
 | Sinal observado | Obrigação |
 | --- | --- |

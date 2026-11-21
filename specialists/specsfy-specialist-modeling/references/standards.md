@@ -1,5 +1,7 @@
 # Padrões e referências de modelagem
 
+Revisado em 2026-11-20 contra: Domain-Driven Design Reference (Eric Evans), DDD Crew (context mapping e bounded context canvas), EventStorming, ADR, ISO/IEC 9075-1:2023 e a documentação atual do Laravel (migrations).
+
 ## Índice das referências
 
 | Modo | Arquivo | Conteúdo |
@@ -43,6 +45,6 @@
 - DDD Crew, context mapping: https://github.com/ddd-crew/context-mapping
 - EventStorming (Alberto Brandolini): https://www.eventstorming.com/
 - Architecture Decision Records: https://adr.github.io/
-- SQL standard overview (ISO/IEC 9075): https://www.iso.org/standard/76583.html
+- SQL standard (ISO/IEC 9075-1:2023, SQL/Framework): https://www.iso.org/standard/76583.html
 - PostgreSQL documentation: https://www.postgresql.org/docs/current/
 - Laravel migrations: https://laravel.com/docs/migrations

@@ -20,7 +20,8 @@ Este especialista cuida do contrato de tipos que eles expõem.
 ## Como ele trabalha
 
 1. Lê o `tsconfig`, o `type` do `package.json`, o bundler, o runtime e a
-   versão do TypeScript.
+   versão do TypeScript. Desde o TypeScript 6.0, `strict` já é o default e
+   várias flags mudaram.
 2. Identifica as entradas não confiáveis e os tipos que formam a API pública
    do módulo.
 3. Modela os estados válidos com unions discriminadas e narrowing.
@@ -33,8 +34,13 @@ Este especialista cuida do contrato de tipos que eles expõem.
 
 ## Padrões aplicados
 
-- As opções strict compatíveis com o projeto ficam ativas. Os erros que elas
-  revelam são corrigidos sem casts cosméticos.
+- As opções strict efetivas são conferidas. Em TypeScript 5.x elas precisam
+  ser ativadas. Desde o 6.0, `strict` é o default, `module` é `esnext`,
+  `types` começa vazio e `rootDir` começa em `./`. Os erros revelados pelas
+  flags são corrigidos sem casts cosméticos.
+- `moduleResolution` acompanha a geração: `node`, `node10` e `classic` foram
+  removidos no TypeScript 7.0, que recomenda `bundler` ou `nodenext`.
+  `baseUrl` também saiu, e `paths` é relativo à raiz do projeto.
 - Uma union como `{ status: "ok"; data: T } | { status: "error"; error: E }`
   substitui combinações de booleanos que permitem estados inválidos.
 - Entradas ainda não validadas usam `unknown` no lugar de `any`.
@@ -64,6 +70,8 @@ Este especialista cuida do contrato de tipos que eles expõem.
   consumidor real ou simulado.
 - A área alterada não tem `@ts-ignore`, `as any`, cast duplo ou tipos
   duplicados sem justificativa.
+- A versão do compilador foi confirmada. Quando a ferramenta depende da API
+  do compilador, o TypeScript 6.0 roda em paralelo com o 7.0.
 
 ## Como instalar
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - Testes"
+  short_description: "Pest, Playwright e Vitest com teste confiável"
+  default_prompt: "Use $specsfy-specialist-testing para orientar esta tarefa com padrões e validação especializados."

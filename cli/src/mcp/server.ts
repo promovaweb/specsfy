@@ -24,6 +24,8 @@ import { registerTestingTools } from "./tools/testing.ts";
 import { registerMilestonesTools } from "./tools/milestones.ts";
 import { registerProjectDocsTools } from "./tools/project-docs.ts";
 import { registerFrameworkTools } from "./tools/framework.ts";
+import { specialistSuggestDef } from "../cli/commands/specialists.ts";
+import { registerCommandTools } from "../engine/script-command.ts";
 
 /** Metadata collected during registration, for `mcp --list`. */
 export interface Catalog {
@@ -68,6 +70,7 @@ function registerAll(r: Registrar): void {
   registerMilestonesTools(r);
   registerProjectDocsTools(r);
   registerFrameworkTools(r);
+  registerCommandTools(r, [specialistSuggestDef]);
   registerResources(r);
   registerPrompts(r);
 }

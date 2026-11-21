@@ -1,5 +1,7 @@
 # Padrões e referências Redis
 
+Revisado em 2026-11-20 contra: Redis Open Source 8.10.3 (notas de versão 8.10, documentação de eviction, streams, persistência, locks, segurança e cluster) e comparação de linha com Valkey 9.2.
+
 ## Seleção de estrutura e complexidade
 
 | Estrutura | Uso típico | Operação | Complexidade |
@@ -63,19 +65,28 @@
 
 ## Eviction e memória
 
+- `maxmemory` vem em `0` (sem limite) em sistema de 64 bits: sem definir o
+  limite, a política de eviction nunca entra em ação e o processo cresce até o
+  OOM do host. Defina `maxmemory` antes de discutir política.
 - `maxmemory-policy noeviction` (padrão): ao atingir o limite, **rejeita
   escritas** — trate esse erro explicitamente na aplicação ou evite esse
   modo para uso como cache.
 - `allkeys-lru`/`allkeys-lfu`: evictam a chave menos recentemente usada/
   frequentemente usada entre todas — apropriado quando tudo no banco é
   cache.
+- `allkeys-lrm`/`volatile-lrm` (Redis 8.6+): consideram apenas a última
+  escrita, não a última leitura; úteis em carga de leitura alta sobre dados que
+  mudam pouco.
+- `allkeys-random`/`volatile-random`: quando o acesso é aproximadamente
+  uniforme, sem padrão de popularidade a explorar.
 - `volatile-lru`/`volatile-ttl`: evictam apenas entre chaves com TTL
   definido — necessário quando o mesmo banco lógico mistura cache (com TTL)
   e dado que não pode ser evictado (sem TTL, ex.: lock, contador de
-  negócio).
+  negócio). Com `volatile-*`, chave sem TTL se comporta como `noeviction`.
 - Monitore `used_memory` vs `maxmemory` e a taxa de eviction
   (`evicted_keys`) — eviction alta e crescente indica subdimensionamento ou
-  TTL mal calibrado, não um estado normal.
+  TTL mal calibrado, não um estado normal. `INFO stats` traz também
+  `current_eviction_exceeded_time` e as rejeições por comando.
 
 ## Cluster e Sentinel
 
@@ -88,6 +99,10 @@
   chaves estiverem no mesmo slot (hash tags `{tenant}:key`).
 - Cliente precisa entender a topologia (cluster-aware) — driver que não
   suporta Cluster/Sentinel corretamente falha de forma confusa no failover.
+- O barramento do cluster não tem autenticação própria; desde a 8.10.2 o nó
+  avisa no startup quando a porta do barramento fica sem proteção. Use
+  `tls-cluster` ou defina `cluster-bus-port-protected-mode yes` para o nó se
+  recusar a subir sem TLS no barramento.
 
 ## Resiliência do cliente
 
@@ -134,10 +149,11 @@
 ## Fontes oficiais
 
 - Documentação: https://redis.io/docs/latest/
+- Notas de versão (8.10 e anteriores): https://github.com/redis/redis/blob/8.10.3/00-RELEASENOTES
 - Estruturas de dados: https://redis.io/docs/latest/develop/data-types/
 - Streams: https://redis.io/docs/latest/develop/data-types/streams/
 - Expiração: https://redis.io/docs/latest/commands/expire/
-- Eviction (políticas de maxmemory): https://redis.io/docs/latest/develop/reference/eviction/
+- Eviction (políticas de maxmemory, inclui LRM): https://redis.io/docs/latest/develop/reference/eviction/
 - Persistência (RDB/AOF): https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/
 - Distributed locks (Redlock): https://redis.io/docs/latest/develop/use/patterns/distributed-locks/
 - Segurança: https://redis.io/docs/latest/operate/oss_and_stack/management/security/

@@ -4,7 +4,10 @@
 
 Registre antes da auditoria:
 
-- WCAG e nível requerido, normalmente WCAG 2.2 A/AA quando aplicável;
+- WCAG e nível requerido. A versão vigente é a WCAG 2.2, publicada em outubro
+  de 2023 e atualizada em dezembro de 2024, também ISO/IEC 40500:2025; a
+  EN 301 549:2026 adota a WCAG 2.2. WCAG 3 ainda é rascunho e não serve como
+  alvo de conformidade;
 - páginas, estados, idiomas e fluxos incluídos;
 - browsers, viewports e tecnologias assistivas representativas;
 - conteúdo ou integrações de terceiros fora do controle;
@@ -12,6 +15,7 @@ Registre antes da auditoria:
 
 Conformidade é avaliada sobre páginas e processos completos no escopo. Um
 componente isolado ou ferramenta automática não prova conformidade do fluxo.
+O critério 4.1.1 Parsing é obsoleto na WCAG 2.2; não o use como bloqueio.
 
 ## Matriz de critérios frequentes
 

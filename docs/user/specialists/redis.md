@@ -63,7 +63,8 @@ estruturas temporárias.
   memória.
 - Lock com `SETNX` e `DEL` sem TTL, que fica preso quando o processo cai.
 - Usar a política padrão `noeviction` como se fosse cache, o que faz o Redis
-  rejeitar escritas ao atingir o limite.
+  rejeitar escritas ao atingir o limite. Sem `maxmemory` definido não existe
+  limite nem eviction, e o processo cresce até faltar memória no host.
 
 ## Como conferir o resultado
 

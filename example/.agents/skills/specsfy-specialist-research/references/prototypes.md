@@ -8,7 +8,7 @@
 - **Pergunta de integração** ("essa API de terceiro se comporta como
   documentado sob nossa carga?"): spike isolado contra sandbox, ambiente de
   teste do provedor ou fake controlado, nunca contra produção do terceiro
-  sem autorização.
+  sem autorização. (regra da casa)
 - **Pergunta de estrutura de UI** ("esse fluxo de telas resolve a tarefa do
   usuário?"): wireframe navegável com conteúdo realista — fidelidade visual
   baixa, fidelidade de fluxo alta.

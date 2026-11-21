@@ -1,5 +1,7 @@
 # Padrões comuns e referências de servidor
 
+Revisado em 2026-11-20 contra: Debian 13.7 (trixie), Docker Engine 29.10.0, Ansible 14 (ansible-core 2.21) e community.docker 5.4.0.
+
 Reúne as regras que valem para os três modos (debian, ansible e report) e
 serve de índice para a referência de cada um.
 
@@ -44,7 +46,7 @@ serve de índice para a referência de cada um.
 
 - A prova de idempotência é operacional: duas execuções consecutivas no mesmo
   alvo, com a segunda sem `changed`. Leitura do playbook não substitui a
-  execução.
+  execução. (regra da casa)
 - Acesso ao socket Docker e ao grupo `docker` equivale a acesso administrativo
   amplo ao host.
 - Restringir `become` à task que precisa e declarar `serial`/`throttle` quando a
@@ -60,3 +62,18 @@ serve de índice para a referência de cada um.
 - [ansible-lint](https://ansible.readthedocs.io/projects/lint/)
 - [community.docker](https://galaxy.ansible.com/ui/repo/published/community/docker/)
 - [Docker Engine no Debian](https://docs.docker.com/engine/install/debian/)
+- [Debian 13 estável](https://www.debian.org/releases/stable/)
+- [Debian 12 e LTS](https://www.debian.org/releases/bookworm/)
+- [APT sources.list e Signed-By](https://manpages.debian.org/trixie/apt/sources.list.5.en.html)
+- [Docker Engine 29](https://docs.docker.com/engine/release-notes/29/)
+- [Backend nftables do Docker e limitação em Swarm](https://docs.docker.com/engine/network/firewall-nftables/)
+- [Escopo de docker node inspect](https://docs.docker.com/reference/cli/docker/node/inspect/)
+- [Inspeção local com docker info](https://docs.docker.com/reference/cli/docker/system/info/)
+- [Status de saída do docker run](https://docs.docker.com/reference/cli/docker/container/run/#exit-status)
+- [Inspeção de containers](https://docs.docker.com/reference/cli/docker/container/inspect/)
+- [Manutenção e compatibilidade Python do Ansible](https://docs.ansible.com/projects/ansible/latest/reference_appendices/release_and_maintenance.html)
+- [Listagem de precedência de variáveis](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_variables.html#understanding-variable-precedence)
+- [Instalação do ansible-core](https://docs.ansible.com/projects/ansible/latest/installation_guide/intro_installation.html)
+- [Instalação de collections pelo Galaxy](https://docs.ansible.com/projects/ansible/latest/collections_guide/collections_installing.html)
+- [Tratamento de falhas](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_error_handling.html)
+- [Capabilities e requisitos de docker_stack](https://docs.ansible.com/projects/ansible/latest/collections/community/docker/docker_stack_module.html)

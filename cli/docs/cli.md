@@ -123,7 +123,7 @@ Criação, captura e movimentação do trabalho pelo método.
 | Command | Função | Options principais |
 | --- | --- | --- |
 | `specs new` | Cria uma spec em `specs/draft/` com o próximo número, a partir do template instalado. | `--title <title>`, `--slug <slug>`, `--project <dir>` |
-| `specs transition` | Move a spec para uma pasta de estado vizinha e espelha o Status. Ordem: `draft`, `defined`, `planned`, `in-progress`, `review`, `completed`. | `<spec>`, `<state>`, `--project <dir>` |
+| `specs transition` | Move a spec para uma pasta de estado vizinha e atualiza o Status e os vínculos do backlog. Ordem: `draft`, `defined`, `planned`, `in-progress`, `review`, `completed`. | `<spec>`, `<state>`, `--project <dir>` |
 | `specs effort` | Registra o esforço estimado de 1 a 10 com uma justificativa. | `<spec>`, `<effort>`, `--reason <text>`, `--project <dir>` |
 | `specs migrate` | Move specs dos layouts antigos para as pastas de estado, pelo Status. | `--project <dir>` |
 | `specs research` | Lista e carrega a pesquisa local indexada pela spec e confere as afirmações. | `<spec>`, `--emit-content`, `--max-bytes <bytes>`, `--project <dir>` |
@@ -161,6 +161,14 @@ Cada gate sai com 0 quando aprova e com 10 quando encontra problemas. O
 não existe, usa os scripts embutidos no binário e a checagem de skills falha.
 O Node.js não é necessário. O `--self-test` exercita a política e os canários
 sem olhar as specs.
+
+Para cada spec verificada, o relatório avisa se um especialista declarado é
+desconhecido no catálogo ou não está instalado em `.agents/skills/`, e se um
+sinal encontrado pede um especialista ainda não declarado. Em texto, os
+avisos vão para stderr. Com `--json`, aparecem em `data.warnings` com
+`severity: "warning"`, `kind`, `message` e, para avisos de uma spec, `spec`,
+`name` e o modo e sinal quando disponíveis. O resultado dos gates, o código
+de saída e o arquivo de atestação seguem a política de verificação.
 
 ### Contexto
 
@@ -213,6 +221,24 @@ consulta a versão publicada. `skills` gerencia os especialistas do catálogo.
 | `skills install` | Instala um ou mais especialistas. | `<names>`, `--project <dir>` |
 | `skills remove` | Remove especialistas instalados. | `<names>`, `--project <dir>` |
 | `skills update` | Igual ao `update` do nível principal. | `--check`, `--latest`, `--force`, `--project <dir>` |
+| `specialists suggest` | Sugere especialistas a partir das palavras-chave encontradas na spec. | `<spec>`, `--project <dir>`, `--json` |
+| `skills suggest` | Também executa `specialists suggest`. | `<spec>`, `--project <dir>`, `--json` |
+
+Use `{{bin}} specialists suggest 0001` ao revisar o plano de uma spec. Cada
+linha mostra o nome, o modo quando existe, o sinal e se a skill foi declarada
+na spec e instalada em `.agents/skills/`. A consulta aceita número, slug,
+pasta ou caminho. Especialista de tecnologia só entra na sugestão quando a
+stack do projeto confirma a tecnologia, pela detecção do catálogo ou pelo
+`.specsfy/STACK.md`; o especialista declarado na spec aparece sempre. Com
+`--json`, `data` contém `project`, `spec` (caminho relativo) e `suggestions`
+com `name`, `mode` opcional, `signal`, `declared` e `installed`. O comando
+sai com 0 após ler a spec, inclusive com a lista vazia, e com 6 quando a
+spec não puder ser encontrada ou lida.
+
+O catálogo padrão para analisar specs está embutido. Um arquivo indicado por
+`SPECSFY_SPECIALISTS_CATALOG` ou um `catalog.repository` personalizado pode
+substituí-lo. Se a origem configurada falhar, o binário usa o catálogo embutido
+e informa o fallback em stderr ou no campo `catalogWarning` da saída JSON.
 
 `update` reconcilia o projeto com `skills/inventory.json` do framework, lido
 da tag `v<versão>` do binário (`--latest` usa a branch padrão). O `--json`

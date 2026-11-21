@@ -6,9 +6,9 @@ O playbook separa roles para host Debian, Docker Engine, Docker Swarm e
 aplicação. A automação configura repositório de pacotes, daemon, rotação de
 logs, firewall, diretórios, registry e redes antes de publicar a stack.
 
-Aplicações Laravel usam Laravel Octane com Open Swoole. A imagem instala a
-extensão `openswoole`, enquanto o Compose e a stack executam
-`octane:start --server=swoole`.
+O template do Specsfy para Laravel exige Laravel Octane com Open Swoole.
+A imagem instala a extensão `openswoole`, enquanto o Compose e a stack executam
+`octane:start --server=swoole`. O Octane também oferece outros servidores.
 
 O ingresso público padrão usa Cloudflare Tunnel. A stack executa `cloudflared`
 como serviço na mesma rede overlay do Laravel, e o hostname configurado no
@@ -30,6 +30,11 @@ controlador e adicione seu conteúdo ao `authorized_keys` de `deploy`. Use
 `exclusive: false` para preservar acessos anteriores. Nunca abra nem envie
 arquivos privados sem o sufixo `.pub`. Valide o daemon Docker com
 `become_user: deploy`.
+
+A versão de `community.docker` consultada na auditoria é a da documentação
+oficial. O scaffold atual declara a série 4.x em `ansible/requirements.yml`.
+Confira os requisitos dos módulos na série instalada antes de atualizar a
+collection.
 
 ## Hosts e conexões
 
@@ -75,7 +80,8 @@ agente, precedência das fontes e atualização de scripts existentes.
 
 No padrão Cloudflare Tunnel, trate o token como `vault_cloudflare_tunnel_token`.
 O Ansible cria o Docker Secret externo `cloudflare_tunnel_token`, e o serviço
-usa `--token-file /run/secrets/cloudflare_tunnel_token`. Não use `--token`,
+usa `--token-file /run/secrets/cloudflare_tunnel_token` para o túnel gerenciado
+remotamente, com `cloudflared` 2025.4.0 ou posterior. Não use `--token`,
 variável aberta ou valor literal no YAML.
 
 O playbook lê as variáveis `vault_<nome>`, usa
@@ -104,5 +110,5 @@ Herdr; a skill executa os utilitários sem exigir memorização.
 - [Docker Swarm](https://docs.docker.com/engine/swarm/)
 - [Módulos community.docker](https://docs.ansible.com/ansible/latest/collections/community/docker/)
 - [Cloudflare Tunnel](https://developers.cloudflare.com/tunnel/)
-- [Parâmetros do cloudflared](https://developers.cloudflare.com/tunnel/advanced/run-parameters/)
+- [Parâmetros do cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/configure-tunnels/run-parameters/)
 - [Tokens do túnel](https://developers.cloudflare.com/tunnel/advanced/tunnel-tokens/)

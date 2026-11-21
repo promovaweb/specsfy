@@ -29,8 +29,8 @@ que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
 
 ## Pronto quando
 
-- Cada informação a guardar aplicável está confirmada, adiada ou encerrada pela
-  pessoa, dentro do limite de oito perguntas por área.
+- Cada informação a guardar aplicável está confirmada, decidida por escolha
+  delegada, adiada ou encerrada pela pessoa, dentro do limite de oito perguntas por área.
 - Cada resposta confirmada foi gravada pelo comando na seção
   `Informações a guardar confirmadas` de `.specsfy/DATABASE.md`, com fontes.
 - Nenhuma hipótese, dado real, credencial ou informação pessoal sensível foi
@@ -41,7 +41,8 @@ que será lembrado, quem usa, o que muda e quando deixa de ser necessário.
 
 1. Leia em paralelo a origem da descoberta (Inbox, `MVP.md`, backlog, spec ou
    pedido), `PROJECT.md` e `.specsfy/DATABASE.md` quando existirem.
-2. Separe o que já está confirmado do que ainda precisa de conversa.
+2. Consulte respostas confirmadas, escolhas delegadas e evidências. Separe
+   o que já tem decisão aplicável do que ainda precisa de conversa.
 3. Considere só informações que o sistema precise guardar, consultar,
    comparar, mostrar, compartilhar, corrigir ou apagar. Dado que não altera a
    jornada nem a operação fica fora da conversa.
@@ -81,8 +82,9 @@ escolhida pelo uso esperado e sem citar tecnologia:
 | comprovantes e anexos | arquivo ou imagem |
 
 Apresente a sugestão como hipótese, explique o motivo em uma frase e pergunte
-se ela representa o uso real. Registre o `formato sugerido` só depois da
-confirmação. Uma informação com usos distintos gera um registro por uso.
+se ela representa o uso real. Registre o `formato sugerido` depois da
+confirmação ou siga o protocolo de escolha delegada quando houver autorização
+expressa. Uma informação com usos distintos gera um registro por uso.
 
 ## Registrar o que foi confirmado
 
@@ -122,6 +124,13 @@ registrar_dados_conversados.mjs \
 Registre somente respostas confirmadas na seção `Informações a guardar
 confirmadas`, separada do que foi observado no código. O trecho detectado
 automaticamente pertence ao modo `database` e fica intocado.
+
+Se a pessoa delegar expressamente a escolha, aplique a opção recomendada no
+alcance autorizado e registre em `### Escolhas delegadas` de
+`.specsfy/DATABASE.md` a escolha, a fonte da autorização e o alcance. Use
+`context data` para as respostas confirmadas e preserve a evidência observada
+no trecho detectado pelo modo `database`. Deixe em aberto o que a autorização
+não cobrir.
 
 ## Handoffs
 

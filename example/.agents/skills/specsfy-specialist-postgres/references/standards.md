@@ -1,5 +1,7 @@
 # Padrões e referências PostgreSQL
 
+Revisado em 2026-11-20 contra: PostgreSQL 19.0 (release notes 19, funções UUID, eviction/índices, concorrência, backup) com conferência nas versões 18 e 17 ainda suportadas.
+
 ## Tipos e modelagem
 
 - Use `NOT NULL`, `CHECK`, `UNIQUE`, FKs e tipos de domínio quando expressarem
@@ -13,7 +15,10 @@
   nunca como atalho para evitar modelar colunas conhecidas — colunas
   tipadas são indexáveis, checáveis e mais baratas de consultar.
 - IDs: `bigint identity`/sequência para chave interna sequencial; UUID quando
-  a chave precisar ser gerada fora do banco ou não expor ordem/volume.
+  a chave precisar ser gerada fora do banco ou não expor ordem/volume. No
+  PostgreSQL 18 ou superior, `uuidv7()` gera UUID ordenado por tempo, com
+  localidade de índice melhor que `gen_random_uuid()`; em versão anterior,
+  aceite o custo de inserção aleatória ou gere a chave na aplicação.
 - Defina política explícita de soft delete (`deleted_at`) vs hard delete —
   soft delete exige índice parcial (`WHERE deleted_at IS NULL`) para manter
   unicidade e performance corretas.
@@ -37,8 +42,10 @@
   ...`.
 - **Composto**: ordem das colunas importa — a coluna de maior seletividade
   usada em igualdade geralmente vem primeiro, e o índice serve prefixos
-  (índice em `(a, b)` serve consultas por `a` e por `a, b`, não por `b`
-  isolado).
+  (índice em `(a, b)` serve consultas por `a` e por `a, b`; no PostgreSQL 18
+  ou superior o *skip scan* também permite usá-lo quando `a` não aparece no
+  filtro, desde que `a` tenha poucos valores distintos). Não conte com skip
+  scan para substituir um índice dedicado em versão anterior.
 - Todo índice tem custo de escrita e espaço; não crie por especulação —
   crie a partir do plano de uma consulta real e revise a fração de índices
   não usados (`pg_stat_user_indexes.idx_scan = 0`) periodicamente.
@@ -67,7 +74,9 @@
 - `EXPLAIN (ANALYZE, BUFFERS)` executa a consulta de verdade e mostra tempo
   real, linhas reais vs estimadas, e buffers lidos do cache/disco — só use
   em ambiente onde executar a consulta é seguro (evite em produção sem
-  transação com `ROLLBACK` ou em réplica).
+  transação com `ROLLBACK` ou em réplica). Desde o PostgreSQL 18,
+  `EXPLAIN ANALYZE` já inclui `BUFFERS` por padrão; escrever a opção continua
+  correto e deixa a intenção explícita.
 - Estimativa muito distante do real (`rows=10` estimado vs `rows=100000`
   reais) indica estatística desatualizada — rode `ANALYZE` na tabela.
 - `Seq Scan` não é sempre ruim: em tabela pequena ou quando a consulta lê
@@ -94,6 +103,22 @@
   na tabela (não pode rodar dentro de transação, e falha exige `DROP INDEX
   CONCURRENTLY` do índice inválido antes de tentar de novo).
 
+## Mudanças recentes que alteram recomendação
+
+- **PostgreSQL 19** (19/11/2026): `REPACK` unifica `VACUUM FULL` e `CLUSTER`
+  e `REPACK (CONCURRENTLY)` reorganiza a tabela sem bloqueio exclusivo de
+  leitura e escrita; JIT passou a vir desabilitado por padrão; `log_lock_waits`
+  vem ligado; `EXPLAIN (ANALYZE, IO)` reporta I/O assíncrono;
+  `max_locks_per_transaction` passou de 64 para 128; autenticação RADIUS foi
+  removida e MD5 emite aviso (descontinuada desde a 18).
+- **PostgreSQL 18** (25/09/2025): `uuidv7()` e `uuidv4()` nativas; colunas
+  geradas virtuais como padrão; subsistema de I/O assíncrono; skip scan em
+  B-tree; `EXPLAIN ANALYZE` inclui buffers; `initdb` liga data checksums por
+  padrão.
+- Versões com suporte em 20/11/2026: 19, 18, 17, 16 e 15. A 14 e anteriores
+  não recebem mais correção; não recomende recurso novo sobre versão sem
+  suporte sem registrar a consequência.
+
 ## Segurança e operação
 
 - Role de aplicação sem privilégio de DDL; role de migration separado e
@@ -112,9 +137,13 @@
 ## Fontes oficiais
 
 - Manual atual: https://www.postgresql.org/docs/current/
+- Notas da versão 19: https://www.postgresql.org/docs/19/release-19.html
+- Notas da versão 18: https://www.postgresql.org/docs/19/release-18.html
+- Comando `REPACK`: https://www.postgresql.org/docs/current/sql-repack.html
 - Tipos de dados: https://www.postgresql.org/docs/current/datatype.html
+- Funções UUID (`uuidv7()`): https://www.postgresql.org/docs/current/functions-uuid.html
 - Constraints: https://www.postgresql.org/docs/current/ddl-constraints.html
-- Índices: https://www.postgresql.org/docs/current/indexes.html
+- Índices e índices multicoluna: https://www.postgresql.org/docs/current/indexes.html
 - Concorrência (MVCC): https://www.postgresql.org/docs/current/mvcc.html
 - Transaction isolation: https://www.postgresql.org/docs/current/transaction-iso.html
 - Using EXPLAIN: https://www.postgresql.org/docs/current/using-explain.html

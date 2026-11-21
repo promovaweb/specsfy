@@ -379,7 +379,7 @@
           },
           {
             "name": "transition",
-            "description": "Move a spec to another state folder and mirror its Status; only adjacent states of the method are accepted.",
+            "description": "Move a spec to another state folder and update its Status and backlog links.",
             "arguments": [
               {
                 "name": "spec",
@@ -3206,7 +3206,7 @@
       },
       {
         "name": "skills",
-        "description": "Specsfy skills of the project: list, detect, install, remove, update.",
+        "description": "Specsfy skills of the project: list, detect, install, remove, update, suggest.",
         "commands": [
           {
             "name": "list",
@@ -3477,6 +3477,124 @@
               {
                 "code": 10,
                 "description": "GATE_FAILED: A Specsfy gate or validation found problems in the project."
+              }
+            ]
+          },
+          {
+            "name": "suggest",
+            "description": "Suggest specialists based on signals in a spec.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec ID, slug, folder name or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specialists suggest 0001",
+              "specsfy specialists suggest recover-password --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
+              }
+            ]
+          }
+        ],
+        "exitCodes": [
+          {
+            "code": 0,
+            "description": "SUCCESS: Operation completed."
+          },
+          {
+            "code": 1,
+            "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+          },
+          {
+            "code": 2,
+            "description": "USAGE: Invalid arguments, options or subcommand."
+          }
+        ]
+      },
+      {
+        "name": "specialists",
+        "description": "Specialists for a spec.",
+        "commands": [
+          {
+            "name": "suggest",
+            "description": "Suggest specialists based on signals in a spec.",
+            "arguments": [
+              {
+                "name": "spec",
+                "description": "Spec ID, slug, folder name or path.",
+                "required": true
+              }
+            ],
+            "options": [
+              {
+                "name": "--project",
+                "description": "Project root. Defaults to the nearest directory above the current one with specs/, .specsfy/ or skills-lock.json.",
+                "arguments": [
+                  {
+                    "name": "dir",
+                    "required": true,
+                    "arity": {
+                      "minimum": 1,
+                      "maximum": 1
+                    }
+                  }
+                ]
+              }
+            ],
+            "examples": [
+              "specsfy specialists suggest 0001",
+              "specsfy specialists suggest recover-password --json"
+            ],
+            "exitCodes": [
+              {
+                "code": 0,
+                "description": "SUCCESS: Operation completed."
+              },
+              {
+                "code": 1,
+                "description": "GENERIC_ERROR: Unexpected failure without a specific classification."
+              },
+              {
+                "code": 2,
+                "description": "USAGE: Invalid arguments, options or subcommand."
+              },
+              {
+                "code": 6,
+                "description": "NOT_FOUND: Requested resource does not exist."
               }
             ]
           }

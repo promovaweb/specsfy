@@ -71,3 +71,35 @@ test('rastreabilidade ignora cópias do repositório em .claude/worktrees', t =>
   const payload = JSON.parse(node(script('specsfy-06-implement', 'check_traceability'), [spec, root, '--json']).stdout);
   assert.ok(!JSON.stringify(payload).includes('.claude'), JSON.stringify(payload));
 });
+
+test('research aceita declaração de fontes locais sem artefatos externos', t => {
+  const root = temporary(t);
+  const spec = put(root, 'specs/defined/0001-exemplo/spec.md',
+    '#### Artefatos de pesquisa armazenados\n\n- Nenhum artefato externo; somente código local foi consultado.\n');
+  const result = node(script('specsfy-03-specify', 'load_research'), [spec, '--json']);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout).artifacts, []);
+});
+
+test('a declaração de ausência de fonte externa não mascara índice inválido ou claim crítico sem evidência', t => {
+  const root = temporary(t);
+  mkdirSync(join(root, 'specs/defined/0001-exemplo/research/sem-arquivos'), { recursive: true });
+  const index = '#### Artefatos de pesquisa armazenados\n\n- Nenhum artefato externo.\n';
+  for (const extra of [
+    '- `research/fonte-ausente.md`\n',
+    '- `research/fonte-sem-fechar.md\n',
+    '- [Fonte](research/fonte.md)\n',
+    '- `research/sem-arquivos/`\n',
+    '#### Researchs executados\n\n- **R-001** [critical] Afirmação — Verdict: verified — Confidence: high — Evidence: research/fonte.md — Budget: 1/3\n',
+  ]) {
+    const spec = put(root, 'specs/defined/0001-exemplo/spec.md', index + extra);
+    const result = node(script('specsfy-03-specify', 'load_research'), [spec, '--json']);
+    assert.equal(result.status, 1, result.stdout + result.stderr);
+    assert.notDeepEqual(JSON.parse(result.stdout).errors, []);
+  }
+  const evidence = put(root, 'specs/defined/0001-exemplo/research/fonte.md', '# Fonte\n');
+  const spec = put(root, 'specs/defined/0001-exemplo/spec.md', index + '- `research/fonte.md`\n');
+  const result = node(script('specsfy-03-specify', 'load_research'), [spec, '--json']);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.ok(evidence.endsWith('/' + JSON.parse(result.stdout).artifacts[0].path));
+});

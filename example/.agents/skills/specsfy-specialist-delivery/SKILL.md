@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-delivery
-description: Coordenar a entrega com os modos deploy (release completo em servidor Docker e Swarm via Ansible, scaffold, inventário, Vault e publicação), versioning (SEMVER, incremento, tag Git e alinhamento entre artefato, imagem, manifesto e deploy) e ci-cd (pipeline, artefato imutável, promoção entre ambientes, migrations, rollout e rollback). Use para release, deploy, versão, tag, pipeline, promoção ou escolha entre rolling, blue-green, canary e feature flag; não use para o estado Debian do host (`$specsfy-specialist-server`), para build de imagem e topologia Swarm (`$specsfy-specialist-docker`), para os sinais que decidem o rollout (`$specsfy-specialist-observability`), para branches e conflitos (`$specsfy-specialist-git`) nem para hardening de credencial de pipeline (`$specsfy-specialist-application-security`).
+description: Coordenar a entrega com os modos deploy (release completo em servidor Docker e Swarm via Ansible, scaffold, inventário, Vault e publicação), versioning (SEMVER, incremento, tag Git e alinhamento entre artefato, imagem, manifesto e deploy) e ci-cd (pipeline, GitHub Actions, artefato imutável, promoção entre ambientes, migrations, rollout e rollback). Use para release, deploy, versão, tag, pipeline, promoção ou escolha entre rolling, blue-green, canary e feature flag; não use para o estado Debian do host (`$specsfy-specialist-server`), para build de imagem e topologia Swarm (`$specsfy-specialist-docker`), para os sinais que decidem o rollout (`$specsfy-specialist-observability`), para branches e conflitos (`$specsfy-specialist-git`) nem para hardening de credencial de pipeline (`$specsfy-specialist-application-security`).
 ---
 
 # Entrega
@@ -15,7 +15,7 @@ número e o ci-cd desenha pipeline, promoção e rollback.
 | --- | --- | --- |
 | Fazer release ou deploy de aplicação em servidor, preparar servidor que receberá stacks Docker Swarm via Ansible, cadastrar, adicionar ou conferir máquina do ambiente | deploy | [Contrato do servidor de deploy](references/deploy.md) e [senha do Vault](references/vault.md) |
 | Preparar ou conferir versão, `SEMVER`, incremento `patch`/`minor`/`major`, tag Git e alinhamento entre imagem, manifesto e deploy | versioning | [SemVer, artefatos e ordem de publicação](references/versioning.md) |
-| Desenhar pipeline CI/CD, artefato e promoção entre ambientes, migrations, rollout e rollback, ou escolher entre rolling, blue-green, canary e feature flag | ci-cd | [Etapas de pipeline, estratégias e supply chain](references/ci-cd.md) |
+| Desenhar pipeline CI/CD, artefato e promoção entre ambientes, migrations, rollout e rollback, ou escolher entre rolling, blue-green, canary e feature flag | ci-cd | [Etapas de pipeline, estratégias e supply chain](references/ci-cd.md) e [GitHub Actions](references/github-actions.md) |
 
 Não use para:
 
@@ -39,6 +39,11 @@ escreve e a conclusão volta para a spec.
    `#### Especialistas` dentro de `### 8. Plano técnico` e a seção que a fase
    está escrevendo, mais `.specsfy/STACK.md` e `.specsfy/RULES.md`. Abrir
    `.specsfy/DATABASE.md` quando a entrega envolver migration ou banco.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, ler e
+     registrar no item de `specs/backlog/`; em specify e validate, ler a spec
+     aberta (linha `| Especialistas |`, subseção 8, seção em escrita); só
+     `specsfy-05-tasks` escreve a seção 14, então apenas indicar o que a tarefa
+     deve prever; em `specsfy-06-implement`, seguir a tarefa indicada.
 2. Seguir o modo indicado na spec ou na tarefa
    (`Especialista: $specsfy-specialist-delivery (deploy)`, `(versioning)` ou
    `(ci-cd)`); sem indicação, escolher pelo "Quando usar".
@@ -153,6 +158,10 @@ do agente.
 
 ### Modo ci-cd
 
+Para GitHub Actions, leia [a referência de workflows](references/github-actions.md)
+e verifique eventos, matriz, cache, artefatos, permissões por job, OIDC,
+proteções de ambiente, reuso e concorrência.
+
 1. Mapear commit, artefato, ambientes, aprovações necessárias e owner de cada
    promoção antes de desenhar o pipeline.
 2. Tornar build e testes reproduzíveis a partir de lockfiles versionados, nunca
@@ -181,8 +190,9 @@ No modo deploy:
 - Manter `SEMVER` na raiz governando imagem, manifesto, tag Git e release, com
   `compose.yaml` para desenvolvimento e `stack.yaml` para produção em Docker
   Swarm.
-- Em Laravel, exigir `laravel/octane` com Open Swoole: a imagem instala
-  `openswoole` e Compose e stack executam `--server=swoole`.
+- No template do Specsfy para Laravel, exigir `laravel/octane` com Open
+  Swoole: a imagem instala `openswoole` e Compose e stack executam
+  `--server=swoole`. (regra da casa)
 - Usar Cloudflare Tunnel como entrada pública padrão, com `cloudflared` na mesma
   rede overlay e sem porta pública no Laravel; o hostname aponta para
   `http://app:8000`. Trocar só a pedido, sem gerar serviço e secret do token.
@@ -191,7 +201,7 @@ No modo deploy:
 - Criar o usuário `deploy`, adicionar somente ele ao grupo `docker` e atribuir a
   ele os diretórios da aplicação; manter `ansible/inventory.yml` como mapa dos
   servidores, com inclusão que preserva hosts, testa a conexão nova e só então
-  configura o node e o papel.
+  configura o node e o papel. (regra da casa)
 - Em nova chamada, reler a aplicação e reconciliar só o que mudou; o gerador
   serve ao primeiro bootstrap e não sobrescreve arquivo.
 - Usar módulos idempotentes e `community.docker`, com `swarm init` condicionado
@@ -215,15 +225,16 @@ No modo versioning:
 
 No modo ci-cd:
 
-- Usar menor privilégio e credenciais temporárias (OIDC/STS), com actions
-  fixadas por hash ou versão exata, construir uma vez, assinar ou gerar digest e
-  promover a mesma referência sem reconstruir por ambiente.
+- Usar menor privilégio e credenciais temporárias (OIDC/STS). Fixar actions
+  externas do GitHub pelo SHA completo de commit. Construir uma vez, registrar
+  o digest e promover a mesma referência sem reconstruir por ambiente.
 - Impedir dois deploys do mesmo serviço ao mesmo tempo e deploy de commit sem o
   pipeline de teste completo, mantendo a configuração de ambiente fora do
   artefato.
 - Exigir smoke check e observabilidade ativa, tratar rollback de código e de
   dados como problemas distintos e preservar trilha auditável sem segredo.
-  Detalhes em [references/ci-cd.md](references/ci-cd.md).
+  Detalhes em [references/ci-cd.md](references/ci-cd.md) e
+  [references/github-actions.md](references/github-actions.md).
 
 ## Antipadrões
 
@@ -236,6 +247,7 @@ No modo ci-cd:
   concluído só porque o comando retornou zero.
 - Alterar `SEMVER` depois da imagem compilada, criar tag Git antes de confirmar
   a imagem no registry ou recompilar o mesmo número para corrigir uma publicação.
+  (regra da casa)
 - Tratar a preparação local como autorização implícita para publicar.
 - Manter feature flag sem owner nem expiração.
 - Remover coluna antiga no mesmo deploy da migration nova, quebrando o rollback;
@@ -280,6 +292,9 @@ No modo ci-cd:
   pausam ou revertem um rollout.
 - `$specsfy-specialist-application-security` revisa credencial de pipeline,
   assinatura de artefato e supply chain.
+- `$specsfy-specialist-cloudflare` e `$specsfy-specialist-n8n` recebem a
+  promoção coordenada aqui, e `$specsfy-specialist-testing` prova a versão
+  promovida antes da tag.
 
 Leia [references/standards.md](references/standards.md) para os padrões comuns,
 o índice dos modos e as fontes oficiais, [references/deploy.md](references/deploy.md)

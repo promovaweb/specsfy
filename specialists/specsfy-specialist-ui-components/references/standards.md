@@ -1,5 +1,7 @@
 # Padrões comuns de componentes de UI
 
+Revisado em 2026-11-20 contra: shadcn/ui CLI v4 (changelog até outubro de 2026) e ReUI (registry e docs de 2026).
+
 - Leia `DESIGNSYSTEM.MD` e `INTERFACE.md`. Resolva tarefa, hierarquia e
   estados com `$specsfy-specialist-interface` antes de escolher componentes.
 - Confirme versões, imports, aliases e dependências em manifests, lockfile,
@@ -28,4 +30,7 @@
 - [React DOM](https://react.dev/reference/react-dom/components)
 - [Tailwind CSS](https://tailwindcss.com/docs/responsive-design)
 - [ReUI](https://reui.io/docs/get-started)
+- [ReUI Registry](https://reui.io/docs/registry)
 - [shadcn/ui](https://ui.shadcn.com/docs)
+- [shadcn/ui CLI](https://ui.shadcn.com/docs/cli)
+- [shadcn/ui Changelog](https://ui.shadcn.com/docs/changelog)

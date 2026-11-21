@@ -27,6 +27,12 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md`,
    `.specsfy/RULES.md` e, por tratar schema e dado persistido,
    `.specsfy/DATABASE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-postgres`. Sem indicação, confirme pelo
    "Quando usar" acima se o banco é Postgres e qual versão está instalada.
@@ -139,6 +145,13 @@ description: Modelar, consultar, migrar e operar PostgreSQL com integridade, ín
 - `$specsfy-specialist-docker` para empacotar e operar o servidor Postgres
   em container (imagem oficial, volume de dados, healthcheck): escolha de
   schema, índice e plano continuam aqui.
+- `$specsfy-specialist-mysql` cobre o outro banco relacional quando o projeto
+  usa MySQL ou Percona: semântica de índice, lock e DDL não é transportável
+  entre os dois.
+- `$specsfy-specialist-mongodb` cobre o caso de documento quando o dado
+  relacional não serve; aqui permanece a integridade referencial do schema.
+- `$specsfy-specialist-n8n` quando o Postgres guarda workflow, execução e
+  credencial da instância n8n: o schema, o índice e a poda continuam aqui.
 
 Leia [references/standards.md](references/standards.md) para tipos, índices,
 concorrência, segurança, migrations, operação e fontes oficiais.

@@ -37,18 +37,29 @@ PostgreSQL. O resultado dessa análise volta para as policies do Supabase.
 ## Padrões aplicados
 
 - Toda tabela de schema exposto tem RLS habilitada e acesso negado por padrão.
-- A chave `service_role` fica fora do navegador, de apps e de bundles
-  públicos, porque ignora a RLS.
+- A chave secreta (`sb_secret_...`) fica fora do navegador, de apps e de
+  bundles públicos, porque resolve para o papel `service_role` e ignora a RLS.
+  Onde a RLS deve decidir, entra a chave publicável (`sb_publishable_...`). As
+  chaves `anon` e `service_role` em JWT são legadas e têm descontinuação
+  anunciada para o fim de 2026.
+- Cada policy declara o papel com `to authenticated` ou `to anon`, cobre uma
+  operação e envolve `auth.uid()` em `(select auth.uid())` para o planner
+  calcular o valor uma vez por statement.
 - Cada policy é testada para `anon`, `authenticated` e os papéis da aplicação.
-- Funções `SECURITY DEFINER` têm `search_path` fixo e validação interna.
+- Funções `SECURITY DEFINER` têm `search_path` fixo, validação interna e ficam
+  em schema não exposto, como `private`.
 - Claims do JWT só autorizam acesso quando a origem é confiável.
 - Buckets públicos do Storage são revisados como superfície sensível.
+- Realtime segue a RLS: Postgres Changes entrega só a linha que o usuário pode
+  ler e canais privados exigem policy em `realtime.messages` mais
+  `private: true` no cliente.
 - Toda mudança de schema entra por `supabase migration new`, sem edição manual
   no dashboard de produção.
 - A RLS resolve a autorização sobre cada registro, enquanto o Auth resolve a
   identidade do usuário.
 - A conexão direta, o session pool e o transaction pool são escolhidos
-  conforme a carga e o driver.
+  conforme a carga e o driver. O transaction pool não tem prepared statements,
+  cursores entre transações nem estado de sessão.
 
 ## Erros que ele evita
 
@@ -63,8 +74,10 @@ PostgreSQL. O resultado dessa análise volta para as policies do Supabase.
 
 - Acessos permitidos e negados foram provados com identidades de teste para
   cada papel, incluindo `anon` e um usuário de outro tenant.
-- `supabase db reset`, o lint e as migrations rodaram no ambiente local.
-- Os tipos gerados com `supabase gen types` estão atualizados.
+- `supabase db reset`, `supabase db lint` e `supabase test db` rodaram no
+  ambiente local, e `supabase db advisors` não apontou RLS ausente nem chave
+  exposta.
+- Os tipos gerados com `supabase gen types --remote` estão atualizados.
 - Realtime segue o mesmo modelo de tenancy, o Storage tem policies por bucket
   e os segredos das Edge Functions ficam fora do código.
 - Um restore ou export completo foi testado, além do backup gerenciado.

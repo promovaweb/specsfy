@@ -30,6 +30,9 @@ Não use para:
   o modo components se houver React ou use `$specsfy-specialist-interface`
   com o especialista da stack existente. Para outra biblioteca visual já
   adotada, avalie o modo components junto do modo ui de interface.
+- Instalar ou migrar primitives sem confirmar a base: desde julho de 2026 o
+  shadcn/ui cria projeto novo em Base UI por default, então `init` sem `-b
+  radix` muda a base de um projeto que esperava Radix.
 
 ## No Specsfy
 
@@ -38,6 +41,12 @@ Não use para:
    metadados, a subseção `#### Especialistas` em `### 8. Plano técnico` e a
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` e, como a tarefa compõe telas, `INTERFACE.md`.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-ui-components (components|reui|shadcn)`.
    Sem indicação, escolha o modo pelo "Quando usar" acima.
@@ -62,8 +71,8 @@ Não use para:
    presente. Preserve roteamento, hidratação e convenções da stack.
 3. Confirme com os modos ux e ui de interface a tarefa, o fluxo de
    informação, as telas, a abertura de ações, os formulários, a densidade,
-   os estados e os breakpoints. Fixe as superfícies CRUD e dashboard antes
-   de buscar componentes.
+   os estados e os breakpoints. Fixe as superfícies CRUD e dashboard e as
+   operações incluídas no Contrato CRUD antes de buscar componentes.
 4. Escolha o menor conjunto de componentes que atenda ao comportamento.
    Prefira o equivalente local. Resolva dependências e peça autorização
    antes de instalar pacotes.
@@ -101,12 +110,12 @@ Todo CRUD com interface React e Tailwind usa ReUI como base visual: Data Grid
 ou List para consulta, Filters para recorte, Form e campos ReUI para criação e
 edição, Dialog ou Sheet para ações contextuais e Alert/Badge para retorno e
 status. Não crie uma alternativa manual quando o catálogo gratuito já atender
-a interação.
+a interação. (regra da casa)
 
-1. Confirme React 19, Tailwind CSS v4 e shadcn/ui. Use o modo shadcn para
-   inicializar ou auditar `components.json`, aliases, tema e primitives.
-   Leia [reui-setup.md](references/reui-setup.md) para escolher a variante
-   Base UI ou Radix já adotada e configurar `@reui`.
+1. Confirme React 19+, Tailwind CSS v4 e shadcn/ui com a CLI atual. Use o
+   modo shadcn para inicializar ou auditar `components.json`, aliases, tema e
+   primitives. Leia [reui-setup.md](references/reui-setup.md) para escolher a
+   variante Base UI ou Radix já adotada e configurar `@reui`.
 2. Abra [reui-catalog-free.md](references/reui-catalog-free.md) para mapear
    o CRUD e [reui-components-free.md](references/reui-components-free.md)
    para percorrer as famílias antes de criar uma alternativa. Em Laravel
@@ -126,15 +135,20 @@ a interação.
 1. Confirme versão, estilo, aliases, CSS variables e registry do workspace
    correto. Leia [shadcn-primitives.md](references/shadcn-primitives.md).
    Identifique a base pelos imports dos componentes e confirme no manifest.
-   Se a base for mista ou incerta, registre o sinal por arquivo e esclareça
-   a divergência antes de adicionar, migrar ou reescrever primitives.
+   Projeto novo desde julho de 2026 nasce em Base UI; Radix continua
+   suportado e é escolhido com `npx shadcn@latest init -b radix`. Se a base
+   for mista ou incerta, registre o sinal por arquivo e esclareça a
+   divergência antes de adicionar, migrar ou reescrever primitives.
 2. Compare código incorporado e customizações locais. Escolha a semântica
    e o comportamento exigidos, como Dialog modal, Popover ou Sheet, usando
-   a API, as props e os atributos de estado da base presente.
+   a API, as props e os atributos de estado da base presente. Na Base UI, a
+   composição usa a prop `render` onde o Radix usava `asChild`.
 3. Use [shadcn-standards.md](references/shadcn-standards.md) para registry,
    composição, Data Table, formulários, overlays, Sidebar, Chart e tema.
    Adicione somente o necessário e revise linha a linha o código copiado.
-   Compare o diff do registry antes de atualizar um arquivo customizado.
+   Use `npx shadcn@latest info` para leitura do projeto, `--dry-run`, `--diff`
+   e `--view` do `add` para conferir antes de escrever, e compare o diff do
+   registry antes de atualizar um arquivo customizado.
 4. Adapte tokens e variantes `cva` preservando semântica, foco e teclado.
    Combine com reui para composições de CRUD e dashboard compatíveis.
 
@@ -143,14 +157,22 @@ a interação.
 - Use `assets/components/` como referências versionadas e copiáveis. Código
   gerado pelo registry entra no projeto e passa a ser mantido pelo time.
   Preserve contratos locais, `Link`, imagens, ícones, tokens e primitives.
-- Use o contrato CRUD do modo system de interface. Para CRUD React e
-  Tailwind, consulte ReUI gratuito primeiro: Data Grid ou List, Filters,
-  Form e campos, Dialog ou Sheet, Alert e Badge. Adapte à tarefa, inclusive
-  clique e teclado na linha com controles independentes, `Breadcrumb` do
-  shell e erro de campo associado abaixo do controle.
+- Use o contrato CRUD do modo system de interface. Monte as ações pela lista de
+  operações incluídas declaradas no campo `Operações:` do Contrato CRUD da
+  spec; uma tela só de listagem e cadastro não ganha editar/apagar. Para CRUD
+  React e Tailwind, consulte ReUI gratuito primeiro: Data Grid ou List,
+  Filters, Form e campos, Dialog ou Sheet, Alert e Badge. Adapte à tarefa,
+  inclusive clique e teclado na linha com controles independentes,
+  `Breadcrumb` do shell e erro de campo associado abaixo do controle.
+  (regra da casa)
 - Centralize CSS variables e variantes. Preserve semântica, labels,
   `aria-*`, `sr-only`, `alt`, tema claro/escuro, breakpoints, foco inicial,
   trap, retorno ao gatilho e Escape oferecidos pela primitive.
+- Importe `cn` do pacote `cn` (padrão desde setembro de 2026), não de uma
+  cópia local de `clsx` + `tailwind-merge`; `lib/utils.ts` apenas reexporta.
+  Projeto antigo migra com `npx shadcn@latest migrate cn`. O CSS global
+  importa `@import "shadcn/tailwind.css"` para as variantes e animações
+  compartilhadas; `eject` existe para quem precisa inlinear esse CSS.
 - Componha Data Table por caso de uso, com colunas, ordenação, filtro,
   seleção e paginação pertinentes. Faça a Sidebar colapsar no mobile,
   respeitar a densidade de navegação e indicar a rota ativa.
@@ -181,9 +203,10 @@ a interação.
 ## Validação
 
 - Rode testes, lint, typecheck e build conforme o projeto. Confira imports,
-  rotas, assets externos, `components.json`, tokens e proveniência.
-  Confirme que novos pacotes foram aprovados e que itens ReUI são
-  `@reui/c-*` ou dependências públicas do registry.
+  rotas, assets externos, `components.json`, tokens e proveniência. Confirme
+  que novos pacotes foram aprovados e que itens ReUI são `@reui/c-*` ou
+  dependências públicas do registry, e que `cn` vem do pacote `cn` quando o
+  projeto já usa a CLI v4.
 - Exercite estados nominal, loading, empty, error, disabled e permission
   denied quando relevantes. Confira tabela com e sem dados, gráfico com
   e sem dados, formulário pendente, erro, sucesso e reabertura após falha

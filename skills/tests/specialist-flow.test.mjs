@@ -25,12 +25,12 @@ test('A mesma demanda recebe a mesma indicação em cada fase', t => {
   });
   for (const table of tables) assert.equal(table, tables[0]);
   const catalog = JSON.parse(read('specialists/catalog.json')).skills;
-  const names = [...tables[0].matchAll(/^\| [^|]+ \| `([a-z-]+)` \|/gm)].map(match => match[1]);
+  const names = [...tables[0].matchAll(/^\| [^|]+ \| `([a-z0-9-]+)` \|/gm)].map(match => match[1]);
   assert.deepEqual([...new Set(names)].sort(), catalog.map(skill => skill.name.replace('specsfy-specialist-', '')).sort());
   for (const name of new Set(names)) {
     const specialist = read(`specialists/specsfy-specialist-${name}/SKILL.md`);
     const modes = [...specialist.matchAll(/^### Modo (\S+)$/gm)].map(match => match[1]);
-    const rows = tables[0].split('\n').filter(line => line.includes('| `' + name + '` |'));
+    const rows = tables[0].split('\n').filter(line => line.split('|')[2]?.trim() === '`' + name + '`');
     for (const row of rows) {
       const mode = row.split('|')[3].trim().replaceAll('`', '');
       assert.ok((modes.length ? modes : ['padrão']).includes(mode), row);

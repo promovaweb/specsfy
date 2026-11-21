@@ -70,9 +70,11 @@ e o limite estrutural que restringe a capacidade com a
 - Labels de métricas com cardinalidade limitada, como endpoint normalizado e
   código de status. IDs de usuário e URLs com query string ficam fora dos
   labels.
-- Traces que mantêm a correlação ao atravessar HTTP, filas e jobs assíncronos.
-- Amostragem de traces que preserva todos os erros e as transações de negócio
-  importantes.
+- A correlação atravessa HTTP e filas por propagação de contexto. O consumo
+  em lote pode ligar traces por meio de span links.
+- A política do especialista é preservar traces com erros e transações
+  críticas. Quando essa decisão depende dos spans finais, a amostragem
+  acontece ao fim do trace e a retenção real é verificada.
 - Alertas ligados ao impacto no cliente ou à ameaça de violar o SLO, cada um com
   responsável e runbook.
 - Dashboards que começam pela saúde agregada (RED ou USE) e permitem descer até
@@ -105,7 +107,7 @@ e o limite estrutural que restringe a capacidade com a
 ## Como conferir o resultado
 
 - A telemetria gerada em um cenário controlado mantém o trace id em todos os
-  pontos de passagem.
+  pontos de passagem ou os liga por span links.
 - Cardinalidade, custo, retenção e mascaramento de campos sensíveis foram
   conferidos.
 - Os alertas disparam no cenário previsto e o runbook pode ser executado por

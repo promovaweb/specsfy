@@ -26,7 +26,7 @@ que será mudado.
 
 | Sinal no componente ou manifest | Base a registrar | Como seguir |
 | --- | --- | --- |
-| `@base-ui/react` | Base UI | Use as APIs e atributos documentados para Base UI. |
+| `@base-ui/react` | Base UI | Use as APIs e atributos documentados para Base UI; a prop de composição é `render`, não `asChild`. |
 | `radix-ui` ou `@radix-ui/react-*` | Radix | Preserve a variante presente no arquivo; imports individuais antigos também continuam sendo Radix. |
 | `react-aria-components` ou `@react-aria/*` | React Aria | Use a variante React Aria do componente e seus seletores de estado. |
 | Sinais de duas ou mais bases no mesmo conjunto de componentes | Mista | Registre a base por arquivo e mantenha cada arquivo na sua base atual. |
@@ -35,13 +35,20 @@ que será mudado.
 O valor `style` em `components.json`, inclusive nomes como `base-nova`, define
 o estilo do registry. Ele não comprova que o componente usa Base UI.
 
+Desde julho de 2026, projeto novo criado por `npx shadcn@latest init` usa Base
+UI por default. Para manter Radix, rode `init -b radix`; para React Aria, `-b
+aria`. A escolha da base é decisão de projeto, não consequência do estilo.
+
 ## Mudanças e migrações
 
 - Não converta uma base só para uniformizar imports durante uma alteração de
   interface. A migração precisa de escopo próprio, comparação por componente e
   testes de teclado, foco e formulários.
 - A migração `shadcn migrate radix` unifica imports Radix individuais em
-  `radix-ui`; ela não transforma um projeto Radix em Base UI.
+  `radix-ui`; ela não transforma um projeto Radix em Base UI. Para migrar para
+  Base UI, a documentação oficial publica uma skill que trata componente por
+  componente (`npx skills add shadcn/ui`).
+- `shadcn migrate cn` troca `clsx` e `tailwind-merge` pelo pacote `cn`.
 - Componentes de bases distintas podem existir no mesmo projeto depois de uma
   evolução parcial. Trate esse estado como informação do código, não como
   permissão para trocar os demais arquivos.

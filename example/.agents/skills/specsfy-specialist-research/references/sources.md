@@ -22,6 +22,21 @@ Uma fonte de nível inferior nunca sobrepõe uma de nível superior sem uma
 razão explícita (ex.: a documentação oficial está desatualizada e o
 changelog mais recente contradiz).
 
+## Vigência do documento citado
+
+- **RFC**: confira o cabeçalho da própria RFC. Um RFC pode ser obsoletado ou
+  atualizado por outro (`Obsoletes`/`Updates`), e o link correto passa a ser o
+  do substituto. RFC 9110 substituiu RFC 7230 a 7235, e RFC 9457 substituiu
+  RFC 7807.
+- **Internet-Draft**: não é padrão publicado e expira em seis meses. Use como
+  fonte de trabalho, diga que é draft, informe o número (`-08`, `-12`) e a data,
+  e revalide antes de apoiar uma escolha durável. Verifique se virou RFC.
+- **Documentação de projeto**: a versão faz parte da citação. Página sem versão
+  não comprova comportamento de uma versão específica, ainda que descreva o
+  comportamento atual.
+- **Versão de software**: SemVer descreve a intenção da mudança, não garante
+  compatibilidade de comportamento; confirme no changelog e nos testes.
+
 ## Matriz de avaliação de uma fonte
 
 - **Autoridade**: quem controla de fato o comportamento descrito — o mesmo
@@ -38,7 +53,7 @@ changelog mais recente contradiz).
 
 Uma fonte que falha em "aplicabilidade" ou tem alto "incentivo" não é
 descartada automaticamente, mas exige triangulação com uma segunda fonte
-independente antes de sustentar uma conclusão importante.
+independente antes de sustentar uma conclusão importante. (regra da casa)
 
 ## Formato de síntese
 

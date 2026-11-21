@@ -52,11 +52,11 @@ export function registerLifecycleTools(registrar: Registrar): void {
     annotations: write,
   }, (input) => respond(() => lifecycleActions.process(resolveProject(input.project), input.capture, input.specs)));
 
-  catalog.tools.push({ name: "spec_transition", description: "Move a spec to an adjacent state folder and mirror its Status." });
+  catalog.tools.push({ name: "spec_transition", description: "Move a spec to another state folder and update its Status and backlog links." });
   server.registerTool("spec_transition", {
     title: "Transition a spec",
     description:
-      `Move a spec to another state folder (${SPEC_FOLDERS.join(" → ")}) and mirror its Status. Only adjacent states are accepted; ` +
+      `Move a spec to another state folder (${SPEC_FOLDERS.join(" → ")}) and update its Status and backlog links. Only adjacent states are accepted; ` +
       "an invalid transition fails with USAGE and details.accepted lists the valid destinations. Milestones are synced afterwards.",
     inputSchema: { spec, state: z.enum(SPEC_FOLDERS as unknown as [string, ...string[]]).describe("Destination state folder."), project },
     annotations: write,

@@ -1,5 +1,10 @@
 # Padrões e referências de pesquisa
 
+Revisado em 2026-11-20 contra: RFC Editor (BCP 14, RFC 2119 e RFC 8174),
+W3C Technical Reports, ECMA International, NIST Publications, Crossref,
+GitHub Releases, Semantic Versioning 2.0.0, GOV.UK Service Manual e SAFe
+(spikes).
+
 ## Índice das referências
 
 | Modo | Arquivo | Conteúdo |
@@ -15,6 +20,8 @@
   e o que deixaria a pergunta inconclusiva.
 - Versão, data e ambiente do projeto consumidor acompanham toda conclusão que
   pode mudar entre releases.
+- A vigência do documento é verificada antes da citação: RFC obsoletado,
+  Internet-Draft expirado ou versão substituída invalidam a conclusão.
 - Fato, inferência, consequência e lacuna aparecem rotulados de forma explícita.
 - O resultado vive no local autorizado pela spec do projeto. Nunca criar
   `research.md`, `plan.md` ou fonte normativa paralela.

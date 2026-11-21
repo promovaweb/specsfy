@@ -40,6 +40,11 @@ escreve e a conclusão volta para a spec.
    `#### Especialistas` dentro de `### 8. Plano técnico` e a seção que a fase
    está escrevendo, mais `.specsfy/STACK.md` e `.specsfy/RULES.md`. Abrir
    `.specsfy/DATABASE.md` quando o host hospedar banco ou storage do serviço.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, ler e
+     registrar no item de `specs/backlog/`; em specify e validate, ler a spec
+     aberta (linha `| Especialistas |`, subseção 8, seção em escrita); só
+     `specsfy-05-tasks` escreve a seção 14, então apenas indicar o que a tarefa
+     deve prever; em `specsfy-06-implement`, seguir a tarefa indicada.
 2. Seguir o modo indicado na spec ou na tarefa
    (`Especialista: $specsfy-specialist-server (debian)`, `(ansible)` ou
    `(report)`); sem indicação, escolher pelo "Quando usar".
@@ -145,14 +150,15 @@ No modo debian:
   pacotes externos; não misturar suites Debian para obter versão nova.
 - Manter serviços em unidades systemd ou pacotes oficiais, com restart,
   dependências, limites e logs definidos; não sustentar processo por sessão SSH.
-- Preferir nftables e salvar a configuração carregada no boot, testando uma nova
-  sessão administrativa antes de fechar as conexões existentes.
+- Preferir nftables para a política do host. Em Swarm no Engine 29, manter
+  iptables como backend do Docker. Salvar a configuração do host para o boot e
+  testar outra sessão administrativa antes de fechar as conexões existentes.
 - Criar arquivos pequenos e nomeados em `/etc/sysctl.d/`, registrar a finalidade
   de cada parâmetro e evitar bloco genérico sem owner.
 - Configurar rotação e retenção de logs conforme o disco disponível, alertar
   para uso de filesystem e inodes antes que o Docker pare de criar camadas e
   tratar o socket Docker e o grupo `docker` como acesso administrativo amplo ao
-  host.
+  host. (regra da casa)
 
 No modo ansible:
 
@@ -172,7 +178,7 @@ No modo ansible:
 - Usar FQCN e módulos declarativos, nomes acionáveis em tasks e handlers e
   `notify` somente quando a task realmente mudar estado.
 - Separar `defaults/main.yml`, `vars/main.yml` e secrets em arquivos distintos;
-  fixar collections em `requirements.yml` e validar a compatibilidade com o
+  fixar collections no manifesto Galaxy e validar a compatibilidade com o
   `ansible-core` instalado.
 - Usar `changed_when`/`failed_when` apenas para a semântica real do comando,
   nunca para silenciar falha genuína ou fingir idempotência.
@@ -196,12 +202,12 @@ No modo report:
   systemd com falha e pendências); seção ausente recebe motivo registrado, como
   "não aplicável em host sem Swarm".
 - Tratar container parado com `docker ps -a --filter status=exited`, código de
-  saída e trecho final do log. Código `0` não é erro; `137` indica OOM ou kill
-  externo e pede correlação com `dmesg` e limites.
+  saída e trecho final do log. Código `137` é compatível com `SIGKILL`.
+  Para investigar OOM, conferir `.State.OOMKilled`, eventos do kernel e limites.
 - Listar imagens com repositório, tag, digest, tamanho e data, marcando
   `dangling` e candidatas a `prune` sem executar limpeza no mesmo play.
 - Medir disco com `df -h`, `df -i` e `docker system df`: alerta acima de 80%,
-  crítico acima de 90% ou inodes acima de 85%.
+  crítico acima de 90% ou inodes acima de 85%. (regra da casa)
 - Versionar relatórios quando o projeto versiona `server-reports/`, nunca
   commitando segredo, token de join ou conteúdo de Vault; na dúvida, manter fora
   do commit e registrar o motivo no índice.
@@ -252,7 +258,7 @@ No modo report:
   segredo.
 - Duas execuções consecutivas no mesmo alvo: a segunda não relata nenhuma task
   como `changed`. Essa é a prova operacional de idempotência, não a leitura do
-  código.
+  código. (regra da casa)
 - Testar handlers (o serviço reinicia quando deveria), templates por ambiente e
   falha parcial com `any_errors_fatal` ou `max_fail_percentage`.
 - Confirmar inventory e `--limit` usados antes de qualquer mutação remota; nunca
@@ -279,6 +285,8 @@ No modo report:
   relatório; este especialista para no achado comprovado.
 - `$specsfy-specialist-application-security` revisa a gestão de segredos do
   vault, o acesso SSH e a exposição de portas que este especialista configura.
+- `$specsfy-specialist-cloudflare` e `$specsfy-specialist-n8n` publicam o que
+  este especialista expõe; a borda e o webhook continuam com eles.
 
 Leia [references/standards.md](references/standards.md) para os padrões comuns,
 o índice dos modos e as fontes oficiais, [references/debian.md](references/debian.md)

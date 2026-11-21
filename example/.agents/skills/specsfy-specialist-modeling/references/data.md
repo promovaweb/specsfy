@@ -72,6 +72,6 @@ quando houver exclusão lógica.
 
 ## Fontes oficiais
 
-- [SQL standard overview](https://www.iso.org/standard/76583.html)
+- [SQL standard, ISO/IEC 9075-1:2023 (SQL/Framework)](https://www.iso.org/standard/76583.html)
 - [PostgreSQL documentation](https://www.postgresql.org/docs/current/)
-- [Laravel migrations](https://laravel.com/docs/12.x/migrations)
+- [Laravel migrations](https://laravel.com/docs/migrations)

@@ -99,6 +99,17 @@ test('setup descobre CRUDs, menus e recompõe documentação do sistema', () => 
 test('contrato Laravel exige Octane com Open Swoole', () => {
   for (const text of [read('skills/Spec.md'), read('skills/templates/Spec.md'), setupText(), readSpecialist('laravel')]) includes(text, ['Laravel Octane', 'obrigatório', 'laravel/octane', 'Open Swoole']);
 });
+test('setup registra runtime e UI ausentes como pendência de stack anterior ao deploy', () => {
+  const setup = setupText().split(/\s+/).join(' ');
+  includes(setup, ['Pendências de stack', 'O setup pode ser aprovado',
+    'laravel/octane', 'openswoole', '--server=swoole', 'shadcn/ui e ReUI',
+    'tarefa de instalação', 'pré-condição do deploy']);
+  for (const text of [
+    read('skills/Spec.md'), read('skills/templates/Spec.md'),
+    read('specialists/specsfy-specialist-laravel/SKILL.md'),
+  ]) includes(text.split(/\s+/).join(' '), ['pendência de stack', 'pré-condição do deploy']);
+  assert.ok(!setup.includes('antes de aprovar o setup'));
+});
 test('especialista de componentes documenta instalação ReUI pelo registry gratuito', () => {
   includes(readSpecialist('ui-components'), ['Componentes gratuitos ReUI', 'references/reui-setup.md']);
   includes(read('specialists/specsfy-specialist-ui-components/references/reui-setup.md'), ['npx shadcn@latest add', 'Laravel', '@reui', 'starter kit React oficial', 'Form Requests']);
@@ -107,4 +118,46 @@ test('ReUI define a composição de CRUDs compatíveis', () => {
   includes(read('specialists/specsfy-specialist-ui-components/references/reui-catalog-free.md'), ['## Mapa obrigatório para CRUDs', 'Data Grid', 'Filters']);
   includes(read('specialists/specsfy-specialist-ui-components/references/reui-components-free.md'), ['# Componentes gratuitos ReUI', 'Comércio', 'Planejamento']);
   includes(readSpecialist('ui-components').split(/\s+/).join(' '), ['Todo CRUD com interface React e Tailwind usa ReUI']);
+});
+
+const crudSpec = (operations, controls, taskDescriptions = []) => interfaceSpec(
+  fixtures.complete + '\n#### Contrato CRUD\n\n' +
+  (operations === null ? '' : `- **Operações**: ${operations}\n`) +
+  controls + '\n\n### 14. Tarefas\n\n#### Fase de interface\n\n' +
+  taskDescriptions.map((description, index) =>
+    `- [ ] T00${index + 1} [CODE] ${description} em src/Products.tsx — Refs: FR-001 — Depends: none\n`).join(''),
+);
+const crudErrors = (root, operations, controls, tasks) =>
+  validate(root, crudSpec(operations, controls, tasks)).filter(error => error.includes('Contrato CRUD'));
+
+test('Contrato CRUD aceita listar e criar, leitura e CRUD completo conforme as operações incluídas', t => {
+  const root = temporary(t);
+  const list = 'PageHeader e DataGrid com coluna ID visível.';
+  const create = 'Formulário de criação.';
+  const detail = 'Link para a tela de detalhe.';
+  const edit = 'Ação de edição.';
+  const remove = 'Botão de exclusão com confirmação.';
+  for (const [operations, controls, tasks] of [
+    ['listar, criar', [list, create], ['Implementar listagem e formulário para criar']],
+    ['listar, consultar', [list, detail], ['Implementar listagem e detalhe']],
+    ['consultar', ['PageHeader.', detail], ['Implementar detalhe']],
+    ['listar, consultar, criar, editar, apagar', [list, detail, create, edit, remove],
+      ['Implementar listagem e detalhe', 'Implementar criação, edição e exclusão']],
+    [null, [list, 'Botões de editar e apagar.'], []],
+  ]) {
+    assert.deepEqual(crudErrors(root, operations, controls.join(' '), tasks), [], operations);
+  }
+});
+
+test('Contrato CRUD exige controles e tarefas das operações declaradas, com fallback legado', t => {
+  const root = temporary(t);
+  const list = 'PageHeader e DataGrid com coluna ID visível.';
+  const errors = crudErrors(root, 'listar, criar', list, ['Implementar listagem']);
+  assert.ok(errors.some(error => error.includes('criar') && error.includes('formulário')), errors.join('\n'));
+  assert.ok(errors.some(error => error.includes('criar') && error.includes('tarefa')), errors.join('\n'));
+  assert.ok(errors.every(error => !/apagar|editar/.test(error)));
+  assert.notDeepEqual(crudErrors(root, null, list), []);
+  assert.notDeepEqual(crudErrors(root, 'listar, inventar', list), []);
+  assert.notDeepEqual(crudErrors(root, '', list), []);
+  assert.deepEqual(crudErrors(root, 'listar, criar', list + ' Formulário de criação.'), []);
 });

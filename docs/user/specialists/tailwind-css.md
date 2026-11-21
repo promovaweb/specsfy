@@ -3,7 +3,8 @@
 O especialista Tailwind CSS orienta o agente no uso de tokens, classes
 utilitárias, variantes, responsividade e dark mode. Ele parte dos tokens que o
 projeto já declara e trata acessibilidade e preferências do usuário como parte
-do componente desde a primeira versão.
+do componente desde a primeira versão. Na versão 4.3, o framework já traz
+utilitários de scrollbar, container de tamanho, zoom e tab-size.
 
 ## Quando usar
 
@@ -18,9 +19,9 @@ componentes.
 
 ## Como ele trabalha
 
-1. Confirma a versão do Tailwind, a integração (Vite, PostCSS ou framework) e
-   onde os tokens são declarados, em `tailwind.config.js` ou em `@theme` na
-   versão 4.
+1. Confirma a versão do Tailwind, a integração (Vite, PostCSS, webpack ou
+   framework) e onde os tokens são declarados, em `tailwind.config.js` ou em
+   `@theme` na versão 4.
 2. Traduz o layout e os estados da interface em breakpoints ou `@container`
    antes de escrever classes.
 3. Reaproveita os tokens semânticos existentes antes de usar um valor
@@ -48,6 +49,11 @@ componentes.
   fazem parte do design.
 - Layout fluido e `@container` atendem componentes que respondem ao espaço do
   próprio container, como um card dentro de uma sidebar estreita.
+  `@container-size` cobre consultas que também dependem da altura.
+- Propriedades lógicas, como `ms-`, `pbs-` e `inset-s-*`, mantêm o layout
+  correto em RTL. `start-*` e `end-*` estão depreciados.
+- Scrollbar, zoom e tab-size usam utilitários da própria versão 4.3 antes de
+  CSS customizado.
 - Valores arbitrários repetidos indicam um token ausente na escala.
 
 ## Erros que ele evita
@@ -61,7 +67,9 @@ componentes.
 
 ## Como conferir o resultado
 
-- O build de produção contém todas as classes esperadas.
+- O build de produção contém todas as classes esperadas. Em projeto sem
+  framework, o CSS é gerado por `npx @tailwindcss/cli`, porque o binário
+  `tailwindcss` da versão 4 não traz mais o CLI.
 - A interface foi testada em telas pequenas e grandes e com zoom de 200% e
   400%, sem perda de conteúdo nem rolagem horizontal indesejada.
 - Os estados `hover`, `focus-visible`, `disabled`, carregando, erro e

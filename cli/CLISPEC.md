@@ -48,7 +48,7 @@ CI pelo `--json`.
 | `specs list` | List specs with state, gates and task progress. | `--state <state>`, `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `specs show` | Show one spec: metadata, gates, tasks and, with --content, the Markdown. | `<spec>`, `--content`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `specs new` | Create a spec in specs/draft/ with the next number, from the installed template. | `--title <title>`, `--slug <slug>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
-| `specs transition` | Move a spec to another state folder and mirror its Status; only adjacent states of the method are accepted. | `<spec>`, `<state>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
+| `specs transition` | Move a spec to another state folder and update its Status and backlog links. | `<spec>`, `<state>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `specs effort` | Record the estimated effort of a spec (integer 1 to 10) with a rationale. | `<spec>`, `<effort>`, `--reason <text>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `specs migrate` | Move specs from the legacy layouts (`specs/<slug>/`, `specs/specs/<slug>/`) to the state folders, by their Status. | `--project <dir>` | ver `--skill reference` | n/a | n/a |
 | `specs research` | List and load the local research indexed by a spec and check its claims. | `<spec>`, `--emit-content`, `--max-bytes <bytes>`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
@@ -70,7 +70,7 @@ CI pelo `--json`.
 | `gate evidence` | Verify the material evidence of the tasks of a spec (Evidence Contract 1). | `<spec>`, `--delivery`, `--task <id>`, `--attestation <file>`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
 | `gate findings` | Validate the product, architecture and security findings recorded in a spec. | `<spec>`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
 | `gate database` | Check that tests use a separate database and that a command cannot wipe data. | `--command <command>`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
-| `verify` | Run the whole Specsfy policy on the project: the CI entry point. | `--boundary <boundary>`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
+| `verify` | Run the project policy for CI and report informational specialist warnings. | `--boundary <boundary>`, `--attestation <file>`, `--timeout-seconds <seconds>`, `--max-output-bytes <bytes>`, `--self-test`, `--project <dir>` | ver `--skill reference`, `data.warnings` | 10, 6 | n/a |
 | `test` | Run the project test suite. | `--project <dir>` | ver `--skill reference` | 10, 6 | n/a |
 | `context setup` | Create the minimum project context (PROJECT.md, .specsfy/STACK.md, RULES.md, DATABASE.md...) without overwriting existing files. | `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `context inspect` | Summarize the relevant sources of the project by group (instructions, manifests, routes, persistence, tests...) without changing files. | `--project <dir>` | ver `--skill reference` | 6 | n/a |
@@ -92,6 +92,8 @@ CI pelo `--json`.
 | `skills install` | Install specialists from the catalog, with their requirements. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 4, 5, 6, 7 | `github.token` |
 | `skills remove` | Remove Specsfy skills from the project; skills outside the Specsfy namespace are refused. | `<names>`, `--force`, `--project <dir>` | ver `--skill reference` | 6, 7 | `github.token` |
 | `skills update` | Bring the Specsfy skills of the project to the framework inventory; same as the top-level update. | `--check`, `--latest`, `--force`, `--project <dir>` | ver `--skill reference` | 5, 6, 7, 10 | `github.token` |
+| `specialists suggest` | Suggest specialists from the spec and report mode, signal, declaration and installation. | `<spec>`, `--project <dir>`, `--json` | `project`, `spec`, `suggestions`, `catalogWarning` opcional | 6 | `github.token` para catálogo personalizado no GitHub |
+| `skills suggest` | Same as `specialists suggest`. | `<spec>`, `--project <dir>`, `--json` | mesmos dados de `specialists suggest` | 6 | mesmas de `specialists suggest` |
 | `scripts list` | List the framework scripts embedded in the binary. | n/a | ver `--skill reference` | n/a | n/a |
 | `scripts run` | Run an embedded framework script by name, passing the remaining arguments unchanged. | `<script>`, `[args]`, `--project <dir>` | ver `--skill reference` | 6 | n/a |
 | `about` | identidade, runtime e créditos | n/a | ver `--skill reference` | n/a | n/a |
@@ -120,7 +122,7 @@ Commands de projeto que repassam a um script do framework devolvem `data` `{ pro
 | Screen | Função | Teclas |
 | --- | --- | --- |
 | `overview` | projeto, resumo de progresso, estados, backlog, inbox, próximos passos e MCP | `↑/↓` spec, `Enter` open, `r` reload |
-| `specs` | specs por estado com gates, tarefas e o Markdown da selecionada | `↑/↓` spec, `t` move, `Espaço` check, `u` undo, `e` effort, `n` new spec, `g` gates, `r` reload |
+| `specs` | specs por estado com gates, tarefas, especialistas e o Markdown da selecionada | `↑/↓` spec, `t` move, `Espaço` check, `u` undo, `e` effort, `n` new spec, `g` gates, `r` reload |
 | `backlog` | backlog e inbox com preview | `↑/↓` item, `PgUp/PgDn` scroll, `c` capture, `p` process, `b` backlog, `r` reload |
 | `milestones` | milestones de `specs/milestones/` com a porcentagem do progresso derivado e a prévia | `↑/↓` milestone, `PgUp/PgDn` scroll, `s` sync |
 | `context` | documentos de contexto do projeto, com `✓` quando existem e a prévia | `↑/↓` file, `PgUp/PgDn` scroll |
@@ -158,7 +160,7 @@ aberto segue na versão que carregou até ser reaberto.
 | tool | `task_next` | Show the next ready task of a spec, with its next checklist item; --all lists every ready task. | `read` |
 | tool | `delivery_render` | Render the delivery summary of a spec: gates, delivered IDs, tasks, evidence and rollback. | `read` |
 | tool | `inbox_process` | Move a capture to specs/inbox/processed/ once specs with the Definition Gate passed cover it. | `write` |
-| tool | `spec_transition` | Move a spec to an adjacent state folder and mirror its Status. | `write` |
+| tool | `spec_transition` | Move a spec to another state folder and update its Status and backlog links. | `write` |
 | tool | `spec_effort` | Record the effort (1 to 10) of a spec with a rationale. | `write` |
 | tool | `specs_migrate` | Move legacy specs to the state folders by their Status. | `write` |
 | tool | `task_check` | Mark or unmark a task, or an item of its checklist, in spec.md. | `read` |
@@ -170,7 +172,7 @@ aberto segue na versão que carregou até ser reaberto.
 | tool | `gate_evidence` | Verify the material evidence of the tasks of a spec (Evidence Contract 1). | `read` |
 | tool | `gate_findings` | Validate the product, architecture and security findings recorded in a spec. | `read` |
 | tool | `gate_database` | Check that tests use a separate database and that a command cannot wipe data. | `read` |
-| tool | `verify` | Run the whole Specsfy policy on the project (CI entry point). | `read` |
+| tool | `verify` | Run the project policy for CI and report informational specialist warnings. | `read` |
 | tool | `context_setup` | Create the minimum project context (PROJECT.md, .specsfy/STACK.md, RULES.md, DATABASE.md...) without overwriting existing files. | `write` |
 | tool | `context_inspect` | Summarize the relevant sources of the project by group (instructions, manifests, routes, persistence, tests...) without changing files. | `read` |
 | tool | `context_interface` | Summarize the interface stack (frameworks, routing, styling, components, forms, tests) and the current routes and components. | `read` |
@@ -186,6 +188,7 @@ aberto segue na versão que carregou até ser reaberto.
 | tool | `docs_build` | Rebuild the project documentation in docs/ and .specsfy/PACKAGES.md; --check only verifies it is up to date. | `write` |
 | tool | `skills_list` | List the specialist catalog of the framework repository. | `read` |
 | tool | `skills_detect` | Detect the specialists that match the project. | `read` |
+| tool | `specialists_suggest` | Suggest specialists from a spec; returns the CLI JSON data. | `read` |
 | tool | `framework_install` | Install the Specsfy framework in the project. | `write` |
 | tool | `framework_update` | Bring the Specsfy skills of the project to the framework inventory. | `write` |
 | tool | `skills_install` | Install specialists with their requirements. | `write` |
@@ -244,6 +247,7 @@ aberto segue na versão que carregou até ser reaberto.
 | 0020 | Example nas pastas de estado e release do Hub | done |
 | 0021 | Navegação e mais ações na TUI | done |
 | 0022 | Aviso de versão instalada na TUI | done |
+| 0023 | Especialistas na spec | done |
 
 ## Notes
 
@@ -291,3 +295,4 @@ aberto segue na versão que carregou até ser reaberto.
 - 2026-11-20: spec 0020 (Example nas pastas de estado e release do Hub) closed.
 - 2026-11-20: spec 0021 (Navegação e mais ações na TUI) closed.
 - 2026-11-20: spec 0022 (Aviso de versão instalada na TUI) closed.
+- 2026-11-20: spec 0023 (Especialistas na spec) closed.

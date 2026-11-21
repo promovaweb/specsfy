@@ -152,8 +152,9 @@ Os próximos guias são opcionais. Consulte-os quando a entrega exigir uma
 integração ou tecnologia específica:
 
 - [Especialistas](specialists.md), para conhecimento técnico adicional, com
-  um guia para cada um dos 21 especialistas do catálogo:
+  um guia para cada um dos 27 especialistas do catálogo:
   - [Arquitetura](specialists/architecture.md)
+  - [Cloudflare](specialists/cloudflare.md)
   - [Code Review](specialists/code-review.md)
   - [Componentes de UI](specialists/ui-components.md)
   - [Debugging](specialists/debugging.md)
@@ -162,7 +163,11 @@ integração ou tecnologia específica:
   - [Git](specialists/git.md)
   - [Interface](specialists/interface.md)
   - [Laravel](specialists/laravel.md)
+  - [MCP](specialists/mcp.md)
   - [Modelagem](specialists/modeling.md)
+  - [MongoDB](specialists/mongodb.md)
+  - [MySQL](specialists/mysql.md)
+  - [n8n](specialists/n8n.md)
   - [Next.js](specialists/nextjs.md)
   - [Observabilidade](specialists/observability.md)
   - [Pesquisa](specialists/research.md)
@@ -173,6 +178,7 @@ integração ou tecnologia específica:
   - [Servidor](specialists/server.md)
   - [Supabase](specialists/supabase.md)
   - [Tailwind CSS](specialists/tailwind-css.md)
+  - [Testes](specialists/testing.md)
   - [TypeScript](specialists/typescript.md)
 - [Como funciona o Deploy da aplicação](deploy.md), para ligar `SEMVER`, imagem, Ansible e
   Docker Swarm em um deploy verificável.

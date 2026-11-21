@@ -1,7 +1,9 @@
 # Next.js
 
 O especialista Next.js orienta o agente em aplicações Next.js, com o App
-Router, Server Components por padrão e cache declarado por rota. Ele define o
+Router, Server Components por padrão e cache declarado por rota. Desde a
+versão 16.4, o modelo recomendado é Cache Components, com `"use cache"`,
+`cacheLife` e `cacheTag`, e `proxy.ts` no lugar do middleware. Ele define o
 limite entre servidor e cliente e trata cada Server Action como um endpoint
 público.
 
@@ -10,7 +12,7 @@ público.
 - O projeto depende de `next` ou tem `next.config`.
 - A tarefa altera uma rota, um layout ou um Server ou Client Component.
 - A tarefa cria ou altera uma Server Action, um route handler, o cache, o
-  middleware ou o deploy.
+  proxy ou o deploy.
 - Você precisa investigar requisições em cascata, hydration mismatch ou um
   cache que mostra conteúdo antigo ou de outro usuário.
 
@@ -21,19 +23,24 @@ limite entre servidor e cliente.
 ## Como ele trabalha
 
 1. Confirma a versão do Next.js, o router, o runtime (Node ou Edge), o destino
-   do deploy e as flags experimentais.
+   do deploy e as flags experimentais. No Next.js 16, Turbopack é o bundler
+   padrão; a partir do 16.4, `cacheComponents` com `partialPrefetching` é o
+   modelo recomendado.
 2. Descreve a rota alterada com `loading`, `error` e `not-found`. Em seguida,
    define onde termina o servidor e começa a interação no cliente.
 3. Mantém os componentes no servidor e marca `"use client"` só no componente
-   folha que usa hooks, eventos ou APIs do navegador.
-4. Declara cache, revalidação e tags de cada fonte de conteúdo, conforme a
-   versão instalada.
+   folha que usa hooks, eventos ou APIs do navegador. `params`, `searchParams`,
+   `cookies()` e `headers()` são assíncronos e precisam de `await`.
+4. Declara cache, revalidação e tags de cada fonte de conteúdo. O cache é
+   opt-in: `"use cache"` na função, `cacheLife` para a duração e `cacheTag`
+   para a invalidação; sem a diretiva, o código roda a cada requisição.
 5. Valida a entrada e confere a autorização dentro de cada Server Action e
-   route handler.
+   route handler. Uma ação que muda dado cacheado chama `updateTag` ou
+   `revalidateTag(tag, "max")` antes de retornar.
 6. Planeja metadata, streaming com `loading.js` e `Suspense`, imagens, fontes
    e recuperação de erros.
-7. Executa lint, typecheck, testes e build de produção e confere o resultado
-   no host de destino, além do `next dev`.
+7. Executa typecheck, lint separado (ESLint ou Biome), testes e build de
+   produção e confere o resultado no host de destino, além do `next dev`.
 
 ## Padrões aplicados
 
@@ -43,13 +50,14 @@ limite entre servidor e cliente.
   Components, porque o bundler pode enviá-los ao navegador.
 - A busca de conteúdo fica perto do componente que o usa, sem requisições
   sequenciais desnecessárias.
-- Cada fonte de conteúdo é declarada como estática, revalidada por tempo,
-  revalidada por tag ou dinâmica.
-- Toda mutation chama `revalidatePath` ou `revalidateTag` para o conteúdo
-  afetado.
+- Cada fonte de conteúdo é declarada como estática, cacheada com `"use cache"`
+  e `cacheLife`, revalidada por tag ou dinâmica em tempo de requisição.
+- Toda mutation invalida o conteúdo afetado com `updateTag` ou
+  `revalidateTag(tag, "max")`, e `refresh()` atualiza só o dado não cacheado.
 - Cada Server Action autentica, autoriza por objeto e valida o payload, porque
   o cliente pode chamá-la diretamente.
-- O middleware guarda apenas lógica curta e compatível com o runtime da rota.
+- O `proxy.ts` guarda apenas lógica curta e compatível com o runtime Node,
+  como redirect, header e cookie.
 - Dependências de comportamento do host, como headers e limites de tempo,
   ficam documentadas.
 
@@ -59,14 +67,18 @@ limite entre servidor e cliente.
   filho interativo.
 - O mesmo conteúdo buscado em vários componentes aninhados, em cascata.
 - Mutation sem revalidação, com a tela exibindo o cache antigo.
+- `middleware.ts` em projeto Next.js 16, quando o arquivo correto é
+  `proxy.ts`.
+- `revalidateTag("tag")` com um argumento, formato depreciado no Next.js 16.
 - Variável de ambiente sem o prefixo `NEXT_PUBLIC_` usada em Client
   Component.
 - Server Action sem autorização por ser considerada acessível só pela tela.
 
 ## Como conferir o resultado
 
-- `next build`, lint e typecheck passam. O relatório de rotas do build
-  (estática, dinâmica ou ISR) corresponde ao cache declarado.
+- `next build`, lint separado e typecheck passam. O relatório de rotas do
+  build usa `○` para estático, `●` para SSG, `ƒ` para dinâmico e `◐` para
+  Partial Prerender, e corresponde ao cache declarado.
 - `loading`, `error`, `not-found`, redirects e autorização foram exercitados
   com acesso direto pela URL.
 - Cache hit, cache miss e invalidação foram provados, sem vazamento entre

@@ -73,6 +73,8 @@ registrada com a [Arquitetura](architecture.md).
 - A citação aponta a página e a seção específicas.
 - A síntese preserva o necessário para a escolha, sem transcrições longas.
 - Fontes que mudam entre releases trazem versão e data.
+- Um RFC obsoletado, um Internet-Draft expirado ou uma versão substituída não
+  sustentam a conclusão, mesmo que o link ainda abra.
 - Fontes em conflito aparecem como conflito declarado.
 - A pesquisa fica no local definido pela spec do projeto, sem um `research.md`
   paralelo.

@@ -27,6 +27,12 @@ description: Revisar diffs, branches e PRs por contrato, correção, segurança,
    seção que a fase está escrevendo. Leia também `.specsfy/STACK.md` e
    `.specsfy/RULES.md` antes de julgar o diff, porque eles definem a stack e
    as regras que o código deve seguir.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, leia e
+     registre no item de `specs/backlog/`; em specify e validate, leia a spec
+     aberta (linha `| Especialistas |`, subseção `#### Especialistas`, seção
+     em escrita) e escreva nela; em `specsfy-06-implement`, siga a tarefa
+     indicada. Só `specsfy-05-tasks` escreve a seção 14: aqui apenas se indica
+     o que a tarefa deve prever, sem criar tarefa.
 2. Siga o modo indicado na spec ou na tarefa, no formato
    `Especialista: $specsfy-specialist-code-review`. Sem indicação, confirme
    pelo "Quando usar" acima qual diff ou PR está sob revisão.
@@ -63,6 +69,8 @@ description: Revisar diffs, branches e PRs por contrato, correção, segurança,
 
 - Priorizar bugs e falhas concretas; não transformar preferência de estilo em
   bloqueador.
+- Aprovar a mudança que melhora a saúde do código do sistema, sem exigir que o
+  diff fique perfeito: perfeccionismo atrasa entrega e não reduz defeito.
 - Cada achado descreve condição de entrada, consequência observável e a
   comprovação que comprova (linha, teste, log).
 - Considerar compatibilidade com clientes existentes, concorrência, plano de

@@ -58,6 +58,17 @@ Um command apoiado em script do framework usa `ScriptCommandDef` em
 `src/cli/commands/<grupo>.ts`. A mesma definição gera o command do CLI e a
 tool MCP, por isso os dois nunca divergem.
 
+`NativeProjectCommandDef` usa os mesmos adaptadores para comandos nativos.
+`specialists suggest`, `verify` e a aba Specs compartilham a leitura de
+declarações e instalações em `src/domain/spec-specialists.ts`. O `verify`
+cruza o catálogo com as specs já analisadas pelo script da política e
+acrescenta avisos à resposta do binário. Consulte a
+[spec 0023](../../cli/specs/0023-especialistas-na-spec.md) para o contrato.
+
+A transição de estado atualiza os vínculos do backlog cujo campo
+`Spec promovida` aponta para o caminho anterior do `spec.md`. Se uma gravação
+falhar, a operação restaura a spec e os vínculos já gravados.
+
 ## Scripts embutidos
 
 A árvore de [`skills/`](../../skills/) entra no binário como texto em

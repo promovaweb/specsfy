@@ -82,6 +82,10 @@ você reabrir a área. O adiamento preserva os pontos para retomada. Quando aind
 houver lacunas aplicáveis, a spec permanece `Status: Draft` e o
 `Definition Gate: Pending`.
 
+Quando você autorizar a skill a decidir, ela registra a opção recomendada como
+`Escolha delegada`, com a fonte da autorização e até onde a escolha vale.
+Respostas diretas suas e evidências do projeto ficam em seus próprios registros.
+
 ## O que esperar
 
 - perguntas adaptadas ao caso, agrupadas em rodadas numeradas.

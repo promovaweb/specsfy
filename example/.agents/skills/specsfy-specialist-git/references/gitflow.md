@@ -8,15 +8,18 @@
 | `develop`    | `main` (uma vez)     | —                       | Permanente; integração contínua     |
 | `feature/*`  | `develop`            | `develop`               | Curta; uma feature por branch       |
 | `release/*`  | `develop`            | `main` e `develop`      | Curta; só correção e preparação     |
-| `hotfix/*`   | `main`               | `main` e `develop`      | Curta; correção urgente em produção |
+| `hotfix/*`   | `main`               | `main` e `develop` ou release em curso | Curta; correção urgente em produção |
 | `support/*`  | `main` (tag antiga)  | conforme decisão local  | Longa; manutenção de versão anterior|
 
 ## Equivalência `git flow` (AVH) → Git puro
 
-O binário `git flow` automatiza os mesmos comandos Git; usar Git puro é
-equivalente e não exige a extensão instalada:
+Os exemplos em Git puro aplicam a política de merge do Specsfy. São
+sequências de referência para o caso simples, com configuração compatível e
+sem release em curso. A extensão pode usar prefixos
+de tag diferentes ou fazer fast-forward no fechamento de uma feature de um
+só commit. O repositório oficial do AVH está arquivado desde 2023.
 
-- `git flow feature start <nome>` ≡
+- `git flow feature start <nome>` →
   `git checkout -b feature/<nome> develop`
 - `git flow feature finish <nome>` ≡
   `git checkout develop && git merge --no-ff feature/<nome> && git branch -d feature/<nome>`
@@ -43,7 +46,7 @@ equivalente e não exige a extensão instalada:
 ## Por que Gitflow nem sempre é a escolha certa
 
 Vincent Driessen, autor do modelo original, publicou em 2020 uma nota no
-próprio repositório reconhecendo que Gitflow foi desenhado para um cenário de
+artigo original reconhecendo que Gitflow foi desenhado para um cenário de
 releases versionadas e espaçadas, e que projetos com entrega contínua
 tendem a se beneficiar mais de um modelo mais simples (trunk-based ou GitHub
 Flow). Proponha a alternativa quando o projeto fizer múltiplos deploys por
@@ -53,8 +56,7 @@ dia; não insista em Gitflow como padrão universal.
 
 - Modelo original (Vincent Driessen, "A successful Git branching model"):
   https://nvie.com/posts/a-successful-git-branching-model/
-- Repositório e extensão `git-flow` (AVH Edition), incluindo a nota de 2020
-  sobre quando não usar Gitflow:
+- Repositório arquivado da extensão `git-flow` (AVH Edition):
   https://github.com/petervanderdoes/gitflow-avh
 - git-merge (`--no-ff`): https://git-scm.com/docs/git-merge
 - git-tag: https://git-scm.com/docs/git-tag

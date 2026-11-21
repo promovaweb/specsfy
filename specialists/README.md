@@ -42,10 +42,15 @@ telas e o nome da equipe ativa visível. Primitives shadcn/ui e
 blocos gratuitos ReUI podem acelerar a composição; o registro local de
 componentes e telas continua em `INTERFACE.md`.
 
-O catálogo cobre a stack Promovaweb, design de interfaces, qualidade,
+O catálogo reúne 27 especialistas: Laravel, MCP, Supabase, PostgreSQL, MySQL,
+MongoDB, Redis, Modelagem, Arquitetura, Interface, Componentes de UI, React,
+Tailwind CSS, Next.js, TypeScript, Docker, Servidor, Cloudflare, Entrega, n8n,
+Git, Observabilidade, Testes, Segurança de Aplicações, Code Review, Debugging e
+Pesquisa. Ele cobre a stack Promovaweb, design de interfaces, qualidade,
 arquitetura, operação e disciplinas de engenharia. A referência completa de
 instalação e uso pertence à
-[`documentação do Specsfy`](../docs/).
+[`documentação do Specsfy`](../docs/), com um guia por especialista em
+[`docs/user/specialists`](../docs/user/specialists.md).
 
 Para release, deploy ou inclusão de servidor, use somente
 `specsfy-specialist-delivery`. A orquestradora prepara o `SEMVER`, inspeciona a

@@ -3,7 +3,7 @@
  * on the right.
  *
  * The detail shows title, state, the three gates (named in text and color),
- * tasks, checklist and progress, followed by the spec Markdown in a
+ * tasks, checklist, specialists and progress, followed by the spec Markdown in a
  * scrollable view. Up/Down (or j/k) change the selection, PgUp/PgDn scroll
  * the Markdown, `g` opens the Gates tab on the selected spec and `r`
  * reloads. The selection survives automatic reloads because it is kept by
@@ -13,6 +13,7 @@ import { BoxRenderable, type CliRenderer, type Renderable } from "@opentui/core"
 import type { SpecSummary } from "../../core/overview.ts";
 import { actionBar, selectList, markdownView, markdownStyle, panel, keyValueTable, progressBar, fit, dim, type SelectItem, listWidth } from "../components.ts";
 import { nextFolders } from "../../domain/lifecycle.ts";
+import { readSpecSpecialists, SPECIALIST_PREFIX } from "../../domain/spec-specialists.ts";
 import type { Theme } from "../theme.ts";
 import type { Screen, ScreenContext } from "../screen.ts";
 import type { ProjectStore, StoreState } from "../store.ts";
@@ -42,7 +43,7 @@ export function specItems(theme: Theme, specs: SpecSummary[]): SelectItem[] {
   return items;
 }
 
-function detailRows(renderer: CliRenderer, theme: Theme, spec: SpecSummary): Renderable[] {
+function detailRows(renderer: CliRenderer, theme: Theme, spec: SpecSummary, specialists = "…"): Renderable[] {
   const gate = (value: string) => gateTone(theme, value);
   const definition = gate(spec.definition_gate);
   const plan = gate(spec.plan_gate);
@@ -51,6 +52,7 @@ function detailRows(renderer: CliRenderer, theme: Theme, spec: SpecSummary): Ren
     keyValueTable(renderer, theme, [
       ["Title", spec.title, theme.textStrong],
       ["State", `${folderLabel(spec.folder)} · status ${spec.status}`],
+      ["Especialistas", specialists, specialists.includes("(!)") ? theme.warn : theme.text],
       ["Definition gate", definition.text, definition.color],
       ["Plan gate", plan.text, plan.color],
       ["Delivery gate", delivery.text, delivery.color],
@@ -186,9 +188,19 @@ export function createSpecsScreen(store: ProjectStore, focus: SpecFocus): Screen
         focus.spec = spec.path;
         replaceChildren(detail, detailRows(renderer, theme, spec));
         reader?.setTitle(spec.relativePath);
-        store.services.readText(spec.path).then(
-          (content) => { if (mine === generation) reader?.setMarkdown(content); },
-          (error) => { if (mine === generation) reader?.setMarkdown(`Unable to read the spec: ${errorMessage(error)}`); },
+        Promise.all([store.services.readText(spec.path), store.services.installedSpecialists(store.project)]).then(
+          ([content, installed]) => {
+            if (mine !== generation) return;
+            const names = readSpecSpecialists(content).map((name) =>
+              name.slice(SPECIALIST_PREFIX.length) + (installed.has(name) ? "" : " (!)"));
+            replaceChildren(detail, detailRows(renderer, theme, spec, names.join(", ") || "none"));
+            reader?.setMarkdown(content);
+          },
+          (error) => {
+            if (mine !== generation) return;
+            replaceChildren(detail, detailRows(renderer, theme, spec, "unavailable"));
+            reader?.setMarkdown(`Unable to read the spec: ${errorMessage(error)}`);
+          },
         );
       };
 

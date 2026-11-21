@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - MySQL"
+  short_description: "Schema, plano e operação de MySQL"
+  default_prompt: "Use $specsfy-specialist-mysql para orientar esta tarefa com padrões e validação especializados."

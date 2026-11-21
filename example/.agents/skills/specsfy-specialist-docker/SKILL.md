@@ -1,6 +1,6 @@
 ---
 name: specsfy-specialist-docker
-description: Criar, revisar e operar imagens Docker, ambientes Compose e stacks Docker Swarm com builds reproduzíveis, segurança, saúde, rollout e recuperação. Use no modo compose para Dockerfile, BuildKit, Compose de desenvolvimento e CI, registry, política de tag e container que não builda, não sobe ou não responde ao healthcheck; use no modo swarm para docker swarm init/join, docker stack deploy, topologia de managers e workers, redes overlay, secrets, configs, update_config, rollback e recuperação de quorum. Não use para coordenar release ou deploy com SEMVER e Vault (`$specsfy-specialist-delivery`), para o host Debian e o Docker Engine (`$specsfy-specialist-server`), para supply chain e CVE de dependência (`$specsfy-specialist-application-security`) nem para escolher os sinais que autorizam o rollout (`$specsfy-specialist-observability`).
+description: Criar, revisar e operar imagens Docker, ambientes Compose e stacks Docker Swarm com builds reproduzíveis, segurança, saúde, rollout e recuperação. Use no modo compose para Dockerfile, BuildKit, Compose de desenvolvimento e CI, registry, política de tag e container que não builda, não sobe ou não responde ao healthcheck; use no modo swarm para docker swarm init/join, docker stack deploy, topologia de managers e workers, redes overlay, secrets, configs, update_config, rollback e recuperação de quorum; use no modo proxy para Traefik v3 no Compose e no Swarm, roteamento HTTP, middlewares, TLS com ACME e dashboard protegido. Não use para coordenar release ou deploy com SEMVER e Vault (`$specsfy-specialist-delivery`), para o host Debian e o Docker Engine (`$specsfy-specialist-server`), para supply chain e CVE de dependência (`$specsfy-specialist-application-security`) nem para escolher os sinais que autorizam o rollout (`$specsfy-specialist-observability`).
 ---
 
 # Docker
@@ -8,7 +8,7 @@ description: Criar, revisar e operar imagens Docker, ambientes Compose e stacks 
 Cobre o empacotamento em imagem e o Compose de desenvolvimento e CI (modo
 compose) e a operação de serviços em Docker Swarm (modo swarm). O modo compose
 entrega imagem pequena, reproduzível e sem root; o modo swarm decide topologia,
-redes, secrets e rollout entre nós.
+redes, secrets e rollout entre nós. O modo proxy configura a entrada HTTP e HTTPS com Traefik.
 
 ## Quando usar
 
@@ -18,6 +18,7 @@ redes, secrets e rollout entre nós.
 | Reduzir imagem, remover segredo vazado em camada ou corrigir processo que não recebe `SIGTERM` | compose | [Padrões comuns, build e Compose](references/standards.md) |
 | Orquestrar múltiplos nós com `docker swarm init/join`, `docker stack deploy` ou arquivo de stack com `deploy:` | swarm | [Topologia, rollout e recuperação](references/swarm.md) |
 | Decidir managers e workers, rollout, rollback, secrets, redes overlay ou recuperação de quorum | swarm | [Topologia, rollout e recuperação](references/swarm.md) |
+| Configurar ou revisar Traefik v3, rotas, TLS com ACME ou dashboard protegido no Compose ou Swarm | proxy | [Traefik](references/traefik.md) |
 
 Não use para:
 
@@ -42,9 +43,14 @@ escreve e a conclusão volta para a spec.
    está escrevendo, mais `.specsfy/STACK.md` e `.specsfy/RULES.md`. Abrir
    `.specsfy/DATABASE.md` quando o trabalho tocar volume, persistência ou
    serviço de dados.
+   - Fonte de entrada por fase: em `specsfy-02-backlog`, sem spec, ler e
+     registrar no item de `specs/backlog/`; em specify e validate, ler a spec
+     aberta (linha `| Especialistas |`, subseção 8, seção em escrita); só
+     `specsfy-05-tasks` escreve a seção 14, então apenas indicar o que a tarefa
+     deve prever; em `specsfy-06-implement`, seguir a tarefa indicada.
 2. Seguir o modo indicado na spec ou na tarefa
-   (`Especialista: $specsfy-specialist-docker (compose)` ou `(swarm)`); sem
-   indicação, escolher pelo "Quando usar".
+   (`Especialista: $specsfy-specialist-docker (compose)`, `(swarm)` ou `(proxy)`);
+   sem indicação, escolher pelo "Quando usar".
 3. Devolver as conclusões para a seção da spec ou para a tarefa que a fase está
    escrevendo, nunca em arquivo paralelo. Se faltar informação, registrar como
    dúvida aberta da spec.
@@ -62,10 +68,10 @@ escreve e a conclusão volta para a spec.
    antes de propor mudança.
 2. Inspecionar `Dockerfile`, `.dockerignore`, Compose, arquivo de stack e a
    política de imagem e tag já em uso pelo projeto.
-3. Classificar o trabalho em compose (imagem e ambiente local/CI) ou swarm
-   (topologia e serviços em cluster). Várias chaves do Compose (`profiles`,
-   `depends_on.condition`, `build` em runtime) não têm efeito em `docker stack
-   deploy`; Compose local não comprova comportamento do Swarm.
+3. Classificar o trabalho em compose (imagem e ambiente local/CI), swarm
+   (topologia e serviços em cluster) ou proxy (entrada HTTP/HTTPS). `docker stack
+   deploy` usa o formato Compose v3 legado, ignora `build` e não implementa
+   recursos da especificação atual, como `profiles` e `depends_on.condition`.
 4. Em release ou deploy, executar sob `$specsfy-specialist-delivery`, usar a
    versão que ele preparou, gerar a referência com `docker-tag` e recusá-la
    quando `verify-docker-tag` apontar diferença.
@@ -111,6 +117,19 @@ escreve e a conclusão volta para a spec.
 7. Documentar deploy, rollback, rotação de secret, backup do estado do Raft e
    recuperação de perda de manager.
 
+### Modo proxy
+
+1. Confirmar se o Traefik é a entrada escolhida e onde o TLS termina, incluindo
+   DNS, portas, redes e eventual proxy externo.
+2. Usar `providers.docker` no Compose e `providers.swarm` no Swarm. Conferir
+   se os labels estão no container ou no serviço e se a rede e a porta interna
+   levam ao backend esperado.
+3. Configurar entrypoints, routers, services e middlewares. Para TLS público,
+   selecionar o challenge ACME e preparar armazenamento persistente.
+4. Manter o dashboard desabilitado até haver rota TLS protegida e conferir
+   acesso à API Docker e ao dashboard antes de abrir a entrada.
+   Consulte [Traefik](references/traefik.md).
+
 ## Padrões
 
 No modo compose:
@@ -140,28 +159,37 @@ No modo swarm:
 - Em deploy coordenado por `$specsfy-specialist-delivery`, usar Cloudflare
   Tunnel como entrada pública padrão, com `cloudflared` e a aplicação na mesma
   rede overlay e sem publicar a porta do Laravel no host. Aceitar outro proxy
-  só quando a pessoa pedir a troca de forma explícita.
+  só quando a pessoa pedir a troca de forma explícita. (regra da casa)
 - Entregar o token do túnel por Docker Secret montado como arquivo e iniciar
-  `cloudflared` com `--token-file`; nunca guardar o valor na stack.
+  `cloudflared` 2025.4.0 ou posterior com `--token-file`; nunca guardar o
+  valor na stack.
 - Separar dependências, aplicação e ingress em stacks diferentes, publicar em
   ordem de dependência, aguardar a convergência de cada serviço e só então
-  abrir o caminho público.
+  abrir o caminho público. (regra da casa)
 - Concentrar migrations em uma réplica; os demais serviços sobem com migrations
   desativadas.
-- Manter número ímpar de managers (1, 3 ou 5), nunca com quorum dependente de um
-  único manager em produção, e preferir `--availability drain` nos managers.
+- Manter número ímpar de managers. Usar 3 ou 5 em produção para tolerar falhas
+  e preferir `--availability drain` nos managers dedicados ao plano de controle.
+  (regra da casa)
 - Publicar imagens por digest (`image@sha256:...`) acessíveis a todos os nodes;
   nenhum node pode divergir por ter build local.
 - Versionar secrets e configs por nome (`app_secret_v2`), nunca embutir segredo
   em variável de ambiente da stack.
 - Separar rede de ingress, rede interna de serviço e rede de dados; não expor
   porta de serviço interno via `ports:`. Criar redes overlay externas e
-  criptografadas antes das stacks.
+  criptografadas antes das stacks. (regra da casa)
 - Definir `resources.limits` e `reservations` explicitamente e aplicar
   `placement.constraints` só com labels administradas (`node.labels.*`), nunca
   com hostname hardcoded.
 - Não assumir que uma opção do Compose (`profiles`, `build`, `develop`,
   `depends_on` com `condition`) é respeitada por `stack deploy`.
+
+No modo proxy:
+
+- Usar `exposedByDefault: false` e habilitar explicitamente o que pode receber
+  tráfego. Publicar portas no proxy e colocar proxy e backend na mesma rede.
+- Restringir o acesso do Traefik à API Docker. Para o dashboard, encaminhar
+  `/api` e `/dashboard/` a `api@internal` com TLS e autenticação.
 
 ## Antipadrões
 
@@ -172,13 +200,18 @@ No modo swarm:
 - Dependência de build na camada final sem multi-stage e healthcheck que só
   confere a porta, ignorando banco ou fila.
 - Rolling update sem `update_config.order: start-first` em serviço com poucas
-  réplicas: a réplica antiga cai antes da nova ficar saudável.
+  réplicas, quando o serviço precisa de sobreposição para manter capacidade.
 - Volume local em serviço com múltiplas réplicas ou reagendamento: o dado
-  desaparece quando o scheduler move o container.
+  fica no node anterior quando o scheduler move a task.
 - Secret alterado in-place: o Swarm trata secrets como imutáveis por nome; crie
   `app_secret_v2`, anexe ao serviço e só então remova a versão antiga.
 - Usar o `docker-compose.yml` de desenvolvimento como stack de produção:
   healthcheck, `deploy:`, secrets e redes overlay costumam faltar ou divergir.
+
+- Reaproveitar `providers.docker.swarmMode` do Traefik v2 ou declarar labels
+  do Swarm fora de `deploy.labels`.
+- Publicar o dashboard com `api.insecure`, colocar credenciais em labels ou
+  compartilhar o mesmo arquivo ACME gravável entre réplicas.
 
 ## Validação
 
@@ -190,7 +223,7 @@ No modo swarm:
   declarada indisponível.
 - Rodar SBOM ou scanner disponível e inspecionar tamanho e número de camadas da
   imagem final. Não declarar imagem segura sem scanner, nem reproduzível sem
-  builds repetidos a partir do mesmo commit.
+  builds repetidos a partir do mesmo commit. (regra da casa)
 - No modo swarm, rodar `docker stack config --compose-file <arquivo>` antes do
   deploy e observar `docker service ps`, `docker service logs`, réplicas
   desejadas versus atuais e eventos do node durante todo o rollout, não apenas
@@ -202,10 +235,16 @@ No modo swarm:
   as duas versões coexistem. Sem esses quatro pontos, a stack não está pronta
   para produção; "funcionou no meu node" não é comprovação de convergência.
 
+- No modo proxy, provar resolução de DNS, redirecionamento HTTPS, certificado
+  esperado e roteamento ao backend sem publicar sua porta. Conferir a emissão
+  primeiro no ambiente de staging da CA e conferir persistência após restart.
+- Verificar que host desconhecido não encaminha à aplicação e que o dashboard
+  e a API estão bloqueados sem credenciais e acessíveis com elas.
+
 ## Skills relacionadas
 
 - `$specsfy-specialist-delivery` coordena release, SEMVER, Vault e a ordem da
-  entrega; este especialista cuida da imagem, do Compose e do Swarm.
+  entrega; este especialista cuida da imagem, do Compose, do Swarm e do Traefik.
 - `$specsfy-specialist-server` define o estado Debian do host, incluindo o
   serviço do Docker Engine que executa a imagem e os nodes do cluster.
 - `$specsfy-specialist-application-security` revisa supply chain, SBOM,
@@ -216,8 +255,12 @@ No modo swarm:
   `$specsfy-specialist-supabase` definem configuração, persistência e backup
   dos serviços de dados que rodam em container; este especialista cuida da
   imagem, dos volumes e da rede.
+- `$specsfy-specialist-mysql`, `$specsfy-specialist-mongodb`,
+  `$specsfy-specialist-n8n` e `$specsfy-specialist-cloudflare` recebem a
+  imagem, o volume e a rede definidos aqui; a configuração de cada serviço
+  continua com eles.
 
 Leia [references/standards.md](references/standards.md) para os padrões comuns,
-o índice dos modos, build, Compose, base images, scan e sinais, e
+o índice dos modos, build, Compose, base images, scan e sinais,
 [references/swarm.md](references/swarm.md) para Raft, redes overlay, placement,
-rollout e recuperação.
+rollout e recuperação e [references/traefik.md](references/traefik.md) para proxy.

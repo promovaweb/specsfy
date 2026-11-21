@@ -6,8 +6,10 @@ registry para obter o nome e a API atual antes da instalação.
 Consulte a [matriz de famílias e primitives](reui-components-free.md) para
 expandir a busca. Escolha por tarefa e estado da tela.
 
-Os componentes internos mais extensos têm variantes Base UI e Radix UI. Use a
-variante correspondente ao projeto.
+Os componentes internos têm variantes Base UI e Radix UI. Use a variante
+correspondente ao projeto. Itens `c-*` e as primitives compartilhadas que eles
+declaram (por exemplo `@reui/data-grid`) são gratuitos; blocos pagos, templates
+e ícones usam o mesmo namespace e exigem licença.
 
 ## Mapa obrigatório para CRUDs
 

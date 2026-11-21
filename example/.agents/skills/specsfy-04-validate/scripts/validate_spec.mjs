@@ -29,6 +29,49 @@ function minimumBddErrors(body) {
   return errors;
 }
 
+const crudOperations = new Map([
+  ["listar", { control: /DataGrid/i, label: "DataGrid com coluna ID", task: /\blist(?:ar|agem|a)\b/i }],
+  ["consultar", { control: /\b(?:detalhe|consulta)\b/i, label: "acesso ao detalhe", task: /\b(?:consult(?:ar|a)|detalh(?:ar|e))\b/i }],
+  ["criar", { control: /(?:formulários?|ação|ações|botão|botões)[^.]*(?:\bcriar\b|criação|cadastro)/i, label: "formulário ou ação de criação", task: /(?:\bcriar\b|criação|\bcadastr(?:ar|o)\b)/i }],
+  ["editar", { control: /(?:formulários?|ação|ações|botão|botões)[^.]*(?:\beditar\b|edição)/i, label: "controle de edição", task: /(?:\beditar\b|edição)/i }],
+  ["apagar", { control: /(?:ação|ações|botão|botões)[^.]*(?:\bapagar\b|\bexcluir\b|exclusão)/i, label: "ação de exclusão", task: /(?:\bapagar\b|\bexcluir\b|exclusão)/i }],
+]);
+
+function crudErrors(content, body) {
+  const prefix = "Interface para pessoas: Contrato CRUD";
+  const declaration = /^[ \t]*(?:[-*][ \t]+)?(?:\*\*Operações\*\*:|\*\*Operações:\*\*|Operações:)[ \t]*(.*)$/gim;
+  const declarations = [...content.matchAll(declaration)];
+  if (!declarations.length) {
+    return [/PageHeader/i, /DataGrid/i, /\bID\b/, /editar/i, /apagar/i].every(pattern => pattern.test(content))
+      ? []
+      : [`${prefix} precisa declarar PageHeader, DataGrid, ID, editar e apagar.`];
+  }
+
+  const operations = declarations[0][1].toLowerCase().split(",").map(operation => operation.trim());
+  if (declarations.length !== 1 || new Set(operations).size !== operations.length ||
+      operations.some(operation => !crudOperations.has(operation))) {
+    return [`${prefix} exige uma linha Operações com itens distintos: listar, consultar, criar, editar, apagar.`];
+  }
+
+  const controls = content.replace(declaration, "");
+  const errors = [];
+  if (!/PageHeader/i.test(controls)) errors.push(`${prefix} precisa declarar PageHeader.`);
+  const taskSection = body.match(/^###[ \t]+(?:14\.[ \t]+)?Tarefas[ \t]*$([\s\S]*?)(?=^###[ \t]+|(?![\s\S]))/im)?.[1] ?? "";
+  const tasks = [...taskSection.matchAll(/^[ \t]*- \[[ xX]\] T\d{3,}[ \t]+((?:\[[^\]\r\n]+\][ \t]+)+)([^\r\n]+)/gm)];
+  const codeTasks = tasks.filter(task => task[1].includes("[CODE]"))
+    .map(task => task[2].split(/[—-] Refs:/)[0]);
+  for (const operation of operations) {
+    const { control, label, task } = crudOperations.get(operation);
+    if (!control.test(controls) || (operation === "listar" && !/\bID\b/.test(controls))) {
+      errors.push(`${prefix}: ${operation} exige ${label}.`);
+    }
+    if (tasks.length && !codeTasks.some(description => task.test(description))) {
+      errors.push(`${prefix}: ${operation} exige uma tarefa [CODE] na seção 14.`);
+    }
+  }
+  return errors;
+}
+
 /** Exige o contrato de interface e, quando aplicável, o contrato CRUD. */
 function interfaceErrors(body, status) {
   const value = field(body, "Interface para pessoas");
@@ -71,9 +114,7 @@ function interfaceErrors(body, status) {
     if (title === "Revisão visual durante o desenvolvimento" && visualChecks.some(([pattern]) => !pattern.test(content))) {
       errors.push("Interface para pessoas: Revisão visual durante o desenvolvimento precisa conferir bordas, espaçamentos, margens, padding e tipografia.");
     }
-    if (title === "Contrato CRUD" && (!/PageHeader/i.test(content) || !/DataGrid/i.test(content) || !/\bID\b/.test(content) || !/editar/i.test(content) || !/apagar/i.test(content))) {
-      errors.push("Interface para pessoas: Contrato CRUD precisa declarar PageHeader, DataGrid, ID, editar e apagar.");
-    }
+    if (title === "Contrato CRUD") errors.push(...crudErrors(content, body));
   }
   return errors;
 }

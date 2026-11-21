@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - MongoDB"
+  short_description: "Documento, índice e operação de MongoDB"
+  default_prompt: "Use $specsfy-specialist-mongodb para orientar esta tarefa com padrões e validação especializados."

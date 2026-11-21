@@ -191,6 +191,13 @@ npx skills add https://github.com/promovaweb/specsfy \
   --skill specsfy-specialist-<nome> --agent universal --copy --full-depth
 ```
 
+O catálogo reúne 27 especialistas: Laravel, MCP, Supabase, PostgreSQL, MySQL,
+MongoDB, Redis, Modelagem, Arquitetura, Interface, Componentes de UI, React,
+Tailwind CSS, Next.js, TypeScript, Docker, Servidor, Cloudflare, Entrega, n8n,
+Git, Observabilidade, Testes, Segurança de Aplicações, Code Review, Debugging e
+Pesquisa. O guia de cada um está em
+[docs/user/specialists.md](../docs/user/specialists.md).
+
 As bases informam o nome, a finalidade e as dependências do especialista. Se
 ele já estiver instalado, carregam-no na mesma conversa. Se estiver ausente,
 avisam que executarão o comando acima, pedem autorização específica e só então

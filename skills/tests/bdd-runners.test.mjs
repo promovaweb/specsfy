@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
-import { ROOT, temporary, put, node } from '../../tests/helpers.mjs';
+import { ROOT, read, temporary, put, node } from '../../tests/helpers.mjs';
 
 const trace = join(ROOT, 'skills/specsfy-06-implement/scripts/check_traceability.mjs');
 const tasks = join(ROOT, 'skills/specsfy-05-tasks/scripts/validate_tasks.mjs');
@@ -55,4 +55,37 @@ test('plano recusa menos de três predecessores TDD na feature e na história', 
 test('caminho para feature não conta como tarefa TDD executável', t => {
   const result = validate(temporary(t), header + '- [ ] T001 [TEST] [US-001] Referenciar cenário em specs/example.feature — Refs: US-001, FR-001, NFR-001, AC-001 — Depends: none\n');
   assert.ok(result.errors.includes('A feature possui 0 predecessor(es) TDD; mínimo exigido: 3.'), result.errors.join('\n'));
+});
+
+test('projeto copiado sem .git valida evidência a partir da raiz do consumidor', t => {
+  const root = temporary(t);
+  const predecessors = ['AC-001', 'AC-002', 'AC-003']
+    .map((ac, index) => task(`T00${index + 1}`, ac) + checklist).join('');
+  const text = '| Evidence Contract | 1 |\n' + header + predecessors;
+  const verifier = '.agents/skills/specsfy-06-implement/scripts/verify_evidence.mjs';
+  put(root, verifier, read('skills/specsfy-06-implement/scripts/verify_evidence.mjs'));
+  put(root, 'nested/project/' + verifier, read('skills/specsfy-06-implement/scripts/verify_evidence.mjs'));
+  put(root, 'nested/project/.specsfy/STACK.md', '# Stack\n');
+  for (const [path, options] of [
+    ['specs/defined/0001-example/spec.md', []],
+    ['specs/specs/0002-example/spec.md', []],
+    ['nested/project/specs/defined/0001-example/spec.md', []],
+    ['nested/project/work/feature/spec.md', []],
+    ['export/feature/spec.md', ['--project', root]],
+  ]) {
+    const spec = put(root, path, text);
+    const result = node(tasks, [...options, spec, '--allow-draft', '--json']);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+  }
+});
+
+test('regressão pós-código não satisfaz a cobertura TDD de um aceite', t => {
+  const root = temporary(t);
+  const predecessors = task('T001', 'AC-001') + checklist + task('T002', 'AC-002') + checklist;
+  const code = '- [ ] T003 [CODE] Implementar em app/Example.php — Refs: US-001, FR-001, NFR-001, AC-001, AC-002, AC-003 — Depends: T001, T002\n' + checklist;
+  const regression = '- [ ] T004 [TEST] Rodar regressão [TDD] do ciclo anterior em tests/Feature/ExampleTest.php — Refs: US-001, FR-001, NFR-001, AC-003 — Depends: T003\n' + checklist;
+  const result = validate(root, header + predecessors + code + regression);
+  assert.equal(result.counts.tdd, 2);
+  assert.equal(result.counts.regression, 1);
+  assert.ok(result.errors.includes('AC-003 não possui tarefa TDD informada pelo BDD da spec.'));
 });

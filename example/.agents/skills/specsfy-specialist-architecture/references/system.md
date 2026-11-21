@@ -12,9 +12,13 @@
   complexidade local justifica, geralmente gerado a partir do código, não
   mantido à mão.
 
-Views adicionais conforme a decisão: **Dados** (ownership, modelo de
-consistência, ciclo de vida/retenção) e **Deployment** (processos, nodes,
-rede, dependências de infraestrutura). arc42 oferece um template completo de
+Além dos quatro níveis centrais, o C4 prevê três diagramas suplementares:
+**System Landscape** (o território ao redor do sistema, quando o contexto
+sozinho não basta), **Dynamic** (uma colaboração ou caso de uso em execução,
+com a ordem das chamadas) e **Deployment** (instâncias, nodes, rede e
+dependências de infraestrutura). Um **modelo de dados** com ownership,
+consistência e ciclo de vida é prática comum de projeto, mas não é um diagrama
+do C4: registre-o como artefato próprio. arc42 oferece um template completo de
 documento de arquitetura equivalente, organizado em 12 seções.
 
 ## Atributos de qualidade como cenário, não adjetivo
@@ -73,4 +77,5 @@ ele registra o raciocínio por trás da escolha estrutural.
 - SEI Quality Attribute Scenarios: https://www.sei.cmu.edu/library/applicability-of-general-scenarios-to-the-architecture-tradeoff-analysis-method/
 - Team Topologies: https://teamtopologies.com/key-concepts
 - The Clean Architecture (regra de dependência): https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
-- RFC 2119 (linguagem normativa em documentos técnicos): https://www.rfc-editor.org/rfc/rfc2119
+- RFC 2119 e RFC 8174 juntas como BCP 14 (linguagem normativa em documentos
+  técnicos): https://www.rfc-editor.org/info/bcp14

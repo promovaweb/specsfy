@@ -5,6 +5,7 @@ import { SCREEN_IDS, createScreens } from "../../src/tui/screens/index.ts";
 import { SETTINGS_SCHEMA } from "../../src/config/settings.ts";
 import { createProjectStore } from "../../src/tui/store.ts";
 import { themes } from "../../src/tui/theme.ts";
+import { put, validSpec } from "../gates/helpers.ts";
 import { EXAMPLE, emptyProject, fakeServices, isolateHome, mount } from "./helpers.ts";
 
 let restoreHome: () => void;
@@ -20,6 +21,21 @@ describe("screen registry", () => {
     const setting = SETTINGS_SCHEMA.find((entry) => entry.key === "tui.initialTab");
     expect(setting?.values).toEqual([...SCREEN_IDS]);
   });
+});
+
+test("the Specs preview marks missing specialist installs and preserves the narrow footer", async () => {
+  const project = emptyProject();
+  put(project.path, "specs/defined/0001-lista/spec.md", validSpec({ Especialistas: "interface, laravel" }));
+  put(project.path, ".agents/skills/specsfy-specialist-interface/SKILL.md", "# Installed");
+  const tui = await mount({ project: project.path, initialTab: "specs", width: 80, height: 24 });
+  try {
+    const frame = await tui.waitFor("laravel (!)", 1000);
+    expect(frame).toMatch(/Especialistas +interface, laravel \(!\)/);
+    expect(frame).toContain("quit");
+  } finally {
+    await tui.close();
+    project.cleanup();
+  }
 });
 
 describe("example project", () => {

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Specsfy - Especialista - n8n"
+  short_description: "Workflows, hospedagem e integração n8n"
+  default_prompt: "Use $specsfy-specialist-n8n para orientar esta tarefa com padrões e validação especializados."

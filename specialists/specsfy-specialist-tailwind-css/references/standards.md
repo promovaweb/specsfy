@@ -1,5 +1,7 @@
 # Padrões e referências Tailwind CSS
 
+Revisado em 2026-11-20 contra: Tailwind CSS v4.3 (blog de v4.3, docs de CLI, theme e detecting classes).
+
 ## Camadas do sistema
 
 | Camada | Papel | Exemplo |
@@ -21,12 +23,19 @@ visual).
   base/components/utilities` no CSS de entrada.
 - Tailwind v4: tokens declarados diretamente em CSS via `@theme`, uma única
   diretiva `@import "tailwindcss"`, detecção de conteúdo automática por
-  padrão (menos necessidade de `content` explícito). Não misture sintaxe de
-  configuração entre as duas gerações sem confirmar a versão instalada no
-  lockfile.
-- `compatibility`/guia de upgrade oficial lista as mudanças de default
-  (cores, `ring`, `border`) entre versões majors — checar antes de migrar um
-  projeto existente.
+  padrão (menos necessidade de `content` explícito). `@source` amplia a
+  detecção para arquivos fora do projeto ou de bibliotecas; `@utility` cria
+  utilitário customizado, com `--value()` e `--default()` (v4.3); `@variant`
+  aplica variantes em CSS e aceita variantes empilhadas e compostas desde a
+  v4.3. `@config` continua carregando um `tailwind.config.js` legado.
+- Não misture sintaxe de configuração entre as duas gerações sem confirmar a
+  versão instalada no lockfile.
+- A v4.2 trouxe `@tailwindcss/webpack`, paletas `mauve`, `olive`, `mist` e
+  `taupe`, utilitários de propriedade lógica e `font-features-*`. A v4.3
+  trouxe `scrollbar-*`, `scrollbar-gutter-*`, `@container-size`, `zoom-*` e
+  `tab-*`.
+- O guia de upgrade oficial lista as mudanças de default (cores, `ring`,
+  `border`) entre versões majors; checar antes de migrar um projeto existente.
 
 ## Detecção de classes
 
@@ -45,10 +54,13 @@ visual).
 
 - Mobile-first: a classe sem prefixo de breakpoint é a base; `sm:`, `md:`,
   `lg:`, `xl:`, `2xl:` sobrepõem a partir daquele breakpoint para cima.
-- `@container` (com um ancestral marcado `@container` e utilitários
-  `@sm:`/`@md:` no próprio Tailwind) resolve o caso em que o componente
-  precisa responder ao tamanho do contêiner (uma sidebar, um painel
-  redimensionável), não ao viewport da janela.
+- `@container` cria um contêiner de tamanho inline e resolve o caso em que o
+  componente precisa responder ao tamanho do contêiner (uma sidebar, um painel
+  redimensionável), não ao viewport da janela. `@container-size` (v4.3) cria um
+  contêiner de tamanho completo, necessário quando a consulta usa `cqb`/`cqh`.
+- Prefira propriedades lógicas (`ms-`/`me-`, `pbs-`/`pbe-`, `inline-*`,
+  `block-*`, `inset-s-*`/`inset-e-*`) para layout que precisa funcionar em RTL.
+  `start-*` e `end-*` continuam existindo, mas estão depreciados desde a v4.2.
 - Zoom e reflow são requisitos de acessibilidade tratados como
   responsividade: o layout não pode exigir scroll horizontal a 400% de zoom
   (equivalente a uma viewport de 320px CSS de largura) para conteúdo que
@@ -79,25 +91,30 @@ visual).
 
 ## Comandos de verificação
 
-- `npx tailwindcss -i ./src/input.css -o ./dist/output.css --minify` gera o
-  CSS final fora de um framework com build step próprio; inspecionar o
-  arquivo gerado para confirmar que nenhuma classe usada ficou ausente.
+- `npx @tailwindcss/cli -i ./src/input.css -o ./dist/output.css --minify`
+  gera o CSS final fora de um framework com build step próprio. O binário
+  `tailwindcss` da v4 não traz mais o CLI; instale `tailwindcss` e
+  `@tailwindcss/cli` e use o comando acima. Inspecione o arquivo gerado para
+  confirmar que nenhuma classe usada ficou ausente.
 - Em projetos com framework (Next.js, Astro, Vite), o build do próprio
   framework (`next build`, `astro build`, `vite build`) já invoca o
   PostCSS/Tailwind configurado — rodar esse build é a validação real, não
   apenas o servidor de desenvolvimento.
-- `npx tailwindcss --help`/documentação do CLI lista as flags de watch e
-  minify; confirmar a versão com `npx tailwindcss --version` antes de aplicar
-  sintaxe de uma geração diferente da instalada.
+- `npx @tailwindcss/cli --help` lista as flags de watch e minify; confirmar a
+  versão instalada no lockfile antes de aplicar sintaxe de uma geração
+  diferente.
 
 ## Fontes oficiais
 
 - Documentação: https://tailwindcss.com/docs
 - Theme variables (v4): https://tailwindcss.com/docs/theme
+- Functions and directives: https://tailwindcss.com/docs/functions-and-directives
 - Responsive design: https://tailwindcss.com/docs/responsive-design
 - Dark mode: https://tailwindcss.com/docs/dark-mode
 - Hover/focus/other states: https://tailwindcss.com/docs/hover-focus-and-other-states
 - Container queries: https://tailwindcss.com/docs/responsive-design#container-queries
 - Detecting classes in source files: https://tailwindcss.com/docs/detecting-classes-in-source-files
 - Adding custom styles (`@apply`): https://tailwindcss.com/docs/adding-custom-styles
+- Tailwind CLI: https://tailwindcss.com/docs/installation/tailwind-cli
 - Compatibility / upgrade guide: https://tailwindcss.com/docs/compatibility
+- Tailwind CSS v4.3: https://tailwindcss.com/blog/tailwindcss-v4-3

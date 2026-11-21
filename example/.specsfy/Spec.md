@@ -180,7 +180,10 @@ Toda aplicação Laravel usa Laravel Octane como servidor de aplicação. O paco
 `swoole` para esse servidor. Código executado por workers persistentes não pode
 manter
 estado de uma requisição para a seguinte. Build, healthcheck, reload e deploy
-devem exercitar o processo Octane que atende o tráfego real.
+devem exercitar o processo Octane que atende o tráfego real. No setup, registre
+ausência de runtime ou de um dos seus componentes como pendência de stack.
+O setup pode fechar com a pendência registrada. Planeje a instalação e
+configuração como pré-condição do deploy.
 
 ## Contrato de experiência de interface
 
@@ -202,17 +205,18 @@ definição, a conversa deve esclarecer, somente nas lacunas reais:
 
 ### Contrato CRUD
 
-Quando a entrega incluir um CRUD, use os mesmos componentes em todas as telas
-da superfície. O `PageHeader` deve ser um componente único e reutilizável para
-lista, detalhe, criação e edição, com variações recebidas por props ou
-configuração. Não replique o markup do cabeçalho em cada página.
+No `Contrato CRUD` da seção 10, declare em `Operações` os itens incluídos
+entre `listar, consultar, criar, editar, apagar`. Specs anteriores sem a linha
+seguem o contrato completo. Use um único `PageHeader` reutilizável nas telas
+incluídas, com variações por props ou configuração.
 
-- A listagem usa um `DataGrid` que ocupa toda a largura disponível.
-- A coluna `ID` fica visível em toda listagem, inclusive quando a tela também
-  mostra nome, status ou outras informações do registro.
-- A linha inteira funciona como link para o detalhe por mouse e teclado.
-- Cada linha oferece ações independentes de editar e apagar. O botão de apagar
-  respeita a permissão e confirma a consequência antes de executar.
+- Ao listar, use um `DataGrid` que ocupe toda a largura e mostre a coluna `ID`.
+- Ao consultar, descreva o acesso ao detalhe. Se também houver listagem, a
+  linha inteira funciona como link por mouse e teclado.
+- Ao criar ou editar, descreva o formulário e como abrir a ação de cada operação.
+- Ao apagar, use uma ação independente que respeite a permissão e confirme a
+  consequência antes de executar.
+- Na seção 14, registre as tarefas das operações incluídas.
 - Componentes recorrentes de cabeçalho, tabela, linha, ações, formulário,
   estados e feedback são registrados em `INTERFACE.md` e reaproveitados antes
   de uma nova implementação.
@@ -266,8 +270,10 @@ suas telas e formulários: não se resume a rota, serviço ou persistência.
 
 Em projeto React, toda interface deve ser composta por componentes React.
 shadcn/ui fornece as primitives e ReUI fornece as composições gratuitas; para
-Laravel com React, a dupla é obrigatória. A página ou rota limita-se a obter
-dados e compor componentes de domínio. Formulários, tabelas, filtros, ações em
+Laravel com React, a dupla é obrigatória. No setup, registre ausência de
+shadcn/ui ou ReUI como pendência de stack e planeje a instalação como
+pré-condição do deploy. A página ou rota limita-se a obter dados e compor
+componentes de domínio. Formulários, tabelas, filtros, ações em
 lote, diálogos, painéis laterais, estados visuais e partes repetidas ficam em
 componentes próprios. Antes de criar uma peça, leia `INTERFACE.md`, localize
 algo reutilizável e registre nela cada arquivo criado ou reaproveitado, sua

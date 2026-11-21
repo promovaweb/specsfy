@@ -92,7 +92,7 @@ grava apenas quando uma option pede.
 | `task_next` | Próxima tarefa pronta da spec com o próximo item da checklist; `all` lista todas. | só lê |
 | `delivery_render` | Resumo de entrega: gates, IDs entregues, tarefas, provas e rollback. | só lê |
 | `inbox_process` | Move a captura para `specs/inbox/processed/` quando specs com o Definition Gate aprovado a cobrem. | altera |
-| `spec_transition` | Move a spec para uma pasta de estado vizinha e espelha o Status. | altera |
+| `spec_transition` | Move a spec para uma pasta de estado vizinha e atualiza o Status e os vínculos do backlog. | altera |
 | `spec_effort` | Registra o esforço de 1 a 10 com uma justificativa. | altera |
 | `specs_migrate` | Move specs dos layouts antigos para as pastas de estado, pelo Status. | altera |
 | `task_check` | Marca ou desmarca uma tarefa, ou um item da checklist, no `spec.md`. | altera |
@@ -104,7 +104,7 @@ grava apenas quando uma option pede.
 | `gate_evidence` | Confere as provas materiais das tarefas no Evidence Contract 1. | só lê |
 | `gate_findings` | Valida os achados de produto, arquitetura e segurança registrados na spec. | só lê |
 | `gate_database` | Confere que os testes usam um banco separado e que um comando não apaga dados. | só lê |
-| `verify` | Roda a política inteira do Specsfy e devolve o payload de atestação. | só lê; grava o atestado com `attestation` |
+| `verify` | Roda a política inteira, devolve o payload de atestação e informa avisos de especialistas em `warnings`. | só lê; grava o atestado com `attestation` |
 | `context_setup` | Cria o contexto mínimo do projeto e os blocos em `AGENTS.md` e `CLAUDE.md`, sem sobrescrever arquivos existentes. | altera |
 | `context_inspect` | Resume as fontes relevantes por grupo: instruções, manifests, rotas, persistência e testes. | só lê |
 | `context_interface` | Resume a stack de interface e as rotas e componentes atuais. | só lê |
@@ -120,6 +120,7 @@ grava apenas quando uma option pede.
 | `docs_build` | Reconstrói a documentação do projeto em `docs/` e `.specsfy/PACKAGES.md`; `check` só confere. | altera; `check` só lê |
 | `skills_list` | Lista as skills instaladas e as disponíveis no catálogo. | só lê |
 | `skills_detect` | Detecta os agentes e skills presentes no projeto. | só lê |
+| `specialists_suggest` | Sugere especialistas por sinal na spec, com modo, declaração e instalação. | só lê |
 | `framework_install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | altera |
 | `framework_update` | Deixa as skills do projeto iguais ao inventário do framework; `check` devolve só o plano. | altera |
 | `skills_install` | Instala um ou mais especialistas do catálogo. | altera |
@@ -130,6 +131,12 @@ As tools `framework_install`, `framework_update`, `skills_list`,
 `skills_detect`, `skills_install`, `skills_remove` e `update_check` pertencem
 às specs 0002 e 0011. Quando uma versão ainda não as registrar, `mcp --list`
 continua sendo a lista efetiva daquela versão.
+
+`specialists_suggest` recebe `spec` (número, slug, nome da pasta ou caminho)
+e `project` opcional. Retorna os dados de `specialists suggest --json`. Só
+sugere especialista de tecnologia quando a stack do projeto confirma a
+tecnologia, pela detecção do catálogo ou pelo `.specsfy/STACK.md`; o
+especialista declarado na spec aparece sempre.
 
 ## Resources
 

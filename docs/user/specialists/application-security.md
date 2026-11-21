@@ -46,7 +46,8 @@ Entrega. Este guia trata da aplicação e das informações que ela guarda.
   desserialização são tratados como entradas hostis por padrão.
 - A criptografia usa bibliotecas estabelecidas. Segredos, tokens e senhas
   ficam fora dos logs, inclusive em debug.
-- Credenciais são rotacionadas, com preferência por tokens de curta duração.
+- Credenciais estáticas são rotacionadas por compromisso ou troca de
+  tecnologia, com preferência por tokens de curta duração.
 - O rate limit considera o usuário, a API key ou o tenant, além do IP.
 - Cada vulnerabilidade corrigida ganha um teste de regressão.
 
@@ -99,5 +100,5 @@ npx skills add https://github.com/promovaweb/specsfy \
 
 As instruções completas que o agente segue estão no
 [SKILL.md do especialista](../../../specialists/specsfy-specialist-application-security/SKILL.md),
-com checklist de ameaças por limite de confiança, ASVS e cadeia de
+com checklist de ameaças por limite de confiança, ASVS 5.0.0 e cadeia de
 suprimentos no arquivo de referência da mesma pasta.
