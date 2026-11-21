@@ -4,6 +4,17 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.40.5] - 2026-11-21
+
+### Corrigido
+
+- A trava da transição de spec cobre a resolução da spec. Antes, a busca pelo
+  número acontecia antes de adquirir a trava. Se outro processo estivesse
+  renomeando a pasta naquele instante, a busca devolvia "não encontrada".
+  Isso aparecia como falha intermitente no CI de release e podia afetar dois
+  agentes movendo specs ao mesmo tempo. O teste concorrente passou 200 vezes
+  seguidas sob carga.
+
 ## [0.40.4] - 2026-11-20
 
 ### Corrigido
