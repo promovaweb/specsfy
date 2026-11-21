@@ -52,10 +52,13 @@ release-cli ──promove──► cli/CHANGELOG.md
   `npm publish <tgz> --access public`.
 - A seção `## [X.Y.Z] - YYYY-MM-DD` origina o corpo do release.
 - O GitHub Release usa a mesma seção do changelog, sem regeneração.
-- Após a publicação no npm, quando o Specsfy está no Hub, o script sincroniza
-  a documentação pública, publica o ebook e as imagens no R2, registra o
-  destino das páginas removidas, publica a release do website e confere a
-  documentação em produção.
+- Na preparação, o build conserva em `ebook/` a edição de `VERSION` e a maior
+  edição SemVer anterior. Cada edição tem PDF e EPUB.
+- Após a publicação no npm, o script sincroniza a documentação em um worktree
+  do website. Após `media:publicar`, executa `media:podar-ebook-specsfy` para
+  aplicar a retenção nos downloads locais, no manifesto de mídia e no R2.
+  O script registra o destino das páginas removidas, publica a release do
+  website quando há mudanças versionadas e confere a documentação em produção.
 - Em seguida, o script atualiza o gitlink do Specsfy no Hub e, quando houve
   publicação do site, o gitlink do website. Ele incrementa o patch do Hub e
   publica a release correspondente. O

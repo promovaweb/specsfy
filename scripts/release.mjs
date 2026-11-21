@@ -31,17 +31,10 @@
  *
  * Site — the documentation of promovaweb.com/docs/specsfy:
  *
- *   1. runs `npm run sync:docs:specsfy` in the Hub and takes the files it
- *      wrote under website/ (pages, build.json, ebook and images);
- *   2. moves them to a clean worktree of the website origin/main and gives
- *      the website checkout back as it was (other work there stays intact);
- *      a page the sync removed (its source left this repository) is deleted
- *      there; the page of a specialist renamed in skills/inventory.json gets
- *      a 301 to the new page in src/config/redirects.mjs and any other route
- *      a 410 in src/config/gone.mjs (routes that already have one are kept);
- *   3. publishes the media to R2 (`npm run media:publicar`), writes a
- *      sitespec, bumps the website patch version and changelog, commits only
- *      those paths, tags, pushes and creates the website GitHub Release;
+ *   1. sincroniza a documentação em um worktree limpo de origin/main;
+ *   2. registra 301 para páginas movidas e 410 para fontes retiradas;
+ *   3. envia a mídia ao R2 e mantém só o ebook vigente e o anterior nos downloads;
+ *      registra a sitespec, atualiza o patch e publica a release do website;
  *   4. runs `npm run site:specsfy:check` against production.
  *   The ClickUp record of the Website list stays manual (MCP website).
  *
@@ -58,10 +51,11 @@
  * working tree goes into the release commit.
  */
 import { execFileSync, spawnSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { planEditions } from "../.ebook/prune-editions.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const CLI = join(ROOT, "cli");
@@ -93,10 +87,7 @@ if (!version || !/^\d+\.\d+\.\d+$/.test(version)) {
 function step(title, command, args, cwd = ROOT) {
   console.log(`\n▸ ${title}`);
   const result = spawnSync(command, args, { cwd, stdio: "inherit" });
-  if (result.status !== 0) {
-    console.error(`✗ ${title} failed (exit ${result.status ?? "signal"})`);
-    process.exit(1);
-  }
+  if (result.status !== 0) throw new Error(`✗ ${title} failed (exit ${result.status ?? "signal"})`);
 }
 
 /** Runs a command and returns its trimmed stdout. */
@@ -282,46 +273,44 @@ function registerRemovedRoutes(worktree, routes) {
 /** Publishes the Specsfy documentation, ebook and images on the website. */
 function releaseSite() {
   const WEBSITE = join(HUB, "website");
-  const sync = spawnSync("npm", ["run", "sync:docs:specsfy"], { cwd: HUB, encoding: "utf8" });
-  if (sync.status !== 0) {
-    console.error(`✗ npm run sync:docs:specsfy failed\n${sync.stdout}${sync.stderr}`);
-    process.exit(1);
-  }
-  // The sync lists every path it wrote as "- website/<path>".
-  const written = [...new Set([...sync.stdout.matchAll(/^- website\/(\S+)$/gmu)].map(([, path]) => path))];
-  if (!written.length) {
-    console.log("✓ site already matches the Specsfy docs; nothing to publish");
-    return;
-  }
   step("website fetch", "git", ["fetch", "-q", "origin"], WEBSITE);
-  const worktree = join(mkdtempSync(join(tmpdir(), "specsfy-site-")), "website");
-  const branch = `specsfy-docs-${version}`;
-  step("website worktree", "git", ["worktree", "add", "-q", "-B", branch, worktree, "origin/main"], WEBSITE);
+  const temporary = mkdtempSync(join(tmpdir(), "specsfy-site-"));
+  const worktree = join(temporary, "website");
   try {
-    // A listed path that no longer exists was removed by the sync (its
-    // source left this repository): it leaves the site with a 410.
+    step("website worktree", "git", ["worktree", "add", "-q", "--detach", worktree, "origin/main"], WEBSITE);
+    if (!existsSync(join(worktree, "scripts/media-podar-ebook-specsfy.mjs"))) {
+      throw new Error("Publique o script de retenção no website antes de executar a etapa do site.");
+    }
+    symlinkSync(join(WEBSITE, "node_modules"), join(worktree, "node_modules"));
+    const sync = output("npm", ["run", "sync:docs:specsfy", "--", "--website-dir", worktree], HUB);
+    const downloads = join(worktree, "public/docs/specsfy/downloads");
+    const build = JSON.parse(readFileSync(join(downloads, "build.json"), "utf8"));
+    if (build.version !== version) throw new Error(`Ebook na versão ${build.version}; release na versão ${version}.`);
+
+    // O sincronizador lista os caminhos removidos junto com os gravados.
     const removed = [];
-    for (const path of written) {
-      if (!existsSync(join(WEBSITE, path))) {
-        rmSync(join(worktree, path), { force: true });
-        const route = /^src\/content\/opensource-docs\/specsfy\/(.+)\.mdx?$/u.exec(path);
-        if (route) removed.push(`/docs/specsfy/${route[1]}`);
-        continue;
+    for (const [, path] of sync.matchAll(/^- website\/(\S+)$/gmu)) {
+      const route = /^src\/content\/opensource-docs\/specsfy\/(.+)\.mdx?$/u.exec(path);
+      if (route && !existsSync(join(worktree, path))) removed.push(`/docs/specsfy/${route[1]}`);
+    }
+    const ebook = join(ROOT, "ebook");
+    const { retained, groups } = planEditions(ebook, 2, version);
+    const previousEdition = retained[1];
+    if (previousEdition) {
+      for (const file of groups.get(previousEdition)) {
+        copyFileSync(join(ebook, file), join(downloads, file));
       }
-      mkdirSync(dirname(join(worktree, path)), { recursive: true });
-      cpSync(join(WEBSITE, path), join(worktree, path));
     }
     const { moved, gone } = registerRemovedRoutes(worktree, removed);
     const anchors = refreshSpecialistAnchors(worktree);
-    // Give the website checkout back: tracked files return to HEAD and new
-    // files the sync created there are removed (media stays, it is ignored).
-    for (const path of written) {
-      const tracked = spawnSync("git", ["-C", WEBSITE, "ls-files", "--error-unmatch", path], { stdio: "ignore" }).status === 0;
-      if (tracked) spawnSync("git", ["-C", WEBSITE, "checkout", "--", path], { stdio: "ignore" });
-      else if (!/\.(png|jpe?g|webp|gif|avif|pdf|epub|zip)$/iu.test(path)) rmSync(join(WEBSITE, path), { force: true });
-    }
-    symlinkSync(join(WEBSITE, "node_modules"), join(worktree, "node_modules"));
     step("media to R2", "npm", ["run", "media:publicar"], worktree);
+    step("retain current and previous Specsfy ebooks", "npm", [
+      "run", "media:podar-ebook-specsfy", "--", "--public-local", join(WEBSITE, "public"),
+    ], worktree);
+    if (!output("git", ["status", "--porcelain", "--untracked-files=no"], worktree) && !removed.length && !/^- website\/src\//mu.test(sync)) {
+      console.log("✓ site already matches the Specsfy docs; nothing to publish");
+      return;
+    }
     const id = nextSitespecId(worktree);
     const sitespec = join(worktree, ".sitespec", `${id}-specsfy-docs-${version.replaceAll(".", "")}`, "SITEPEC.md");
     const now = new Date().toISOString();
@@ -345,6 +334,7 @@ function releaseSite() {
       "  - src/content/opensource-docs/specsfy/",
       "  - public/docs/specsfy/downloads/build.json",
       "  - scripts/media-manifest.json",
+      "  - scripts/media-podar-ebook-specsfy.mjs",
       "tags:",
       "  - specsfy",
       "  - docs",
@@ -360,6 +350,7 @@ function releaseSite() {
       "",
       `- [x] Páginas de /docs/specsfy/ sincronizadas com a Specsfy ${version} {#sd01}`,
       "- [x] Ebook e imagens do guia publicados no R2 e registrados no media-manifest.json {#sd02}",
+      "- [x] Downloads do ebook retêm a edição vigente e a anterior no manifesto e no R2 {#sd04}",
       "- [x] Release do website criada; conferência em produção pelo npm run site:specsfy:check {#sd03}",
       "",
     ].join("\n"));
@@ -370,7 +361,7 @@ function releaseSite() {
       const errors = (parsed.data ?? parsed).errors ?? [];
       if (errors.length) {
         console.error(`✗ invalid sitespec: ${JSON.stringify(errors)}`);
-        process.exit(1);
+        throw new Error("A sitespec do release não passou na validação.");
       }
     } else console.log("! astrofy not found; the sitespec was not validated");
     const pkg = JSON.parse(readFileSync(join(worktree, "package.json"), "utf8"));
@@ -399,7 +390,7 @@ function releaseSite() {
     console.log(`✓ website ${next} published with the Specsfy ${version} docs`);
   } finally {
     spawnSync("git", ["-C", WEBSITE, "worktree", "remove", "--force", worktree], { stdio: "ignore" });
-    spawnSync("git", ["-C", WEBSITE, "branch", "-D", branch], { stdio: "ignore" });
+    rmSync(temporary, { recursive: true, force: true });
   }
   const check = spawnSync("npm", ["run", "site:specsfy:check"], { cwd: HUB, encoding: "utf8" });
   console.log(check.status === 0 ? "✓ production check passed" : `! production check: ${(check.stdout + check.stderr).trim().split("\n").slice(-4).join(" | ")} (the deploy may still be running; rerun npm run site:specsfy:check)`);

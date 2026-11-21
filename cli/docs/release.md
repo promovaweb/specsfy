@@ -75,16 +75,23 @@ As opções controlam as etapas seguintes. `--no-site` e `--no-hub` pulam a
 etapa correspondente; `--site` e `--hub` executam somente aquela etapa, depois
 de uma publicação.
 
-A etapa do site roda `npm run sync:docs:specsfy` no Hub. Se a documentação já
-estiver sincronizada, a etapa termina. Quando há mudanças, o script leva os
-arquivos listados pelo comando para um worktree limpo do website, baseado em
-`origin/main`. O script restaura do `HEAD` os arquivos versionados que a
-sincronização listou no checkout do website. Depois publica a mídia no R2 com
-`npm run media:publicar`, escreve uma sitespec, sobe o patch do website e
-registra a mudança no changelog. O commit inclui as páginas, o manifesto do
-ebook, o manifesto de mídia, a sitespec, a versão, o changelog e as
-configurações de rotas. Por fim, o script cria a tag, faz push, cria a GitHub
-Release do website e roda `npm run site:specsfy:check` em produção.
+Na preparação, `make ebook` mantém em `ebook/` a edição de `VERSION` e a edição
+anterior por SemVer, com PDF e EPUB de cada uma. Depois do npm, o release
+sincroniza a documentação em um worktree do website baseado em
+`origin/main`. O comando do Hub recebe `--website-dir` com o caminho desse
+worktree.
+
+O release roda `npm run media:publicar` e depois
+`npm run media:podar-ebook-specsfy`. A limpeza confere referências no site e
+mantém as duas edições nos downloads locais, no manifesto e no R2. A etapa
+também atualiza os downloads locais do checkout do Hub. Para simular a
+limpeza em um worktree do website, rode
+`npm run media:podar-ebook-specsfy -- --dry-run`.
+
+A primeira execução exige o comando de retenção em `origin/main` do website
+e o suporte a `--website-dir` no sincronizador do Hub. Quando há alterações
+versionadas, o script registra a sitespec e o changelog, cria o patch e a
+GitHub Release do website e roda `npm run site:specsfy:check` em produção.
 
 Se a sincronização remover uma página, o script registra automaticamente o
 destino da rota no worktree do website.

@@ -21,21 +21,22 @@ test('extrai classificação e ignora páginas sem tabela', t => {
   assert.throws(() => extractMetadata(root, [join(root, '..', 'fora.md')]), /fora da raiz/);
 });
 
-for (const protect of [undefined, '1.0.0']) {
-  test('retém cinco edições com ordenação SemVer e proteção ' + protect, t => {
+for (const [current, retained] of [
+  [undefined, ['2.0.0', '1.10.0']],
+  ['1.10.0', ['1.10.0', '1.9.0']],
+]) {
+  test('retém duas edições por SemVer a partir de ' + (current ?? 'a maior'), t => {
     const root = temporary(t);
-    for (const version of ['1.0.0', '1.1.0', '1.2.0', '1.10.0', '2.0.0', '2.1.0']) {
-      for (const ext of ['pdf', 'epub']) writeFileSync(join(root, `Specsfy-Guia-do-Usuario-v${version}.${ext}`), 'fixture');
-    }
-    writeFileSync(join(root, 'README.md'), 'preservar');
-    writeFileSync(join(root, 'Specsfy-Guia-do-Usuario-v01.0.0.pdf'), 'preservar');
-    const result = pruneEditions(root, 5, protect);
-    assert.equal(result.retained.length, 5);
-    assert.deepEqual(result.removed, [protect ? '1.1.0' : '1.0.0']);
-    assert.equal(result.removedFiles, 2);
-    assert.equal(readFileSync(join(root, 'README.md'), 'utf8'), 'preservar');
-    assert.equal(readdirSync(root).length, 12);
-    assert.equal(pruneEditions(root, 5, protect).removedFiles, 0);
+    const versions = ['1.2.0', '1.9.0', '1.10.0', '2.0.0'];
+    const editions = version => ['epub', 'pdf'].map(ext => `Specsfy-Guia-do-Usuario-v${version}.${ext}`);
+    const extras = ['README.md', 'ebook-specsfy.pdf', 'Specsfy-Guia-do-Usuario-v01.0.0.pdf'];
+    for (const file of [...versions.flatMap(editions), ...extras]) writeFileSync(join(root, file), 'fixture');
+
+    const result = pruneEditions(root, undefined, current);
+    assert.deepEqual(result.retained, retained);
+    assert.equal(result.removedFiles, 4);
+    assert.deepEqual(readdirSync(root).sort(), [...retained.flatMap(editions), ...extras].sort());
+    assert.equal(pruneEditions(root, undefined, current).removedFiles, 0);
   });
 }
 
@@ -44,5 +45,6 @@ test('recusa parâmetros inválidos sem remover artefatos', t => {
   writeFileSync(join(root, 'Specsfy-Guia-do-Usuario-v1.0.0.pdf'), 'fixture');
   for (const keep of [0, -1, 1.5, NaN]) assert.throws(() => pruneEditions(root, keep), /inteiro/);
   assert.throws(() => pruneEditions(root, 5, 'x'), /SemVer/);
+  assert.throws(() => pruneEditions(root, 2, '2.0.0'), /ausente/);
   assert.equal(readdirSync(root).length, 1);
 });

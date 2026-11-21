@@ -282,7 +282,7 @@ cp "$EPUB_OUT" "$EPUB_ALIAS"
 check_manifest
 node "$RETENTION_SCRIPT" \
   --ebook-root "$EBOOK_ROOT" \
-  --keep 5 \
+  --keep 2 \
   --protect-version "$VERSION"
 echo "PDF:  $PDF_OUT"
 echo "EPUB: $EPUB_OUT"

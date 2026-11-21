@@ -86,9 +86,9 @@ defina `SPECSFY_CHROMIUM_PATH` com o caminho absoluto do executável.
 
 O build gera os dois artefatos versionados e `ebook/build.json`. O manifesto
 registra o digest recursivo das páginas, imagens e fontes de build, além dos
-hashes do PDF e EPUB. Depois de validar a edição vigente, o pipeline conserva
-as cinco versões SemVer mais recentes e remove PDF e EPUB das anteriores. A
-regressão executa a mesma verificação. Portanto, toda mudança em `docs/user/`
+hashes do PDF e EPUB. Depois de validar a edição de `VERSION`, o pipeline
+conserva essa edição e a anterior por SemVer. A regressão executa a mesma
+verificação. Portanto, toda mudança em `docs/user/`
 precisa reconstruir o ebook na mesma entrega.
 
 As tabelas `## Classificação` são metadados das fontes Markdown. O pipeline

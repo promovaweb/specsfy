@@ -8,7 +8,7 @@ const feature=read('tests/features/ebook_usuario.feature');
 const scenarios=[
  ['Gerar os dois formatos a partir da fonte oficial','ebook.test.mjs','SemVer controla|ordem editorial contém'],
  ['Controlar a edição com versionamento semântico','version-alignment.test.mjs','aceita projeções alinhadas'],
- ['Manter somente as cinco edições mais recentes','ebook-utilities.test.mjs','retém cinco edições'],
+ ['Manter a edição atual e a anterior','ebook-utilities.test.mjs','retém duas edições'],
  ['Exigir rebuild após qualquer mudança nos docs do usuário','ebook.test.mjs','manifesto comprova'],
  ['Aplicar o sistema visual oficial','ebook.test.mjs','fontes visuais reutilizam'],
  ['Ensinar em uma sequência pedagógica única','documentation-contracts.test.mjs','ordem de leitura|portal ensina|ebook consome'],

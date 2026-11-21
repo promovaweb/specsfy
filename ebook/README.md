@@ -46,10 +46,9 @@ Para links permanentes, use os aliases da edição mais recente:
 - [PDF vigente](ebook-specsfy.pdf): `ebook-specsfy.pdf`;
 - [EPUB vigente](ebook-specsfy.epub): `ebook-specsfy.epub`.
 
-Cada execução bem-sucedida mantém somente as cinco edições SemVer mais
-recentes. PDF e EPUB de versões mais antigas são removidos juntos. A limpeza
-considera exclusivamente arquivos que seguem o padrão acima e preserva
-README, manifesto, fontes e qualquer outro arquivo do diretório.
+Cada build mantém a edição de `VERSION` e a edição imediatamente anterior por
+SemVer. A limpeza remove juntos o PDF e o EPUB das demais edições com nome
+versionado. Os aliases da edição vigente continuam disponíveis.
 
 [`build.json`](build.json) registra a edição, a ordem, o digest das fontes e os
 hashes dos dois arquivos. As tabelas `## Classificação` permanecem nas fontes
@@ -101,5 +100,5 @@ A regressão da raiz também executa a verificação. Ela falha se o digest das
 fontes ou os hashes do PDF e EPUB não coincidirem com `build.json`.
 
 O script de retenção é executado somente depois que a edição vigente passa
-pela verificação de integridade. Se `../VERSION` não estiver entre as cinco
-versões SemVer mais recentes encontradas, o build interrompe a limpeza.
+pela verificação de integridade. Quando a edição de `../VERSION` está ausente,
+o script interrompe a limpeza.

@@ -22,7 +22,7 @@ test('guia portátil exige pt-BR e identidade própria',()=>{
  includes(build,['deve declarar lang:','deve declarar lang="pt-BR"']);includes(readme,['Português do Brasil','experiência autocontida','citação nominal','online-only']);
 });
 test('retenção ocorre depois da conferência de integridade',()=>{
- const build=read('.ebook/build-ebook.sh');assert.ok(build.includes('check_manifest\nnode "$RETENTION_SCRIPT" \\\n  --ebook-root "$EBOOK_ROOT" \\\n  --keep 5 \\\n  --protect-version "$VERSION"'));
+ const build=read('.ebook/build-ebook.sh');assert.ok(build.includes('check_manifest\nnode "$RETENTION_SCRIPT" \\\n  --ebook-root "$EBOOK_ROOT" \\\n  --keep 2 \\\n  --protect-version "$VERSION"'));
 });
 test('SemVer controla os dois formatos publicados',()=>{
  assert.match(version,/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);for(const ext of ['pdf','epub'])assert.ok(existsSync(stem+'.'+ext));

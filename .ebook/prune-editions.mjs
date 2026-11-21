@@ -8,8 +8,8 @@ import { parseArgs } from 'node:util';
 const SEMVER = '(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)';
 const artifactPattern = new RegExp(`^Specsfy-Guia-do-Usuario-v${SEMVER}\\.(pdf|epub)$`);
 
-/** Ordena versões numericamente e mantém os dois formatos da mesma edição. */
-export function pruneEditions(root, keep = 5, protectVersion) {
+/** Lê as edições do diretório e seleciona a vigente e suas antecessoras por SemVer. */
+export function planEditions(root, keep = 2, protectVersion) {
   if (!Number.isSafeInteger(keep) || keep < 1) throw new Error('--keep deve ser um inteiro maior que zero');
   if (protectVersion !== undefined && !new RegExp(`^${SEMVER}$`).test(protectVersion)) throw new Error('--protect-version exige SemVer estável');
   const groups = new Map();
@@ -25,9 +25,16 @@ export function pruneEditions(root, keep = 5, protectVersion) {
     for (let i = 0; i < 3; i++) if (a[i] !== b[i]) return a[i] > b[i] ? -1 : 1;
     return 0;
   });
-  let retained = versions.slice(0, keep);
-  if (groups.has(protectVersion) && !retained.includes(protectVersion)) retained = [...retained.slice(0, keep - 1), protectVersion];
+  const currentIndex = protectVersion === undefined ? 0 : versions.indexOf(protectVersion);
+  if (currentIndex === -1) throw new Error(`Edição vigente ausente: ${protectVersion}`);
+  const retained = versions.slice(currentIndex, currentIndex + keep);
   const removed = versions.filter(version => !retained.includes(version));
+  return { retained, removed, groups };
+}
+
+/** Remove ambos os formatos das edições fora da retenção. */
+export function pruneEditions(root, keep = 2, protectVersion) {
+  const { retained, removed, groups } = planEditions(root, keep, protectVersion);
   let removedFiles = 0;
   for (const version of removed) for (const file of groups.get(version)) { unlinkSync(join(root, file)); removedFiles++; }
   return { retained, removed, removedFiles };
@@ -35,7 +42,7 @@ export function pruneEditions(root, keep = 5, protectVersion) {
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    const { values } = parseArgs({ options: { 'ebook-root': { type: 'string' }, keep: { type: 'string', default: '5' }, 'protect-version': { type: 'string' } } });
+    const { values } = parseArgs({ options: { 'ebook-root': { type: 'string' }, keep: { type: 'string', default: '2' }, 'protect-version': { type: 'string' } } });
     if (!values['ebook-root']) throw new Error('--ebook-root é obrigatório');
     const result = pruneEditions(resolve(values['ebook-root']), Number(values.keep), values['protect-version']);
     console.log(`Retenção do ebook: ${result.retained.length} edição(ões) mantida(s), ${result.removed.length} removida(s) (${result.removedFiles} arquivo(s)).`);

@@ -80,8 +80,8 @@ implementarem ou modificarem o framework:
 - Qualquer alteração em `docs/user/`, inclusive imagens: atualize a edição em
   `VERSION` na raiz conforme SemVer e reconstrua PDF, EPUB e `ebook/build.json`
   com `make ebook`.
-- O build conserva somente as cinco edições SemVer mais recentes em `ebook/`.
-  A retenção remove apenas PDF e EPUB com o nome canônico e ocorre depois da
+- O build conserva em `ebook/` a edição de `VERSION` e a edição anterior por
+  SemVer. A limpeza dos demais PDF e EPUB com nome versionado ocorre após a
   verificação da edição vigente.
 - Mudança na jornada: atualize juntos `docs/user/README.md` e
   `docs/user/reading-order.txt`. O ebook deve consumir essa mesma ordem.
