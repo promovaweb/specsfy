@@ -4,6 +4,36 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.40.1] - 2026-11-20
+
+### Corrigido
+
+Achados de uma revisão independente da 0.40.0 (Codex):
+
+- Planos de tarefas aprovados antes da tag `[TDD]` voltaram a passar no
+  `gate tasks` e no `verify`: uma tarefa `[TEST]` que precede o código
+  conta como TDD. O mínimo TDD passa a contar critérios de aceite distintos.
+- O research recusa claim inválido, qualquer que seja a criticidade, e só
+  aceita índice vazio quando nenhum claim exige evidência.
+- O Contrato CRUD declara, por operação, o controle de interface e a tarefa
+  que o implementa. Uma negação ("não haverá botão") não conta, e a ordem
+  das palavras não importa.
+- O catálogo ganhou `stack: true` (especialista que exige a tecnologia
+  confirmada), `aliases` (nomes como aparecem no `STACK.md`, por exemplo
+  "PostgreSQL" e "Next.js") e `detect.images` (imagem num arquivo Compose,
+  usada pelo n8n). Interface e arquitetura voltam a ser sugeridos sem
+  ferramenta instalada. "Sem Redis" no `STACK.md` não confirma o Redis. O
+  Laravel só é confirmado por `artisan` ou `laravel/framework`.
+- O `verify` calcula a stack uma vez e transforma falha de detecção em
+  aviso, sem perder a resposta do gate.
+- O `specs transition` serializa a transição por spec, corrige backlinks
+  antigos de forma idempotente e compara caminhos resolvidos, inclusive em
+  links Markdown.
+- Os parsers reconhecem `### Plano técnico` e `### Tarefas` sem número.
+- O `signals --check` falha quando falta um dos marcadores da tabela.
+- No site, o build da 3.106.12 falhava com os 301 que têm âncora acentuada.
+  A correção saiu no website 3.106.13.
+
 ## [0.40.0] - 2026-11-20
 
 ### Adicionado
