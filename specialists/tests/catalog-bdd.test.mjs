@@ -68,6 +68,10 @@ const definitions = [
     mode('server', 'ansible', 'ansible');
   }],
   ['o gerador publica Compose local, stack de produção e playbook completo', () => { assert.ok(existsSync(join(base, 'specsfy-specialist-delivery/scripts/scaffold.mjs'))); includes(readSpecialist('delivery'), ['compose.yaml', 'stack.yaml', 'Docker Swarm', 'usuário `deploy`']); }],
+  ['o modo pipeline integra testes, publicação, promoção e rollback', () => {
+    mode('delivery', 'pipeline', 'pipeline');
+    runContract('specialists/tests/deploy-node.test.mjs', '^(scaffold inclui workflow|scaffold preserva workflow|pipeline separa publicação)');
+  }],
   ['o deploy manual usa entrada oculta mesmo com uma fonte externa', () => runContract('specialists/tests/deploy-node.test.mjs', '^deploy manual usa prompt oculto')],
   ['o configurador grava fora do projeto e pede confirmação para substituir', () => runContract('specialists/tests/deploy-node.test.mjs', '^(configurador no terminal|configuração externa grava)')],
   ['o deploy aceita arquivo, script, configuração nativa e identidade', () => runContract('specialists/tests/deploy-node.test.mjs', '^modo automático respeita ambiente')],

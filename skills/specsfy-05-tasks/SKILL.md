@@ -386,3 +386,5 @@ Ao decompor a entrega, consulte a seção 8 da spec e
 aplicáveis ao planejamento. Em tarefas de UI, dados, API, deploy ou qualquer
 outro sinal aplicável, registre um item sem checkbox
 `Especialista: $specsfy-specialist-<nome> (<modo>)` por especialista e modo.
+Para automatizar testes, build e deploy via Ansible, use
+`$specsfy-specialist-delivery (pipeline)`.

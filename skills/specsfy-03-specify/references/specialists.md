@@ -52,6 +52,7 @@ Exemplo combinado em Laravel com Inertia: para autorização por equipe × papel
 | Servidor Debian, serviços systemd, rede ou configuração do host | `server` | `debian` |
 | Inventário ou playbook Ansible | `server` | `ansible` |
 | Relatório de servidor somente leitura | `server` | `report` |
+| Pipeline de deploy automático do teste à produção | `delivery` | `pipeline` |
 | Deploy, rollout, rollback ou inventário de entrega | `delivery` | `deploy` |
 | Versão de release, arquivo SEMVER ou tag da imagem | `delivery` | `versioning` |
 | Pipeline de build, testes ou publicação | `delivery` | `ci-cd` |

@@ -3,7 +3,7 @@
 Compare os sinais com o escopo da mudança e a stack confirmada no projeto.
 Combine especialistas quando os sinais se somarem. Por exemplo, uma migration
 ativa `modeling` em `data` e o especialista do banco aplicável, como `postgres`
-ou `supabase`. Um deploy que muda o host combina `delivery` com `server`.
+ou `supabase`. Um deploy que muda o host combina `delivery` com `server`. Para automatizar testes, build e deploy via Ansible, use `$specsfy-specialist-delivery (pipeline)`.
 Use `padrão` para skills sem modos nomeados.
 
 <!-- specsfy:signals:start -->
@@ -52,6 +52,7 @@ Exemplo combinado em Laravel com Inertia: para autorização por equipe × papel
 | Servidor Debian, serviços systemd, rede ou configuração do host | `server` | `debian` |
 | Inventário ou playbook Ansible | `server` | `ansible` |
 | Relatório de servidor somente leitura | `server` | `report` |
+| Pipeline de deploy automático do teste à produção | `delivery` | `pipeline` |
 | Deploy, rollout, rollback ou inventário de entrega | `delivery` | `deploy` |
 | Versão de release, arquivo SEMVER ou tag da imagem | `delivery` | `versioning` |
 | Pipeline de build, testes ou publicação | `delivery` | `ci-cd` |

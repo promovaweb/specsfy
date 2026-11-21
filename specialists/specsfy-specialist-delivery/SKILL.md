@@ -1,13 +1,14 @@
 ---
 name: specsfy-specialist-delivery
-description: Coordenar a entrega com os modos deploy (release completo em servidor Docker e Swarm via Ansible, scaffold, inventário, Vault e publicação), versioning (SEMVER, incremento, tag Git e alinhamento entre artefato, imagem, manifesto e deploy) e ci-cd (pipeline, GitHub Actions, artefato imutável, promoção entre ambientes, migrations, rollout e rollback). Use para release, deploy, versão, tag, pipeline, promoção ou escolha entre rolling, blue-green, canary e feature flag; não use para o estado Debian do host (`$specsfy-specialist-server`), para build de imagem e topologia Swarm (`$specsfy-specialist-docker`), para os sinais que decidem o rollout (`$specsfy-specialist-observability`), para branches e conflitos (`$specsfy-specialist-git`) nem para hardening de credencial de pipeline (`$specsfy-specialist-application-security`).
+description: Coordenar deploy em Docker Swarm via Ansible, versioning com SEMVER, desenho de CI/CD e modo pipeline para automatizar testes, build, staging, promoção por tag Git, verificação e rollback no GitHub Actions. Use para release, deploy, versão, tag, promoção e estratégias de rollout. Acione Server para Debian, Docker para imagem e Swarm, Testing para as suítes e Observability para os sinais de rollout.
 ---
 
 # Entrega
 
 Coordena versão, artefato, servidor, cluster e promoção com a mesma referência
 imutável. O modo deploy executa o release, o versioning prepara e confere o
-número e o ci-cd desenha pipeline, promoção e rollback.
+número, o ci-cd desenha a estratégia, e o pipeline integra o fluxo executável
+desde o pull request até a produção.
 
 ## Quando usar
 
@@ -16,6 +17,7 @@ número e o ci-cd desenha pipeline, promoção e rollback.
 | Fazer release ou deploy de aplicação em servidor, preparar servidor que receberá stacks Docker Swarm via Ansible, cadastrar, adicionar ou conferir máquina do ambiente | deploy | [Contrato do servidor de deploy](references/deploy.md) e [senha do Vault](references/vault.md) |
 | Preparar ou conferir versão, `SEMVER`, incremento `patch`/`minor`/`major`, tag Git e alinhamento entre imagem, manifesto e deploy | versioning | [SemVer, artefatos e ordem de publicação](references/versioning.md) |
 | Desenhar pipeline CI/CD, artefato e promoção entre ambientes, migrations, rollout e rollback, ou escolher entre rolling, blue-green, canary e feature flag | ci-cd | [Etapas de pipeline, estratégias e supply chain](references/ci-cd.md) e [GitHub Actions](references/github-actions.md) |
+| Automatizar testes, build Docker, deploy Ansible em staging e promoção para produção | pipeline | [Pipeline de deploy](references/pipeline.md) |
 
 Não use para:
 
@@ -48,7 +50,7 @@ Não use para:
    `.specsfy/DATABASE.md` quando a entrega envolver migration ou banco.
 2. Seguir o modo indicado na spec ou na tarefa
    (`Especialista: $specsfy-specialist-delivery (deploy)`, `(versioning)` ou
-   `(ci-cd)`); sem indicação, escolher pelo "Quando usar".
+   `(ci-cd)`, ou `(pipeline)`); sem indicação, escolher pelo "Quando usar".
 3. Devolver as conclusões e dúvidas abertas no destino indicado no item 1,
    no próprio backlog, na spec ou na tarefa da fase.
 4. Nunca mudar o estado da spec nem marcar gates: isso é de
@@ -65,8 +67,8 @@ Não use para:
    pendências. Push, provisionamento e mudança remota só com alvo e autorização
    explícitos; a preparação local pode criar ou atualizar `SEMVER`.
 2. Identificar o modo: deploy para executar a entrega, versioning para preparar
-   ou conferir a versão e ci-cd para desenhar pipeline e promoção. Em release ou
-   deploy completo, o modo deploy coordena e aciona os demais.
+   ou conferir a versão, ci-cd para desenhar a estratégia e pipeline para
+   automatizar a entrega no GitHub Actions.
 3. Inspecionar `Dockerfile`, Compose, stack e `ansible/` existentes, comparando
    PHP, extensões, dependências, assets, entrypoint, usuário interno, portas,
    healthcheck e comando da aplicação. Preservar trechos personalizados e
@@ -178,6 +180,23 @@ proteções de ambiente, reuso e concorrência.
 7. Registrar proveniência, versão, comprovação de teste e resultado do rollout
    de forma auditável.
 
+### Modo pipeline
+
+1. Ler [pipeline.md](references/pipeline.md). Escolher os testes com
+   `$specsfy-specialist-testing`, a imagem e o rollout com
+   `$specsfy-specialist-docker` e o acesso ao Swarm com
+   `$specsfy-specialist-server`.
+2. Gerar o scaffold com `--pipeline` em um projeto novo. Em um projeto
+   existente, comparar com o scaffold gerado em outra pasta e incorporar
+   os arquivos e as adaptações necessárias.
+3. Configurar inventário, Vault e secrets por ambiente no modo deploy,
+   inclusive o acesso SSH e o healthcheck da aplicação.
+4. Usar o modo versioning para preparar o `SEMVER`. Exigir os testes no PR,
+   a publicação da imagem e a verificação de staging na `main`. Só então
+   promover por tag Git, com aprovação em produção.
+5. Conferir digest, réplicas, rollout e smoke HTTP. Ensaiar o rollback em
+   staging e registrar o resultado junto à execução do workflow.
+
 ## Padrões
 
 No modo deploy:
@@ -187,7 +206,7 @@ No modo deploy:
   `ansible.cfg`, o cadastro local é alternativa e falha de fonte encerra a
   execução. Não executar `configure-vault` pela IA.
 - Atualizar projeto existente por diff, preservando personalizações: o scaffold
-  recusa sobrescrita e não migra `./deploy` ou `ansible/`.
+  só sobrescreve com `--force` e não migra `./deploy` ou `ansible/`.
 - Manter `SEMVER` na raiz governando imagem, manifesto, tag Git e release, com
   `compose.yaml` para desenvolvimento e `stack.yaml` para produção em Docker
   Swarm.
@@ -204,7 +223,7 @@ No modo deploy:
   servidores, com inclusão que preserva hosts, testa a conexão nova e só então
   configura o node e o papel. (regra da casa)
 - Em nova chamada, reler a aplicação e reconciliar só o que mudou; o gerador
-  serve ao primeiro bootstrap e não sobrescreve arquivo.
+  serve ao primeiro bootstrap e só sobrescreve com `--force`.
 - Usar módulos idempotentes e `community.docker`, com `swarm init` condicionado
   ao estado atual, managers ímpares e portas restritas aos nodes autorizados.
 - Publicar uma imagem uma vez e promover o mesmo digest; guardar senhas, tokens
@@ -237,6 +256,13 @@ No modo ci-cd:
   Detalhes em [references/ci-cd.md](references/ci-cd.md) e
   [references/github-actions.md](references/github-actions.md).
 
+No modo pipeline:
+
+- Usar inventário e Vault do modo deploy em cada ambiente. Guardar no manager
+  a última stack verificada para reverter um rollout que falhar.
+- Manter publicação sob um único workflow e serializar cada ambiente do deploy
+  ao fim da verificação ou do rollback.
+
 ## Antipadrões
 
 - Usar `latest` ou tag que não reproduza `SEMVER`.
@@ -254,6 +280,9 @@ No modo ci-cd:
 - Remover coluna antiga no mesmo deploy da migration nova, quebrando o rollback;
   usar expand e contract separados.
 - Liberar secret de produção para job de pull request de fork externo.
+- Liberar a promoção por tag sem verificar o staging do mesmo commit.
+- Assumir o controle de uma stack existente sem registrar a referência
+  anterior que o pipeline consegue restaurar.
 
 ## Validação
 
@@ -274,6 +303,9 @@ No modo ci-cd:
   aponta para versão e digest disponíveis.
 - Validar o pipeline com lint, execução completa em branch segura e teste
   deliberado de falha que impede a promoção.
+- Para o modo pipeline, rodar `actionlint` e `ansible-playbook --syntax-check`
+  segundo [pipeline.md](references/pipeline.md#validação). Testar a promoção
+  do digest e provocar uma falha de saúde para confirmar rollback.
 - Conferir digest, SBOM e assinatura quando o projeto adota, e ensaiar rollout e
   rollback em ambiente representativo.
 - Confirmar gates de aprovação, branch protection e permissões no provedor, não

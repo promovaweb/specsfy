@@ -1,5 +1,8 @@
 # GitHub Actions no modo ci-cd
 
+Para gerar um workflow completo com build Docker, staging e promoção via
+Ansible, siga o [modo pipeline](pipeline.md).
+
 ## Workflows, eventos e jobs
 
 - Versione workflows YAML diretamente em `.github/workflows/`. Declare em

@@ -44,3 +44,4 @@ Feature: Catálogo de especialistas sob demanda
     Given o catálogo versionado de especialistas
     Then o especialista de entrega coordena deploy e SEMVER com Docker, Swarm, servidor e Ansible
     And o gerador publica Compose local, stack de produção e playbook completo
+    And o modo pipeline integra testes, publicação, promoção e rollback

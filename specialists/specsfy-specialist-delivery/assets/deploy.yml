@@ -96,6 +96,7 @@
 - name: Publicar a stack pelo manager principal
   hosts: "swarm_managers[0]"
   become: true
+  tags: [stack]
   tasks:
     - name: Criar Docker Secrets externos
       ansible.builtin.import_tasks: secrets.yml

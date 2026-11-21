@@ -1,0 +1,71 @@
+---
+- name: Ler o manifesto que a stack deve executar
+  ansible.builtin.slurp:
+    src: "{{ pipeline_verify_file }}"
+  register: pipeline_manifest
+
+- name: Identificar serviços e imagem esperada
+  ansible.builtin.set_fact:
+    pipeline_services: "{{ (pipeline_manifest.content | b64decode | from_yaml).services }}"
+    pipeline_app_name: "{{ app_stack_name }}_{{ pipeline_service }}"
+
+- name: Exigir um healthcheck e uma imagem por digest
+  ansible.builtin.assert:
+    that:
+      - pipeline_service in pipeline_services
+      - pipeline_services[pipeline_service].image is search('@sha256:[0-9a-f]{64}$')
+      - pipeline_services[pipeline_service].healthcheck.test | default([]) | length > 0
+      - pipeline_services[pipeline_service].healthcheck.test[0] != 'NONE'
+      - not (pipeline_services[pipeline_service].healthcheck.disable | default(false) | bool)
+
+- name: Aguardar réplicas de todos os serviços da stack
+  ansible.builtin.command:
+    argv:
+      - docker
+      - stack
+      - services
+      - --format
+      - "{% raw %}{{json .}}{% endraw %}"
+      - "{{ app_stack_name }}"
+  register: pipeline_replicas
+  changed_when: false
+  retries: 30
+  delay: 5
+  vars:
+    observed_services: "{{ pipeline_replicas.stdout_lines | map('from_json') | list }}"
+    ready_replicas: '^(?P<count>[1-9][0-9]*)/(?P=count)( |$)'
+    expected_services: "{{ pipeline_services.keys() | map('regex_replace', '^', app_stack_name + '_') | list }}"
+  until:
+    - pipeline_replicas.rc == 0
+    - (observed_services | map(attribute='Name') | sort) == (expected_services | sort)
+    - observed_services | rejectattr('Replicas', 'match', ready_replicas) | list | length == 0
+
+- name: Aguardar o fim dos rollouts e conferir o digest do serviço
+  ansible.builtin.command:
+    argv: "{{ ['docker', 'service', 'inspect'] + (pipeline_replicas.stdout_lines | map('from_json') | map(attribute='Name') | list) }}"
+  register: pipeline_rollout
+  changed_when: false
+  retries: 30
+  delay: 5
+  vars:
+    inspected: "{{ pipeline_rollout.stdout | from_json }}"
+    selected: "{{ inspected | selectattr('Spec.Name', 'equalto', pipeline_app_name) | first }}"
+    active_healthcheck: "{{ selected.Spec.TaskTemplate.ContainerSpec.Healthcheck.Test | default([]) }}"
+  until:
+    - pipeline_rollout.rc == 0
+    - inspected | map(attribute='UpdateStatus.State', default='completed') | difference(pipeline_accepted_states | default(['completed'])) | length == 0
+    - selected.Spec.TaskTemplate.ContainerSpec.Image == pipeline_services[pipeline_service].image
+    - active_healthcheck | length > 0
+    - active_healthcheck[0] != 'NONE'
+
+- name: Executar smoke HTTP pela rota do ambiente
+  ansible.builtin.uri:
+    url: "{{ pipeline_smoke_url }}"
+    status_code: 200
+    follow_redirects: none
+    timeout: 10
+  delegate_to: localhost
+  register: pipeline_smoke
+  until: pipeline_smoke.status == 200
+  retries: 10
+  delay: 5

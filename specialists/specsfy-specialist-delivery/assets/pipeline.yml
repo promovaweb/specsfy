@@ -1,0 +1,275 @@
+name: Pipeline de deploy
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+# O lock cobre publicação, rollout, verificação e eventual rollback.
+concurrency:
+  group: pipeline-${{ github.event_name == 'pull_request' && github.ref || (github.ref_type == 'tag' && (vars.PRODUCTION_ENVIRONMENT || 'production') || (vars.STAGING_ENVIRONMENT || 'staging')) }}
+  cancel-in-progress: false
+
+env:
+  IMAGE: ${{ vars.PIPELINE_IMAGE || format('ghcr.io/{0}', github.repository) }}
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+      commit: ${{ steps.metadata.outputs.commit }}
+      image: ${{ steps.metadata.outputs.image }}
+      registry: ${{ steps.metadata.outputs.registry }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: shivammathur/setup-php@db91e1a0e48e84637d325a7ee4d2677e146ceec4 # 2.36.0
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite
+          tools: composer:v2
+          coverage: none
+      - name: Localizar cache do Composer
+        id: composer
+        run: echo "path=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ steps.composer.outputs.path }}
+          key: ${{ runner.os }}-php84-composer-${{ hashFiles('composer.lock') }}
+      - name: Instalar dependências e testar
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress
+          php artisan test
+      - name: Resolver versão e commit
+        if: github.event_name == 'push'
+        id: metadata
+        run: |
+          version=$(cat SEMVER)
+          [[ "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]
+          commit=$(git rev-parse HEAD)
+          image=$(printf '%s' "$IMAGE" | tr '[:upper:]' '[:lower:]')
+          registry=${image%%/*}
+          [[ "$registry" == *.* || "$registry" == *:* || "$registry" == localhost ]]
+          [[ "$image" =~ ^[a-z0-9.:-]+(/[a-z0-9._-]+)+$ ]]
+          if [[ "$GITHUB_REF_TYPE" == tag ]]; then
+            [[ "$GITHUB_REF_NAME" == "v$version" ]]
+          fi
+          {
+            echo "version=$version"
+            echo "commit=$commit"
+            echo "image=$image"
+            echo "registry=$registry"
+          } >> "$GITHUB_OUTPUT"
+
+  image:
+    if: github.event_name == 'push' && github.ref_type == 'branch'
+    needs: test
+    runs-on: ${{ vars.PIPELINE_BUILD_RUNNER || 'ubuntu-24.04' }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      ref: ${{ steps.release.outputs.ref }}
+      version: ${{ needs.test.outputs.version }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Autenticar no registry
+        env:
+          REGISTRY: ${{ needs.test.outputs.registry }}
+          REGISTRY_USER: ${{ needs.test.outputs.registry == 'ghcr.io' && github.actor || vars.PIPELINE_REGISTRY_USER }}
+          REGISTRY_TOKEN: ${{ needs.test.outputs.registry == 'ghcr.io' && github.token || secrets.PIPELINE_REGISTRY_TOKEN }}
+        run: printf '%s' "$REGISTRY_TOKEN" | docker login "$REGISTRY" --username "$REGISTRY_USER" --password-stdin
+      - name: Conferir tags antes de publicar
+        id: existing
+        env:
+          REPOSITORY: ${{ needs.test.outputs.image }}
+          VERSION: ${{ needs.test.outputs.version }}
+          COMMIT: ${{ needs.test.outputs.commit }}
+        run: |
+          resolve_digest() {
+            local result
+            if result=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "$1" 2>&1); then
+              jq -er 'select(test("^sha256:[0-9a-f]{64}$"))' <<< "$result"
+            elif [[ "$result" == *"manifest unknown"* || "$result" == *": not found" ]]; then
+              return 0
+            else
+              printf 'Falha consultando %s: %s\n' "$1" "$result" >&2
+              return 1
+            fi
+          }
+
+          by_commit=$(resolve_digest "$REPOSITORY:sha-$COMMIT")
+          by_version=$(resolve_digest "$REPOSITORY:$VERSION")
+          if [[ -n "$by_version" && "$by_version" != "$by_commit" ]]; then
+            echo "SEMVER $VERSION já reservado por outra imagem." >&2
+            exit 1
+          fi
+          echo "commit_digest=$by_commit" >> "$GITHUB_OUTPUT"
+          echo "version_digest=$by_version" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        if: steps.existing.outputs.commit_digest == ''
+        id: build
+        with:
+          context: .
+          push: true
+          platforms: ${{ vars.PIPELINE_PLATFORM || 'linux/amd64' }}
+          tags: ${{ needs.test.outputs.image }}:sha-${{ needs.test.outputs.commit }}
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ needs.test.outputs.version }}
+            org.opencontainers.image.revision=${{ needs.test.outputs.commit }}
+          cache-from: type=gha,scope=deploy-image
+          cache-to: type=gha,scope=deploy-image,mode=max
+          provenance: true
+          sbom: true
+      - name: Publicar SemVer e comprovar o digest
+        id: release
+        env:
+          REPOSITORY: ${{ needs.test.outputs.image }}
+          VERSION: ${{ needs.test.outputs.version }}
+          COMMIT: ${{ needs.test.outputs.commit }}
+          DIGEST: ${{ steps.existing.outputs.commit_digest || steps.build.outputs.digest }}
+          VERSION_DIGEST: ${{ steps.existing.outputs.version_digest }}
+        run: |
+          [[ "$DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]]
+          if [[ -z "$VERSION_DIGEST" ]]; then
+            docker buildx imagetools create --prefer-index=false \
+              --tag "$REPOSITORY:$VERSION" "$REPOSITORY@$DIGEST"
+          fi
+          for tag in "$VERSION" "sha-$COMMIT"; do
+            published=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "$REPOSITORY:$tag")
+            [[ $(jq -er . <<< "$published") == "$DIGEST" ]]
+          done
+          echo "ref=$REPOSITORY@$DIGEST" >> "$GITHUB_OUTPUT"
+          printf 'Imagem: %s@%s\nVersão: %s\nCommit: %s\n' "$REPOSITORY" "$DIGEST" "$VERSION" "$COMMIT" >> "$GITHUB_STEP_SUMMARY"
+
+  promote:
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      actions: read
+      packages: read
+    outputs:
+      ref: ${{ steps.release.outputs.ref }}
+      version: ${{ needs.test.outputs.version }}
+    steps:
+      - name: Confirmar staging do mesmo commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ needs.test.outputs.commit }}
+          WORKFLOW_REF: ${{ github.workflow_ref }}
+        run: |
+          workflow=${WORKFLOW_REF%@*}
+          run=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/${workflow##*/}/runs" \
+            --method GET -f branch=main -f event=push -f status=success \
+            -f head_sha="$COMMIT" --jq '.workflow_runs[0] | [.id, .run_attempt] | @tsv')
+          read -r run_id attempt <<< "$run"
+          [[ "$run_id" =~ ^[0-9]+$ && "$attempt" =~ ^[0-9]+$ ]]
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" \
+            --name "staging-image-$attempt" --dir "$RUNNER_TEMP/staging"
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - name: Autenticar no registry
+        env:
+          REGISTRY: ${{ needs.test.outputs.registry }}
+          REGISTRY_USER: ${{ needs.test.outputs.registry == 'ghcr.io' && github.actor || vars.PIPELINE_REGISTRY_READ_USER }}
+          REGISTRY_TOKEN: ${{ needs.test.outputs.registry == 'ghcr.io' && github.token || secrets.PIPELINE_REGISTRY_READ_TOKEN }}
+        run: printf '%s' "$REGISTRY_TOKEN" | docker login "$REGISTRY" --username "$REGISTRY_USER" --password-stdin
+      - name: Resolver o mesmo digest publicado antes da tag Git
+        id: release
+        env:
+          REPOSITORY: ${{ needs.test.outputs.image }}
+          VERSION: ${{ needs.test.outputs.version }}
+          COMMIT: ${{ needs.test.outputs.commit }}
+        run: |
+          by_commit=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "$REPOSITORY:sha-$COMMIT" | jq -er .)
+          by_version=$(docker buildx imagetools inspect --format '{{json .Manifest.Digest}}' "$REPOSITORY:$VERSION" | jq -er .)
+          [[ "$by_commit" =~ ^sha256:[0-9a-f]{64}$ && "$by_version" == "$by_commit" ]]
+          [[ $(cat "$RUNNER_TEMP/staging/image-ref") == "$REPOSITORY@$by_commit" ]]
+          echo "ref=$REPOSITORY@$by_commit" >> "$GITHUB_OUTPUT"
+          printf 'Imagem: %s@%s\nVersão: %s\nCommit: %s\n' "$REPOSITORY" "$by_commit" "$VERSION" "$COMMIT" >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    if: ${{ !cancelled() && (needs.image.result == 'success' || needs.promote.result == 'success') }}
+    needs: [image, promote]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    environment:
+      name: ${{ github.ref_type == 'tag' && (vars.PRODUCTION_ENVIRONMENT || 'production') || (vars.STAGING_ENVIRONMENT || 'staging') }}
+      url: ${{ vars.PIPELINE_SMOKE_URL }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Instalar Ansible e collections
+        run: |
+          python3 -m venv "$RUNNER_TEMP/pipeline-ansible"
+          "$RUNNER_TEMP/pipeline-ansible/bin/pip" install 'ansible-core>=2.19,<2.20'
+          "$RUNNER_TEMP/pipeline-ansible/bin/ansible-galaxy" collection install -r ansible/requirements.yml
+          echo "$RUNNER_TEMP/pipeline-ansible/bin" >> "$GITHUB_PATH"
+      - name: Publicar, verificar e reverter em caso de falha
+        env:
+          INVENTORY: ${{ vars.PIPELINE_INVENTORY || 'ansible/inventory.yml' }}
+          VAULT_FILE: ${{ vars.PIPELINE_VAULT_FILE || 'ansible/group_vars/all/vault.yml' }}
+          STACK: ${{ vars.PIPELINE_STACK || 'app' }}
+          SMOKE_URL: ${{ vars.PIPELINE_SMOKE_URL }}
+          IMAGE_REF: ${{ needs.image.outputs.ref || needs.promote.outputs.ref }}
+          VERSION: ${{ needs.image.outputs.version || needs.promote.outputs.version }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          ANSIBLE_VAULT_PASSWORD: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+          REGISTRY_PULL_USER: ${{ vars.PIPELINE_REGISTRY_PULL_USER }}
+          REGISTRY_PULL_TOKEN: ${{ secrets.PIPELINE_REGISTRY_PULL_TOKEN }}
+          ANSIBLE_HOST_KEY_CHECKING: 'True'
+        run: |
+          [[ -n "$DEPLOY_SSH_KEY" && -n "$DEPLOY_KNOWN_HOSTS" && -n "$ANSIBLE_VAULT_PASSWORD" ]]
+          [[ "$SMOKE_URL" =~ ^https?:// && -f "$INVENTORY" && -f "$VAULT_FILE" ]]
+          umask 077
+          auth_dir=$(mktemp -d "$RUNNER_TEMP/deploy.XXXXXXXX")
+          trap 'rm -rf -- "$auth_dir"' EXIT
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$auth_dir/key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$auth_dir/known_hosts"
+          printf '%s\n' "$ANSIBLE_VAULT_PASSWORD" > "$auth_dir/vault"
+          unset DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS ANSIBLE_VAULT_PASSWORD
+          export ANSIBLE_PRIVATE_KEY_FILE="$auth_dir/key"
+          export ANSIBLE_SSH_COMMON_ARGS="-o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$auth_dir/known_hosts"
+          ANSIBLE_INVENTORY="$INVENTORY" ./deploy check-hosts --vault-password-file "$auth_dir/vault"
+          jq -n --arg stack "$STACK" --arg ref "$IMAGE_REF" --arg version "$VERSION" \
+            --arg url "$SMOKE_URL" --arg vault_file "$GITHUB_WORKSPACE/$VAULT_FILE" \
+            '{app_stack_name: $stack, app_image_ref: $ref, app_version: $version, pipeline_smoke_url: $url, pipeline_vault_file: $vault_file}' > "$auth_dir/release.json"
+          ansible-playbook -i "$INVENTORY" --vault-password-file "$auth_dir/vault" \
+            --extra-vars "@$auth_dir/release.json" ansible/stack-deploy.yml
+      - name: Registrar a imagem verificada em staging
+        if: github.ref_type == 'branch'
+        env:
+          IMAGE_REF: ${{ needs.image.outputs.ref }}
+        run: printf '%s\n' "$IMAGE_REF" > "$RUNNER_TEMP/image-ref"
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: github.ref_type == 'branch'
+        with:
+          name: staging-image-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/image-ref
+          if-no-files-found: error

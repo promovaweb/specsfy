@@ -1,0 +1,177 @@
+---
+- name: Conferir o inventário do pipeline
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Exigir um manager e conferir a referência publicada
+      ansible.builtin.assert:
+        that:
+          - groups.get('swarm_managers', []) | length > 0
+          - app_stack_name is match('^[a-z0-9][a-z0-9_-]*$')
+          - app_image_ref is match('^[^ @]+@sha256:[0-9a-f]{64}$')
+          - pipeline_smoke_url is match('^https?://')
+
+- name: Publicar a stack e confirmar o rollout
+  hosts: "swarm_managers[0]"
+  gather_facts: false
+  vars:
+    pipeline_baseline: "{{ app_root }}/pipeline-{{ app_stack_name }}.yaml"
+    pipeline_service: "{{ pipeline_app_service | default('app') }}"
+    pipeline_pull_user: "{{ lookup('ansible.builtin.env', 'REGISTRY_PULL_USER') }}"
+    pipeline_pull_token: "{{ lookup('ansible.builtin.env', 'REGISTRY_PULL_TOKEN') }}"
+  tasks:
+    - name: Carregar variáveis criptografadas do ambiente
+      ansible.builtin.include_vars:
+        file: "{{ pipeline_vault_file }}"
+      no_log: true
+
+    - name: Listar stacks existentes
+      ansible.builtin.command:
+        argv: [docker, stack, ls, --format, "{% raw %}{{.Name}}{% endraw %}"]
+      register: pipeline_stacks
+      changed_when: false
+
+    - name: Procurar a última stack validada
+      ansible.builtin.stat:
+        path: "{{ pipeline_baseline }}"
+      register: pipeline_previous
+
+    - name: Exigir uma referência de rollback para uma stack existente
+      ansible.builtin.assert:
+        that:
+          - app_stack_name not in pipeline_stacks.stdout_lines or pipeline_previous.stat.exists
+        fail_msg: "Prepare {{ pipeline_baseline }} com a stack anterior validada antes de adotar um serviço existente."
+
+    - name: Criar diretório temporário privado no manager
+      ansible.builtin.tempfile:
+        state: directory
+        path: "{{ app_root }}"
+        prefix: pipeline-
+      register: pipeline_work
+
+    - name: Preparar e aplicar a entrega
+      environment:
+        DOCKER_CONFIG: "{{ pipeline_work.path }}"
+      block:
+        - name: Validar as credenciais opcionais de pull
+          ansible.builtin.assert:
+            that:
+              - (pipeline_pull_user | length > 0) == (pipeline_pull_token | length > 0)
+          no_log: true
+
+        - name: Autenticar no registry pelo manager
+          ansible.builtin.command:
+            argv:
+              - docker
+              - login
+              - "{{ app_image_ref.split('/')[0] }}"
+              - --username
+              - "{{ pipeline_pull_user }}"
+              - --password-stdin
+            stdin: "{{ pipeline_pull_token }}"
+          when: pipeline_pull_token | length > 0
+          no_log: true
+          changed_when: false
+
+        - name: Preparar a stack candidata
+          ansible.builtin.template:
+            src: stack.yaml.j2
+            dest: "{{ pipeline_work.path }}/stack.yaml"
+            mode: "0600"
+
+        - name: Validar configuração da stack
+          ansible.builtin.command:
+            argv: [docker, stack, config, --compose-file, "{{ pipeline_work.path }}/stack.yaml"]
+          changed_when: false
+
+        - name: Reaproveitar as tarefas de Docker Secrets do provisionamento
+          ansible.builtin.import_tasks: secrets.yml
+
+        - name: Aplicar e conferir migrations compatíveis antes do rollout
+          ansible.builtin.include_tasks: "{{ pipeline_migration_tasks }}"
+          when: pipeline_migration_tasks is defined
+
+        - name: Fazer deploy e verificar antes de gravar a nova referência
+          block:
+            - name: Publicar a stack candidata
+              ansible.builtin.command:
+                argv:
+                  - docker
+                  - stack
+                  - deploy
+                  - --prune
+                  - --with-registry-auth
+                  - --compose-file
+                  - "{{ pipeline_work.path }}/stack.yaml"
+                  - "{{ app_stack_name }}"
+              changed_when: true
+
+            - name: Verificar a stack candidata
+              ansible.builtin.import_tasks: stack-verify.yml
+              vars:
+                pipeline_verify_file: "{{ pipeline_work.path }}/stack.yaml"
+
+            - name: Registrar a última stack validada
+              ansible.builtin.copy:
+                remote_src: true
+                src: "{{ pipeline_work.path }}/stack.yaml"
+                dest: "{{ pipeline_baseline }}"
+                mode: "0600"
+
+          rescue:
+            - name: Restaurar a stack anterior e conferir a recuperação
+              when: app_stack_name in pipeline_stacks.stdout_lines
+              block:
+                - name: Republicar a stack anterior
+                  ansible.builtin.command:
+                    argv:
+                      - docker
+                      - stack
+                      - deploy
+                      - --prune
+                      - --with-registry-auth
+                      - --compose-file
+                      - "{{ pipeline_baseline }}"
+                      - "{{ app_stack_name }}"
+                  changed_when: true
+
+                - name: Verificar a stack restaurada
+                  ansible.builtin.import_tasks: stack-verify.yml
+                  vars:
+                    pipeline_verify_file: "{{ pipeline_baseline }}"
+                    pipeline_accepted_states: [completed, rollback_completed]
+
+            - name: Desfazer a primeira entrega
+              when: app_stack_name not in pipeline_stacks.stdout_lines
+              block:
+                - name: Conferir se a tentativa criou uma stack
+                  ansible.builtin.command:
+                    argv: [docker, stack, ls, --format, "{% raw %}{{.Name}}{% endraw %}"]
+                  register: pipeline_failed_stacks
+                  changed_when: false
+
+                - name: Remover a stack criada
+                  ansible.builtin.command:
+                    argv: [docker, stack, rm, "{{ app_stack_name }}"]
+                  when: app_stack_name in pipeline_failed_stacks.stdout_lines
+                  changed_when: true
+
+                - name: Aguardar a remoção da stack
+                  ansible.builtin.command:
+                    argv: [docker, stack, ls, --format, "{% raw %}{{.Name}}{% endraw %}"]
+                  register: pipeline_remaining_stacks
+                  until: app_stack_name not in pipeline_remaining_stacks.stdout_lines
+                  retries: 30
+                  delay: 5
+                  changed_when: false
+
+            - name: Encerrar a entrega com falha após o rollback
+              ansible.builtin.fail:
+                msg: "A stack candidata falhou. O rollback do ambiente foi executado."
+
+      always:
+        - name: Remover manifestos temporários e credenciais do registry
+          ansible.builtin.file:
+            path: "{{ pipeline_work.path }}"
+            state: absent

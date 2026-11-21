@@ -1,11 +1,10 @@
 # Entrega
 
-O especialista Delivery coordena a entrega de uma aplicação do começo ao fim:
-versão, artefato, servidor, cluster e promoção entre ambientes com a mesma
-referência imutável. Ele trabalha em três modos: **Deploy**, para executar o
-release em servidor com Docker Swarm preparado por Ansible; **Versionamento**,
-para preparar e conferir o `SEMVER`; e **CI/CD**, para desenhar pipeline,
-promoção, migrations, rollout e rollback.
+O especialista Delivery coordena versão, imagem, servidor, cluster e promoção
+entre ambientes. O modo **Deploy** prepara o servidor e executa o release. O
+modo **Versionamento** prepara e confere o `SEMVER`. O modo **CI/CD** define a
+estratégia de entrega. O modo **Pipeline de deploy** automatiza os testes,
+o build Docker e a publicação em staging e produção.
 
 ## Quando usar
 
@@ -17,6 +16,8 @@ promoção, migrations, rollout e rollback.
   alinhamento entre imagem, manifesto e deploy.
 - O projeto tem arquivos de CI/CD, estratégia de release ou promoção entre
   ambientes.
+- Você quer que o GitHub Actions teste, publique a imagem e faça deploy via
+  Ansible com verificação e rollback.
 - Você precisa escolher entre rolling, blue-green, canary ou feature flag para
   uma mudança específica.
 
@@ -215,9 +216,54 @@ o mesmo job em várias versões ou plataformas.
   sequência. Confira o comportamento em PR de fork, com aprovação pendente
   e com duas promoções simultâneas.
 
+## Pipeline de deploy
+
+Use o modo `$specsfy-specialist-delivery (pipeline)` para ligar os testes à
+produção. O projeto precisa de um `SEMVER` na raiz, um `Dockerfile`, um Swarm
+preparado com Ansible e uma rota HTTP de saúde em cada ambiente.
+
+1. Em um projeto novo, gere a base informando `--pipeline`:
+
+   ```bash
+   node scripts/scaffold.mjs --project /caminho/app \
+     --image ghcr.io/organizacao/app --pipeline
+   ```
+
+   O gerador inclui `.github/workflows/deploy.yml` e os arquivos Ansible de
+   rollout e verificação. Se você já tem automação, gere uma cópia em outra
+   pasta e incorpore as mudanças por comparação. Use `--force` somente quando
+   quiser substituir os arquivos gerados existentes.
+2. Configure os ambientes `staging` e `production` no GitHub. Em cada um,
+   indique o inventário, o Vault criptografado, a stack e a URL de saúde.
+   Cadastre a chave SSH, as chaves públicas verificadas dos hosts e a senha
+   do Vault como secrets. Restrinja produção às tags de release e exija
+   aprovação de um revisor.
+3. Abra um pull request para rodar os testes. O template usa PHP e Composer.
+   O especialista [Testing](testing.md) ajuda a ajustar a suíte, incluindo
+   testes de frontend e navegador quando o projeto precisar.
+4. Prepare um `SEMVER` disponível antes de integrar o commit à `main`. O
+   pipeline publica a imagem no GHCR com tags de versão e commit. Em staging,
+   o Ansible aplica a stack pelo digest, o identificador exato do conteúdo.
+5. Depois de staging passar, crie a tag Git `vX.Y.Z` no mesmo commit. O
+   workflow confirma o resultado de staging e o digest das duas tags da
+   imagem. Após a aprovação, o Ansible publica essa mesma imagem em produção.
+6. A entrega só passa quando as réplicas convergem, o rollout termina e a URL
+   de saúde responde com HTTP 200. Se falhar, o pipeline restaura a última
+   stack validada do ambiente. Em uma primeira instalação, remove a stack
+   criada. Para adotar uma stack em funcionamento, registre previamente o
+   manifesto da versão saudável.
+
+Se a entrega mudar o banco, faça primeiro as mudanças compatíveis com as
+duas versões da aplicação. Deixe a remoção de estruturas antigas para uma
+entrega posterior, quando a versão anterior puder sair do plano de rollback.
+
+A [referência do modo pipeline](../../../specialists/specsfy-specialist-delivery/references/pipeline.md)
+lista as variáveis e secrets do GitHub, o preparo dos hosts e os comandos de
+validação.
+
 ## Erros que ele evita
 
-- Tag `latest` ou qualquer tag diferente do `SEMVER`.
+- Deploy pela tag móvel `latest` ou por uma tag sem vínculo com o `SEMVER`.
 - `docker swarm init` em todas as execuções do playbook.
 - Token de join, senha, chave ou token do Cloudflare Tunnel em log, variável
   aberta, `stack.yaml`, argumento ou imagem.
@@ -305,8 +351,8 @@ e o pipeline em
 
 ## Justificativa de tamanho
 
-Este guia reúne os três especialistas antigos de entrega: deploy,
-versionamento e CI/CD. Você acompanha o mesmo artefato desde o build até o
+Este guia reúne deploy, versionamento, CI/CD e o pipeline que integra esses
+modos. Você acompanha o mesmo artefato desde o build até o
 rollback, sem trocar de página quando o assunto passa de versão para pipeline.
 Separar cada modo em um guia diferente esconderia justamente as passagens em
 que um depende do outro, como a tag que o pipeline consome e a versão que o

@@ -2,7 +2,7 @@
 
 /** Gera Compose, stack Swarm e automação Ansible para o sistema do usuário. */
 
-import { chmod, mkdir, readFile, stat, writeFile } from "node:fs/promises";
+import { chmod, lstat, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import process from "node:process";
 
@@ -14,10 +14,14 @@ function parseArguments(values) {
   let project;
   let image;
   let proxy = "cloudflare-tunnel";
+  let pipeline = false;
+  let force = false;
   for (let index = 0; index < values.length; index += 1) {
     if (values[index] === "--project") project = values[index + 1];
     if (values[index] === "--image") image = values[index + 1];
     if (values[index] === "--proxy") proxy = values[index + 1];
+    if (values[index] === "--pipeline") pipeline = true;
+    if (values[index] === "--force") force = true;
   }
   if (!project || !image) throw new Error("Informe --project e --image.");
   if (image.includes("@") || image.split("/").at(-1).includes(":")) {
@@ -26,24 +30,24 @@ function parseArguments(values) {
   if (!SUPPORTED_PROXIES.has(proxy)) {
     throw new Error("Informe --proxy cloudflare-tunnel ou --proxy external.");
   }
-  return { image, project: resolve(project), proxy };
+  return { image, project: resolve(project), proxy, pipeline, force };
 }
 
-/** Informa se o caminho já existe. */
-async function exists(path) {
+/** Consulta o destino sem seguir links simbólicos. */
+async function destinationInfo(path) {
   try {
-    await stat(path);
-    return true;
+    return await lstat(path);
   } catch (error) {
-    if (error.code === "ENOENT") return false;
+    if (error.code === "ENOENT") return undefined;
     throw error;
   }
 }
 
-/** Escreve todos os arquivos somente após confirmar que nenhum será sobrescrito. */
-async function writeScaffold(project, files) {
+/** Valida todos os destinos antes de escrever o primeiro arquivo. */
+async function writeScaffold(project, files, force) {
   for (const relative of Object.keys(files)) {
-    if (await exists(resolve(project, relative))) {
+    const destination = await destinationInfo(resolve(project, relative));
+    if (destination && (!force || !destination.isFile())) {
       throw new Error(`Arquivo existente não foi alterado: ${relative}`);
     }
   }
@@ -102,7 +106,7 @@ async function writeScaffold(project, files) {
       );
     }
     await mkdir(dirname(destination), { recursive: true });
-    await writeFile(destination, rendered, { encoding: "utf8", flag: "wx" });
+    await writeFile(destination, rendered, { encoding: "utf8", flag: force ? "w" : "wx" });
     if (relative.endsWith(".sh") || relative === "deploy") {
       await chmod(destination, 0o755);
     }
@@ -123,7 +127,7 @@ function buildFiles(image, version, checkHosts, proxy) {
   const cloudflareSecretName = usesCloudflare ? "  - cloudflare_tunnel_token\n" : "";
   return {
     "Dockerfile": `FROM composer:2 AS vendor\nWORKDIR /app\nCOPY composer.json composer.lock ./\nRUN composer install --no-dev --prefer-dist --no-interaction --no-scripts\n\nFROM php:8.4-cli-bookworm AS runtime\nRUN pecl install openswoole \\\n    && docker-php-ext-enable openswoole\nWORKDIR /app\nRUN groupadd --gid 1000 app \\\n    && useradd --uid 1000 --gid app --create-home --shell /usr/sbin/nologin app\nCOPY --chown=app:app . .\nCOPY --from=vendor --chown=app:app /app/vendor ./vendor\nRUN chmod 0755 docker/entrypoint.sh\nUSER app\nEXPOSE 8000\nENTRYPOINT ["docker/entrypoint.sh"]\nCMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000"]\n`,
-    ".dockerignore": `.git\n.env\nnode_modules\nstorage/logs/*\ntests\n`,
+    ".dockerignore": `.git\n.github\nansible\n.env\nnode_modules\nstorage/logs/*\ntests\n`,
     "docker/entrypoint.sh": `#!/bin/sh\nset -eu\n\nfor secret_file in /run/secrets/*; do\n  [ -f "$secret_file" ] || continue\n  secret_name=$(basename "$secret_file" | tr '[:lower:]' '[:upper:]')\n  secret_value=$(cat "$secret_file")\n  export "$secret_name=$secret_value"\ndone\n\nexec "$@"\n`,
     "compose.yaml": `services:\n  app:\n    build: .\n    image: ${taggedImage}\n    command: ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000"]\n    ports:\n      - "8000:8000"\n    env_file:\n      - .env\n    healthcheck:\n      test: ["CMD", "php", "artisan", "octane:status"]\n      interval: 30s\n      timeout: 5s\n      retries: 3\n`,
     "stack.yaml": `services:\n  app:\n    image: ${taggedImage}\n    command: ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000"]\n    networks:\n      - app\n    secrets:\n      - app_key\n      - db_password\n    deploy:\n      replicas: 2\n      update_config:\n        order: start-first\n        failure_action: rollback\n      rollback_config:\n        order: stop-first\n      restart_policy:\n        condition: on-failure\n${cloudflareService}\nnetworks:\n  app:\n    driver: overlay\n\nsecrets:\n  app_key:\n    external: true\n  db_password:\n    external: true\n${cloudflareSecret}`,
@@ -135,13 +139,13 @@ function buildFiles(image, version, checkHosts, proxy) {
     "ansible/sync-keys.yml": `---\n- name: Sincronizar chaves públicas locais\n  hosts: all\n  become: true\n  tasks:\n    - name: Manter grupo de serviço deploy\n      ansible.builtin.group:\n        name: "{{ deploy_user }}"\n        state: present\n\n    - name: Manter usuário deploy apto a receber acesso SSH por chave\n      ansible.builtin.user:\n        name: "{{ deploy_user }}"\n        group: "{{ deploy_user }}"\n        groups: docker\n        append: true\n        create_home: true\n        shell: /bin/bash\n        password_lock: true\n\n    - name: Sincronizar chaves públicas sem remover acessos existentes\n      ansible.builtin.import_tasks: keys.yml\n`,
     "ansible/inventory.example.yml": `all:\n  children:\n    swarm_managers:\n      hosts:\n        app01:\n          ansible_host: 192.0.2.10\n          ansible_port: 22\n          ansible_user: root\n    swarm_workers:\n      hosts:\n        app02:\n          ansible_host: 192.0.2.11\n          ansible_port: 22\n          ansible_user: root\n`,
     "ansible/group_vars/all.yml": `deploy_user: deploy\napp_root: /opt/apps/app\napp_stack_name: app\napp_image: "${image}"\napp_version: "${version}"\nswarm_advertise_addr: "{{ ansible_default_ipv4.address }}"\nlocal_ssh_public_key_pattern: "{{ lookup('ansible.builtin.env', 'HOME') }}/.ssh/*.pub"\napp_secret_names:\n  - app_key\n  - db_password\n${cloudflareSecretName}`,
-    "ansible/templates/stack.yaml.j2": `services:\n  app:\n    image: "{{ app_image }}:{{ app_version }}"\n    command: ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000"]\n    networks:\n      - app\n    secrets:\n      - app_key\n      - db_password\n    deploy:\n      replicas: 2\n      update_config:\n        order: start-first\n        failure_action: rollback\n      rollback_config:\n        order: stop-first\n      restart_policy:\n        condition: on-failure\n${cloudflareService}\nnetworks:\n  app:\n    driver: overlay\nsecrets:\n  app_key:\n    external: true\n  db_password:\n    external: true\n${cloudflareSecret}`,
+    "ansible/templates/stack.yaml.j2": `services:\n  app:\n    image: "{{ app_image_ref | default(app_image ~ ':' ~ app_version) }}"\n    command: ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000"]\n    networks:\n      - app\n    secrets:\n      - app_key\n      - db_password\n    healthcheck:\n      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);"]\n      interval: 10s\n      timeout: 5s\n      retries: 3\n      start_period: 15s\n    deploy:\n      replicas: 2\n      update_config:\n        order: start-first\n        failure_action: rollback\n        monitor: 45s\n      rollback_config:\n        order: stop-first\n      restart_policy:\n        condition: on-failure\n${cloudflareService}\nnetworks:\n  app:\n    driver: overlay\nsecrets:\n  app_key:\n    external: true\n  db_password:\n    external: true\n${cloudflareSecret}`,
   };
 }
 
 /** Executa o gerador. */
 async function main() {
-  const { image, project, proxy } = parseArguments(process.argv.slice(2));
+  const { image, project, proxy, pipeline, force } = parseArguments(process.argv.slice(2));
   const version = (await readFile(resolve(project, "SEMVER"), "utf8")).trim();
   if (!STABLE_SEMVER.test(version)) throw new Error(`SEMVER inválido: ${version}`);
   const checkHosts = await readFile(
@@ -154,14 +158,22 @@ async function main() {
     "utf8",
   );
   // Os utilitários são copiados integralmente para permitir revisão e ShellCheck.
-  for (const [destination, source] of Object.entries({
+  const assets = {
     deploy: "deploy.sh",
     "ansible/create-vault.sh": "create-vault.sh",
     "ansible/vault.mjs": "vault.mjs",
-  })) {
+  };
+  if (pipeline) {
+    Object.assign(assets, {
+      ".github/workflows/deploy.yml": "pipeline.yml",
+      "ansible/stack-deploy.yml": "stack-deploy.yml",
+      "ansible/stack-verify.yml": "stack-verify.yml",
+    });
+  }
+  for (const [destination, source] of Object.entries(assets)) {
     files[destination] = await readFile(new URL(`../assets/${source}`, import.meta.url), "utf8");
   }
-  await writeScaffold(project, files);
+  await writeScaffold(project, files, force);
   process.stdout.write(`${Object.keys(files).length} arquivos gerados para ${image}:${version}.\n`);
 }
 

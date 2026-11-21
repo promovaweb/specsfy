@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, statSync, chmodSync, mkdirSync, symlinkSync, existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync, spawn } from 'node:child_process';
+import { parse } from 'yaml';
 import { ROOT, temporary, put, node } from '../../tests/helpers.mjs';
 import { configure, defaultPasswordPath, externalPath } from '../specsfy-specialist-delivery/assets/vault.mjs';
 import { inventoryHosts, roleFor, connectionStates } from '../specsfy-specialist-delivery/assets/check-hosts.mjs';
@@ -297,4 +298,69 @@ test('cancelamento do playbook encerra o processo filho e remove a senha tempor�
     const path = call.args[call.args.indexOf('--vault-password-file') + 1];
     assert.ok(!existsSync(path));
   }
+});
+
+test('scaffold inclui workflow e playbooks do pipeline somente sob opção explícita', t => {
+  const standard = fixture(t).project;
+  const pipeline = fixture(t, ['--pipeline']).project;
+  const assets = join(ROOT, 'specialists/specsfy-specialist-delivery/assets');
+  for (const [path, asset] of [
+    ['.github/workflows/deploy.yml', 'pipeline.yml'],
+    ['ansible/stack-deploy.yml', 'stack-deploy.yml'],
+    ['ansible/stack-verify.yml', 'stack-verify.yml'],
+  ]) {
+    assert.ok(!existsSync(join(standard, path)), path);
+    assert.equal(text(pipeline, path), text(assets, asset));
+  }
+  includes(text(pipeline, 'ansible/templates/stack.yaml.j2'), ['app_image_ref', 'healthcheck:', 'monitor:']);
+  includes(text(pipeline, 'ansible/group_vars/all.yml'), ['app_image: "example/app"']);
+});
+
+test('scaffold preserva workflow existente até receber --force', t => {
+  const project = temporary(t);
+  put(project, 'SEMVER', '2.3.4\n');
+  put(project, '.github/workflows/deploy.yml', 'workflow humano\n');
+  const args = ['--project', project, '--image', 'example/app', '--pipeline'];
+  const refused = node(scaffold, args);
+  assert.notEqual(refused.status, 0);
+  includes(refused.stderr, ['.github/workflows/deploy.yml']);
+  assert.equal(text(project, '.github/workflows/deploy.yml'), 'workflow humano\n');
+  assert.ok(!existsSync(join(project, 'ansible/stack-deploy.yml')));
+  successful(node(scaffold, [...args, '--force']));
+  assert.ok(existsSync(join(project, 'ansible/stack-deploy.yml')));
+  assert.notEqual(text(project, '.github/workflows/deploy.yml'), 'workflow humano\n');
+});
+
+test('pipeline separa publicação, promoção e deploy com rollback', () => {
+  const assets = join(ROOT, 'specialists/specsfy-specialist-delivery/assets');
+  const workflow = parse(text(assets, 'pipeline.yml'));
+  assert.deepEqual(workflow.on.pull_request.branches, ['main']);
+  assert.deepEqual(workflow.on.push, { branches: ['main'], tags: ['v*'] });
+  assert.deepEqual(workflow.permissions, {});
+  assert.deepEqual(workflow.jobs.test.permissions, { contents: 'read' });
+  assert.equal(workflow.jobs.image.needs, 'test');
+  assert.match(workflow.jobs.image.if, /ref_type == 'branch'/);
+  assert.equal(workflow.jobs.image.permissions.packages, 'write');
+  assert.equal(workflow.jobs.promote.needs, 'test');
+  assert.match(workflow.jobs.promote.if, /ref_type == 'tag'/);
+  assert.equal(workflow.jobs.promote.permissions.packages, 'read');
+  const staging = workflow.jobs.promote.steps.find(step => step.env?.WORKFLOW_REF);
+  assert.match(staging.run, /event=push -f status=success/);
+  assert.match(staging.run, /gh run download/);
+  assert.match(workflow.jobs.promote.steps.find(step => step.id === 'release').run, /staging\/image-ref/);
+  assert.deepEqual(workflow.jobs.deploy.needs, ['image', 'promote']);
+  assert.match(workflow.jobs.deploy.environment.name, /'production'.*'staging'/);
+  const evidence = workflow.jobs.deploy.steps.find(step => step.uses?.startsWith('actions/upload-artifact@'));
+  assert.match(evidence.with.name, /^staging-image-.*github.run_attempt/);
+  assert.equal(workflow.concurrency['cancel-in-progress'], false);
+  for (const job of Object.values(workflow.jobs)) {
+    for (const step of job.steps.filter(step => step.uses)) assert.match(step.uses, /@[0-9a-f]{40}$/);
+  }
+  const [, deployment] = parse(text(assets, 'stack-deploy.yml'));
+  const prepared = deployment.tasks.find(task => task.always && task.block);
+  const rollout = prepared.block.find(task => task.rescue);
+  assert.equal(rollout.block[1]['ansible.builtin.import_tasks'], 'stack-verify.yml');
+  assert.ok(rollout.block[2]['ansible.builtin.copy']);
+  assert.equal(rollout.rescue[0].block[1]['ansible.builtin.import_tasks'], 'stack-verify.yml');
+  assert.ok(rollout.rescue.at(-1)['ansible.builtin.fail']);
 });

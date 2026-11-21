@@ -76,3 +76,10 @@ npm run validate:skills
 ```
 
 Cada módulo possui comandos adicionais em seu `AGENTS.md`.
+
+Para manter o scaffold de deploy do catálogo, valide os assets de GitHub
+Actions e de Ansible em um consumidor gerado. O
+[modo pipeline](../../specialists/specsfy-specialist-delivery/references/pipeline.md#validação)
+documenta os comandos. Os testes de scaffold em
+[`specialists/tests`](../../specialists/tests/) cobrem geração, preservação de
+arquivos existentes e a sequência dos jobs.

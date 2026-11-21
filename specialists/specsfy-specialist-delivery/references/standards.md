@@ -2,7 +2,7 @@
 
 Revisado em 2026-11-20 contra: SemVer 2.0.0, SLSA 1.2, GitHub Actions no GitHub.com, Ansible 14 (ansible-core 2.21), community.docker 5.4.0, Docker Engine 29.10.0, Laravel Octane e Cloudflare Tunnel (cloudflared 2025.4.0+ para --token-file).
 
-Reúne as regras que valem para os três modos (deploy, versioning e ci-cd) e
+Reúne as regras que valem para deploy, versioning, ci-cd e pipeline e
 serve de índice para a referência de cada um.
 
 ## Índice dos modos
@@ -12,6 +12,7 @@ serve de índice para a referência de cada um.
 | deploy | [deploy.md](deploy.md) e [vault.md](vault.md) | estado do servidor pela automação, hosts, imagem, secrets e ordem operacional |
 | versioning | [versioning.md](versioning.md) | `SEMVER`, incremento, correspondência entre artefatos e ordem de publicação |
 | ci-cd | [ci-cd.md](ci-cd.md) e [github-actions.md](github-actions.md) | etapas de pipeline, estratégias de release, migrations, supply chain e GitHub Actions |
+| pipeline | [pipeline.md](pipeline.md) | workflow de testes, build Docker, promoção e rollback via Ansible |
 
 ## Autorização e alcance
 
