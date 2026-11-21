@@ -13,10 +13,11 @@ src/
     crypto.ts             AES-256-GCM e master key
     credentials.ts        cofre cifrado
   core/
-    project.ts            raiz do projeto e resolução do identificador da spec
+    project.ts            descoberta da raiz do projeto
     overview.ts           leitura do projeto: specs, progresso, backlog e inbox
   domain/
-    lifecycle.ts          pastas de estado, transições e scanners de spec
+    lifecycle.ts          mudanças de estado e migrações de specs
+    spec-paths.ts         varredura de layouts e resolução de seletores de spec
     progress.ts           progresso, gates e leitura das tarefas
     red-tasks.ts          seleção de teste TDD com Plan Gate pendente
     backlog.ts            itens de specs/backlog/
@@ -72,8 +73,8 @@ tests/                    bun test
 ## Camadas do domínio
 
 `src/core/` lê o projeto. `project.ts` encontra a raiz a partir de `specs/`,
-`.specsfy/` ou `skills-lock.json` e resolve o identificador da spec (número,
-pasta, slug ou caminho). `overview.ts` monta a visão de leitura usada por
+`.specsfy/` ou `skills-lock.json`. `domain/spec-paths.ts` resolve o seletor
+da spec (número, pasta, slug ou caminho). `overview.ts` monta a visão de leitura usada por
 `status`, `specs list`, `specs show`, as tools MCP e as screens da TUI. Nada
 em `core/` escreve arquivos.
 
@@ -83,12 +84,14 @@ framework, catálogo de especialistas, lock, testes do projeto, milestones e
 GitHub. Os commands nativos chamam essas funções diretamente, sem passar por
 um script.
 
-Transições e migrações usam um lock SQLite por projeto e identificador da
-spec, em um arquivo no diretório temporário do sistema. O lock vale da
-resolução do estado até a escrita do status e dos vínculos no backlog.
-O sistema libera o lock quando o processo termina. Com a pasta como fonte
-do estado atual, a transição seguinte pode reescrever referências aos
-layouts legados e a qualquer estado anterior do mesmo identificador.
+Transições e migrações usam um lock SQLite por projeto, em um arquivo no
+diretório temporário do sistema. `BEGIN IMMEDIATE` adquire a trava antes de
+procurar a spec. A mesma trava cobre a movimentação, a escrita do status e
+dos vínculos no backlog, a atualização dos milestones e a leitura do
+vínculo com o ClickUp. A espera por uma trava ocupada tem limite de 30
+segundos. O sistema libera a trava se o processo terminar abruptamente.
+Com a pasta como fonte do estado atual, a transição seguinte pode reescrever
+referências aos layouts legados e a qualquer estado anterior da mesma spec.
 
 `src/engine/` executa os scripts do framework embutidos. A árvore de
 `../skills/` é importada como texto em `skills.gen.ts`, gerado por

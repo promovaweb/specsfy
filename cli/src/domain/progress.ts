@@ -11,7 +11,7 @@ import { readFile } from "node:fs/promises";
 import { basename, dirname, relative } from "node:path";
 import { error } from "../app/errors.ts";
 import { resolvePath } from "./filesystem.ts";
-import { scanSpecPaths } from "./lifecycle.ts";
+import { scanSpecPaths } from "./spec-paths.ts";
 
 const FIELD = /^\*\*([^*]+)\*\*:\s*(.+?)\s*$/;
 const TABLE_FIELD = /^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/;

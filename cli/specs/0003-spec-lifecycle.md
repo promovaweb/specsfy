@@ -31,8 +31,9 @@ transição corrige vínculos antigos, mesmo quando a spec fica no mesmo estado.
 `src/domain/lifecycle.ts` e `inbox.ts`. `tasks check` é nativo e altera o
 checkbox da tarefa ou do item no `spec.md`.
 O domínio lê os itens com `scanBacklogs` e compara os caminhos resolvidos
-com as localizações conhecidas do mesmo identificador. Um lock por spec
-serializa a resolução do estado, a movimentação e a escrita dos vínculos.
+com as localizações conhecidas do mesmo identificador. Um lock por projeto
+serializa transições e migrações, desde a busca pelo seletor até a atualização
+dos vínculos e das projeções de milestones.
 
 ## Surface
 
@@ -61,6 +62,9 @@ serializa a resolução do estado, a movimentação e a escrita dos vínculos.
 - [x] Transição atualiza vínculos com e sem crases e preserva as outras specs.
 - [x] Transições concorrentes serializam as escritas e uma nova transição
   corrige vínculos antigos após uma interrupção.
+- [x] Dois processos CLI usando o mesmo número de spec concluem a operação.
+  Um move a spec e o outro encontra o estado de destino. O `Status` e o
+  vínculo do backlog apontam para o estado final.
 - [x] Transição e migração reescrevem vínculos Markdown e caminhos
   equivalentes preservando o formato da célula.
 
@@ -68,3 +72,6 @@ serializa a resolução do estado, a movimentação e a escrita dos vínculos.
 
 - 2026-11-20: teste focal confirmou a restauração após falha de gravação no
   backlog. `bun run validate` passou com 348 testes aprovados.
+- 2026-11-21: a versão anterior reproduziu `NOT_FOUND` na 11ª execução sob
+  carga. Com a busca dentro da trava, o teste passou 200 vezes seguidas
+  sob a mesma carga.

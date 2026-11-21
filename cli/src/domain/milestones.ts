@@ -10,7 +10,7 @@
 import { readFile, readdir } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
-import { scanSpecPaths } from "./lifecycle.ts";
+import { scanSpecPaths } from "./spec-paths.ts";
 
 const TABLE_FIELD = /^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/u;
 const BOLD_FIELD = /^\*\*([^*]+?)\*\*:\s*(.+?)\s*$/u;

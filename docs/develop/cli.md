@@ -40,8 +40,8 @@ seção `Surface` do `CLISPEC.md` e em `cli/docs/cli.md`, `cli/docs/tui.md` e
 | --- | --- |
 | `app/` | manifest do binário, tabela de exit codes e `AppError` |
 | `config/` | `~/.specsfy/`, `settings.json`, cofre cifrado e master key |
-| `core/` | raiz do projeto, resolução do identificador da spec e visão de leitura |
-| `domain/` | estados da spec, progresso, backlog, inbox, instalador, catálogo, lock, updater, testes do projeto, milestones e GitHub |
+| `core/` | raiz do projeto e visão de leitura |
+| `domain/` | resolução e estados da spec, progresso, backlog, inbox, instalador, catálogo, lock, updater, testes do projeto, milestones e GitHub |
 | `engine/` | `ScriptCommandDef` e o runner dos scripts `.mjs` embutidos |
 | `cli/` | registry próprio de commands, parser, help, OpenCLI e formatação |
 | `mcp/` | `McpServer` sobre stdio, tools, resources e prompts |
@@ -68,6 +68,8 @@ acrescenta avisos à resposta do binário. Consulte a
 A transição de estado atualiza os vínculos do backlog cujo campo
 `Spec promovida` aponta para o caminho anterior do `spec.md`. Se uma gravação
 falhar, a operação restaura a spec e os vínculos já gravados.
+Transições e migrações adquirem a mesma trava do projeto antes de procurar
+as specs e a liberam depois de atualizar as projeções de milestones.
 
 ## Scripts embutidos
 

@@ -9,24 +9,18 @@
 
 import { Database } from "bun:sqlite";
 import { createHash } from "node:crypto";
-import { mkdir, readFile, readdir, realpath, rename } from "node:fs/promises";
+import { mkdir, readFile, realpath, rename } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { AppError, error } from "../app/errors.ts";
 import { ExitCode } from "../app/exit-codes.ts";
 import { scanBacklogs } from "./backlog.ts";
-import { isFile, pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
+import { clickUpfyHandoff, type ClickUpfyHandoff } from "./clickupfy.ts";
+import { pathExists, resolvePath, writeTextAtomic } from "./filesystem.ts";
+import { syncMilestones } from "./milestones.ts";
+import { findLegacySpecPaths, resolveSpecPath, scanSpecPaths, SPEC_FOLDERS, type SpecFolder } from "./spec-paths.ts";
 
-export const SPEC_FOLDERS = [
-  "draft",
-  "defined",
-  "planned",
-  "in-progress",
-  "review",
-  "completed",
-] as const;
-
-export type SpecFolder = (typeof SPEC_FOLDERS)[number];
+export { SPEC_FOLDERS, type SpecFolder } from "./spec-paths.ts";
 
 const STATUS_BY_FOLDER: Record<SpecFolder, string> = {
   draft: "Draft",
@@ -85,15 +79,10 @@ export interface EffortUpdateOptions {
   updatedAt?: string;
 }
 
-/** Lists spec paths of every layout the framework accepts. */
-export async function scanSpecPaths(project: string): Promise<string[]> {
-  return findSpecPaths(resolvePath(project));
-}
-
 /** Locates a single spec, in the current or the legacy layout. */
 export async function resolveSpec(project: string, identifier: string): Promise<ResolvedSpec> {
   const root = resolvePath(project);
-  const matches = (await findSpecPaths(root)).filter(
+  const matches = (await scanSpecPaths(root)).filter(
     (path) => basename(dirname(path)) === identifier,
   );
   if (!matches.length) throw error.notFound(`Spec not found: ${identifier}`);
@@ -113,18 +102,19 @@ export async function resolveSpec(project: string, identifier: string): Promise<
 }
 
 /**
- * Moves a spec between adjacent states and updates its Status and backlinks.
+ * Resolves a spec selector, moves the spec, and updates its Status, backlinks and milestones.
  * An invalid transition throws USAGE with the accepted destinations in
  * `details.accepted`.
  */
 export async function transitionSpec(
   project: string,
-  identifier: string,
+  selector: string,
   to: SpecFolder,
-): Promise<SpecTransition> {
+): Promise<SpecTransition & { clickupfy: ClickUpfyHandoff }> {
   assertFolder(to);
   const root = resolvePath(project);
-  return withSpecLock(root, identifier, async () => {
+  return withProjectTransitionLock(root, async () => {
+    const identifier = basename(dirname(await resolveSpecPath(root, selector)));
     const spec = await resolveSpec(root, identifier);
     if (!NEXT_FOLDERS[spec.folder].includes(to)) {
       throw error.usage(
@@ -132,12 +122,15 @@ export async function transitionSpec(
         { from: spec.folder, to, accepted: [...NEXT_FOLDERS[spec.folder]] },
       );
     }
-    return relocateSpec(root, spec, to);
+    const result = await relocateSpec(root, spec, to);
+    await syncMilestones(root);
+    return { ...result, clickupfy: await clickUpfyHandoff(root, result.path, "transition") };
   });
 }
 
-async function withSpecLock<T>(root: string, identifier: string, operation: () => Promise<T>): Promise<T> {
-  const key = createHash("sha256").update(await realpath(root)).update("\0").update(identifier).digest("hex");
+async function withProjectTransitionLock<T>(root: string, operation: () => Promise<T>): Promise<T> {
+  // Resolving a selector and updating the derived index both scan the whole project.
+  const key = createHash("sha256").update(await realpath(root)).digest("hex");
   const directory = join(tmpdir(), `specsfy-transitions-${process.getuid?.() ?? "user"}`);
   await mkdir(directory, { recursive: true, mode: 0o700 });
   const lock = new Database(join(directory, key));
@@ -152,7 +145,7 @@ async function withSpecLock<T>(root: string, identifier: string, operation: () =
         break;
       } catch (cause) {
         if ((cause as { code?: string }).code !== "SQLITE_BUSY") throw cause;
-        if (Date.now() >= deadline) throw new Error(`Timed out waiting for the transition of ${identifier}`, { cause });
+        if (Date.now() >= deadline) throw new Error(`Timed out waiting for the transition lock in ${root}`, { cause });
         await Bun.sleep(25);
       }
     }
@@ -266,23 +259,22 @@ function updatePromotedPath(root: string, backlogPath: string, content: string, 
 /** Migrates specs from both legacy layouts to the current state folders. */
 export async function migrateSpecs(project: string): Promise<SpecTransition[]> {
   const root = resolvePath(project);
-  const legacy = await findLegacySpecPaths(root);
-  const results: SpecTransition[] = [];
-  for (const path of legacy) {
-    const identifier = basename(dirname(path));
-    const result = await withSpecLock(root, identifier, async () => {
+  return withProjectTransitionLock(root, async () => {
+    const results: SpecTransition[] = [];
+    for (const path of await findLegacySpecPaths(root)) {
+      const identifier = basename(dirname(path));
       const spec = await resolveSpec(root, identifier);
-      if (spec.path !== path) return undefined;
+      if (spec.path !== path) continue;
       const status = readStatus(await readFile(path, "utf8"));
       const to = status ? FOLDER_BY_STATUS.get(status.toLowerCase()) : undefined;
       if (!to) {
         throw error.usage(`Invalid Status to migrate ${identifier}: ${status ?? "missing"}`);
       }
-      return relocateSpec(root, spec, to);
-    });
-    if (result) results.push(result);
-  }
-  return results;
+      results.push(await relocateSpec(root, spec, to));
+    }
+    if (results.length) await syncMilestones(root);
+    return results;
+  });
 }
 
 /** Updates the estimated effort and keeps a traceable rationale. */
@@ -314,44 +306,6 @@ export async function updateSpecEffort(
 export function statusForFolder(folder: SpecFolder): string {
   assertFolder(folder);
   return STATUS_BY_FOLDER[folder];
-}
-
-async function findSpecPaths(root: string): Promise<string[]> {
-  const current = await Promise.all(
-    SPEC_FOLDERS.map(async (folder) => listSpecPaths(join(root, "specs", folder))),
-  );
-  return [...current.flat(), ...(await findLegacySpecPaths(root))].sort();
-}
-
-async function findLegacySpecPaths(root: string): Promise<string[]> {
-  const parents = [join(root, "specs", "specs")];
-  const directPaths: string[] = [];
-  const direct = join(root, "specs");
-  try {
-    for (const entry of await readdir(direct, { withFileTypes: true })) {
-      if (entry.isDirectory() && !SPEC_FOLDERS.includes(entry.name as SpecFolder) &&
-        !["inbox", "backlog", "specs"].includes(entry.name)) {
-        const path = join(direct, entry.name, "spec.md");
-        if (await isFile(path)) directPaths.push(path);
-      }
-    }
-  } catch {
-    return [];
-  }
-  return [...directPaths, ...(await Promise.all(parents.map(listSpecPaths))).flat()].sort();
-}
-
-async function listSpecPaths(parent: string): Promise<string[]> {
-  try {
-    const entries = await readdir(parent, { withFileTypes: true });
-    const candidates = entries
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => join(parent, entry.name, "spec.md"));
-    const available = await Promise.all(candidates.map(async (path) => ({ path, ok: await isFile(path) })));
-    return available.filter((entry) => entry.ok).map((entry) => entry.path);
-  } catch {
-    return [];
-  }
 }
 
 function folderFromPath(root: string, path: string, content?: string): SpecFolder {

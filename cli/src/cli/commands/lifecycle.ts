@@ -23,7 +23,6 @@ import { error } from "../../app/errors.ts";
 import { resolveProject, resolveSpecPath } from "../../core/project.ts";
 import { migrateSpecs, SPEC_FOLDERS, transitionSpec, updateSpecEffort, type SpecFolder, type SpecTransition } from "../../domain/lifecycle.ts";
 import { processInboxCapture } from "../../domain/inbox.ts";
-import { syncMilestones } from "../../domain/milestones.ts";
 import { nextRedTask } from "../../domain/red-tasks.ts";
 import { setTaskCheck } from "../../domain/progress.ts";
 import { clickUpfyHandoff, type ClickUpfyHandoff } from "../../domain/clickupfy.ts";
@@ -226,10 +225,8 @@ export const lifecycleActions = {
     if (!(SPEC_FOLDERS as readonly string[]).includes(to)) {
       throw error.usage(`Invalid state: ${to}. Accepted: ${SPEC_FOLDERS.join(", ")}.`, { accepted: [...SPEC_FOLDERS] });
     }
-    const identifier = await specIdentifier(project, spec);
-    const result = await transitionSpec(project, identifier, to as SpecFolder);
-    await syncMilestones(project);
-    return { ...result, relativePath: relative(project, result.path), clickupfy: await clickUpfyHandoff(project, result.path, "transition") };
+    const result = await transitionSpec(project, spec, to as SpecFolder);
+    return { ...result, relativePath: relative(project, result.path) };
   },
 
   /** Records the effort (1 to 10) of a spec with its rationale. */
@@ -244,7 +241,6 @@ export const lifecycleActions = {
   /** Moves legacy specs (`specs/<slug>/`, `specs/specs/<slug>/`) to state folders. */
   async migrate(project: string) {
     const migrated = await migrateSpecs(project);
-    if (migrated.length) await syncMilestones(project);
     return { count: migrated.length, migrated: migrated.map((item) => ({ ...item, relativePath: relative(project, item.path) })) };
   },
 

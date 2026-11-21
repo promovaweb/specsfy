@@ -61,8 +61,21 @@ describe("specs transition", () => {
       writeFileSync(item, `| Spec promovida | [Spec](../planned/${spec}/spec.md) |\n`);
       const args = ["specs", "transition", "42", "in-progress", "--project", workspace, "--json"];
       const results = await Promise.all([runCli(args, home), runCli(args, home)]);
-      expect(results.map(({ code }) => code)).toEqual([ExitCode.SUCCESS, ExitCode.SUCCESS]);
+      expect(results.map(({ code, json, stderr }) => ({
+        code,
+        error: json?.error,
+        stderr,
+      }))).toEqual([
+        { code: ExitCode.SUCCESS, error: undefined, stderr: "" },
+        { code: ExitCode.SUCCESS, error: undefined, stderr: "" },
+      ]);
       expect(results.map(({ json }) => json.data.from).sort()).toEqual(["in-progress", "planned"]);
+      const target = join("specs", "in-progress", spec, "spec.md");
+      for (const { json } of results) {
+        expect(json.data).toMatchObject({ identifier: spec, to: "in-progress", relativePath: target });
+      }
+      expect(existsSync(source)).toBe(false);
+      expect(readFileSync(join(workspace, target), "utf8")).toBe("# Login social\n\n| Status | Implementing |\n");
       expect(readFileSync(item, "utf8")).toBe(`| Spec promovida | [Spec](../in-progress/${spec}/spec.md) |\n`);
     } finally {
       rmSync(workspace, { recursive: true, force: true });
