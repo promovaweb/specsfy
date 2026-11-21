@@ -18,6 +18,8 @@ cria specs, avança gates ou é instalada automaticamente na raiz do monorepo.
 - Versões são descobertas em manifests e lockfiles do projeto consumidor.
 - Skills relacionadas apontam umas para as outras sem duplicar normas.
 - `catalog.json` é a fonte executável de descoberta e instalação.
+- Após alterar o catálogo, rode `npm run signals` na raiz do monorepo para
+  regenerar as sete tabelas de sinais e `npm run signals:check` para conferi-las.
 
 ## Limites
 

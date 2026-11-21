@@ -198,11 +198,10 @@ fecha o gate, pois ele pode cobrir somente parte do comportamento.
 
 ## Anatomia completa da spec
 
-A tabela inicial da spec identifica o formato, o ID, o slug, o estado, Effort,
-o vínculo opcional com ClickUp, os três gates, a versão do contrato de
-comprovação e a data de atualização. Não use essa tabela para esconder uma
-mudança material: o detalhamento fica na seção que trata do assunto e a tabela
-apenas torna o estado geral legível.
+A tabela inicial da spec registra formato, ID, slug, estado, Effort, vínculo
+opcional com ClickUp, milestones, gates, contrato de comprovação, interface
+para pessoas e data de atualização. A linha `Especialistas` lista os nomes
+curtos das skills técnicas usadas, separados por vírgula.
 
 ### Ato I: seções 1 a 7
 
@@ -245,7 +244,7 @@ história vaga, requisito sem teste e cenário que não representa valor.
 
 | Seção | Finalidade | Perguntas que a seção responde |
 | --- | --- | --- |
-| 8. Plano técnico | tornar a implementação compreensível antes da execução | quais módulos, dados, contratos, arquivos e compatibilidades serão afetados? |
+| 8. Plano técnico | tornar a implementação compreensível antes da execução | quais módulos, dados, contratos, arquivos e compatibilidades serão afetados? A subseção `Especialistas` registra cada skill, seu modo, o sinal e as fases em que será carregada. |
 | 9. Modelo de dados | explicar persistência e ciclo de vida da informação | quais entidades, estados, transições, retenção e migrações existem? |
 | 10. Interfaces e contratos | registrar superfícies de integração e a experiência para pessoas | quais telas, menus, formulários, fluxos, ações, APIs, eventos, entradas, saídas e falhas importam? |
 | 11. Estratégia TDD | derivar testes executáveis do BDD | qual caso falha primeiro, por qual motivo e como ficará verde? |
@@ -268,6 +267,14 @@ telas, componentes, conteúdo, permissões e
 testes antes de perguntar as lacunas reais. Assim, painel lateral, modal,
 página ou outro padrão não vira uma escolha escondida do agente nem substitui
 o que já existe sem confirmação.
+
+Para interfaces de recursos, a seção 10 inclui o `Contrato CRUD`. Declare
+as operações da entrega em uma linha, como `Operações: listar, criar`.
+Detalhe cada controle e reserve o ID da tarefa correspondente. O Definition
+Gate confere a reserva e, no plano, cada ID vira uma tarefa `[CODE]` na
+seção 14. Veja os guias de [especificação](skills/specsfy-03-specify.md),
+[validação](skills/specsfy-04-validate.md) e
+[planejamento](skills/specsfy-05-tasks.md).
 
 Uma spec de interface também possui `Fase de interface` na seção 14. Cada tela
 recebe tarefa própria com caminho, testes de navegação, formulário, validações,

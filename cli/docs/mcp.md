@@ -118,13 +118,13 @@ grava apenas quando uma option pede.
 | `milestones_sync` | Reconstrói o progresso dos milestones e o índice de `specs.md`. | altera |
 | `milestones_import_mvp` | Importa os requisitos de `MVP.md` como itens de backlog, specs em Draft e o milestone M01. | altera |
 | `docs_build` | Reconstrói a documentação do projeto em `docs/` e `.specsfy/PACKAGES.md`; `check` só confere. | altera; `check` só lê |
-| `skills_list` | Lista as skills instaladas e as disponíveis no catálogo. | só lê |
-| `skills_detect` | Detecta os agentes e skills presentes no projeto. | só lê |
+| `skills_list` | Lista o catálogo de especialistas do repositório remoto do framework. | só lê |
+| `skills_detect` | Detecta especialistas compatíveis com os arquivos e as dependências do projeto e dos subprojetos. | só lê |
 | `specialists_suggest` | Sugere especialistas por nome e modo, com sinais, linhas de evidência, declaração, instalação e avisos opcionais `catalogWarning` e `stackWarning`. | só lê |
 | `framework_install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | altera |
 | `framework_update` | Deixa as skills do projeto iguais ao inventário do framework; `check` devolve só o plano. | altera |
 | `skills_install` | Instala um ou mais especialistas do catálogo. | altera |
-| `skills_remove` | Remove especialistas instalados. | altera |
+| `skills_remove` | Remove skills do namespace Specsfy, incluindo as da base e os especialistas. Preserva skills externas. Com `force`, remove também skills do Specsfy com alterações locais. | altera |
 | `update_check` | Consulta a última versão publicada do binário, sem trocar o executável. | só lê |
 
 As tools `framework_install`, `framework_update`, `skills_list`,

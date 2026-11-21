@@ -13,11 +13,14 @@ As skills base dividem o método por responsabilidade. Você pode chamar uma
 delas pelo nome ou explicar o resultado esperado. O agente lê o estado da spec,
 seleciona a etapa responsável e anuncia cada transição necessária.
 
-O framework tem 11 skills, nove delas base: `specsfy-setup`,
-`specsfy-documentator`, `specsfy-01-inbox`, `specsfy-02-backlog`,
-`specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`,
-`specsfy-06-implement`, `specsfy-update-spec`, `specsfy-interviewer` e
-`specsfy-milestones`.
+O framework reúne nove skills base e duas de apoio.
+
+- **Base** inclui `specsfy-01-inbox`, `specsfy-02-backlog`,
+  `specsfy-03-specify`, `specsfy-04-validate`, `specsfy-05-tasks`,
+  `specsfy-06-implement`, `specsfy-update-spec`, `specsfy-interviewer` e
+  `specsfy-milestones`.
+- **Apoio** inclui `specsfy-setup`, que prepara e mantém o contexto, e
+  `specsfy-documentator`, que reconstrói a documentação do projeto.
 
 ## Nomes exibidos
 
@@ -47,9 +50,10 @@ a área novamente, a menos que você a reabra. Se adiar, os pontos ficam
 registrados para retomada. Nenhuma das escolhas inventa uma resposta ou aprova
 uma etapa incompleta.
 
-Inbox, progresso, `specsfy-documentator` e a `specsfy-setup` nos modos `stack`
+Inbox, `specsfy-documentator` e a `specsfy-setup` nos modos `stack`
 e `database` não conduzem entrevista. Essas skills registram ou projetam o que
-já existe e encaminham qualquer pergunta para uma etapa conversacional.
+já existe e encaminham perguntas para uma etapa conversacional.
+Para consultar o andamento da spec, use o comando `specsfy progress` do CLI.
 
 | Etapa | Skill | Resultado principal |
 | --- | --- | --- |

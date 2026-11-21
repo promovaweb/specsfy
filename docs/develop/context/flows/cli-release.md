@@ -10,8 +10,9 @@
 
 ## Papel
 
-Preservar uma versão e uma fonte de notas entre pacote npm, commit, tag e
-release.
+Preservar a versão e a origem das notas entre commit, tag, GitHub Release e
+pacote npm. Quando a publicação roda no Hub, sincronizar também o website e
+os gitlinks do Hub, que têm versões próprias.
 
 ## Como usar
 
@@ -34,7 +35,10 @@ release-cli ──promove──► cli/CHANGELOG.md
        ├──publica─► commit ─► tag vX.Y.Z ─► CI ─► GitHub Release
        │                                            ▲
        │                                            └─ mesma seção
-       └──máquina local─► npm pack na tag ─► npm publish ─► pacote npm
+       └──máquina local─► npm publish ─► pacote npm
+                                             │
+                                             ▼ (no Hub, por padrão)
+               sincronização e release do website ─► atualização e release do Hub
 ```
 
 - A skill local do módulo `cli/` governa a sequência.
@@ -42,19 +46,31 @@ release-cli ──promove──► cli/CHANGELOG.md
   compila os cinco executáveis da GitHub Release.
 - A raiz Git contém commit e tag.
 - GitHub hospeda o remoto, CI e release.
-- O registro npm hospeda `@promovaweb/specsfy`. O CI não publica no npm; o
-  pacote sai pela máquina local, com `npm pack` no commit da tag e
-  `npm publish <tgz> --access public`, depois que a GitHub Release existe.
+- O registro npm hospeda `@promovaweb/specsfy`. Após a GitHub Release, o
+  script publica o wrapper a partir de `cli/npm/` na máquina local. O
+  procedimento manual usa `npm pack` no commit da tag e
+  `npm publish <tgz> --access public`.
 - A seção `## [X.Y.Z] - YYYY-MM-DD` origina o corpo do release.
 - O GitHub Release usa a mesma seção do changelog, sem regeneração.
+- Após a publicação no npm, quando o Specsfy está no Hub, o script sincroniza
+  a documentação pública, publica o ebook e as imagens no R2, registra o
+  destino das páginas removidas, publica a release do website e confere a
+  documentação em produção.
+- Em seguida, o script atualiza o gitlink do Specsfy no Hub e, quando houve
+  publicação do site, o gitlink do website. Ele incrementa o patch do Hub e
+  publica a release correspondente. O
+  [guia operacional](../../../../cli/docs/release.md#script-de-release)
+  descreve as opções para executar cada etapa.
 
-O push de `main` e da tag é atômico. Uma retomada reutiliza o estado válido e
-não cria outra versão.
+O script faz o push de `main` e da tag do Specsfy em comandos separados. O
+procedimento manual usa push atômico. Uma retomada reutiliza o estado válido
+e não cria outra versão.
 
 ## Evidência
 
 - `cli/.agents/skills/specsfy-release-cli/SKILL.md`.
 - `cli/.agents/skills/specsfy-release-cli/scripts/release-changelog.mjs`.
+- [Script de release do monorepo](../../../../scripts/release.mjs).
 - `tests/release-changelog.test.mjs`, `tests/release-documentation.test.mjs`
   e `tests/release-bdd.test.mjs`.
 - testes e artefatos em `cli/`.
@@ -74,4 +90,5 @@ ou ownership de qualquer efeito.
 
 As notas confirmadas governam o conteúdo. `cli/CHANGELOG.md` governa a seção
 publicada. GitHub comprova tag, CI e release, enquanto o registro npm comprova
-o pacote distribuído.
+o pacote distribuído. A publicação do website e os gitlinks do Hub registram
+as versões que chegaram às etapas seguintes do fluxo.

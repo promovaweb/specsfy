@@ -80,11 +80,14 @@ O comando move o arquivo para `specs/inbox/processed/`, com o mesmo nome, e:
 - troca `Status: Capturada` por `Status: Processada`;
 - registra as specs que absorveram a solicitação em `Spec derivada` e a data em
   `Processada em`;
-- atualiza os links para a captura no backlog e nas specs;
+- atualiza as referências à captura nas specs, no backlog, em `PROJECT.md` e
+  nos arquivos Markdown de `.specsfy/`;
 - preserva o texto original e a análise inicial sem alteração.
 
+Com `--json`, `data.updated_references` lista os arquivos alterados.
+
 Antes de mover, o comando confere se cada spec indicada está fora
-da pasta `draft`, ter `Status` diferente de `Draft` e mostrar
+da pasta `draft`, tem `Status` diferente de `Draft` e mostra
 `Definition Gate: Passed` na tabela do topo, onde o `Status` também precisa
 estar escrito. Tabelas do corpo e exemplos não comprovam aprovação.
 Se o gate não estiver escrito, a

@@ -55,13 +55,14 @@ skills centrais numeradas, `Specsfy - Nome` para as demais skills base e
 ## Corpo e referências
 
 O corpo usa instruções imperativas e mantém o fluxo essencial perto da ação.
-Conteúdo extenso, padrões externos e matrizes de decisão ficam em
-`references/`, com indicação explícita de quando devem ser lidos.
+Em `references/`, indique quando ler detalhes, padrões externos e matrizes.
 
-As skills base selecionam especialistas pelos sinais da demanda, da spec e
-do código. Cada fase distribui a mesma tabela em sua referência. O
-[contrato de especialistas no fluxo](../../skills/tests/specialist-flow.test.mjs)
-confere a paridade das tabelas com o catálogo e os modos dos especialistas.
+As skills base usam sinais da demanda, da spec e do código. O
+[gerador de sinais](../../scripts/specialist-signals.mjs) replica a tabela
+de `specialists/catalog.json` nas referências. Após alterar os sinais, rode
+`npm run signals` e `npm run signals:check` na raiz.
+[specialist-flow.test.mjs](../../skills/tests/specialist-flow.test.mjs) também
+confere as tabelas e os modos com o catálogo.
 Em `No Specsfy`, **Fonte de entrada por fase** precede a leitura da spec.
 
 O [template da spec](../../skills/templates/Spec.md) armazena os nomes curtos
@@ -70,19 +71,15 @@ seção 14 e registra cada `Especialista:` sem checkbox, entre a tarefa e seu
 checklist. Isso preserva a seleção da próxima tarefa e a contagem dos seis
 itens canônicos.
 
-Scripts automatizam transformações determinísticas. Eles retornam códigos úteis,
-não instalam globalmente e não realizam ações destrutivas por padrão.
+Scripts automatizam transformações determinísticas, retornam códigos úteis
+e evitam instalação global ou ações destrutivas por padrão.
+`scripts/semver.mjs` do especialista de entrega gerencia o `SEMVER` na raiz
+do consumidor, gera a referência Docker e recusa tags com versão divergente.
 
-O especialista `specsfy-specialist-delivery` inclui
-`scripts/semver.mjs`. O utilitário cria, consulta, incrementa e confere o
-arquivo `SEMVER` na raiz do projeto consumidor. Ele também gera a referência
-Docker com essa versão e recusa uma tag diferente.
-
-O planejador usa `[MIGRATION]` para toda tarefa que cria ou altera a estrutura
-do banco. O validador
-de tarefas exige um arquivo versionado em um diretório de migrations. No Ato
-III, `verify_evidence.mjs` só aceita a conclusão depois de encontrar o arquivo,
-o comando que aplicou a migration e uma consulta posterior do estado.
+O planejador marca mudanças na estrutura do banco com `[MIGRATION]`. O
+validador exige um arquivo versionado em um diretório de migrations. No Ato
+III, `verify_evidence.mjs` exige o arquivo, o comando de aplicação e uma
+consulta posterior do estado.
 
 O consumidor pode ampliar o reconhecimento dos comandos por meio de
 `.specsfy/migrations.json`, relativo à raiz passada ao validador. O objeto
@@ -101,19 +98,22 @@ reescrever sua configuração. Os casos executáveis ficam em
 [implementação](../user/skills/specsfy-06-implement.md#runner-próprio-de-migrations)
 mostra a configuração do consumidor.
 
-`specsfy-specialist-delivery` é a entrada para o fluxo completo de release ou
-deploy. Seu catálogo instala Docker e Servidor como dependências e concentra o
-versionamento e a engenharia de entrega. O gerador cria `compose.yaml` para
-desenvolvimento, `stack.yaml` para produção e os arquivos Ansible que preparam o
-usuário `deploy`, o Docker Engine e o Swarm. Os outros especialistas continuam
-atendendo tarefas focais sem assumir a coordenação da entrega. Toda publicação
-ou alteração remota depende de autorização explícita.
+`specsfy-specialist-delivery` coordena release e deploy, com Docker e Servidor
+como dependências do catálogo. O scaffold gera `compose.yaml` para
+desenvolvimento, `stack.yaml` para produção e os arquivos Ansible para
+preparar o usuário `deploy`, o Docker Engine e o Swarm. Publicações e
+alterações remotas exigem autorização explícita.
 
 O scaffold usa `cloudflare-tunnel` como valor padrão de `--proxy`. Nesse modo,
 ele acrescenta `cloudflared` à rede overlay da aplicação, cria a referência ao
 Docker Secret `cloudflare_tunnel_token` e inclui
 `vault_cloudflare_tunnel_token` nos campos protegidos pelo Ansible Vault. O
 valor `external` omite esses componentes quando a pessoa escolhe outro proxy.
+
+Com `--pipeline`, o scaffold gera também `.github/workflows/deploy.yml`,
+`ansible/stack-deploy.yml` e `ansible/stack-verify.yml`. A
+[referência do pipeline](../../specialists/specsfy-specialist-delivery/references/pipeline.md)
+explica a configuração.
 
 ### Contrato operacional do deploy
 

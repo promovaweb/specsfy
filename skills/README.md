@@ -185,8 +185,15 @@ development sem instalar outro runtime ou criar fontes paralelas:
 
 ## Especialistas sob demanda
 
-Cada skill base possui `references/specialists.md` com condições para recomendar
-contexto técnico opcional:
+Backlog (02), especificação (03), validação (04), planejamento de tarefas (05)
+e atualização da spec (`specsfy-update-spec`) registram os sinais de
+especialistas em `references/specialists.md`. A skill 06 usa
+`references/specialists-implement.md` para implementação e
+`references/specialists-tests.md` para testes.
+O [gerador](../scripts/specialist-signals.mjs) mantém essas sete tabelas a partir
+dos gatilhos do [catálogo](../specialists/catalog.json).
+
+Para instalar um especialista:
 
 ```bash
 npx skills add https://github.com/promovaweb/specsfy \

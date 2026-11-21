@@ -36,6 +36,9 @@ specsfy skill cli
 specsfy skill exit-codes
 ```
 
+`specsfy --skill reference` imprime a referência gerada pelo binário.
+A opção global `specsfy --opencli` imprime toda a árvore de comandos em JSON.
+
 ## `specsfy install`
 
 Publica as skills base, `.specsfy/`, templates e blocos gerenciados de
@@ -43,6 +46,8 @@ Publica as skills base, `.specsfy/`, templates e blocos gerenciados de
 pela stack, enquanto `--specialist` recebe nomes separados por vírgula (repetida, a opção guarda só o último valor). `--force` substitui
 conteúdo gerenciado que recebeu alteração local, enquanto `--json` emite a
 lista de caminhos alterados.
+Por padrão, a instalação usa a tag da versão do binário. Com `--latest`,
+usa a branch padrão do repositório do framework.
 
 ```bash
 specsfy install --project .
@@ -57,13 +62,31 @@ specsfy install --project . --detected --force --json
 | --- | --- |
 | `specsfy update` | Deixa o projeto igual ao inventário do framework (`skills/inventory.json`): instala as skills base que faltam, atualiza as que mudaram, remove as renomeadas e as aposentadas e atualiza os especialistas instalados, templates e blocos gerenciados. As skills vêm da tag da versão do binário; `--latest` usa a branch padrão. Skill com alteração local é mantida e listada em `kept`; `--force` a substitui. `--check` só mostra o plano e sai com código `10` quando há diferença. Skills externas, `.specsfy/templates/custom/` e projetos sem o framework ficam intactos. |
 | `specsfy upgrade` | Consulta a última release e substitui o próprio binário em uso. `--check` apenas informa se existe versão nova. O projeto não é alterado. |
-| `specsfy skills list` | Lista o catálogo do framework e dos especialistas. `--json` entrega objetos estruturados. A leitura usa a credencial `github.token`. |
+| `specsfy skills list` | Lista o catálogo remoto de especialistas. `--json` entrega objetos estruturados. |
 | `specsfy skills detect` | Compara o projeto com os sinais de detecção do catálogo e retorna as skills recomendadas. O comando apenas consulta, sem instalar arquivos. |
-| `specsfy skills install` | Materializa as skills nomeadas no projeto. Não instala o catálogo inteiro. |
+| `specsfy skills install` | Instala os especialistas indicados e suas dependências. `--force` permite substituir arquivos gerenciados com mudanças locais. |
 | `specsfy skills remove` | Remove somente as skills nomeadas e preserva skills externas. Conteúdo local divergente impede a remoção, a menos que `--force` seja informado. |
 | `specsfy skills update` | Igual a `specsfy update`, com as mesmas opções. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
+
+## `specsfy specialists suggest`
+
+`specialists suggest <spec>` e seu alias `skills suggest <spec>` buscam
+palavras-chave no conteúdo da spec. Para cada par de especialista e modo,
+mostram os sinais, a linha e o trecho que sustenta cada sinal, se o par foi
+declarado e se a skill está instalada em `.agents/skills/`. Com `--json`,
+consulte `data.suggestions`, com `signals`, `declared` e `installed`.
+
+Para especialistas cujo catálogo exige confirmação de stack, a tecnologia
+precisa ser detectada no projeto ou confirmada em `.specsfy/STACK.md`.
+A declaração do mesmo par dispensa a confirmação de stack. Em todos os
+casos, o sinal precisa de evidência fora dos blocos de declaração.
+
+```bash
+specsfy specialists suggest 0001 --json
+specsfy skills suggest 0001
+```
 
 ## `specsfy status` e `specsfy progress`
 
@@ -95,11 +118,16 @@ specsfy progress --watch
 | `specsfy specs research` | Carrega e confere a pesquisa indexada da spec. O identificador é obrigatório e aceita número, nome da pasta, slug ou caminho. |
 | `specsfy specs change` | Projeta o impacto de uma mudança tardia sem editar a spec. `--base <ref>` escolhe a referência de comparação e `--mode impact\|changelog` escolhe a leitura. `changelog` lista IDs adicionados, removidos e alterados. |
 | `specsfy specs migrate` | Converte os layouts anteriores `specs/<slug>/` e `specs/specs/<slug>/` e alinha o campo `Status`. Quando não há fonte legada, a execução não altera arquivos. |
-| `specsfy tasks next` | Mostra a próxima tarefa pronta da spec e diferencia trabalho concluído de dependência ainda aberta. `--all` lista todas as tarefas prontas. |
+| `specsfy tasks next` | Mostra a próxima tarefa pronta da spec. `--all` lista todas as prontas no modo padrão. `--phase red` seleciona a próxima tarefa de teste TDD antes da aprovação do Plan Gate. |
 | `specsfy tasks check` | Marca ou desmarca o checkbox da tarefa ou de um item do checklist. `--undo` desfaz a marcação. |
 | `specsfy tasks delivery` | Projeta o resumo de entrega sem criar arquivo. Escreve somente em `stdout`. `--format markdown\|json` escolhe o formato. Sem `--preview`, exige Delivery Gate aprovado e nenhuma tarefa aberta. |
 
-Opções e exemplos completos saem em `specsfy <comando> --help`.
+Em `specsfy tasks next 0001 --phase red --json`, a spec precisa usar
+`Specsfy/2.0` e ter `Status: Defined`, `Definition Gate: Passed` e
+`Plan Gate: Pending`. O comando retorna até uma tarefa `[TEST] [TDD]` pronta,
+mesmo com `--all`. Se houver testes pendentes e todos estiverem bloqueados,
+sai com código `1`, estado `blocked` e os IDs de dependências em
+`data.result.blocked[].waiting_for`.
 
 ## `specsfy specs transition`
 
@@ -107,6 +135,11 @@ Move a spec para `draft`, `defined`, `planned`, `in-progress`, `review` ou
 `completed` e atualiza o campo `Status` no mesmo ato. O identificador e o estado
 são obrigatórios. Uma transição fora da ordem do método sai com código `2` e
 explica os destinos aceitos.
+
+O comando reescreve os vínculos do campo `Spec promovida` no backlog e
+atualiza os painéis de milestones e o índice derivado em `specs.md`. Repetir
+a transição para o estado atual também repara vínculos que ficaram com o
+caminho antigo.
 
 ```bash
 specsfy specs transition 0001 defined
@@ -132,7 +165,8 @@ Cria uma captura timestampada com o texto integral e a análise silenciosa. Os
 campos aceitam `--input`, `--title`, `--summary`, `--problem`, `--people`,
 `--value`, `--signals`, `--risks`, `--directions`, `--review`, `--data`,
 `--session`, `--turn` e `--sources`. O comando não sobrescreve capturas
-existentes.
+existentes. Use `--slug` para definir um identificador em kebab-case ASCII.
+Por padrão, o slug deriva do título.
 
 ```bash
 specsfy inbox capture \
@@ -154,6 +188,9 @@ Retira de `specs/inbox/` uma captura integralmente coberta por specs com
 obrigatório e recebe uma ou mais specs separadas por vírgula. Cada spec precisa estar fora de `draft`,
 declarar `Status` diferente de `Draft` e `Definition Gate: Passed` na primeira
 tabela de metadados. Se qualquer spec falhar, nada é movido.
+O comando reescreve referências ao caminho da captura nas specs, no backlog,
+em `PROJECT.md` e nos arquivos Markdown de `.specsfy/`. Com `--json`,
+`data.updated_references` lista os arquivos alterados.
 
 ```bash
 specsfy inbox process \
@@ -199,10 +236,23 @@ escolhe o modo de verificação, `--attestation <arquivo>` grava a atestação e
 `--timeout-seconds` e `--max-output-bytes` limitam a execução. O código de saída
 `10` indica gate reprovado.
 
+Use `--spec <spec>` para rodar as checagens do estado de uma única spec.
+A consulta dispensa a checagem geral das skills e inclui o caminho em
+`data.result.spec` na saída JSON. Use `--self-test` para exercitar a política
+e seus canários sem verificar specs. As opções são mutuamente exclusivas.
+
+Nas specs verificadas, o comando avisa sobre especialistas declarados que
+estão fora do catálogo ou ausentes em `.agents/skills/`, e sobre sinais
+de pares de especialista e modo ainda sem declaração. Os avisos saem em
+`stderr` no modo texto ou em `data.warnings` com `--json`. Eles são
+informativos e o código de saída segue o resultado da política.
+
 ```bash
 specsfy verify --boundary local
 specsfy verify --boundary ci --json
 specsfy verify --attestation run.json
+specsfy verify --spec 0001 --json
+specsfy verify --self-test --json
 ```
 
 ## Contexto do projeto
@@ -226,7 +276,7 @@ Opções e exemplos completos saem em `specsfy <comando> --help`.
 | Comando | O que faz |
 | --- | --- |
 | `specsfy docs build` | Reconstrói `docs/` e `.specsfy/PACKAGES.md` a partir do código e das specs. `--check` sai com `10` quando a documentação está desatualizada. |
-| `specsfy milestones sync` | Projeta os vínculos das specs para `specs.md` e `specs/milestones/MNN.md`. Somente blocos gerados são substituídos. |
+| `specsfy milestones sync` | Recalcula e grava os blocos gerados em `specs.md` e nos painéis em `specs/milestones/`, inclusive com `--json`. Cria um esqueleto para milestones citados que ainda não existem. |
 | `specsfy milestones import-mvp` | Converte `MVP.md` em `M01`, backlog e specs Draft. Lê `MVP.md` do projeto ou do superprojeto Git; aceita só `--project`. |
 
 Opções e exemplos completos saem em `specsfy <comando> --help`.
@@ -266,6 +316,8 @@ specsfy tui --project ./api --tab about
 
 | Comando | O que faz |
 | --- | --- |
+| `specsfy about` | Mostra versão, executável, runtime, plataforma e créditos. |
+| `specsfy completion <shell>` | Imprime o script de autocompletar para `bash`, `zsh` ou `fish`. |
 | `specsfy config` | Lê e grava preferências em `~/.specsfy/settings.json`. Os subcomandos são `list`, `get`, `set`, `unset`, `path` e `schema`. |
 | `specsfy credentials` | Guarda segredos cifrados em `~/.specsfy/credentials.json`. Os subcomandos são `set`, `get`, `list`, `remove`, `status`, `clear` e `rotate-key`. `set --stdin` lê o valor da entrada padrão e `get --reveal` mostra o valor sem máscara. A credencial `github.token` alimenta o catálogo, as releases e o diagnóstico do projeto. |
 | `specsfy doctor` | Confere o runtime embutido, o terminal, as configurações, a origem da chave e a leitura do cofre. `--project <dir>` acrescenta as checagens do projeto (Git, CLI de skills, `skills-lock.json`, token do GitHub e checagem diária de release). Qualquer checagem reprovada produz código de saída `3`. |
@@ -313,7 +365,7 @@ e de `specsfy --skill exit-codes`.
 ## Confirmação e diagnóstico
 
 Depois de qualquer escrita, confirme o resultado com uma leitura compatível:
-`specs show`, `progress`, `milestones sync --json` ou `config list`. Falhas do
+`specs show`, `progress`, `status --json` ou `config list`. Falhas do
 CLI são impressas em `stderr` com o prefixo `error` e o código entre colchetes,
 como `[2 USAGE]`; com `--json`, o erro sai no envelope `{ ok, command, error }`. `--help` mostra a gramática instalada e `--version` confirma qual
 release está em execução.

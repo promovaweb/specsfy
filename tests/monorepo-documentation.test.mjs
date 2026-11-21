@@ -47,5 +47,5 @@ test('download público usa a URL curta canônica',()=>{
 test('guia CLI publica imagens PNG e sequência fornecida',()=>{
  const screenshots=[['cli-dash.png','Dashboard Home'],['cli-backlogs.png','Backlogs'],['cli-specs.png','Specs'],['cli-skills.png','Skills']];
  for(const [file,alt] of screenshots){const bytes=readFileSync(join(ROOT,'docs/user/assets/cli',file));assert.deepEqual(bytes.subarray(0,8),Buffer.from([137,80,78,71,13,10,26,10]));includes(read('docs/user/cli.md'),[`![${alt}](assets/cli/${file})`]);}
- const stacked=screenshots.map(([file,alt])=>`![${alt}](https://promovaweb.com/docs/specsfy/cli/${file})`).join('\n\n');includes(read('cli/README.md'),[stacked]);includes(read('specsfy/README.md'),['![Dashboard Home do Specsfy](../docs/user/assets/cli/cli-dash.png)']);
+ const stacked=screenshots.map(([file,alt])=>`![${alt}](../docs/user/assets/cli/${file})`).join('\n\n');includes(read('cli/README.md'),[stacked]);includes(read('specsfy/README.md'),['![Dashboard Home do Specsfy](../docs/user/assets/cli/cli-dash.png)']);
 });

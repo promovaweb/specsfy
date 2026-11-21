@@ -129,6 +129,8 @@ git diff --check
 ```
 
 `npm test` executa os contratos da raiz, das skills e dos especialistas.
+Após alterar `specialists/catalog.json`, rode `npm run signals` para regenerar
+as sete tabelas de sinais e `npm run signals:check` para conferir a paridade.
 
 | Comando | Escopo |
 | --- | --- |

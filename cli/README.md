@@ -3,13 +3,8 @@
 <!-- markdownlint-disable MD033 -->
 <p align="center">
   <picture>
-    <source srcset="https://promovaweb.com/opensource/specsfy/icon.svg"
-    type="image/svg+xml">
-    <img
-      src="https://promovaweb.com/opensource/specsfy/icon.png"
-      alt="Logo do Specsfy"
-      width="128"
-    >
+    <source srcset="../brand/logo/icon.svg" type="image/svg+xml">
+    <img src="../brand/logo/icon.png" alt="Logo do Specsfy" width="128">
   </picture>
 </p>
 <!-- markdownlint-enable MD033 -->
@@ -123,13 +118,13 @@ projeto subindo a partir da pasta atual e se atualiza sozinha quando os
 arquivos das specs mudam. As abas são Overview, Specs, Backlog, Milestones,
 Context, Gates, Tests, Skills e About.
 
-![Dashboard Home](https://promovaweb.com/docs/specsfy/cli/cli-dash.png)
+![Dashboard Home](../docs/user/assets/cli/cli-dash.png)
 
-![Backlogs](https://promovaweb.com/docs/specsfy/cli/cli-backlogs.png)
+![Backlogs](../docs/user/assets/cli/cli-backlogs.png)
 
-![Specs](https://promovaweb.com/docs/specsfy/cli/cli-specs.png)
+![Specs](../docs/user/assets/cli/cli-specs.png)
 
-![Skills](https://promovaweb.com/docs/specsfy/cli/cli-skills.png)
+![Skills](../docs/user/assets/cli/cli-skills.png)
 
 Os prints de todas as telas, nos temas `night` e `day`, estão no
 [showcase da TUI](../docs/develop/showcase.md).

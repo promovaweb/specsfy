@@ -60,12 +60,16 @@ instalação.
 | Supabase, PostgreSQL, MySQL, MongoDB ou Redis | banco ou plataforma correspondente |
 | React, Next.js ou TypeScript | especialista correspondente |
 | Tailwind CSS, shadcn/ui ou ReUI | Tailwind CSS ou componentes de interface |
-| Docker, Swarm, Traefik ou Ansible | Docker e servidor correspondentes |
+| Docker, Swarm ou Ansible | Docker ou Servidor, conforme os arquivos detectados |
 | Cloudflare, Workers ou wrangler | Cloudflare |
 | n8n | n8n |
 | OpenAPI, OpenTelemetry, Prometheus ou CI/CD | arquitetura, observabilidade ou entrega correspondente |
-| `laravel/mcp` ou Route Handlers do Next.js | MCP |
+| `routes/ai.php` ou dependências MCP reconhecidas, como `laravel/mcp`, `@modelcontextprotocol/server`, `@modelcontextprotocol/sdk` e `mcp-handler` | MCP |
 | Pest, Playwright ou Vitest | testes |
+
+Traefik em uma spec sinaliza o modo `proxy` do especialista Docker. Para
+detectar Docker no projeto, o catálogo usa arquivos como `Dockerfile`,
+`compose.yaml` e `docker-stack.yml`.
 
 ## Instalação manual
 
@@ -205,7 +209,7 @@ domínio.
 | [Docker](specialists/docker.md) | Modos `compose`, `swarm` e `proxy`: imagens e ambiente local, stack Swarm com rollout e recuperação, e Traefik como reverse proxy. |
 | [Servidor](specialists/server.md) | Modos `debian`, `ansible` e `report`: APT, systemd, SSH e nftables, automação com Ansible e relatório de servidor somente leitura. |
 | [Cloudflare](specialists/cloudflare.md) | Modos `dns`, `workers` e `security`: DNS, proxy e TLS, Workers com wrangler, KV, D1, R2 e Pages, WAF, Access e Tunnel. |
-| [Entrega](specialists/delivery.md) | Modos `deploy`, `versioning` e `ci-cd`: deploy em Docker e Swarm via Ansible, SEMVER e GitHub Actions com promoções, migrations e rollback. |
+| [Entrega](specialists/delivery.md) | `deploy` cobre Docker Swarm via Ansible. `versioning` cobre SEMVER e releases. `ci-cd` orienta workflows de build, testes e publicação. `pipeline` liga esses passos ao deploy automatizado, com staging, promoção e rollback. |
 | [n8n](specialists/n8n.md) | Modos `workflows`, `self-hosting` e `integration`: nós, expressões, credenciais e retries, queue mode com Postgres e Redis, API e webhooks. |
 | [Git](specialists/git.md) | Modos `gitflow` e `conflicts`: branches, merge e ciclo de release no `gitflow`; resolução de conflito preservando a intenção no `conflicts`. |
 | [Observabilidade](specialists/observability.md) | Modos `signals` e `performance`: logs, métricas, traces, SLOs e alertas no `signals`; profiling, carga e regressão no `performance`. |
@@ -227,11 +231,13 @@ registra o modo, o sinal observado e as fases em que a skill será carregada.
 Uma spec sem demanda especializada deixa esses campos vazios.
 
 Use `specsfy specialists suggest 0001` para consultar os sinais de uma spec.
-O comando só sugere especialista de tecnologia quando a stack do projeto
-confirma a tecnologia, pela detecção do catálogo ou pelo `.specsfy/STACK.md`.
-O especialista declarado na spec aparece sempre, mesmo que a detecção não o
-encontre no projeto. O `specsfy verify` avisa sobre especialistas desconhecidos,
-sem instalação ou sugeridos por um sinal e ainda sem declaração.
+Para especialistas que exigem confirmação de stack, o comando usa a detecção
+do catálogo ou as tecnologias confirmadas em `.specsfy/STACK.md`. Declarar
+o mesmo par de especialista e modo dispensa essa confirmação. Toda sugestão
+exige evidência no conteúdo da spec, fora dos blocos de declaração.
+O `specsfy verify` também avisa sobre declarações de especialistas
+desconhecidos ou sem instalação, mesmo quando não há sugestões. Sinais
+de um par ainda sem declaração também geram aviso.
 
 - **Backlog** usa o próprio item em `specs/backlog/` para registrar decisões,
   sinais e especialistas prováveis.

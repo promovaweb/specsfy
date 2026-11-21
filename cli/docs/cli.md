@@ -228,22 +228,25 @@ do runner em `data.exitCode`.
 
 O grupo instala e mantém o próprio framework no projeto. `install` publica as
 skills base, a pasta `.specsfy/` e os blocos gerenciados de `AGENTS.md` e
-`CLAUDE.md`; `--detected` usa os agentes encontrados no projeto,
-`--specialist <name>` instala um especialista junto com as skills base e
-`--force` reescreve o que já existe. `update` atualiza o que está intacto e
-preserva arquivos alterados; `--force` atualiza também esses arquivos.
+`CLAUDE.md`. Com `--detected`, instala também os especialistas que
+correspondem aos arquivos e às dependências do projeto. Use
+`--specialist <name>` para indicar um especialista e `--force` para
+substituir arquivos gerenciados com alterações locais.
+`update` preserva arquivos alterados. Com `--force`, atualiza também esses
+arquivos.
 `upgrade` troca o binário em uso pela última release; `--check` apenas
-consulta a versão publicada. `skills` gerencia os especialistas do catálogo.
+consulta a versão publicada. O grupo `skills` consulta o catálogo, detecta
+e instala especialistas, remove skills do Specsfy e atualiza o framework.
 
 | Command | Função | Options principais |
 | --- | --- | --- |
-| `install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | `--detected`, `--specialist <name>`, `--force`, `--project <dir>` |
+| `install` | Instala as skills base, `.specsfy/` e os blocos gerenciados do projeto. | `--detected`, `--specialist <name>`, `--latest`, `--force`, `--project <dir>` |
 | `update` | Deixa as skills do projeto iguais ao inventário do framework: instala as que faltam, atualiza as que mudaram e remove as renomeadas e as aposentadas. | `--check`, `--latest`, `--force`, `--project <dir>` |
 | `upgrade` | Troca o executável pela última versão publicada. | `--check` |
-| `skills list` | Lista as skills instaladas e as disponíveis no catálogo. | `--project <dir>` |
-| `skills detect` | Detecta os agentes e skills presentes no projeto. | `--project <dir>` |
-| `skills install` | Instala um ou mais especialistas. | `<names>`, `--project <dir>` |
-| `skills remove` | Remove especialistas instalados. | `<names>`, `--project <dir>` |
+| `skills list` | Lista o catálogo de especialistas do repositório remoto do framework. | |
+| `skills detect` | Detecta especialistas compatíveis com os arquivos e as dependências do projeto. | `--project <dir>` |
+| `skills install` | Instala especialistas do catálogo e suas dependências. Com `--force`, substitui arquivos gerenciados com alterações locais. | `<names...>`, `--force`, `--project <dir>` |
+| `skills remove` | Remove skills do namespace Specsfy, incluindo as da base e os especialistas. Preserva skills externas. Com `--force`, remove também skills do Specsfy com alterações locais. | `<names...>`, `--force`, `--project <dir>` |
 | `skills update` | Igual ao `update` do nível principal. | `--check`, `--latest`, `--force`, `--project <dir>` |
 | `specialists suggest` | Sugere especialistas a partir das palavras-chave encontradas na spec. | `<spec>`, `--project <dir>`, `--json` |
 | `skills suggest` | Também executa `specialists suggest`. | `<spec>`, `--project <dir>`, `--json` |

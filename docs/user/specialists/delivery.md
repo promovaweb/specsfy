@@ -43,11 +43,14 @@ especialista [Docker](docker.md).
 
 1. Confirma a raiz do sistema e aciona o modo Versionamento para ler ou
    preparar o `SEMVER`.
-2. Na primeira preparação, quando nenhum arquivo de destino existe, executa o
-   gerador:
+2. Na primeira preparação, com um `SEMVER` válido e antes de criar os arquivos
+   de destino, execute o gerador na raiz do projeto. O caminho abaixo assume
+   a instalação padrão da skill. Substitua a imagem pelo endereço do seu
+   repositório, sem tag ou digest.
 
    ```bash
-   node scripts/scaffold.mjs --project <raiz> --image <registry>/<aplicacao>
+   node .agents/skills/specsfy-specialist-delivery/scripts/scaffold.mjs \
+     --project . --image ghcr.io/organizacao/app
    ```
 
    A stack inclui o Cloudflare Tunnel por padrão. Para outro proxy, o gerador
@@ -219,14 +222,17 @@ o mesmo job em várias versões ou plataformas.
 ## Pipeline de deploy
 
 Use o modo `$specsfy-specialist-delivery (pipeline)` para ligar os testes à
-produção. O projeto precisa de um `SEMVER` na raiz, um `Dockerfile`, um Swarm
-preparado com Ansible e uma rota HTTP de saúde em cada ambiente.
+produção. Para executar o pipeline, o projeto precisa de um `SEMVER` na raiz,
+um `Dockerfile`, um Swarm preparado com Ansible e uma rota HTTP de saúde em
+cada ambiente.
 
-1. Em um projeto novo, gere a base informando `--pipeline`:
+1. Na raiz de um projeto novo, com a skill instalada e o `SEMVER` já
+   definido, gere a base com `--pipeline`. Substitua o endereço da imagem
+   pelo do seu repositório, sem tag ou digest.
 
    ```bash
-   node scripts/scaffold.mjs --project /caminho/app \
-     --image ghcr.io/organizacao/app --pipeline
+   node .agents/skills/specsfy-specialist-delivery/scripts/scaffold.mjs \
+     --project . --image ghcr.io/organizacao/app --pipeline
    ```
 
    O gerador inclui `.github/workflows/deploy.yml` e os arquivos Ansible de

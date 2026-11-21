@@ -88,9 +88,10 @@ bun install
 bun run validate
 ```
 
-`validate` encadeia `embed:check`, `typecheck`, `bun test`, `skills:check`,
-`opencli:check`, `showcase:check`, `docs:check`, `build` e `smoke`. O `smoke`
-roda o binário compilado `dist/specsfy` sem rede (`--version`, `--skill tui`,
+`validate` encadeia `embed:check`, `launcher:check`, `typecheck`, `bun test`,
+`skills:check`, `opencli:check`, `showcase:check`, `docs:check`, `build` e
+`smoke`. O `smoke` roda o binário compilado `dist/specsfy` sem rede
+(`--version`, `--skill tui`,
 `mcp --list`, `doctor --json`, `install` num projeto temporário a partir deste
 repositório e `update --check`) e pega falha que só aparece no binário
 compilado, antes da tag. `docs:check` exige que todo command, screen, tool,

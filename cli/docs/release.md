@@ -21,9 +21,10 @@ que ele deixou e para a publicação feita sem o script.
    bun run validate
    ```
 
-   O encadeamento cobre `embed:check`, `typecheck`, `bun test`, `skills:check`,
-   `opencli:check`, `showcase:check`, `docs:check`, `build` e `smoke`. O
-   `smoke` roda o binário compilado `dist/specsfy` sem rede (`--version`,
+   O encadeamento cobre `embed:check`, `launcher:check`, `typecheck`,
+   `bun test`, `skills:check`, `opencli:check`, `showcase:check`,
+   `docs:check`, `build` e `smoke`. O `smoke` roda o binário compilado
+   `dist/specsfy` sem rede (`--version`,
    `--skill tui`, `mcp --list`, `doctor --json`, `install` num projeto
    temporário a partir do próprio repositório e `update --check`) e pega
    falha que só aparece no binário compilado, antes da tag. Se a TUI mudou
@@ -55,16 +56,17 @@ lançador, o `opencli` e todo o showcase, recompila o ebook, confere a versão e
 roda os testes da raiz, a validação das skills e o `validate` do CLI. Depois
 dele, revise o diff e escreva `## [X.Y.Z]` em `cli/CHANGELOG.md`.
 
-O segundo comando publica e mantém tudo sincronizado: um único `--publish`
-leva a versão nova ao CLI, às skills, ao ebook, à documentação do repositório,
-às páginas de `/docs/specsfy/` do site e ao Hub, sem etapa manual no meio.
+O segundo comando publica a versão do Specsfy. Quando o monorepo está
+registrado como submódulo do Hub, `--publish` também sincroniza as páginas de
+`/docs/specsfy/` e publica a atualização do Hub.
 
 Ele commita o que estiver no working tree como `chore(release): vX.Y.Z`, cria a
-tag, faz push, espera o workflow `CLI Release` (refaz uma vez um job que
-falhar), confere os cinco executáveis com o `SHA256SUMS` e publica o wrapper
-npm. Em seguida roda a etapa do site e depois a etapa do Hub. Ele recusa a
-execução sem a seção do changelog, com a tag já existente ou com o `VERSION`
-diferente de `X.Y.Z`.
+tag, faz push de `main` e da tag em comandos separados e espera os workflows,
+incluindo `CLI Release`. O script reexecuta uma vez os jobs que falharem,
+confere se a GitHub Release tem seis arquivos e publica o wrapper npm. Em
+seguida, roda as etapas habilitadas do site e do Hub, nessa ordem. Ele recusa
+a execução sem a seção do changelog, com a tag já existente ou com o
+`VERSION` diferente de `X.Y.Z`.
 
 O trabalho de funcionalidade se commita antes do `--publish`: tudo o que
 sobrar no working tree entra no commit de release.
@@ -73,15 +75,32 @@ As opções controlam as etapas seguintes. `--no-site` e `--no-hub` pulam a
 etapa correspondente; `--site` e `--hub` executam somente aquela etapa, depois
 de uma publicação.
 
-A etapa do site publica a documentação de `promovaweb.com/docs/specsfy`. Ela
-roda `npm run sync:docs:specsfy` no Hub, leva os arquivos que o comando
-escreveu em `website/` para um worktree limpo do `origin/main` do website e
-devolve o checkout do website como estava, então o trabalho de outras sessões
-continua intacto. Depois publica a mídia no R2 com `npm run media:publicar`,
-escreve uma sitespec, sobe o patch do website com o changelog e commita apenas
-esses caminhos (nunca o registro de imagens responsivas). Por fim cria a tag,
-faz push, cria a GitHub Release do website e roda `npm run site:specsfy:check`
-em produção.
+A etapa do site roda `npm run sync:docs:specsfy` no Hub. Se a documentação já
+estiver sincronizada, a etapa termina. Quando há mudanças, o script leva os
+arquivos listados pelo comando para um worktree limpo do website, baseado em
+`origin/main`. O script restaura do `HEAD` os arquivos versionados que a
+sincronização listou no checkout do website. Depois publica a mídia no R2 com
+`npm run media:publicar`, escreve uma sitespec, sobe o patch do website e
+registra a mudança no changelog. O commit inclui as páginas, o manifesto do
+ebook, o manifesto de mídia, a sitespec, a versão, o changelog e as
+configurações de rotas. Por fim, o script cria a tag, faz push, cria a GitHub
+Release do website e roda `npm run site:specsfy:check` em produção.
+
+Se a sincronização remover uma página, o script registra automaticamente o
+destino da rota no worktree do website.
+
+- Para um especialista absorvido, registra um 301 em
+  `src/config/redirects.mjs` apontando para a seção do modo que o absorveu. O
+  vínculo vem de `modes[].absorbs` em `specialists/catalog.json` e a âncora
+  deriva do título do modo.
+- Para um especialista renomeado em `skills/inventory.json` sem âncora de
+  absorção, registra um 301 para a página com o novo nome.
+- Para uma rota retirada sem destino, registra um 410 em
+  `src/config/gone.mjs`.
+
+O registro de rotas removidas só cria entradas para rotas sem 301 ou 410.
+Na etapa de sincronização, o script também atualiza os 301 existentes de
+especialistas absorvidos para a âncora do modo correspondente.
 
 A etapa do Hub roda depois da do site. O script avança para o `origin/main` sem
 tocar nos arquivos não commitados de outras pessoas e recusa um repositório com
@@ -97,9 +116,8 @@ depois que a etapa do site termina.
 
 ## Tag e GitHub Release
 
-O CLI fica no monorepo `promovaweb/specsfy`, e a tag pertence ao monorepo. O
-`--publish` do script executa os comandos abaixo; eles ficam aqui para
-conferência e para retomar uma publicação parcial:
+O CLI fica no monorepo `promovaweb/specsfy`, e a tag pertence ao monorepo.
+Na publicação manual, a criação da tag e o push seguem esta sequência.
 
 ```bash
 git tag -a vX.Y.Z -m "Specsfy CLI vX.Y.Z"

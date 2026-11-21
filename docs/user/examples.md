@@ -124,6 +124,7 @@ tabela que os scripts e o CLI leem:
 | Effort rationale | Consulta paginada em módulo existente, sem migração. |
 | ClickUp Task | |
 | Milestones | M01 |
+| Especialistas | interface |
 | Definition Gate | Pending |
 | Plan Gate | Pending |
 | Delivery Gate | Pending |
@@ -134,6 +135,16 @@ tabela que os scripts e o CLI leem:
 
 Ao final da entrega, o mesmo cabeçalho mostra `Status: Complete` e os três
 gates como `Passed`.
+
+Na seção 8, o plano técnico registra o modo de interface usado para o diretório:
+
+```text
+#### Especialistas
+
+| Especialista | Modo | Sinal que o puxou | Fases |
+| --- | --- | --- | --- |
+| specsfy-specialist-interface | ui | Tabela paginada e estado vazio do diretório | validate |
+```
 
 ## 6. História, cenário e requisitos
 
@@ -153,14 +164,16 @@ O cenário BDD descreve o comportamento em linguagem que qualquer pessoa da
 equipe consegue revisar:
 
 ```gherkin
-@US-001 @FR-001 @FR-002 @AC-001
+@US-001
 Feature: Diretório global de usuários
 
+  @FR-001 @FR-002 @FR-003 @AC-001
   Scenario: Pessoa autenticada consulta a primeira página
     Given existem dezesseis usuários com nomes conhecidos
     When uma pessoa autenticada abre o diretório de usuários
     Then recebe quinze usuários ordenados por nome e sem e-mails
 
+  @FR-001 @AC-002
   Scenario: Visitante tenta consultar usuários
     Given uma pessoa não autenticada
     When ela abre o diretório de usuários
@@ -193,13 +206,17 @@ Cada caso recebe um marcador `SPECSFY:` com os IDs que ele comprova. Em um
 projeto PHP, com Pest:
 
 ```php
-// SPECSFY: US-001 FR-001 AC-001
+<?php
+
+use App\Models\User;
+
+// SPECSFY: US-001 FR-001 AC-002
 it('redireciona visitante para o login', function () {
     $this->get(route('directory.users.index'))
         ->assertRedirect(route('login'));
 });
 
-// SPECSFY: US-001 FR-002 FR-003 AC-001
+// SPECSFY: US-001 FR-001 FR-002 FR-003 AC-001
 it('lista quinze usuários por página, sem e-mail', function () {
     User::factory()->count(16)->create();
 
@@ -232,7 +249,7 @@ itens obrigatórios, nesta ordem:
 
 ```text
 - [x] T002 [US-001] Implementar a rota e a página do diretório
-      — Refs: US-001, FR-001, FR-002, FR-003, AC-001 — Depends: T001
+      — Refs: US-001, FR-001, FR-002, FR-003, AC-001, AC-002 — Depends: T001
   - [x] PREP: rota, controller e componentes existentes conferidos.
   - [x] EXECUTE: rota autenticada, query paginada e página criadas.
   - [x] VERIFY: testes focais verdes; regressão completa verde.
@@ -252,7 +269,7 @@ A seção 11 guarda a prova de cada ciclo:
 ```text
 | IDs | Teste TDD | RED observado | GREEN observado | Refactor/regressão |
 | --- | --- | --- | --- | --- |
-| FR-001, FR-002, FR-003, AC-001 | tests/Feature/Directory/UserDirectoryTest.php | rota directory.users.index ausente | Pest: 2/2 | suíte completa verde; build passou |
+| FR-001, FR-002, FR-003, AC-001, AC-002 | tests/Feature/Directory/UserDirectoryTest.php | rota directory.users.index ausente | Pest: 2/2 | suíte completa verde; build passou |
 ```
 
 Essa tabela é o que permite a qualquer pessoa conferir, meses depois, por que

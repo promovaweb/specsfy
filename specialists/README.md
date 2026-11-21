@@ -10,8 +10,8 @@
 <!-- markdownlint-enable MD033 -->
 
 Catálogo oficial de skills técnicas opcionais do Specsfy. O prefixo
-`specsfy-specialist-` distingue contexto especializado das skills
-skills base que executam a metodologia.
+`specsfy-specialist-` distingue o contexto especializado das skills base
+que executam a metodologia.
 
 Os especialistas são instalados sob demanda no projeto consumidor:
 

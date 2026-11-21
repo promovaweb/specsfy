@@ -158,7 +158,7 @@ Aprofunde no índice de [Skills base](skills/README.md).
 | `specsfy doctor --project .` | confere runtime, terminal, configuração, Git e token do GitHub |
 | `specsfy update` | deixa skills, templates e blocos gerenciados iguais ao inventário do framework |
 | `specsfy upgrade` | substitui o próprio binário pela última release |
-| `specsfy skills list` | lista o catálogo do framework e dos especialistas |
+| `specsfy skills list` | lista o catálogo remoto de especialistas |
 | `specsfy skills detect` | recomenda especialistas pela stack |
 | `specsfy skills install <nome>` | instala um especialista |
 | `specsfy status` | resume specs por estado, gates, tarefas, backlog e inbox |
@@ -183,6 +183,8 @@ Aprofunde no índice de [Skills base](skills/README.md).
 Quase todos aceitam `--project <caminho>` e `--json`. O
 `specsfy <comando> --help` mostra as opções de cada comando do CLI. A lista completa, com
 os códigos de saída, está na [Referência dos comandos](cli-reference.md).
+O inventário das skills do framework fica em
+[`skills/inventory.json`](../../skills/inventory.json).
 
 ## Ver o progresso
 

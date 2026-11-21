@@ -24,8 +24,11 @@ Ao absorver um especialista publicado, registre seu nome antigo como chave de
 completo do especialista que o absorveu como valor. Por exemplo,
 `specsfy-specialist-reui` aponta para `specsfy-specialist-ui-components`.
 O `specsfy update` usa esse mapa para migrar a instalação nos projetos
-consumidores. O site gera automaticamente o redirecionamento HTTP 301 da
-página antiga para a do especialista que a substituiu.
+consumidores. No [catálogo](../catalog.json), registre também o nome completo
+da skill antiga em `modes[].absorbs` no modo que a absorveu. Por exemplo, o
+modo `swarm` de Docker usa `"absorbs": "specsfy-specialist-docker-swarm"`.
+A release usa `modes[].title` para direcionar o HTTP 301 da página antiga
+à seção do modo na página do especialista que o assumiu.
 
 ## Contrato de frontmatter
 
@@ -38,6 +41,9 @@ página antiga para a do especialista que a substituiu.
   é de 1024 caracteres, sem `<` ou `>`.
 
 ## Campos do catálogo
+
+Depois de alterar o catálogo, rode `npm run signals` na raiz do monorepo para
+regenerar as sete tabelas de sinais e `npm run signals:check` para conferi-las.
 
 - Use `stack: true` quando uma sugestão nova depender de confirmação da
   tecnologia. O campo é opcional e o padrão é `false`.

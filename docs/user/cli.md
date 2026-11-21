@@ -23,16 +23,17 @@ Markdown de duas colunas, `Campo` e `Valor`, com um metadado por linha.
 
 ## Instalação e atualização
 
-Baixe o binário da plataforma em `get.specsfy.dev` ou instale pelo npm:
+Para instalar o lançador pelo npm, use:
 
 ```bash
 npm install --global @promovaweb/specsfy
 specsfy --version
 ```
 
-O pacote npm e o lançador de `get.specsfy.dev` são arquivos em Node.js (18 ou
-superior) que baixam e conferem o binário da plataforma na primeira execução.
-Para dispensar o Node.js, baixe o executável da GitHub Release.
+O pacote npm e o lançador disponível em `get.specsfy.dev` exigem Node.js 18
+ou superior. Ambos baixam e conferem o binário na primeira execução.
+Para usar o CLI sem Node.js, baixe o executável da sua plataforma na
+[GitHub Release](https://github.com/promovaweb/specsfy/releases).
 
 Depois de instalar o programa, prepare o projeto consumidor:
 
@@ -152,28 +153,21 @@ e a evidência dos sinais que ainda precisam de declaração.
 
 ## Inbox e backlog
 
-Uma captura entra na fila ativa com `inbox capture` e só sai depois que specs
-aprovadas cobrem toda a solicitação:
+Guarde o caminho retornado por `inbox capture`. Depois que uma spec cobrir
+toda a solicitação e passar no Definition Gate, processe a captura. No
+exemplo, essa spec é `0007-avisos-de-atraso`. Use o ID correspondente no
+seu projeto.
 
 ```bash
-specsfy inbox list
-specsfy inbox capture \
+captura=$(specsfy inbox capture \
   --input "Clientes ficam sem contexto quando a entrega atrasa." \
-  --title "Avisar clientes sobre atrasos" \
-  --summary "Notificar clientes afetados." \
-  --problem "Falta de contexto durante atrasos." \
-  --people "Clientes com entrega em andamento." \
-  --value "Reduzir incerteza." \
-  --signals "Canal sugerido: e-mail." \
-  --review "Definir gatilho e conteúdo." \
-  --project .
-specsfy inbox process 2026-07-28-143205-recuperar-senha.md \
-  --spec 0001 --project .
+  --title "Avisar clientes sobre atrasos" --project .)
+specsfy inbox process "$captura" --spec 0007-avisos-de-atraso --project .
 ```
 
 O processamento move a captura para `specs/inbox/processed/` e preserva o
-texto original. Também corrige os vínculos nas specs, no backlog e no contexto,
-incluindo `.specsfy/DATABASE.md`. Para registrar o backlog:
+texto original. Ele reescreve referências nas specs, no backlog, em
+`PROJECT.md` e nos arquivos Markdown de `.specsfy/`. Para registrar o backlog:
 
 ```bash
 specsfy backlog list

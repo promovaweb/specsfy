@@ -172,7 +172,7 @@ aberto segue na versão que carregou até ser reaberto.
 | tool | `gate_evidence` | Verify the material evidence of the tasks of a spec (Evidence Contract 1). | `read` |
 | tool | `gate_findings` | Validate the product, architecture and security findings recorded in a spec. | `read` |
 | tool | `gate_database` | Check that tests use a separate database and that a command cannot wipe data. | `read` |
-| tool | `verify` | Run the project policy for CI and report informational specialist warnings. | `read` |
+| tool | `verify` | Executa a política do projeto ou diagnostica uma spec com o argumento opcional `spec` (ID, nome da pasta, slug ou caminho). Retorna avisos informativos sobre especialistas. | `read` |
 | tool | `context_setup` | Create the minimum project context (PROJECT.md, .specsfy/STACK.md, RULES.md, DATABASE.md...) without overwriting existing files. | `write` |
 | tool | `context_inspect` | Summarize the relevant sources of the project by group (instructions, manifests, routes, persistence, tests...) without changing files. | `read` |
 | tool | `context_interface` | Summarize the interface stack (frameworks, routing, styling, components, forms, tests) and the current routes and components. | `read` |

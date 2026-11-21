@@ -55,7 +55,7 @@ serve de índice para a referência de cada um.
 ## Fontes oficiais
 
 - [Manual de administração Debian](https://www.debian.org/doc/manuals/debian-handbook/)
-- [Manual de proteção Debian](https://www.debian.org/doc/manuals/securing-debian-manual/)
+- [Manual de proteção Debian (repositório oficial)](https://salsa.debian.org/ddp-team/securing-debian-manual)
 - [Documentação geral do Ansible](https://docs.ansible.com/ansible/latest/)
 - [Precedência de variáveis](https://docs.ansible.com/ansible/latest/reference_appendices/general_precedence.html)
 - [Ansible Vault](https://docs.ansible.com/ansible/latest/vault_guide/)
