@@ -4,6 +4,36 @@ Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
 ## [Unreleased]
 
+## [0.41.1] - 2026-11-21
+
+### Corrigido
+
+Uma auditoria de documentação (Codex) encontrou 38 divergências: 14 erradas,
+8 desatualizadas, 14 faltando e 2 cosméticas. Todas foram corrigidas:
+
+- Referência de comandos (`docs/user/cli-reference.md`):
+  - passou a cobrir `specialists suggest` (e `skills suggest`),
+    `tasks next --phase red`, `verify --spec` e `--self-test`,
+    `install --latest`, `inbox capture --slug`,
+    `skills install --force`, `about`, `completion` e `--opencli`;
+  - descreve o que `specs transition` e `inbox process` atualizam;
+  - corrige a descrição do `skills list`;
+  - explica que `milestones sync --json` grava arquivos.
+- Exemplos corrigidos: a invocação do scaffold do pipeline, o fluxo de inbox
+  do guia do CLI, a spec de exemplo com a linha Especialistas e os critérios de
+  aceite do teste do visitante.
+- O índice de especialistas mostra o modo `pipeline` e corrige o que dizia
+  sobre detecção e sugestão. O método descreve a linha Especialistas e o
+  Contrato CRUD com `Operações`.
+- README do CLI: os prints e o logo voltaram a carregar. A lista de etapas do
+  `validate` inclui o `launcher:check`.
+- `cli/docs`, `CLISPEC`, o fluxo de release (etapas de site e Hub, rotas
+  com 301 e 410) e o guia de skills foram alinhados ao binário.
+- A regeneração dos sinais (`npm run signals`) foi documentada no
+  CONTRIBUTING, no guia do catálogo e no template, que também passou a
+  registrar `modes[].absorbs`.
+- Um link oficial quebrado no especialista `server` foi trocado.
+
 ## [0.41.0] - 2026-11-21
 
 ### Adicionado
