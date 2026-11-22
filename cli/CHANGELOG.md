@@ -2,6 +2,10 @@
 
 Todas as mudanças relevantes do Specsfy CLI são registradas neste arquivo.
 
+## [0.41.3] - 2026-11-22
+
+- Documenta a atualização das tarefas do ClickUp para pronto após o commit e publicado após o push.
+
 ## [Unreleased]
 
 ## [0.41.2] - 2026-11-21
