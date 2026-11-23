@@ -10,21 +10,21 @@ const removed=['mark.svg','favicon.svg','logo/logo.md'];
 test('READMEs rastreados adotam logo canônico com fallback PNG',()=>{
 // cli/docs/ e cli/template/ são documentação embutida no binário e stubs do Termfy, sem logo. O README do pacote npm usa URLs públicas.
  const files=execFileSync('git',['ls-files','-z'],{cwd:ROOT,encoding:'utf8'}).split('\0').filter(path=>(path.endsWith('/README.md')||path==='README.md')&&!/^cli\/(\.agents\/skills\/termfy|docs\/|template\/)/.test(path));assert.ok(files.length);
- for(const path of files){const text=read(path);if(path==='cli/npm/README.md'){includes(text,['srcset="https://promovaweb.com/opensource/specsfy/icon.svg"','src="https://promovaweb.com/opensource/specsfy/icon.png"']);continue;}
+ for(const path of files){const text=read(path);if (path === "README.md") { includes(text, ['srcset="https://raw.githubusercontent.com/promovaweb/specsfy/main/brand/logo/icon.svg"', 'src="https://raw.githubusercontent.com/promovaweb/specsfy/main/brand/logo/icon.png"', 'alt="Specsfy"']); continue; } if(path==='cli/npm/README.md'){includes(text,['srcset="https://promovaweb.com/opensource/specsfy/icon.svg"','src="https://promovaweb.com/opensource/specsfy/icon.png"']);continue;}
  const logo=relative(dirname(join(ROOT,path)),join(ROOT,'brand/logo')).replaceAll('\\','/');includes(text,[`<source srcset="${logo}/icon.svg" type="image/svg+xml">`,`<img src="${logo}/icon.png" alt="Logo do Specsfy" width="128">`]);for(const asset of removed)assert.ok(!text.includes(asset),path+': '+asset);
  }
 });
 test('marca mantém vetor acessível e PNG de 512x512',()=>{
  const svg=read('brand/logo/icon.svg');
  const xpath=expression=>execFileSync('xmllint',['--nonet','--xpath',expression,'-'],{input:svg,encoding:'utf8'}).trim();
- for(const [field,expected] of Object.entries({width:'512',height:'512',viewBox:'0 0 512 512',role:'img'}))assert.equal(xpath(`string(/*/@${field})`),expected);
- assert.equal(xpath('string(/*/*[local-name()="title"])'),'Ícone principal do Specsfy');includes(xpath('string(/*/*[local-name()="desc"])'),['Camadas de especificação e código']);includes(svg,['#00161E','#A866FF','#2AD5BE','#C4B5FD']);
+ for(const [field,expected] of Object.entries({width:'512',height:'512',viewBox:'0 0 64 64',role:'img'}))assert.equal(xpath(`string(/*/@${field})`),expected);
+ assert.equal(xpath('string(/*/*[local-name()="title"])'),'Specsfy');includes(xpath('string(/*/*[local-name()="desc"])'),['Checklist da especificação']);includes(svg,['#201532','#B780FF','#F4EDFF']);
  const png=readFileSync(join(ROOT,'brand/logo/icon.png'));assert.deepEqual(png.subarray(0,8),Buffer.from([137,80,78,71,13,10,26,10]));assert.equal(png.readUInt32BE(16),512);assert.equal(png.readUInt32BE(20),512);
  for(const ext of ['svg','png'])assert.ok(!existsSync(join(ROOT,'brand/icons/icon.'+ext)));
 });
 test('manual e fontes de marca descrevem identidade canônica',()=>{
- includes(read('brand/logo/LOGO.md'),['# Sistema de logo do Specsfy','## Variantes','## Proteção e tamanho','## Restrições','512','três camadas','código','`icon.svg`','`icon.png`','28 px','12,5%','petróleo','violeta']);
- for(const path of ['README.md','guidelines.md','checklist.md','guide/brand-guide.md','style-guide.html','icons/icons.md']){const text=read('brand/'+path);includes(text.toLowerCase(),['camadas']);assert.ok(['icon.svg','logo-light.svg','brand/logo/'].some(term=>text.includes(term)),path);for(const asset of removed)assert.ok(!text.includes(asset),path+': '+asset);}
+ includes(read('brand/logo/LOGO.md'),['# Sistema de logo do Specsfy','## Variantes','## Proteção e tamanho','## Restrições','512','requisito concluído','em aberto','`icon.svg`','`icon.png`','28 px','12,5%','#201532','#B780FF']);
+ for(const path of ['README.md','guidelines.md','checklist.md','guide/brand-guide.md','style-guide.html','icons/icons.md']){const text=read('brand/'+path);assert.match(text.toLowerCase(), /checklist|requisitos? concluído/, path);assert.ok(['icon.svg','logo-light.svg','brand/logo/'].some(term=>text.includes(term)),path);for(const asset of removed)assert.ok(!text.includes(asset),path+': '+asset);}
 });
 test('paleta e tokens seguem as cores canônicas',()=>{
  const palette=read('brand/colors/palette.md');includes(palette,['#00161E','#FFFFFF','petróleo','logo']);includes(read('brand/colors/tokens.css'),['@import "../global.css"']);const tokens=JSON.parse(read('brand/colors/tokens.json'));assert.equal(tokens.families.primary['950'],'#00161E');assert.equal(tokens.light.background,'#FFFFFF');

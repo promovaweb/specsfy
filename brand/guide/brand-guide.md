@@ -17,21 +17,18 @@ fria.
 
 ![Ícone principal do Specsfy](../logo/icon.svg){width=128px}
 
-As três camadas representam decisões que permanecem conectadas durante a
-entrega. O código na camada superior indica que a especificação chega ao
-software executável.
+A checklist mostra um requisito concluído e outro em aberto.
 
 ### Variantes
 
-- `logo/icon.svg`: ícone principal com placa petróleo;
+- `logo/icon.svg`: ícone principal com placa violeta-escura;
 - `logo/icon-light.svg`: aplicação transparente em fundo claro;
 - `logo/icon-dark.svg`: aplicação transparente em fundo escuro;
 - `logo/logo-light.svg`: assinatura horizontal para fundo claro;
 - `logo/logo-dark.svg`: assinatura horizontal para fundo escuro;
 - `logo/icon.png`: fallback raster.
 
-Reserve 12,5% de espaço livre e não use o ícone abaixo de 28 px. Não remova,
-separe ou reordene camadas. Gradiente, sombra, filtro, rotação e deformação não
+Reserve 12,5% de espaço livre e não use o ícone abaixo de 28 px. Preserve os dois itens da checklist. Gradiente, sombra, filtro, rotação e deformação não
 são permitidos.
 
 ## Cores

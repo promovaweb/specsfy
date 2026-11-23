@@ -1,4 +1,9 @@
 {
+  "projectColor": {
+    "name": "Lilás",
+    "hex": "#B780FF",
+    "meaning": "O preenchimento lilás distingue o requisito já verificado da caixa que continua em aberto."
+  },
   "name": "Specsfy",
   "families": {
     "primary": {

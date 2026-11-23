@@ -1,7 +1,7 @@
 # Ícones conceituais — Specsfy
 
 O logo oficial vive exclusivamente em [`../logo/`](../logo/LOGO.md). Sua
-geometria de três camadas e símbolo de código não pertence a este conjunto e
+composição de dois requisitos em checklist não pertence a este conjunto e
 não deve ser copiada como ícone conceitual.
 
 ## Relação com o logo
@@ -15,8 +15,7 @@ específicos do método. Logo e ícones compartilham:
 - cantos e terminações controlados;
 - ausência de gradiente, sombra e decoração.
 
-Eles não são intercambiáveis. O logo sempre preserva as três camadas e o
-símbolo de código; um ícone conceitual nunca substitui essa assinatura.
+Eles não são intercambiáveis. O logo sempre preserva os dois itens da checklist; um ícone conceitual nunca substitui essa assinatura.
 
 ## Especificação técnica
 

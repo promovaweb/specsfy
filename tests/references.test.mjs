@@ -40,7 +40,7 @@ test('assets HTML, CSS e SVG resolvem',()=>{
 });
 test('navegação interna não usa URLs remotas do Git',()=>{
  const pattern=/https:\/\/(?:raw\.githubusercontent\.com\/promovaweb\/specsfy\/main\/|github\.com\/promovaweb\/specsfy\/(?:blob|tree)\/main\/)/;
- assert.deepEqual(files(['.md','.html']).filter(path=>pattern.test(readFileSync(path,'utf8'))).map(path=>relative(ROOT,path)),[]);
+ assert.deepEqual(files(['.md','.html']).filter(path=>pattern.test(readFileSync(path,'utf8').replace(/(?:src|srcset)="https:\/\/raw\.githubusercontent\.com\/promovaweb\/specsfy\/main\/brand\/logo\/icon\.(?:png|svg)"/g,''))).map(path=>relative(ROOT,path)),[]);
 });
 test('imagens do repositório possuem assinatura e dimensões válidas',()=>{
  const failures=[];

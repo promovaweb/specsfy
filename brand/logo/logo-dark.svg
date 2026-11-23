@@ -1,11 +1,5 @@
 <svg width="1120" height="320" viewBox="0 0 1120 320" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title">
   <title id="title">Logo horizontal do Specsfy para fundos escuros</title>
-  <g transform="translate(16 16) scale(.5625)">
-    <path d="M256 72L416 152L256 232L96 152L256 72Z" fill="#2AD5BE"/>
-    <path d="M96 248L256 328L416 248" stroke="#C4B5FD" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M96 344L256 424L416 344" stroke="#99F5ED" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M230 130L196 164L230 198" stroke="#021C26" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M282 130L316 164L282 198" stroke="#021C26" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
-  </g>
+  <g transform="translate(16 16) scale(4.5)"><g stroke-linecap="round" stroke-linejoin="round"><path stroke="#F4EDFF" stroke-width="4.5" d="M10 10h30"/><rect x="8" y="22" width="15" height="15" rx="3" fill="#B780FF"/><path fill="none" stroke="#201532" stroke-width="2.8" d="m11.5 29 3 3 5-6"/><rect x="9.5" y="44" width="12" height="12" rx="2" fill="none" stroke="#F4EDFF" stroke-width="3"/><path stroke="#F4EDFF" stroke-width="4" d="M32 30h22M32 50h16"/></g></g>
   <text x="336" y="205" fill="#ECFDFB" font-family="Manrope, Inter, Arial, sans-serif" font-size="128" font-weight="750" letter-spacing="-5">Specs<tspan fill="#C4B5FD">fy</tspan></text>
 </svg>

@@ -1,8 +1,8 @@
 <p align="center">
-  <a href="https://github.com/promovaweb/specsfy">
+  <a href="https://promovaweb.com/specsfy/">
     <picture>
-      <source srcset="brand/logo/icon.svg" type="image/svg+xml">
-      <img src="brand/logo/icon.png" alt="Logo do Specsfy" width="128">
+      <source type="image/svg+xml" srcset="https://raw.githubusercontent.com/promovaweb/specsfy/main/brand/logo/icon.svg">
+      <img alt="Specsfy" src="https://raw.githubusercontent.com/promovaweb/specsfy/main/brand/logo/icon.png" width="112" height="112">
     </picture>
   </a>
 </p>
@@ -27,7 +27,10 @@
 </p>
 
 <p align="center">
+  <a href="https://promovaweb.com/specsfy/">Site do Specsfy</a> ·
   <a href="https://promovaweb.com/docs/specsfy/">Documentação</a> ·
+  <a href="https://promovaweb.com/harness/">Harness</a> ·
+  <a href="https://promovaweb.com/ferramentas/">Ferramentas</a> ·
   <a href="https://promovaweb.com/discord">Discord</a> ·
   <a href="https://promovaweb.com/planos?utm_source=github&utm_medium=readme&utm_campaign=specsfy">Planos da Promovaweb</a> ·
   <a href="cli/CHANGELOG.md">Changelog</a>

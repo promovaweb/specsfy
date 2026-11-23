@@ -2,12 +2,12 @@
 Feature: Sistema oficial de logo do Specsfy
   Para manter uma identidade única em todo o monorepo
   Como equipe responsável pela marca
-  Quero derivar o guia completo do novo símbolo em camadas
+  Quero derivar o guia do símbolo de checklist
 
   Scenario: Publicar o novo logo canônico
     Given os novos arquivos SVG e PNG do logo
     When a construção vetorial é inspecionada
-    Then o logo preserva as três camadas e o símbolo de código
+    Then o logo preserva o requisito marcado e a caixa em aberto
     And o PNG preserva a prancheta quadrada de 512 pixels
 
   Scenario: Documentar todas as regras do logo

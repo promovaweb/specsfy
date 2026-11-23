@@ -1,6 +1,6 @@
 # Referência rápida do Specsfy
 
-- Marca: três camadas com código.
+- Marca: checklist com um requisito concluído e outro em aberto.
 - Cor de produto: violeta.
 - Fonte de títulos: Manrope.
 - Fonte de interface: Inter.

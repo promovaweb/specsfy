@@ -1,10 +1,5 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title description">
-  <title id="title">Ícone principal do Specsfy</title>
-  <desc id="description">Camadas de especificação e código nas cores petróleo, violeta e turquesa.</desc>
-  <rect width="512" height="512" rx="112" fill="#00161E"/>
-  <path d="M256 72L416 152L256 232L96 152L256 72Z" fill="#A866FF"/>
-  <path d="M96 248L256 328L416 248" stroke="#2AD5BE" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M96 344L256 424L416 344" stroke="#C4B5FD" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M230 130L196 164L230 198" stroke="#ECFDFB" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M282 130L316 164L282 198" stroke="#ECFDFB" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 64 64" role="img" aria-label="Specsfy">
+  <title>Specsfy</title>
+  <desc>Checklist da especificação com um requisito concluído e outro em aberto.</desc>
+  <rect width="64" height="64" rx="12" fill="#201532"/><g stroke-linecap="round" stroke-linejoin="round"><path stroke="#F4EDFF" stroke-width="4.5" d="M10 10h30"/><rect x="8" y="22" width="15" height="15" rx="3" fill="#B780FF"/><path fill="none" stroke="#201532" stroke-width="2.8" d="m11.5 29 3 3 5-6"/><rect x="9.5" y="44" width="12" height="12" rx="2" fill="none" stroke="#F4EDFF" stroke-width="3"/><path stroke="#F4EDFF" stroke-width="4" d="M32 30h22M32 50h16"/></g>
 </svg>

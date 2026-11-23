@@ -2,7 +2,7 @@
 
 - [ ] O ativo veio de `brand/logo/`.
 - [ ] A variante corresponde ao fundo.
-- [ ] As três camadas permanecem completas e ordenadas.
+- [ ] Os requisitos concluído e em aberto estão legíveis.
 - [ ] A área de proteção e o tamanho mínimo foram preservados.
 - [ ] Violeta e turquesa cumprem funções distintas.
 - [ ] A interface usa tokens de `global.css` ou `tailwind-theme.js`.

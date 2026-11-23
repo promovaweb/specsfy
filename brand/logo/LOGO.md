@@ -1,39 +1,17 @@
 # Sistema de logo do Specsfy
 
-As três camadas com código representam especificação, implementação e
-evidência conectadas. A geometria principal vive em `icon.svg`; as demais
-versões são derivações aprovadas.
-
-O arquivo `icon.svg` usa uma prancheta de 512 × 512 px, preservada também no
-fallback `icon.png`.
+Checklist da especificação com um requisito concluído e outro em aberto. A cor do projeto é `#B780FF`. O símbolo usa um quadro quadrado de 64 unidades e margem óptica próxima de 6 unidades.
 
 ## Variantes
 
-| Arquivo | Fundo |
-| --- | --- |
-| `icon.svg` | qualquer superfície, pois inclui placa petróleo |
-| `icon-light.svg` | clara e uniforme |
-| `icon-dark.svg` | escura e uniforme |
-| `logo-light.svg` | assinatura horizontal sobre superfície clara |
-| `logo-dark.svg` | assinatura horizontal sobre superfície escura |
-| `icon.png` | sistemas sem suporte a SVG |
+Use `icon.svg` com a placa própria, `icon-light.svg` sobre fundo claro e `icon-dark.svg` sobre fundo escuro. As assinaturas horizontais preservam o nome.
+
+O fallback `icon.png` mede 512 × 512 pixels. Use `logo-light.svg` ou `logo-dark.svg` para as assinaturas horizontais.
 
 ## Proteção e tamanho
 
-- área livre: 12,5% da largura do ativo em todos os lados;
-- ícone digital: mínimo de 28 px;
-- assinatura horizontal: mínimo de 130 px;
-- impressão: mínimo de 9 mm para o ícone.
+Reserve 12,5% de espaço livre e mantenha o símbolo com pelo menos 28 px. A caixa lilás (`#B780FF`) distingue o requisito concluído sobre a placa escura (`#201532`).
 
 ## Restrições
 
-- Não distorcer, girar, inclinar ou recortar.
-- Não remover, separar ou reordenar as três camadas.
-- Não inverter a imagem com filtros.
-- Não aplicar gradiente, sombra, brilho, textura ou contorno.
-- Não trocar violeta e turquesa por cores de estado.
-- Não usar uma variante transparente sobre fundo sem contraste.
-
-No SVG informativo, preserve título e descrição. Em HTML, use
-`alt="Logo do Specsfy"` ou `alt=""` quando o nome visível já identificar a
-marca.
+Preserve os dois itens e a marca de verificação. Mantenha a proporção do arquivo e as cores da variante escolhida.
