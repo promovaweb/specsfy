@@ -13,6 +13,7 @@ for (const [description, expected, present] of [
   ['[CODE] [US-001] Criar tabela de clientes em app/Models/Cliente.php', 'sem uma tarefa [MIGRATION]', true],
   ['[CODE] [US-001] Consultar clientes no banco em app/Queries/ListarClientes.php', 'sem uma tarefa [MIGRATION]', false],
   ['[CODE] [MIGRATION] [US-001] Criar tabela em app/Models/Cliente.php', 'diretório de migrations', true],
+  ['[CODE] [MIGRATION] [US-001] Criar tabela em alembic/versions/0001_clientes.py', 'diretório de migrations', false],
 ]) {
   test('planejamento: ' + description, t => {
     const root = temporary(t);
@@ -44,4 +45,14 @@ test('delivery recusa migration aberta, aceita seu planejamento', t => {
   assert.equal(planning.status, 0, planning.stdout + planning.stderr);
   const delivery = node(evidence, [spec, root, '--json', '--delivery']);
   assert.ok(JSON.parse(delivery.stdout).errors.some(error => error.includes('migration planejada ainda não foi concluída')));
+});
+
+test('conclusão aceita migration do Alembic com upgrade e current', t => {
+  const root = temporary(t);
+  put(root, 'alembic/versions/0001_clientes.py', '# migration\n');
+  const alembic = completed.replace('database/migrations/2026_create_clients.php', 'alembic/versions/0001_clientes.py');
+  const record = { task: 'T004', refs: ['US-001', 'FR-001', 'AC-001'], files: ['alembic/versions/0001_clientes.py'], commands: ['uv run alembic upgrade head', 'uv run alembic current'].map(run => ({ run, exit: 0 })) };
+  const spec = put(root, 'specs/completed/0001-clientes/spec.md', alembic + `  <!-- specsfy:evidence ${JSON.stringify(record)} -->\n`);
+  const result = node(evidence, [spec, root, '--json']);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
 });

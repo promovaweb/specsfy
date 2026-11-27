@@ -14,7 +14,7 @@ const SCHEMA_TARGETS = "schema|tabela|coluna|campo\\s+persistente|model\\s+persi
 const word = (alternatives) => `(?<![\\p{L}\\p{N}_])(?:${alternatives})(?![\\p{L}\\p{N}_])`;
 const SCHEMA_CHANGE_TASK = new RegExp(`${word(SCHEMA_VERBS)}.*${word(SCHEMA_TARGETS)}|${word(SCHEMA_TARGETS)}.*${word(SCHEMA_VERBS)}`, "iu");
 /** Aceita os diretórios versionados usados pelos frameworks cobertos. */
-const MIGRATION_PATH = /(?:^|[\s`])(?:database\/migrations|migrations|prisma\/migrations|supabase\/migrations)\/[\w./-]+/i;
+const MIGRATION_PATH = /(?:^|[\s`])(?:database\/migrations|migrations|prisma\/migrations|supabase\/migrations|alembic\/versions)\/[\w./-]+/i;
 const args = process.argv.slice(2);
 const projectFlag = args.indexOf("--project");
 const project = projectFlag < 0 ? undefined : args[projectFlag + 1];
