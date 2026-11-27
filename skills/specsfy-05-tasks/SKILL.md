@@ -206,8 +206,8 @@ Quando `Interface para pessoas` for `Sim`:
   Ela aponta para o arquivo versionado no diretório de migrations do projeto,
   depende dos testes TDD e precede o código que usa a nova estrutura.
 - Use a tag `[MIGRATION]` somente junto de `[CODE]` ou `[OPS]`, com caminho em
-  `database/migrations/`, `migrations/`, `prisma/migrations/` ou
-  `supabase/migrations/`, conforme a stack encontrada.
+  `database/migrations/`, `migrations/`, `prisma/migrations/`,
+  `supabase/migrations/` ou `alembic/versions/`, conforme a stack encontrada.
 - Leitura, consulta ou uso de tabela existente não exige `[MIGRATION]` por si
   só. A tag é obrigatória quando o plano cria ou altera a estrutura.
 - O item `VERIFY` da tarefa `[MIGRATION]` registra dois comandos aprovados pelo
