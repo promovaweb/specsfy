@@ -23,3 +23,9 @@ test('template, framework e documentação publicam o mesmo mínimo',()=>{
  const template=read('skills/templates/Spec.md');for(const id of ['AC-001','AC-002','AC-003'])assert.ok(template.includes(id));
  for(const path of ['skills/Spec.md','docs/develop/context/engineering/testing.md']){const text=read(path);assert.ok(text.includes('três'));assert.ok(text.includes('SPECSFY:'));}
 });
+test('marcadores em testes Dart (Flutter) entram na rastreabilidade',t=>{
+ const root=temporary(t),spec=put(root,'specs/specs/0001-example/spec.md','#### US-001 — Example\n#### AC-001 — Example\n#### AC-002 — Example\n#### AC-003 — Example\n- **FR-001**: Example.\n- **NFR-001**: Example. **Verificação**: teste.\n');
+ put(root,'apps/mobile/test/example_test.dart',Array.from({length:3},(_,i)=>`  // SPECSFY: US-001 FR-001 NFR-001 AC-00${i+1}\n  testWidgets('case${i}', (tester) async {});\n`).join(''));
+ const result=node(trace,[spec,root,'--json']);assert.equal(result.status,0,result.stdout+result.stderr);
+ assert.ok(JSON.parse(result.stdout).files.includes('apps/mobile/test/example_test.dart'));
+});
